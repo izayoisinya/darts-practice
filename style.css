@@ -580,3 +580,23 @@ gap: 24px;
 .next-button:not(:disabled) {
   box-shadow: 0 0 20px rgba(0, 255, 200, 0.4);
 }
+
+
+
+@media (max-width: 900px) and (orientation: landscape) {
+  
+  .container {
+    flex-direction: column;
+    height: calc(100dvh - 140px);
+  }
+  
+  .round-area,
+  .input-area,
+  .stats-area {
+    flex: 1;
+    min-height: 0;
+  }
+  
+}
+
+

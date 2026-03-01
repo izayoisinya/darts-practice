@@ -16,11 +16,9 @@ body {
 
 }
 
-html,
-body {
-  min-height: 100dvh;
-  
-  touch-action: manipulation;
+html, body {
+  height: 100%;
+  overflow: hidden;   /* ← ページ全体スクロール禁止 */
 }
 
 button {
@@ -109,8 +107,9 @@ gap: 24px;
   align-items: stretch; /* ← 高さ統一 */
   
   padding-bottom: calc(20px + env(safe-area-inset-bottom));
-  min-height: calc(100dvh - 140px);
-  height: auto;
+  
+  height: calc(100dvh - 140px); /* ヘッダー差し引き */
+  overflow: hidden;
   
   overflow-x: auto;
   overflow-y: visible; /* ← hidden を消す */
@@ -195,6 +194,15 @@ gap: 24px;
 .divider {
   margin: 0 14px;
   color: #6b7280;
+}
+
+.round-list,
+.number-table,
+.stats-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Dart Colors */

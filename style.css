@@ -21,7 +21,6 @@ body {
   min-height: 100dvh;
   
   touch-action: manipulation;
-  overscroll-behavior: none;
 }
 
 button {

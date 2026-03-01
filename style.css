@@ -582,21 +582,36 @@ gap: 24px;
 }
 
 
+/* デフォルト：詳細表示ON（iPad想定） */
+.stats-detail {
+  display: block;
+}
 
+/* iPhone横のみ */
 @media (max-width: 900px) and (orientation: landscape) {
   
   .container {
-    flex-direction: column;
-    height: calc(100dvh - 140px);
+    grid-template-columns: 1fr 1fr 0.7fr;
   }
   
-  .round-area,
-  .input-area,
-  .stats-area {
-    flex: 1;
-    min-height: 0;
+  .stats-detail {
+    display: none;
+  }
+  
+  .stats-detail.open {
+    display: block;
+  }
+  
+  .stats-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+  }
+  
+  .expand-btn {
+    margin-top: 6px;
   }
   
 }
-
 

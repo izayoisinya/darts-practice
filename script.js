@@ -577,8 +577,13 @@ document
     .catch(err => console.log("SW error", err));
 }
   
-  
-  
+document
+  .getElementById("toggleStats")
+  .addEventListener("click", () => {
+    document
+      .querySelector(".stats-detail")
+      .classList.toggle("open");
+  });  
   
   
   

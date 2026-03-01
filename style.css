@@ -4,11 +4,16 @@
 
 /* ===== Base ===== */
 body {
+  
+  height: 100%;
+  min-height: 100dvh;
+  
   margin: 0;
   background: #0f1115;
   color: #e6edf3;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   
+  padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
 
 }
@@ -97,6 +102,10 @@ gap: 24px;
   gap: 20px;
   align-items: stretch; /* ← 高さ統一 */
   overflow: hidden;
+  
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+
+  
 }
 
 .container > div {

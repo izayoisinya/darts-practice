@@ -4,6 +4,15 @@ let bullMode = "fat";
 let lockedRound = -1;
 let sessions = [];
 
+function detectIphone() {
+  const isIphone = /iPhone/.test(navigator.userAgent);
+  if (isIphone) {
+    document.body.classList.add("iphone-mode");
+  }
+}
+
+detectIphone();
+
 // ====== ゲーム状態 ======
 const game = {
   rounds: [],
@@ -576,14 +585,40 @@ document
     .then(() => console.log("SW registered"))
     .catch(err => console.log("SW error", err));
 }
-  
-document
-  .getElementById("toggleStats")
-  .addEventListener("click", () => {
+
+
+// ===== iPhone検出 =====
+function detectIphone() {
+  const isIphone =
+  /iPhone/.test(navigator.userAgent) &&
+  window.innerWidth < 900;
+  if (isIphone) {
+    document.body.classList.add("iphone-mode");
+  }
+}
+detectIphone();
+
+// ===== Statsトグル =====
+const statsBtn = document.getElementById("statsToggleBtn");
+
+if (statsBtn) {
+  statsBtn.addEventListener("click", () => {
+    document.body.classList.toggle("iphone-stats-open");
+    
+    if (document.body.classList.contains("iphone-stats-open")) {
+      statsBtn.textContent = "◀";
+    } else {
+      statsBtn.textContent = "▶";
+    }
+  });
+}
+
+// ===== compact展開 =====
+const toggleBtn = document.getElementById("toggleStats");
+if (toggleBtn) {
+  toggleBtn.addEventListener("click", () => {
     document
       .querySelector(".stats-detail")
       .classList.toggle("open");
-  });  
-  
-  
-  
+  });
+}

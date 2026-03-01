@@ -104,20 +104,13 @@ gap: 24px;
 .container {
   display: flex;
   gap: 20px;
-  align-items: stretch; /* ← 高さ統一 */
-  
+  align-items: stretch;
+
+  height: calc(100dvh - 140px);
+  overflow: hidden; /* ← これだけでいい */
+  min-width: 0;
+
   padding-bottom: calc(20px + env(safe-area-inset-bottom));
-  
-  height: calc(100dvh - 140px); /* ヘッダー差し引き */
-  overflow: hidden;
-  
-  overflow-x: auto;
-  overflow-y: visible; /* ← hidden を消す */
-
-}
-
-.container > div {
-  flex-shrink: 0;
 }
 
 /* ===== Columns ===== */
@@ -131,19 +124,16 @@ gap: 24px;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  min-width: 0;
   overflow: hidden;      /* 外は固定 */
   
   height: auto;
 
 }
 
-.round-area { flex: 1.5; min-width: 400px; }
-.input-area { flex: 0.8; min-width: 250px; }
-.stats-area {
-  flex: 1;
-  min-width: 350px;
-  overflow-y: auto;
-}
+.round-area { flex: 1.5; }
+.input-area { flex: 0.8; }
+.stats-area { flex: 1; }
 
 /* Scroll */
 .stats-area::-webkit-scrollbar,
@@ -463,18 +453,6 @@ gap: 24px;
   border-radius: 10px;
 }
 
-/* ===== Horizontal Scroll Restore ===== */
-
-/* 横スクロールバー */
-.container::-webkit-scrollbar {
-  height: 6px;
-}
-
-.container::-webkit-scrollbar-thumb {
-  background: #2b313d;
-  border-radius: 10px;
-}
-
 /* ===== Score Panel Layout ===== */
 .score-panel {
   min-height: 140px;
@@ -587,31 +565,63 @@ gap: 24px;
   display: block;
 }
 
-/* iPhone横のみ */
-@media (max-width: 900px) and (orientation: landscape) {
-  
-  .container {
-    grid-template-columns: 1fr 1fr 0.7fr;
-  }
-  
-  .stats-detail {
-    display: none;
-  }
-  
-  .stats-detail.open {
-    display: block;
-  }
-  
-  .stats-compact {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 14px;
-  }
-  
-  .expand-btn {
-    margin-top: 6px;
-  }
-  
+
+
+/* ===================================== */
+/* ========== iPhone専用UI ============= */
+/* ===================================== */
+
+.stats-toggle {
+  display: none;
 }
 
+/* iPhone検出時 */
+body.iphone-mode .stats-toggle {
+  display: block;
+  position: fixed;
+  bottom: 20px;
+  right: 15px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #00ffc8;
+  color: #000;
+  border: none;
+  font-weight: bold;
+  font-size: 18px;
+  z-index: 999;
+}
+
+/* ヘッダー圧縮 */
+body.iphone-mode .header {
+  height: 90px;
+}
+
+body.iphone-mode .score-value {
+  font-size: 38px;
+}
+
+body.iphone-mode .sub-value {
+  font-size: 20px;
+}
+
+/* 初期状態：Stats非表示 */
+body.iphone-mode .stats-area {
+  display: none;
+}
+
+/* Stats開いたら */
+body.iphone-mode.iphone-stats-open .input-area {
+  display: none;
+}
+
+body.iphone-mode.iphone-stats-open .stats-area {
+  display: flex;
+}
+
+/* スクロールは内部のみ */
+body.iphone-mode .round-list,
+body.iphone-mode .number-table,
+body.iphone-mode .stats-area {
+  overflow-y: auto;
+}

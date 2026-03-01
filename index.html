@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Darts Practice</title>
+  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1115">
+<link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+
+  <!-- ================= HEADER ================= -->
+<header class="header">
+  <div class="score-panel">
+  <div class="score-block">
+    <div class="total-label">TOTAL SCORE</div>
+    <div class="score-value" id="totalScore"></div>
+  </div>
+  
+  <div class="darts-block">
+    <div class="total-label">TOTAL DARTS</div>
+    <div class="sub-value" id="totalDarts"></div>
+  </div>
+  
+  <button id="nextGameBtn" class="next-button" disabled>
+  NEXT GAME
+</button>
+</div>
+</header>
+
+
+
+  <!-- ================= MAIN ================= -->
+  <div class="container">
+
+    <!-- ===== ROUNDS ===== -->
+    <div class="round-area">
+      <h2>Rounds</h2>
+      <div class="round-list">
+        <div id="roundContainer"></div>
+      </div>
+    </div>
+
+    <!-- ===== INPUT ===== -->
+    <div class="input-area">
+      <h2>Input</h2>
+
+      <div class="bull-setting">
+        <span class="label">Bull Mode</span>
+        <span class="value">FAT</span>
+      </div>
+
+      <div class="top-buttons">
+        <button data-display="Bull">Bull</button>
+        <button data-display="InBull">In</button>
+        <button data-display="Miss">Miss</button>
+        <button id="undoBtn">戻る</button>
+      </div>
+
+      <div id="numberTable" class="number-table"></div>
+    </div>
+
+    <!-- ===== STATS ===== -->
+<div class="stats-area">
+  <h2>Stats</h2>
+  
+  <div class="bull-group">
+    
+    <div class="stat-row">
+      <span class="label">Bulls</span>
+      <span class="value" id="bullCount">0</span>
+      <div class="stat-divider"></div>
+      <div class="bar-bg">
+        <div class="bar-fill" id="bullRateBar"></div>
+      </div>
+      <span class="percent" id="bullPercent">0.0%</span>
+    </div>
+    
+    <div class="stat-row">
+      <span class="label">Inner</span>
+      <span class="value" id="innerBulls">0</span>
+      <div class="stat-divider"></div>
+      <div class="bar-bg">
+        <div class="bar-fill inner" id="innerBullRateBar"></div>
+      </div>
+      <span class="percent" id="innerBullPercent">0.0%</span>
+    </div>
+    
+  </div>
+  
+  <!-- Performance -->
+  <div class="stat-item">
+    <span class="label">PPD</span>
+    <span class="value" id="ppd">0.00</span>
+  </div>
+  
+  <div class="stat-item" id="threeDABox">
+    <span class="label">3DA</span>
+    <span class="value" id="threeDAvg">0.00</span>
+  </div>
+  
+  <div class="stat-item">
+    <span class="label">Round Avg</span>
+    <span class="value" id="roundAvg">0.0</span>
+  </div>
+  
+  <div class="stat-item">
+    <span class="label">Max Round</span>
+    <span class="value" id="maxRound">0</span>
+  </div>
+  
+  <h3 class="awards-title">Awards</h3>
+  <div id="awardsContainer" class="stats-grid"></div>
+  
+  <h3 class="awards-title">Score Graph</h3>
+  <canvas id="scoreChart" height="180"></canvas>
+  
+</div>
+  <script src="script.js"></script>
+</body>
+</html>

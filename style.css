@@ -1,0 +1,557 @@
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===== Base ===== */
+body {
+  margin: 0;
+  background: #0f1115;
+  color: #e6edf3;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  padding-bottom: env(safe-area-inset-bottom);
+
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+h2 {
+  margin: 0 0 16px 0;
+}
+
+/* ===== Header ===== */
+.header {
+  background: #11151c;
+  border-bottom: 1px solid #222733;
+  padding: 0 40px;
+  height: 140px;
+
+  display: flex;
+  align-items: center;
+
+}
+
+.header-inner {
+  display: flex;
+align-items: flex-start;
+gap: 24px;
+}
+
+.header-left {
+  display: flex;
+  gap: 40px;
+}
+
+.score-block,
+.darts-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.total-label {
+  font-size: 12px;
+  color: #8b949e;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.total-score {
+  font-size: 56px;
+  font-weight: 700;
+  color: #00ffc8;
+  text-shadow: 0 0 15px rgba(0, 255, 200, 0.4);
+}
+
+.total-darts {
+  font-size: 28px;
+  font-weight: 600;
+  color: #69f0ae;
+}
+
+/* NEXT */
+.next-button {
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  color: #00ffc8;
+  border: 2px solid #00ffc8;
+  transition: 0.2s ease;
+}
+
+.next-button:hover {
+  background: #00ffc8;
+  color: #000;
+}
+
+/* ===== Layout ===== */
+.container {
+  height: calc(100vh - 140px); /* ヘッダー高さに合わせて調整 */
+  display: flex;
+  gap: 20px;
+  align-items: stretch; /* ← 高さ統一 */
+  overflow: hidden;
+}
+
+.container > div {
+  flex-shrink: 0;
+}
+
+/* ===== Columns ===== */
+.round-area,
+.input-area,
+.stats-area {
+  background: #11151c;
+  border: 1px solid #222733;
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;      /* 外は固定 */
+}
+
+.round-area { flex: 1.5; min-width: 400px; }
+.input-area { flex: 0.8; min-width: 250px; }
+.stats-area {
+  flex: 1;
+  min-width: 350px;
+  overflow-y: auto;
+}
+
+/* Scroll */
+.stats-area::-webkit-scrollbar,
+.round-list::-webkit-scrollbar,
+.number-table::-webkit-scrollbar {
+  width: 6px;
+}
+
+.stats-area::-webkit-scrollbar-thumb,
+.round-list::-webkit-scrollbar-thumb,
+.number-table::-webkit-scrollbar-thumb {
+  background: #2b313d;
+  border-radius: 10px;
+}
+
+/* ===== Rounds ===== */
+.round-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.round {
+  display: grid;
+  grid-template-columns: 60px 1fr 40px 60px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #222733;
+}
+
+.round-score {
+  text-align: right;
+  font-weight: 600;
+}
+
+.round-darts {
+  display: flex;
+  align-items: center;
+}
+
+.dart {
+  width: 55px;
+  text-align: center;
+  padding: 8px 0;
+  background: #1c212c;
+  border-radius: 8px;
+}
+
+.divider {
+  margin: 0 14px;
+  color: #6b7280;
+}
+
+/* Dart Colors */
+.dart.inner-bull { background: #2b1f00; color: #ffd54f; }
+.dart.outer-bull { background: #002b24; color: #00ffc8; }
+.dart.double { background: #2b0005; color: #ff4d4d; }
+.dart.triple { background: #0a1a2b; color: #4dabff; }
+.dart.miss { background: #141414; color: #444; }
+
+/* ===== Input ===== */
+.bull-setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #161a22;
+  border: 1px solid #222733;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.top-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.top-buttons button {
+  padding: 10px 0;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Number table */
+.number-table {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.number-row {
+  display: grid;
+  grid-template-columns: 1fr 60px 60px;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.number-row button {
+  padding: 8px;
+  border-radius: 8px;
+  background: #1c212c;
+  color: #e6edf3;
+  border: 1px solid #2b313d;
+}
+
+/* ===== Stats ===== */
+
+.stat-item {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+.value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #69f0ae;
+}
+
+/* ===== Bull Row Layout ===== */
+.stat-row {
+  display: grid;
+  grid-template-columns: max-content max-content 2px 1fr max-content;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.stat-row .label {
+  font-size: 15px;
+  font-weight: 700;
+  opacity: 1;
+  color: #ffffff;
+}
+
+.stat-row:first-child .label {
+  color: #00ffc8;
+}
+
+.stat-row:nth-child(2) .label {
+  color: #ffd54f;
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-divider {
+  width: 2px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+.bar-bg {
+  height: 12px;
+  background: #1c212c;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  width: 0%;
+  background: #00ffc8;
+  transition: width 0.3s ease;
+}
+
+.bar-fill.inner {
+  background: #ffd54f;
+}
+
+.percent {
+  font-size: 14px;
+  min-width: 50px;
+  text-align: right;
+  color: #9ca3af;   /* 少し落ち着かせる */
+  font-weight: 500;
+}
+
+.stat-row:first-child .percent {
+  color: #00ffc8;
+}
+
+.stat-row:nth-child(2) .percent {
+  color: #ffd54f;
+}
+
+/* ===== Top Button Colors ===== */
+
+/* Bull */
+.top-buttons button[data-display="Bull"] {
+  background: #002b24;
+  color: #00ffc8;
+}
+
+.top-buttons button[data-display="Bull"]:hover {
+  background: #003f34;
+}
+
+/* In Bull */
+.top-buttons button[data-display="InBull"] {
+  background: #2b1f00;
+  color: #ffd54f;
+}
+
+.top-buttons button[data-display="InBull"]:hover {
+  background: #3a2900;
+}
+
+/* Miss */
+.top-buttons button[data-display="Miss"] {
+  background: #1a1a1a;
+  color: #888;
+  border: 1px solid #2a2a2a;
+}
+
+.top-buttons button[data-display="Miss"]:hover {
+  background: #222;
+  color: #aaa;
+}
+
+/* Undo */
+#undoBtn {
+  background: #3a1f1f;
+  color: #ff6b6b;
+}
+
+#undoBtn:hover {
+  background: #502828;
+}
+
+/* ===== Number Button Colors ===== */
+
+/* 通常数字 */
+.number-row button:first-child {
+  background: #1c212c;
+  color: #e6edf3;
+}
+
+/* Double */
+.number-row button:nth-child(2) {
+  background: #2b0005;
+  color: #ff4d4d;
+  border: 1px solid rgba(255, 77, 77, 0.4);
+}
+
+/* Triple */
+.number-row button:nth-child(3) {
+  background: #0a1a2b;
+  color: #4dabff;
+  border: 1px solid rgba(77, 171, 255, 0.4);
+}
+
+/* ===== Scroll Fix ===== */
+
+/* 親が縮められるように */
+.round-area,
+.input-area,
+.stats-area {
+  min-height: 0;
+}
+
+/* Roundsスクロール */
+.round-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Numberテーブルスクロール */
+.number-table {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Statsスクロール */
+.stats-area {
+  overflow-y: auto;
+}
+
+/* Scrollbar style */
+.round-list::-webkit-scrollbar,
+.number-table::-webkit-scrollbar,
+.stats-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.round-list::-webkit-scrollbar-thumb,
+.number-table::-webkit-scrollbar-thumb,
+.stats-area::-webkit-scrollbar-thumb {
+  background: #2b313d;
+  border-radius: 10px;
+}
+
+/* ===== Horizontal Scroll Restore ===== */
+.container {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* 横スクロールバー */
+.container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #2b313d;
+  border-radius: 10px;
+}
+
+/* ===== Score Panel Layout ===== */
+.score-panel {
+  display: flex;
+  align-items: center;
+  gap: 40px;               /* ← 80 → 40 に */
+
+  height: 140px;
+  width: 100%;
+  padding: 0 50px;
+
+  border-radius: 20px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(0,255,200,0.08),
+    rgba(0,150,255,0.05)
+  );
+
+  border: 1px solid rgba(0,255,200,0.15);
+  box-shadow:
+    0 0 40px rgba(0,255,200,0.15),
+    inset 0 0 40px rgba(0,255,200,0.08);
+}
+
+.score-block,
+.darts-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.score-block {
+  min-width: 260px;
+}
+
+/* スコア */
+.score-value {
+  font-size: 64px;
+  font-weight: 800;
+  color: #00ffc8;
+
+  text-shadow:
+    0 0 8px rgba(0,255,200,0.8),
+    0 0 20px rgba(0,255,200,0.7),
+    0 0 40px rgba(0,255,200,0.5),
+    0 0 80px rgba(0,255,200,0.3);
+}
+
+/* ダーツ */
+.score-darts {
+  text-align: right;
+}
+
+.sub-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #69f0ae;
+}
+
+/* ボタン */
+.next-button {
+  width: 160px;
+  height: 48px;
+  border-radius: 20px;
+   font-size: 16px;        /* ← 今より少し大きく */
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-left: auto;   /* ← これが重要 */
+
+}
+/* ===== Score Glow Restore ===== */
+
+.score-value {
+  font-size: 64px;
+  font-weight: 800;
+  color: #00ffc8;
+  font-variant-numeric: tabular-nums;
+  
+  text-shadow:
+    0 0 8px rgba(0, 255, 200, 0.8),
+    0 0 20px rgba(0, 255, 200, 0.7),
+    0 0 40px rgba(0, 255, 200, 0.5),
+    0 0 80px rgba(0, 255, 200, 0.3);
+}
+
+.score-value {
+  line-height: 1;
+}
+
+.sub-value {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.next-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #1c212c;
+  border-color: #2b313d;
+  color: #666;
+}
+
+.next-button:not(:disabled) {
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.4);
+}

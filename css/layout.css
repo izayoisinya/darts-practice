@@ -272,12 +272,15 @@ body.iphone-mode .score-block {
   
   body.iphone-mode .number-table {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px 14px;
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+    gap: 8px 20px;
   }
   
   body.iphone-mode .number-row {
   width: 100%;
+  display: flex;
+justify-content: space-between;
+gap: 6px;
 }
 
 body.iphone-mode .number-table button {

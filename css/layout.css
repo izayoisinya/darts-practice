@@ -298,7 +298,8 @@ body.iphone-mode.iphone-stats-open .stats-area {
 /* iPhone 横専用 3カラムレイアウト */
 /* ================================= */
 
-@media (orientation: landscape) and (max-width: 1024px){
+@media (orientation: landscape){
+  body.iphone-mode .container {
   body.iphone-mode .container {
     display: grid;
     grid-template-columns: 1fr 1fr 80px; /* ← Stats細く */
@@ -465,6 +466,7 @@ body.iphone-mode.iphone-stats-open .stats-area {
   body.iphone-mode.iphone-stats-open .container {
     grid-template-columns: 45% 0px 55%;
   }
+}
 }
 
 @media (min-width: 1024px) {

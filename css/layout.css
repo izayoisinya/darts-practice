@@ -209,6 +209,11 @@ body.iphone-mode.iphone-stats-open .stats-area {
   body.iphone-mode .round {
     grid-template-columns: 45px 1fr 30px 50px;
   }
+  
+  body.iphone-mode .divider {
+  margin: 0 6px;
+  opacity: 0.4;
+}
 
 /* =============================== */
 /* iPhone Header Compact */

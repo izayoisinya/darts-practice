@@ -116,22 +116,28 @@ function registerEvents() {
     nextBtn.addEventListener("click", resetGame);
   }
   
-const statsArea = document.querySelector(".stats-area");
-
-statsArea.addEventListener("click", (e) => {
+  const statsArea = document.querySelector(".stats-area");
   
-  // 詳細エリア操作時は開閉しない
-  if (e.target.closest(".stats-detail")) return;
-  
-  if (
-    document.body.classList.contains("iphone-mode") &&
-    window.matchMedia("(orientation: landscape)").matches
-  ) {
-    document.body.classList.toggle("iphone-stats-open");
-  }
-  
-});
-  
+  statsArea.addEventListener("click", (e) => {
+    
+    // 詳細エリア操作時は開閉しない
+    if (e.target.closest(".stats-detail")) return;
+    
+    if (
+      document.body.classList.contains("iphone-mode") &&
+      window.matchMedia("(orientation: landscape)").matches
+    ) {
+      
+      document.body.classList.toggle("iphone-stats-open");
+      
+      // 👇 ここを追加
+      setTimeout(() => {
+        drawScoreChart();
+      }, 300); // CSSレイアウト変化後に再描画
+      
+    }
+    
+  });
 }
 
 
@@ -722,6 +728,9 @@ function drawScoreChart() {
   
   const canvas = document.getElementById("scoreChart");
   if (!canvas) return;
+  
+  // 👇 追加
+if (canvas.offsetWidth === 0) return;
   
   const ctx = canvas.getContext("2d");
   

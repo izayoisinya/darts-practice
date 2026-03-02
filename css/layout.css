@@ -67,10 +67,13 @@
 
 /* Scroll areas */
 .round-list,
-.number-table,
-.stats-area {
+.number-table {
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
+}
+
+.stats-area {
   overflow-y: auto;
 }
 
@@ -113,6 +116,119 @@
   justify-content: space-between;
   align-items: center;
 }
+
+.stats-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.stat-row .label {
+  font-size: 14px;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.stat-row .count {
+  margin-left: 6px;
+  font-weight: 600;
+}
+
+.stats-compact {
+  display: none;
+}
+
+.stats-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.stat-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-line .label {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.stat-line .value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #00ffc8;
+}
+
+/* ===== KPI行 ===== */
+.stats-kpi {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.kpi-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi-label {
+  font-size: 12px;
+  opacity: 0.6;
+  letter-spacing: 1px;
+}
+
+.kpi-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #00ffc8;
+}
+
+/* 区切り線 */
+.stats-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 14px 0;
+}
+
+
+.bar-bg {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: #00ffc8;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.bar-fill.inner {
+  background: #4da3ff;
+}
+
+.stat-row .percent {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+
 
 /* ================================= */
 /* ============ iPhone ============ */
@@ -276,6 +392,24 @@ body.iphone-mode .number-row {
 body.iphone-mode .number-row button {
   width: 100%;
 }
+  
+  body.iphone-mode .stats-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  body.iphone-mode .stats-detail {
+    display: none;
+  }
+  
+  body.iphone-mode.iphone-stats-open .stats-compact {
+    display: none;
+  }
+  
+  body.iphone-mode.iphone-stats-open .stats-detail {
+    display: block;
+  }
   
 
 }

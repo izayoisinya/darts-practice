@@ -460,19 +460,25 @@ function updateStats() {
   // ③ 数値表示更新
   // ------------------------------------------
   
-  set("totalScore", stats.totalScore);
-  set("totalDarts", stats.totalDarts);
-  
-  set("ppd", stats.ppd.toFixed(2)); // 小数2桁
-  set("roundAvg", stats.roundAvg.toFixed(1));
-  set("maxRound", stats.maxRound);
-  
-  set("bullCount", stats.bullCount);
-  set("innerBulls", stats.innerBullCount);
-  
-  set("bullPercent", stats.bullRate.toFixed(1) + "%");
-  set("innerBullPercent", stats.innerBullRate.toFixed(1) + "%");
-  
+  // Bulls
+set("bullCount", stats.bullCount);
+set("bullCountCompact", stats.bullCount);
+
+// Inner
+set("innerBulls", stats.innerBullCount);
+set("innerBullsCompact", stats.innerBullCount);
+
+// PPD
+set("ppd", stats.ppd.toFixed(2));
+set("ppdCompact", stats.ppd.toFixed(2));
+
+// Avg
+set("roundAvg", stats.roundAvg.toFixed(1));
+set("roundAvgCompact", stats.roundAvg.toFixed(1));
+
+// Max
+set("maxRound", stats.maxRound);
+set("maxRoundCompact", stats.maxRound);
   
   // ------------------------------------------
   // ④ バー表示更新（CSS幅変更）
@@ -714,58 +720,67 @@ function loadGame() {
 // ===============================
 function drawScoreChart() {
   
-  // ------------------------------------------
-  // ① canvas取得
-  // ------------------------------------------
   const canvas = document.getElementById("scoreChart");
   if (!canvas) return;
   
   const ctx = canvas.getContext("2d");
   
-  
-  // ------------------------------------------
-  // ② サイズ同期
-  // ------------------------------------------
-  // 表示幅に合わせて内部解像度も合わせる
   const width = canvas.width = canvas.offsetWidth;
-  const height = canvas.height = 180;
+  const height = canvas.height = 220;
   
-  
-  // ------------------------------------------
-  // ③ クリア
-  // ------------------------------------------
   ctx.clearRect(0, 0, width, height);
   
-  
-  // ------------------------------------------
-  // ④ グラフ領域設定
-  // ------------------------------------------
   const padding = 40;
-  
   const graphWidth = width - padding * 2;
   const graphHeight = height - padding * 2;
   
-  const maxScore = 180; // 縦軸固定
-  const stepX = graphWidth / (TOTAL_ROUNDS - 1); // 横軸間隔
+  const maxScore = 180;
+  const stepX = graphWidth / (TOTAL_ROUNDS - 1);
   
-  
-  // ------------------------------------------
-  // ⑤ ラウンドスコア抽出
-  // ------------------------------------------
-  // 3投完了ラウンドのみ対象
+  // ===== ラウンドスコア取得 =====
   const roundScores = game.rounds.map(round =>
     round.every(d => d !== null) ?
     round.reduce((sum, d) => sum + d.score, 0) :
     null
   );
   
+  const validScores = roundScores.filter(s => s !== null);
+  const maxRoundScore = validScores.length ?
+    Math.max(...validScores) :
+    0;
   
-  // ------------------------------------------
-  // ⑥ 折れ線描画
-  // ------------------------------------------
-  ctx.strokeStyle = "#00ffc8";
-  ctx.lineWidth = 2;
+  // ===== ① 横グリッド（点数目盛り）=====
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.lineWidth = 1;
+  
+  const gridSteps = 6;
+  
+  for (let i = 0; i <= gridSteps; i++) {
+    
+    const value = (maxScore / gridSteps) * i;
+    const y =
+      height - padding -
+      (value / maxScore) * graphHeight;
+    
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(width - padding, y);
+    ctx.stroke();
+    
+    // 縦軸ラベル
+    ctx.fillStyle = "rgba(255,255,255,0.4)";
+    ctx.font = "12px sans-serif";
+    ctx.fillText(
+      Math.round(value),
+      5,
+      y + 4
+    );
+  }
+  
+  // ===== ② 折れ線 =====
   ctx.beginPath();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#00ffc8";
   
   let started = false;
   
@@ -773,10 +788,7 @@ function drawScoreChart() {
     
     if (score === null) return;
     
-    // 横座標（ラウンド番号に比例）
     const x = padding + stepX * i;
-    
-    // 縦座標（スコアを割合に変換）
     const y =
       height - padding -
       (score / maxScore) * graphHeight;
@@ -790,6 +802,47 @@ function drawScoreChart() {
   });
   
   ctx.stroke();
+  
+  // ===== ③ 各ポイント描画 =====
+  roundScores.forEach((score, i) => {
+    
+    if (score === null) return;
+    
+    const x = padding + stepX * i;
+    const y =
+      height - padding -
+      (score / maxScore) * graphHeight;
+    
+    ctx.beginPath();
+    
+    // 最大ラウンドだけ色変更
+    if (score === maxRoundScore) {
+      ctx.fillStyle = "#ffcc00"; // ゴールド
+      ctx.shadowColor = "#ffcc00";
+      ctx.shadowBlur = 10;
+    } else {
+      ctx.fillStyle = "#00ffc8";
+      ctx.shadowBlur = 0;
+    }
+    
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  
+  ctx.shadowBlur = 0;
+  
+  // ===== ④ 横軸ラベル（R1〜R8）=====
+  ctx.fillStyle = "rgba(255,255,255,0.4)";
+  ctx.font = "12px sans-serif";
+  
+  for (let i = 0; i < TOTAL_ROUNDS; i++) {
+    const x = padding + stepX * i;
+    ctx.fillText(
+      "R" + (i + 1),
+      x - 10,
+      height - 10
+    );
+  }
 }
 
 

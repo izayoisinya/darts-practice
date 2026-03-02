@@ -72,46 +72,80 @@
 
   <!-- ===== STATS ===== -->
   <section class="stats-area">
+    <h2>Stats</h2>
 
     <!-- コンパクト表示 -->
     <div class="stats-compact">
-      <div>Bulls <span id="bullCount">0</span></div>
-      <div>Inner <span id="innerBulls">0</span></div>
-      <div>PPD <span id="ppd">0.00</span></div>
-      <div>Avg <span id="roundAvg">0.0</span></div>
-      <div>Max <span id="maxRound">0</span></div>
-    </div>
+  <div>Bulls <span id="bullCountCompact">0</span></div>
+  <div>Inner <span id="innerBullsCompact">0</span></div>
+  <div>PPD <span id="ppdCompact">0.00</span></div>
+  <div>Avg <span id="roundAvgCompact">0.0</span></div>
+  <div>Max <span id="maxRoundCompact">0</span></div>
+</div>
 
     <!-- 詳細表示 -->
     <div class="stats-detail">
-
-      <div class="bull-group">
-
-        <div class="stat-row">
-          <span class="label">Bulls</span>
-          <div class="bar-bg">
-            <div class="bar-fill" id="bullRateBar"></div>
-          </div>
-          <span class="percent" id="bullPercent">0.0%</span>
-        </div>
-
-        <div class="stat-row">
-          <span class="label">Inner</span>
-          <div class="bar-bg">
-            <div class="bar-fill inner" id="innerBullRateBar"></div>
-          </div>
-          <span class="percent" id="innerBullPercent">0.0%</span>
-        </div>
-
-      </div>
-
-      <h3>Awards</h3>
-      <div id="awardsContainer"></div>
-
-      <h3>Score Graph</h3>
-      <canvas id="scoreChart"></canvas>
-
+  
+  <!-- ===== KPI行 ===== -->
+  <div class="stats-kpi">
+    
+    <div class="kpi-item">
+      <span class="kpi-label">PPD</span>
+      <span class="kpi-value" id="ppd">0.00</span>
     </div>
+    
+    <div class="kpi-item">
+      <span class="kpi-label">AVG</span>
+      <span class="kpi-value" id="roundAvg">0.0</span>
+    </div>
+    
+    <div class="kpi-item">
+      <span class="kpi-label">MAX</span>
+      <span class="kpi-value" id="maxRound">0</span>
+    </div>
+    
+  </div>
+  
+  <hr class="stats-divider">
+  
+  <!-- ===== Bull系 ===== -->
+  <div class="bull-group">
+    <div class="stat-row">
+  <span class="label">
+    Bulls <span class="count" id="bullCount">0</span>
+  </span>
+  
+  <div class="bar-bg">
+    <div class="bar-fill" id="bullRateBar"></div>
+  </div>
+  
+  <span class="percent" id="bullPercent">0.0%</span>
+</div>
+
+<div class="stat-row">
+  <span class="label">
+    Inner <span class="count" id="innerBulls">0</span>
+  </span>
+  
+  <div class="bar-bg">
+    <div class="bar-fill inner" id="innerBullRateBar"></div>
+  </div>
+  
+  <span class="percent" id="innerBullPercent">0.0%</span>
+</div>
+  </div>
+  
+  <hr class="stats-divider">
+  
+  <h3>Awards</h3>
+  <div id="awardsContainer"></div>
+  
+  <hr class="stats-divider">
+  
+  <h3>Score Trend</h3>
+  <canvas id="scoreChart"></canvas>
+  
+</div>
 
   </section>
 

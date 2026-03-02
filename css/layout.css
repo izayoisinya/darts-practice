@@ -271,8 +271,11 @@ body.iphone-mode.iphone-stats-open .stats-area {
 
   body.iphone-mode .container {
     display: grid;
-    grid-template-columns: 1.3fr 1fr 80px; /* ← Stats細く */
+    grid-template-columns: 55% 35% 80px; /* ← Stats細く */
     gap: 0px;
+    
+  transition: grid-template-columns 0.3s ease;
+    
   }
 
   body.iphone-mode .round-area {
@@ -413,7 +416,7 @@ body.iphone-mode .number-row button {
   }
   
   body.iphone-mode.iphone-stats-open .container {
-    grid-template-columns: 1.3fr 0fr 1fr;
+    grid-template-columns: 55% 0px 45%;
   }
   
 

@@ -75,12 +75,35 @@
     <h2>Stats</h2>
 
     <!-- コンパクト表示 -->
-    <div class="stats-compact">
-  <div>Bulls <span id="bullCountCompact">0</span></div>
-  <div>Inner <span id="innerBullsCompact">0</span></div>
-  <div>PPD <span id="ppdCompact">0.00</span></div>
-  <div>Avg <span id="roundAvgCompact">0.0</span></div>
-  <div>Max <span id="maxRoundCompact">0</span></div>
+<div class="stats-compact">
+  
+  <div class="compact-block">
+    <div class="compact-label">Bulls</div>
+    <div class="compact-value" id="bullCountCompact">0</div>
+    <div class="compact-sub" id="bullPercentCompact">0.0%</div>
+  </div>
+  
+  <div class="compact-block">
+    <div class="compact-label">Inner</div>
+    <div class="compact-value" id="innerBullsCompact">0</div>
+    <div class="compact-sub" id="innerBullPercentCompact">0.0%</div>
+  </div>
+  
+  <div class="compact-block">
+    <div class="compact-label">PPD</div>
+    <div class="compact-value" id="ppdCompact">0.00</div>
+  </div>
+  
+  <div class="compact-block">
+    <div class="compact-label">Avg</div>
+    <div class="compact-value" id="roundAvgCompact">0.00</div>
+  </div>
+  
+  <div class="compact-block">
+    <div class="compact-label">Max</div>
+    <div class="compact-value" id="maxRoundCompact">0</div>
+  </div>
+  
 </div>
 
     <!-- 詳細表示 -->

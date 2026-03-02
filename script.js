@@ -537,6 +537,27 @@ if (awardsContainer) {
   // ------------------------------------------
   // ラウンドスコアの変化を反映
   drawScoreChart();
+  
+  // Compact表示更新
+const setCompact = (id, value) => {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+};
+
+setCompact("bullCountCompact", stats.bullCount);
+setCompact("bullPercentCompact", stats.bullRate.toFixed(1) + "%");
+
+setCompact("innerBullsCompact", stats.innerBullCount);
+setCompact("innerBullPercentCompact", stats.innerBullRate.toFixed(1) + "%");
+
+setCompact("ppdCompact", stats.ppd.toFixed(2));
+setCompact("roundAvgCompact", stats.roundAvg.toFixed(2));
+setCompact("maxRoundCompact", stats.maxRound);
+
+// Compact Percent
+set("bullPercentCompact", stats.bullRate.toFixed(1) + "%");
+set("innerBullPercentCompact", stats.innerBullRate.toFixed(1) + "%");
+  
 }
 
 

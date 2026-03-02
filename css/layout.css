@@ -297,7 +297,7 @@ body.iphone-mode.iphone-stats-open .stats-area {
 
   body.iphone-mode .container {
     display: grid;
-    grid-template-columns: 50% 40% 80px; /* ← Stats細く */
+    grid-template-columns: 45% 45% 100px; /* ← Stats細く */
     gap: 0px;
     
   transition: grid-template-columns 0.3s ease;
@@ -463,7 +463,7 @@ body.iphone-mode .stats-compact {
   }
   
   body.iphone-mode.iphone-stats-open .container {
-    grid-template-columns: 50% 0px 50%;
+    grid-template-columns: 45% 0px 55%;
   }
   
  

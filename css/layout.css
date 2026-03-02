@@ -277,6 +277,7 @@ body.iphone-mode .number-table {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  overflow: visible;
 }
 
 body.iphone-mode .number-column {

@@ -790,7 +790,7 @@ if (canvas.offsetWidth === 0) return;
   
   ctx.clearRect(0, 0, width, height);
   
-  const padding = 40;
+  const padding = 25;
   const graphWidth = width - padding * 2;
   const graphHeight = height - padding * 2;
   

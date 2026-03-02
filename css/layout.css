@@ -225,9 +225,11 @@ margin-bottom: 6px;
   }
   
   body.iphone-mode .round-area,
-body.iphone-mode .input-area,
 body.iphone-mode .stats-area {
   padding: 10px 18px 18px 18px;
+}
+body.iphone-mode .input-area {
+  padding: 6px 18px 12px 18px;
 }
   
   body.iphone-mode .bull-setting {
@@ -271,6 +273,7 @@ body.iphone-mode .score-block {
 }
   
 body.iphone-mode .number-table {
+  flex: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
@@ -279,13 +282,13 @@ body.iphone-mode .number-table {
 body.iphone-mode .number-column {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 body.iphone-mode .number-row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
 }
 
 body.iphone-mode .number-row button {

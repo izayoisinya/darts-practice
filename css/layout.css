@@ -196,4 +196,21 @@ body.iphone-mode.iphone-stats-open .stats-area {
   font-size: 14px;
 }
 
+body.iphone-mode .header {
+  height: 80px;
+}
+
+body.iphone-mode .score-panel {
+  min-height: 80px;
+  padding: 0 30px; /* 少しだけ横も詰めるとバランス良い */
+}
+
+body.iphone-mode .score-value {
+  font-size: 42px;
+}
+
+body.iphone-mode .sub-value {
+  font-size: 20px;
+}
+
 }

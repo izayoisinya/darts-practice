@@ -75,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===============================
 // ===== ゲーム初期化処理 ========
 // ===============================
-
 function init() {
 
   // ラウンドデータ初期化
@@ -98,45 +97,35 @@ function init() {
 }
 
 
-/// ===============================
+// ===============================
 // ===== イベント登録 ============
 // ===============================
 
 function registerEvents() {
   
+  // ------------------------------------------
   // NEXT GAME ボタン
-  // 押されたらゲームをリセット
+  // ------------------------------------------
   const nextBtn = document.getElementById("nextGameBtn");
   if (nextBtn) {
     nextBtn.addEventListener("click", resetGame);
   }
   
-  
-  // iPhone用 Stats 開閉ボタン
+  // ------------------------------------------
+  // Stats トグルボタン
+  // ------------------------------------------
   const statsBtn = document.getElementById("statsToggleBtn");
-  
   if (statsBtn) {
-    
     statsBtn.addEventListener("click", () => {
-      
-      // body にクラスを付け外ししてレイアウト切替
       document.body.classList.toggle("iphone-stats-open");
-      
-      // ボタン表示を矢印で切替
-      statsBtn.textContent =
-        document.body.classList.contains("iphone-stats-open") ?
-        "◀" :
-        "▶";
     });
   }
-  
 }
 
 
 // ===============================
 // ===== ダーツ追加 ==============
 // ===============================
-
 function addDart(value, multiplier, special = null) {
   
   // 全ラウンド終了していたら何もしない
@@ -182,11 +171,9 @@ function addDart(value, multiplier, special = null) {
 }
 
 
-
 // ===============================
 // ===== ダーツ取り消し ==========
 // ===============================
-
 function undoDart() {
   
   // 何も投げていない場合は何もしない
@@ -220,11 +207,9 @@ function undoDart() {
 }
 
 
-
 // ===============================
 // ===== ラウンド描画 ============
 // ===============================
-
 function renderRounds() {
   
   // 描画先コンテナ取得
@@ -301,61 +286,61 @@ function renderRounds() {
 
 
 // ===============================
-// ===== Stats計算 ===============
+// ===== Stats計算（拡張版） =====
 // ===============================
-
 function calculateStats() {
   
   // ------------------------------------------
   // ① 集計用変数初期化
   // ------------------------------------------
-  let totalScore = 0; // 合計得点
-  let totalDarts = 0; // 総投数
-  let bullCount = 0; // Bull合計
-  let innerBullCount = 0; // Inner Bull数
-  let maxRound = 0; // 最高ラウンド得点
-  let completedRounds = 0; // 1本以上投げたラウンド数
-  
+  let totalScore = 0;
+  let totalDarts = 0;
+  let bullCount = 0;
+  let innerBullCount = 0;
+  let maxRound = 0;
+  let completedRounds = 0;
+
+  // ★ Awards用
+  let hatTrick = 0;
+  let lowTon = 0;
+  let highTon = 0;
+  let ton80 = 0;
+  let threeInTheBlack = 0;
+
   
   // ------------------------------------------
-  // ② 各ラウンドを走査
+  // ② 各ラウンド走査
   // ------------------------------------------
   game.rounds.forEach(round => {
     
-    let roundScore = 0; // そのラウンドの合計
-    let dartCount = 0; // そのラウンドの投数
-    
+    let roundScore = 0;
+    let dartCount = 0;
+
     
     // --------------------------------------
-    // ③ 各ダーツを走査
+    // ③ 各ダーツ走査
     // --------------------------------------
     round.forEach(dart => {
-      
-      // 未入力は無視
       if (!dart) return;
-      
+
       dartCount++;
       totalScore += dart.score;
       totalDarts++;
       roundScore += dart.score;
-      
-      
-      // Bull判定
+
       if (
         dart.special === "outerBull" ||
         dart.special === "innerBull"
       ) {
         bullCount++;
       }
-      
-      // Inner Bull判定
+
       if (dart.special === "innerBull") {
         innerBullCount++;
       }
-      
     });
-    
-    
+
+
     // --------------------------------------
     // ④ ラウンド統計更新
     // --------------------------------------
@@ -363,55 +348,81 @@ function calculateStats() {
       completedRounds++;
       maxRound = Math.max(maxRound, roundScore);
     }
-    
+
+
+    // --------------------------------------
+    // ⑤ Awards判定（3投完了のみ）
+    // --------------------------------------
+    if (dartCount === 3) {
+
+      const allBull = round.every(d =>
+        d.special === "outerBull" ||
+        d.special === "innerBull"
+      );
+
+      const allInner = round.every(d =>
+        d.special === "innerBull"
+      );
+
+      if (allBull) hatTrick++;
+      if (allInner) threeInTheBlack++;
+
+      if (!allBull) {
+        if (roundScore === 180) ton80++;
+        else if (roundScore >= 151 && roundScore <= 179) highTon++;
+        else if (roundScore >= 100 && roundScore <= 149) lowTon++;
+      }
+    }
+
   });
-  
-  
+
+
   // ------------------------------------------
-  // ⑤ 平均計算
+  // ⑥ 平均計算
   // ------------------------------------------
-  
-  // Points Per Dart
   const ppd = totalDarts ?
     totalScore / totalDarts :
     0;
-  
-  
+
+
   // ------------------------------------------
-  // ⑥ 結果オブジェクト返却
+  // ⑦ 結果返却
   // ------------------------------------------
   return {
-    
     totalScore,
     totalDarts,
-    
     bullCount,
     innerBullCount,
-    
+
     bullRate: totalDarts ?
       (bullCount / totalDarts) * 100 :
       0,
-    
+
     innerBullRate: totalDarts ?
       (innerBullCount / totalDarts) * 100 :
       0,
-    
+
     ppd,
-    
+
     roundAvg: completedRounds ?
       totalScore / completedRounds :
       0,
-    
-    maxRound
+
+    maxRound,
+
+    // ★ Awards追加
+    hatTrick,
+    lowTon,
+    highTon,
+    ton80,
+    threeInTheBlack
   };
 }
-
 
 
 // ===============================
 // ===== Stats更新 ===============
 // ===============================
-
 function updateStats() {
   
   // ------------------------------------------
@@ -465,6 +476,37 @@ function updateStats() {
     innerBar.style.width = stats.innerBullRate + "%";
   }
   
+  // ------------------------------------------
+// ⑤ Awards表示更新
+// ------------------------------------------
+
+const awardsContainer = document.getElementById("awardsContainer");
+
+if (awardsContainer) {
+  
+  awardsContainer.innerHTML = "";
+  
+  const awards = [
+    { name: "Hat Trick", value: stats.hatTrick },
+    { name: "Low Ton", value: stats.lowTon },
+    { name: "High Ton", value: stats.highTon },
+    { name: "Ton80", value: stats.ton80 },
+    { name: "3 in the Black", value: stats.threeInTheBlack }
+  ];
+  
+  awards.forEach(a => {
+    if (a.value > 0) {
+      const item = document.createElement("div");
+      item.className = "stat-item";
+      item.innerHTML = `
+        <span class="label">${a.name}</span>
+        <span class="value">${a.value}</span>
+      `;
+      awardsContainer.appendChild(item);
+    }
+  });
+}
+  
   
   // ------------------------------------------
   // ⑤ グラフ再描画
@@ -477,7 +519,6 @@ function updateStats() {
 // ===============================
 // ===== 数字テーブル ============
 // ===============================
-
 function createNumberTable() {
   
   // ------------------------------------------
@@ -531,10 +572,10 @@ function createNumberTable() {
   }
 }
 
+
 // ===============================
 // ===== 上部ボタン設定 ===========
 // ===============================
-
 function setupTopButtons() {
   
   // .top-buttons 内の全ボタン取得
@@ -588,7 +629,6 @@ function setupTopButtons() {
 // ===============================
 // ===== 保存 ====================
 // ===============================
-
 function saveGame() {
   
   // ------------------------------------------
@@ -620,7 +660,6 @@ function saveGame() {
 // ===============================
 // ===== 読み込み =================
 // ===============================
-
 function loadGame() {
   
   // ------------------------------------------
@@ -653,7 +692,6 @@ function loadGame() {
 // ===============================
 // ===== グラフ ==================
 // ===============================
-
 function drawScoreChart() {
   
   // ------------------------------------------
@@ -735,11 +773,9 @@ function drawScoreChart() {
 }
 
 
-
 // ===============================
 // ===== 完了判定 =================
 // ===============================
-
 function isGameComplete() {
   
   // ------------------------------------------
@@ -763,7 +799,6 @@ function isGameComplete() {
 }
 
 
-
 // ===============================
 // NEXT GAME ボタンの有効/無効を制御する関数
 // ===============================
@@ -783,6 +818,7 @@ function updateNextGameButton() {
   
   btn.disabled = !isGameComplete();
 }
+
 
 // ===============================
 // ゲームを完全リセットする関数

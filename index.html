@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <title>Darts Practice</title>
-  <link rel="stylesheet" href="style.css" />
+
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0,
     maximum-scale=1.0, user-scalable=no,
     viewport-fit=cover">
+
   <meta name="theme-color" content="#0f1115">
+
   <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -17,19 +20,21 @@
 <!-- ================= HEADER ================= -->
 <header class="header">
   <div class="score-panel">
+
     <div class="score-block">
       <div class="total-label">TOTAL SCORE</div>
-      <div class="score-value" id="totalScore"></div>
+      <div class="score-value" id="totalScore">0</div>
     </div>
 
     <div class="darts-block">
       <div class="total-label">TOTAL DARTS</div>
-      <div class="sub-value" id="totalDarts"></div>
+      <div class="sub-value" id="totalDarts">0</div>
     </div>
 
     <button id="nextGameBtn" class="next-button" disabled>
       NEXT GAME
     </button>
+
   </div>
 </header>
 
@@ -37,15 +42,15 @@
 <div class="container">
 
   <!-- ===== ROUNDS ===== -->
-  <div class="round-area">
+  <section class="round-area">
     <h2>Rounds</h2>
     <div class="round-list">
       <div id="roundContainer"></div>
     </div>
-  </div>
+  </section>
 
   <!-- ===== INPUT ===== -->
-  <div class="input-area">
+  <section class="input-area">
     <h2>Input</h2>
 
     <div class="bull-setting">
@@ -61,12 +66,12 @@
     </div>
 
     <div id="numberTable" class="number-table"></div>
-  </div>
+  </section>
 
   <!-- ===== STATS ===== -->
-  <div class="stats-area">
+  <section class="stats-area">
 
-    <!-- ▼ コンパクト表示（常時） -->
+    <!-- コンパクト表示 -->
     <div class="stats-compact">
       <div>Bulls <span id="bullCount">0</span></div>
       <div>Inner <span id="innerBulls">0</span></div>
@@ -75,7 +80,7 @@
       <div>Max <span id="maxRound">0</span></div>
     </div>
 
-    <!-- ▼ 詳細表示（iPad常時 / iPhone横で展開） -->
+    <!-- 詳細表示 -->
     <div class="stats-detail">
 
       <div class="bull-group">
@@ -91,11 +96,9 @@
         <div class="stat-row">
           <span class="label">Inner</span>
           <div class="bar-bg">
-            <div class="bar-fill inner"
-              id="innerBullRateBar"></div>
+            <div class="bar-fill inner" id="innerBullRateBar"></div>
           </div>
-          <span class="percent"
-            id="innerBullPercent">0.0%</span>
+          <span class="percent" id="innerBullPercent">0.0%</span>
         </div>
 
       </div>
@@ -104,18 +107,18 @@
       <div id="awardsContainer"></div>
 
       <h3>Score Graph</h3>
-      <canvas id="scoreChart" height="180"></canvas>
+      <canvas id="scoreChart"></canvas>
 
     </div>
 
-  </div>
-
-<button id="statsToggleBtn" class="stats-toggle">
-  ▶
-</button>
+  </section>
 
 </div>
 
+<!-- iPhone Stats Toggle -->
+<button id="statsToggleBtn" class="stats-toggle">▶</button>
+
 <script src="script.js"></script>
+
 </body>
 </html>

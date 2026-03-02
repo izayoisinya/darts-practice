@@ -168,3 +168,32 @@ body.iphone-mode.iphone-stats-open .stats-area {
   flex: 1;
   padding: 24px;
 }
+
+/* ================================= */
+/* iPhone 横専用 3カラムレイアウト */
+/* ================================= */
+
+@media (orientation: landscape) {
+
+  body.iphone-mode .container {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 80px; /* ← Stats細く */
+    gap: 16px;
+  }
+
+  body.iphone-mode .round-area {
+    flex: unset;
+  }
+
+  body.iphone-mode .input-area {
+    flex: unset;
+  }
+
+  body.iphone-mode .stats-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+}
+
+}

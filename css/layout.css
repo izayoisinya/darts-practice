@@ -195,6 +195,24 @@ body.iphone-mode.iphone-stats-open .stats-area {
   align-items: center;
   font-size: 14px;
 }
+  
+  body.iphone-mode .round {
+    padding: 6px 0;
+  }
+  
+  body.iphone-mode .dart {
+    width: 44px;
+    padding: 5px 0;
+    font-size: 14px;
+  }
+  
+  body.iphone-mode .round {
+    grid-template-columns: 45px 1fr 30px 50px;
+  }
+
+/* =============================== */
+/* iPhone Header Compact */
+/* =============================== */
 
 body.iphone-mode .header {
   height: 80px;
@@ -202,7 +220,7 @@ body.iphone-mode .header {
 
 body.iphone-mode .score-panel {
   min-height: 80px;
-  padding: 0 30px; /* 少しだけ横も詰めるとバランス良い */
+  padding: 0 28px;
 }
 
 body.iphone-mode .score-value {
@@ -210,7 +228,11 @@ body.iphone-mode .score-value {
 }
 
 body.iphone-mode .sub-value {
-  font-size: 20px;
+  font-size: 18px;
+}
+
+body.iphone-mode .score-block {
+  transform: translateY(-2px);
 }
 
 }

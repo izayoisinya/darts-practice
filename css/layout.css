@@ -316,6 +316,8 @@ body.iphone-mode.iphone-stats-open .stats-area {
   }
 
   body.iphone-mode .stats-area {
+    flex: unset;   /* ← これが重要 */
+    width: auto;   /* 念のため */
     display: flex;
     flex-direction: column;
     align-items: flex-start;

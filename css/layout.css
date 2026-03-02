@@ -1,0 +1,152 @@
+/* ================================= */
+/* ============ LAYOUT ============= */
+/* ================================= */
+
+/* Header */
+.header {
+  height: 140px;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+}
+
+.score-panel {
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  padding: 0 50px;
+  border-radius: 20px;
+}
+
+.score-block,
+.darts-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.score-block {
+  min-width: 260px;
+}
+
+.next-button {
+  margin-left: auto;
+  width: 160px;
+  height: 48px;
+}
+
+/* Main layout */
+.container {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  
+  height: 100%;
+  overflow: hidden;
+  
+  padding: 0 20px 20px;
+}
+
+/* Columns */
+.round-area,
+.input-area,
+.stats-area {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.round-area { flex: 1.5; }
+.input-area { flex: 1; }
+.stats-area { flex: 1; }
+
+/* Scroll areas */
+.round-list,
+.number-table,
+.stats-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Rounds */
+.round {
+  display: grid;
+  grid-template-columns: 60px 1fr 40px 60px;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.round-darts {
+  display: flex;
+  align-items: center;
+}
+
+/* Input */
+.bull-setting {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.top-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.top-buttons button {
+  padding: 10px 0;
+}
+
+/* Stats */
+.stat-item {
+  padding: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* iPhone layout adjustments */
+.stats-toggle {
+  display: none;
+}
+
+body.iphone-mode .stats-toggle {
+  display: block;
+  position: fixed;
+  bottom: 20px;
+  right: 15px;
+  width: 44px;
+  height: 44px;
+}
+
+body.iphone-mode .header {
+  height: 90px;
+}
+
+body.iphone-mode .round-area { flex: 1.4; }
+body.iphone-mode .input-area { flex: 1; }
+
+body.iphone-mode .stats-area {
+  flex: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body.iphone-mode.iphone-stats-open .input-area {
+  flex: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body.iphone-mode.iphone-stats-open .stats-area {
+  flex: 1;
+  padding: 24px;
+}

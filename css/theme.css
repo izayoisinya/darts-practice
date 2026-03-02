@@ -8,7 +8,9 @@
   
   --border-main: #222733;
   
-  --accent: #00ffc8;
+  --accent-rgb: 0 255 200;
+  --accent: rgb(var(--accent-rgb));
+  
   --accent-soft: #69f0ae;
   --accent-blue: #4dabff;
   --danger: #ff5a5a;
@@ -30,12 +32,10 @@ body {
 }
 
 .score-panel {
-  background: linear-gradient(
-    135deg,
-    rgba(0,255,200,0.08),
-    rgba(0,150,255,0.05)
-  );
-  border: 1px solid rgba(0,255,200,0.15);
+  background: linear-gradient(135deg,
+      rgb(var(--accent-rgb) / 0.1),
+      rgb(var(--accent-rgb) / 0.02));
+  border: 1px solid rgb(var(--accent-rgb) / 0.15);
 }
 
 .total-label {
@@ -47,20 +47,20 @@ body {
 .score-value {
   font-size: 64px;
   font-weight: 800;
-  color: #00ffc8;
+  color: var(--accent);
   font-variant-numeric: tabular-nums;
   line-height: 1;
   text-shadow:
-    0 0 8px rgba(0,255,200,0.8),
-    0 0 20px rgba(0,255,200,0.7),
-    0 0 40px rgba(0,255,200,0.5),
-    0 0 80px rgba(0,255,200,0.3);
+    0 0 8px rgb(var(--accent-rgb) / 0.8),
+    0 0 20px rgb(var(--accent-rgb) / 0.7),
+    0 0 40px rgb(var(--accent-rgb) / 0.5),
+    0 0 80px rgb(var(--accent-rgb) / 0.3);
 }
 
 .sub-value {
   font-size: 32px;
   font-weight: 600;
-  color: #69f0ae;
+  color: var(--accent);
 }
 
 /* Buttons */
@@ -98,11 +98,8 @@ body {
   border-radius: 18px;
 }
 
-.round {
-  border-bottom: 1px solid #222733;
-}
-
 .round-score {
+  color: var(--accent);
   font-weight: 600;
   text-align: right;
 }
@@ -125,7 +122,12 @@ body {
   background: #002b24;
   color: var(--accent);
 }
-.dart.miss { background: #141414; color: #444; }
+
+.dart.miss {
+  background: #141414;
+  color: #444;
+}
+
 .dart.inner-bull {
   background: #2b1f00;
   color: var(--gold);
@@ -140,8 +142,6 @@ body {
   background: #0a1a2b;
   color: var(--accent-blue);
 }
-
-
 
 /* Input */
 .bull-setting {
@@ -170,13 +170,13 @@ body {
 }
 
 .stat-item {
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* iPhone theme */
 body.iphone-mode .stats-toggle {
   border-radius: 50%;
-  background: #00ffc8;
+  background: var(--accent);
   color: #000;
   border: none;
   font-weight: bold;
@@ -184,8 +184,13 @@ body.iphone-mode .stats-toggle {
   z-index: 999;
 }
 
-body.iphone-mode .score-value { font-size: 38px; }
-body.iphone-mode .sub-value { font-size: 20px; }
+body.iphone-mode .score-value {
+  font-size: 38px;
+}
+
+body.iphone-mode .sub-value {
+  font-size: 20px;
+}
 
 body.iphone-mode .stats-area {
   border: none;
@@ -205,7 +210,7 @@ button {
 
 button:hover {
   background: #222a35;
-  box-shadow: 0 0 8px rgba(0, 255, 200, 0.2);
+  box-shadow: 0 0 8px rgb(var(--accent-rgb) / 0.2);
 }
 
 button:active {
@@ -233,7 +238,7 @@ button[data-display="Miss"] {
 }
 
 button[data-display="Bull"]:hover {
-  box-shadow: 0 0 12px rgba(0, 255, 200, 0.5);
+  box-shadow: 0 0 12px rgb(var(--accent-rgb) / 0.5);
 }
 
 .kpi-value {
@@ -284,5 +289,3 @@ button[data-display="Bull"]:hover {
   border: 1px solid rgba(77, 171, 255, 0.4);
   color: var(--accent-blue);
 }
-
-  

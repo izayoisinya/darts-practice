@@ -781,7 +781,7 @@ function drawScoreChart() {
   if (!canvas) return;
   
   // 👇 追加
-if (canvas.offsetWidth === 0) return;
+if (!canvas.offsetWidth || !canvas.offsetHeight) return;
   
   const ctx = canvas.getContext("2d");
   
@@ -840,7 +840,11 @@ if (canvas.offsetWidth === 0) return;
   // ===== ② 折れ線 =====
   ctx.beginPath();
   ctx.lineWidth = 2;
-  ctx.strokeStyle = "#00ffc8";
+  const accent = getComputedStyle(document.documentElement)
+  .getPropertyValue("--accent")
+  .trim();
+
+ctx.strokeStyle = accent;
   
   let started = false;
   
@@ -863,31 +867,30 @@ if (canvas.offsetWidth === 0) return;
   
   ctx.stroke();
   
-  // ===== ③ 各ポイント描画 =====
-  roundScores.forEach((score, i) => {
-    
-    if (score === null) return;
-    
-    const x = padding + stepX * i;
-    const y =
-      height - padding -
-      (score / maxScore) * graphHeight;
-    
-    ctx.beginPath();
-    
-    // 最大ラウンドだけ色変更
-    if (score === maxRoundScore) {
-      ctx.fillStyle = "#ffcc00"; // ゴールド
-      ctx.shadowColor = "#ffcc00";
-      ctx.shadowBlur = 10;
-    } else {
-      ctx.fillStyle = "#00ffc8";
-      ctx.shadowBlur = 0;
-    }
-    
-    ctx.arc(x, y, 5, 0, Math.PI * 2);
-    ctx.fill();
-  });
+// ===== ③ 各ポイント描画 =====
+roundScores.forEach((score, i) => {
+  
+  if (score === null) return;
+  
+  const x = padding + stepX * i;
+  const y =
+    height - padding -
+    (score / maxScore) * graphHeight;
+  
+  ctx.beginPath();
+  
+  if (score === maxRoundScore) {
+    ctx.fillStyle = "#ffcc00";
+    ctx.shadowColor = "#ffcc00";
+    ctx.shadowBlur = 10;
+  } else {
+    ctx.fillStyle = accent;
+    ctx.shadowBlur = 0;
+  }
+  
+  ctx.arc(x, y, 5, 0, Math.PI * 2);
+  ctx.fill();
+});
   
   ctx.shadowBlur = 0;
   

@@ -61,6 +61,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // イベント登録（クリック処理など）
   registerEvents();
 
+// 画面回転時にStatsを閉じる
+window.addEventListener("orientationchange", () => {
+  document.body.classList.remove("iphone-stats-open");
+});
+
   // PWA用 ServiceWorker 登録
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
@@ -111,15 +116,22 @@ function registerEvents() {
     nextBtn.addEventListener("click", resetGame);
   }
   
-  // ------------------------------------------
-  // Stats トグルボタン
-  // ------------------------------------------
-  const statsBtn = document.getElementById("statsToggleBtn");
-  if (statsBtn) {
-    statsBtn.addEventListener("click", () => {
-      document.body.classList.toggle("iphone-stats-open");
-    });
+const statsArea = document.querySelector(".stats-area");
+
+statsArea.addEventListener("click", (e) => {
+  
+  // 詳細エリア操作時は開閉しない
+  if (e.target.closest(".stats-detail")) return;
+  
+  if (
+    document.body.classList.contains("iphone-mode") &&
+    window.matchMedia("(orientation: landscape)").matches
+  ) {
+    document.body.classList.toggle("iphone-stats-open");
   }
+  
+});
+  
 }
 
 

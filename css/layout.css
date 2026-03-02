@@ -277,7 +277,7 @@ body.iphone-mode .score-block {
   }
   
   body.iphone-mode .number-row {
-  display: contents;
+  width: 100%;
 }
 
 body.iphone-mode .number-table button {

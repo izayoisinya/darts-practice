@@ -74,6 +74,10 @@ window.addEventListener("orientationchange", () => {
       .catch(err => console.log("SW error", err));
   }
 
+window.addEventListener("resize", () => {
+  createNumberTable();
+});
+
 });
 
 
@@ -466,6 +470,10 @@ function updateStats() {
   // ③ 数値表示更新
   // ------------------------------------------
   
+  // Header
+set("totalScore", stats.totalScore);
+set("totalDarts", stats.totalDarts);
+  
   // Bulls
 set("bullCount", stats.bullCount);
 set("bullCountCompact", stats.bullCount);
@@ -571,24 +579,46 @@ function createNumberTable() {
   
   table.innerHTML = "";
   
-  // 左カラム（20〜11）
-  const leftColumn = document.createElement("div");
-  leftColumn.className = "number-column";
+  const isIphone =
+    document.body.classList.contains("iphone-mode") &&
+    window.matchMedia("(orientation: landscape)").matches;
   
-  for (let i = 20; i >= 11; i--) {
-    leftColumn.appendChild(createNumberRow(i));
+  // ===============================
+  // iPhone横 → 2カラム
+  // ===============================
+  if (isIphone) {
+    
+    const leftColumn = document.createElement("div");
+    leftColumn.className = "number-column";
+    
+    for (let i = 20; i >= 11; i--) {
+      leftColumn.appendChild(createNumberRow(i));
+    }
+    
+    const rightColumn = document.createElement("div");
+    rightColumn.className = "number-column";
+    
+    for (let i = 10; i >= 1; i--) {
+      rightColumn.appendChild(createNumberRow(i));
+    }
+    
+    table.appendChild(leftColumn);
+    table.appendChild(rightColumn);
+    
   }
   
-  // 右カラム（10〜1）
-  const rightColumn = document.createElement("div");
-  rightColumn.className = "number-column";
-  
-  for (let i = 10; i >= 1; i--) {
-    rightColumn.appendChild(createNumberRow(i));
+  // ===============================
+  // iPad / PC → 1カラム
+  // ===============================
+  else {
+    
+    for (let i = 20; i >= 1; i--) {
+      table.appendChild(createNumberRow(i));
+    }
+    
   }
   
-  table.appendChild(leftColumn);
-  table.appendChild(rightColumn);
+
 }
 
 

@@ -216,3 +216,15 @@ body.iphone-mode.iphone-stats-open .stats-area {
   }
   
 }
+
+@media (orientation: landscape) {
+  
+  body.iphone-mode .darts-block {
+    display: none;
+  }
+  
+  body.iphone-mode .next-button {
+    display: none;
+  }
+  
+}

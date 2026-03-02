@@ -271,17 +271,16 @@ body.iphone-mode .score-block {
 }
   
   body.iphone-mode .number-table {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(180px, 1fr));
-    gap: 8px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
   
   body.iphone-mode .number-row {
-  width: 100%;
-  display: flex;
-justify-content: space-between;
-gap: 6px;
-}
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
 
 body.iphone-mode .number-table button {
   padding: 4px 0;

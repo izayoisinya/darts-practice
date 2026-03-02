@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   gap: 40px;
-  width: 100%;
+  width: auto;
   padding: 0 50px;
   border-radius: 20px;
 }
@@ -203,15 +203,16 @@ body.iphone-mode.iphone-stats-open .stats-area {
 /* ================================= */
 
 @media (orientation: landscape) {
-
+  
   body.iphone-mode .header {
-    display: flex;
-    justify-content: flex-start;
-    padding: 0 20px; /* containerと揃える */
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 80px;
+    gap: 16px;
+    padding: 0 20px;
   }
-
+  
   body.iphone-mode .score-panel {
-    width: calc((100% - 16px * 2 - 80px) * 1.3 / (1.3 + 1));
+    grid-column: 1;
   }
-
+  
 }

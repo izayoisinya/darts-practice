@@ -289,7 +289,7 @@ body.iphone-mode.iphone-stats-open .stats-area {
   body.iphone-mode .stats-area {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   font-size: 14px;
 }
   
@@ -320,6 +320,12 @@ body.iphone-mode.iphone-stats-open .stats-area {
 margin-bottom: 4px;
     opacity: 0.85;
   }
+  
+  body.iphone-mode .stats-area h2 {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 12px;
+}
   
   body.iphone-mode .round-area,
 body.iphone-mode .stats-area {
@@ -419,7 +425,7 @@ body.iphone-mode .number-row button {
     grid-template-columns: 45% 0px 55%;
   }
   
-
+ 
   
 
 }

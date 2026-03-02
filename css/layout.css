@@ -137,7 +137,7 @@ body.iphone-mode .stats-toggle {
 
 /* 開いたら回転 */
 body.iphone-mode.iphone-stats-open .stats-toggle {
-  transform: rotate(-1);
+  transform: rotate(180deg);
 }
 
 /* レイアウト調整 */

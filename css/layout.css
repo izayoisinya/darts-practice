@@ -197,3 +197,21 @@ body.iphone-mode.iphone-stats-open .stats-area {
 }
 
 }
+
+/* ================================= */
+/* iPhone 横 Header 幅調整 */
+/* ================================= */
+
+@media (orientation: landscape) {
+
+  body.iphone-mode .header {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 80px; /* containerと同じ */
+  }
+
+  body.iphone-mode .score-panel {
+    grid-column: 1 / 2; /* 左カラムだけ使う */
+    width: 100%;
+  }
+
+}

@@ -317,6 +317,7 @@ body.iphone-mode.iphone-stats-open .stats-area {
   flex-direction: column;
   align-items: flex-start;
   font-size: 14px;
+  overflow-y: auto;
 }
   
   body.iphone-mode .round {
@@ -400,17 +401,14 @@ body.iphone-mode .score-block {
   transform: translateY(-2px);
 }
   
-body.iphone-mode .number-table {
-  flex: 1;
-  display: block;
-  overflow-y: auto;
-}
-
-body.iphone-mode .number-column {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+  body.iphone-mode .number-table {
+    display: flex;
+    gap: 12px;
+  }
+  
+  body.iphone-mode .number-column {
+    flex: 1;
+  }
 
 body.iphone-mode .number-row {
   display: grid;

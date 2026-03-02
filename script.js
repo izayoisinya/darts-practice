@@ -521,55 +521,63 @@ if (awardsContainer) {
 // ===============================
 function createNumberTable() {
   
-  // ------------------------------------------
-  // ① テーブル取得
-  // ------------------------------------------
   const table = document.getElementById("numberTable");
   if (!table) return;
   
-  // 再生成前に中身をクリア
   table.innerHTML = "";
   
+  // 左カラム（20〜11）
+  const leftColumn = document.createElement("div");
+  leftColumn.className = "number-column";
   
-  // ------------------------------------------
-  // ② 20 → 1 までループ
-  // ------------------------------------------
-  for (let i = 20; i >= 1; i--) {
-    
-    const row = document.createElement("div");
-    row.className = "number-row";
-    
-    
-    // --------------------------------------
-    // ③ ボタンHTML生成
-    // --------------------------------------
-    row.innerHTML = `
-      <button>${i}</button>   <!-- 通常 -->
-      <button>D</button>      <!-- Double -->
-      <button>T</button>      <!-- Triple -->
-    `;
-    
-    
-    // --------------------------------------
-    // ④ イベント登録
-    // --------------------------------------
-    const buttons = row.querySelectorAll("button");
-    
-    // 通常
-    buttons[0].addEventListener("click", () => addDart(i, 1));
-    
-    // Double
-    buttons[1].addEventListener("click", () => addDart(i, 2));
-    
-    // Triple
-    buttons[2].addEventListener("click", () => addDart(i, 3));
-    
-    
-    // --------------------------------------
-    // ⑤ DOMに追加
-    // --------------------------------------
-    table.appendChild(row);
+  for (let i = 20; i >= 11; i--) {
+    leftColumn.appendChild(createNumberRow(i));
   }
+  
+  // 右カラム（10〜1）
+  const rightColumn = document.createElement("div");
+  rightColumn.className = "number-column";
+  
+  for (let i = 10; i >= 1; i--) {
+    rightColumn.appendChild(createNumberRow(i));
+  }
+  
+  table.appendChild(leftColumn);
+  table.appendChild(rightColumn);
+}
+
+
+function createNumberRow(num) {
+  
+  const row = document.createElement("div");
+  row.className = "number-row";
+  
+  // Single
+  const single = document.createElement("button");
+  single.textContent = num;
+  single.addEventListener("click", () => {
+    addDart(num, 1);
+  });
+  
+  // Double
+  const double = document.createElement("button");
+  double.textContent = "D";
+  double.addEventListener("click", () => {
+    addDart(num, 2);
+  });
+  
+  // Triple
+  const triple = document.createElement("button");
+  triple.textContent = "T";
+  triple.addEventListener("click", () => {
+    addDart(num, 3);
+  });
+  
+  row.appendChild(single);
+  row.appendChild(double);
+  row.appendChild(triple);
+  
+  return row;
 }
 
 

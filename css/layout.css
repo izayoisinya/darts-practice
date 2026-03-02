@@ -270,30 +270,27 @@ body.iphone-mode .score-block {
   transform: translateY(-2px);
 }
   
-  /* 全体を左右2ブロック */
-  body.iphone-mode .number-table {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-  
-  /* 各ブロックは縦並び */
-  body.iphone-mode .number-column {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  /* 各行は3列固定 */
-  body.iphone-mode .number-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-  }
-  
-  body.iphone-mode .number-row button {
-    width: 100%;
-  }
+body.iphone-mode .number-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+body.iphone-mode .number-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.iphone-mode .number-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+body.iphone-mode .number-row button {
+  width: 100%;
+}
   
 
 }

@@ -254,6 +254,7 @@ body.iphone-mode .stats-area {
 body.iphone-mode.iphone-stats-open .input-area {
   flex: 0;
   padding: 0;
+  width: 0;
   overflow: hidden;
 }
 
@@ -410,6 +411,12 @@ body.iphone-mode .number-row button {
   body.iphone-mode.iphone-stats-open .stats-detail {
     display: block;
   }
+  
+  body.iphone-mode.iphone-stats-open .container {
+    grid-template-columns: 1.3fr 0fr 1fr;
+  }
+  
+
   
 
 }

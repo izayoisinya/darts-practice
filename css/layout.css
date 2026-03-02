@@ -199,19 +199,19 @@ body.iphone-mode.iphone-stats-open .stats-area {
 }
 
 /* ================================= */
-/* iPhone 横 Header 幅調整 */
+/* iPhone 横 Header 幅制限 */
 /* ================================= */
 
 @media (orientation: landscape) {
 
   body.iphone-mode .header {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr 80px; /* containerと同じ */
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 20px; /* containerと揃える */
   }
 
   body.iphone-mode .score-panel {
-    grid-column: 1 / 2; /* 左カラムだけ使う */
-    width: 100%;
+    width: calc((100% - 16px * 2 - 80px) * 1.3 / (1.3 + 1));
   }
 
 }

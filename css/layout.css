@@ -178,7 +178,7 @@ body.iphone-mode.iphone-stats-open .stats-area {
   body.iphone-mode .container {
     display: grid;
     grid-template-columns: 1.3fr 1fr 80px; /* ← Stats細く */
-    gap: 16px;
+    gap: 0px;
   }
 
   body.iphone-mode .round-area {
@@ -228,6 +228,7 @@ margin-bottom: 6px;
 body.iphone-mode .input-area,
 body.iphone-mode .stats-area {
   padding: 10px 18px 18px 18px;
+  border-radius: 0;
 }
   
   body.iphone-mode .bull-setting {

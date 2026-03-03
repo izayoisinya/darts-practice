@@ -304,6 +304,15 @@ body.phone.landscape .container {
   transition: grid-template-columns 0.3s ease;
 }
 
+body.phone.landscape .number-table {
+  display: flex;
+  gap: 12px;
+}
+
+body.phone.landscape .number-column {
+  flex: 1;
+}
+
 /* 横で閉じた状態 */
 body.phone.landscape .stats-area {
   flex: unset;
@@ -312,6 +321,7 @@ body.phone.landscape .stats-area {
   overflow-y: auto;
     width: 80px;
   min-width: 80px;
+  overflow: hidden;
 }
 
 /* 横で開いた状態 */
@@ -349,6 +359,13 @@ body.phone.landscape .stats-compact {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* 中身だけスクロール */
+body.phone.landscape .stats-detail,
+body.phone.landscape .stats-compact {
+  overflow-y: auto;
+  flex: 1;
 }
 
 body.phone.landscape .stats-detail {

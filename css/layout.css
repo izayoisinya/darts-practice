@@ -345,6 +345,25 @@ body.phone.landscape .number-row {
   gap: 6px;
 }
 
+/* Compact表示制御 */
+body.phone.landscape .stats-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.phone.landscape .stats-detail {
+  display: none;
+}
+
+body.phone.landscape.iphone-stats-open .stats-compact {
+  display: none;
+}
+
+body.phone.landscape.iphone-stats-open .stats-detail {
+  display: block;
+}
+
 
 
 @media (min-width: 1024px) {

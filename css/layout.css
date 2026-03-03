@@ -310,6 +310,8 @@ body.phone.landscape .stats-area {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+    width: 80px;
+  min-width: 80px;
 }
 
 /* 横で開いた状態 */
@@ -327,12 +329,6 @@ body.phone.landscape.iphone-stats-open .input-area {
 body.phone.landscape.iphone-stats-open .stats-area {
   flex: 1;
   padding: 24px;
-}
-
-/* phone 横のとき数字テーブル2列 */
-body.phone.landscape .number-table {
-  display: flex;
-  gap: 12px;
 }
 
 body.phone.landscape .number-column {

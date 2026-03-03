@@ -344,10 +344,6 @@ body.phone.landscape.iphone-stats-open .stats-area {
   min-width: 0;
 }
 
-body.phone.landscape .number-column {
-  flex: 1;
-}
-
 body.phone.landscape .number-row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

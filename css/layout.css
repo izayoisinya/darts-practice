@@ -275,8 +275,6 @@ body.phone .input-area {
   flex: 1;
 }
 
-
-
 /* phone 縦は普通表示 */
 body.phone .stats-area {
   flex: 1;
@@ -316,6 +314,21 @@ body.phone.landscape.iphone-stats-open .stats-area {
   padding: 24px;
 }
 
+/* phone 横のとき数字テーブル2列 */
+body.phone.landscape .number-table {
+  display: flex;
+  gap: 12px;
+}
+
+body.phone.landscape .number-column {
+  flex: 1;
+}
+
+body.phone.landscape .number-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
 
 
 

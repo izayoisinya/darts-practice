@@ -129,10 +129,10 @@
 
 /* Stats */
 .stat-item {
-  padding: 16px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 4px 0;
 }
 
 .stats-detail {
@@ -192,6 +192,17 @@
   margin-bottom: 6px;
 }
 
+.stats-area h3 {
+  margin: 2px 0 0 0;
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+.stats-area canvas {
+  display: block;
+  margin-top: 0;
+}
+
 /* ===== KPI行 ===== */
 .stats-kpi {
   display: grid;
@@ -222,7 +233,7 @@
 .stats-divider {
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin: 8px 0;
+  margin: 4px 0;
 }
 
 .bar-bg {
@@ -259,9 +270,10 @@
   width: 100%;
 }
 
-/* ================================= */
-/* ============ iPhone ============ */
-/* ================================= */
+
+/* ===================================================== */
+/* 02. PHONE (COMMON)                                    */
+/* ===================================================== */
 /* レイアウト調整 */
 body.phone {
   --header-height: 80px;
@@ -281,6 +293,9 @@ body.phone .stats-area {
   padding: 8px 20px 20px 20px;
 }
 
+/* ===================================================== */
+/* 03. PHONE LANDSCAPE                                   */
+/* ===================================================== */
 /* phone 横だけ特別レイアウト */
 body.phone.landscape .container {
   display: grid;
@@ -354,25 +369,4 @@ body.phone.landscape .number-row {
   }
 }
 
-/* ===== Stats 見出し圧縮 ===== */
 
-.stats-area h3 {
-  margin: 2px 0 0 0;
-  font-size: 18px;
-  margin-bottom: 2px;
-}
-
-/* Awardsの1行余白を縮める */
-.stat-item {
-  padding: 4px 0;
-}
-
-/* 区切り線さらに詰める */
-.stats-divider {
-  margin: 4px 0;
-}
-
-.stats-area canvas {
-  display: block;
-  margin-top: 0;
-}

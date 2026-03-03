@@ -263,211 +263,61 @@
 /* ============ iPhone ============ */
 /* ================================= */
 /* レイアウト調整 */
-body.iphone-mode {
+body.phone {
   --header-height: 80px;
   --header-padding-x: 28px;
 }
 
-body.iphone-mode .round-area {
+body.phone .round-area {
   flex: 1.4;
 }
-body.iphone-mode .input-area {
+body.phone .input-area {
   flex: 1;
 }
 
-body.iphone-mode .stats-area {
-  flex: 0;
-  padding: 0;
-  overflow: hidden;
-  min-width: 0;
+
+
+/* phone 縦は普通表示 */
+body.phone .stats-area {
+  flex: 1;
+  padding: 8px 20px 20px 20px;
 }
 
-body.iphone-mode.iphone-stats-open .input-area {
+/* phone 横だけ特別レイアウト */
+body.phone.landscape .container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 80px;
+  gap: 0;
+  transition: grid-template-columns 0.3s ease;
+}
+
+/* 横で閉じた状態 */
+body.phone.landscape .stats-area {
+  flex: unset;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* 横で開いた状態 */
+body.phone.landscape.iphone-stats-open .container {
+  grid-template-columns: 45% 0px 55%;
+}
+
+body.phone.landscape.iphone-stats-open .input-area {
   flex: 0;
   padding: 0;
   width: 0;
   overflow: hidden;
 }
 
-body.iphone-mode.iphone-stats-open .stats-area {
+body.phone.landscape.iphone-stats-open .stats-area {
   flex: 1;
   padding: 24px;
 }
 
-/* ================================= */
-/* iPhone 横専用 3カラムレイアウト */
-/* ================================= */
 
-@media (orientation: landscape){
-  body.iphone-mode .container {
-  body.iphone-mode .container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 80px; /* ← Stats細く */
-    gap: 0px;
 
-    transition: grid-template-columns 0.3s ease;
-  }
-
-  body.iphone-mode .round-area {
-    flex: unset;
-  }
-
-  body.iphone-mode .input-area {
-    flex: unset;
-  }
-
-  body.iphone-mode .stats-area {
-    flex: unset;   /* ← これが重要 */
-    width: auto;   /* 念のため */
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    font-size: 14px;
-    overflow-y: auto;
-  }
-
-  body.iphone-mode .round {
-    padding: 3px 0;
-  }
-
-  body.iphone-mode .dart {
-    width: 44px;
-    padding: 4px 0;
-    font-size: 13px;
-  }
-
-  body.iphone-mode .round {
-    grid-template-columns: 45px 1fr 30px 50px;
-  }
-
-  body.iphone-mode .divider {
-    margin: 0 6px;
-    opacity: 0.4;
-  }
-
-  body.iphone-mode h2 {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    margin-top: 0;
-    margin-bottom: 4px;
-    opacity: 0.85;
-  }
-
-  body.iphone-mode .stats-area h2 {
-    width: 100%;
-    text-align: left;
-    margin-bottom: 12px;
-  }
-
-  body.iphone-mode .round-area,
-  body.iphone-mode .stats-area {
-    padding: 10px 18px 18px 18px;
-  }
-  body.iphone-mode .input-area {
-    padding: 4px 16px 10px 16px;
-  }
-  body.iphone-mode .stats-area {
-    cursor: pointer;
-  }
-
-  body.iphone-mode .bull-setting {
-    padding: 4px 10px;
-    font-size: 12px;
-    margin-bottom: 8px;
-  }
-
-  body.iphone-mode .top-buttons button {
-    padding: 4px 0;
-    font-size: 12px;
-  }
-
-  body.iphone-mode .top-buttons {
-    gap: 4px;
-    margin-bottom: 8px;
-  }
-
-  /* =============================== */
-  /* iPhone Header Compact */
-  /* =============================== */
-  body.iphone-mode .score-value {
-    font-size: 42px;
-  }
-
-  body.iphone-mode .sub-value {
-    font-size: 18px;
-  }
-
-  body.iphone-mode .score-block {
-    transform: translateY(-2px);
-  }
-
-  body.iphone-mode .number-table {
-    display: flex;
-    gap: 12px;
-  }
-
-  body.iphone-mode .number-column {
-    flex: 1;
-  }
-
-  body.iphone-mode .number-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 6px;
-  }
-
-  body.iphone-mode .number-row button {
-    width: 100%;
-  }
-
-  body.iphone-mode .stats-compact {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-  }
-
-  body.iphone-mode .compact-block {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-  }
-
-  body.iphone-mode .compact-label {
-    font-size: 11px;
-    opacity: 0.6;
-  }
-
-  body.iphone-mode .compact-value {
-    font-size: 16px;
-    font-weight: 600;
-    color: #00ffc8;
-  }
-
-  body.iphone-mode .compact-sub {
-    font-size: 12px;
-    opacity: 0.7;
-  }
-
-  body.iphone-mode .stats-detail {
-    display: none;
-  }
-
-  body.iphone-mode.iphone-stats-open .stats-compact {
-    display: none;
-  }
-
-  body.iphone-mode.iphone-stats-open .stats-detail {
-    display: block;
-  }
-
-  body.iphone-mode.iphone-stats-open .container {
-    grid-template-columns: 45% 0px 55%;
-  }
-}
-}
 
 @media (min-width: 1024px) {
   .number-table {

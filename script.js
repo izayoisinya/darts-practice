@@ -49,11 +49,8 @@ const game = {
 
 // DOM構築完了後に実行
 document.addEventListener("DOMContentLoaded", () => {
-
-  // iPhone判定 → レイアウト切替用クラス付与
-  if (/iPhone/.test(navigator.userAgent)) {
-    document.body.classList.add("iphone-mode");
-  }
+  
+  updateDeviceClass(); 
 
   // ゲーム初期化（状態作成＋描画）
   init();
@@ -75,8 +72,11 @@ window.addEventListener("orientationchange", () => {
   }
 
 window.addEventListener("resize", () => {
+  updateDeviceClass();
   createNumberTable();
 });
+
+updateDeviceClass();
 
 });
 
@@ -128,9 +128,9 @@ function registerEvents() {
     if (e.target.closest(".stats-detail")) return;
     
     if (
-      document.body.classList.contains("iphone-mode") &&
-      window.matchMedia("(orientation: landscape)").matches
-    ) {
+  document.body.classList.contains("phone") &&
+  document.body.classList.contains("landscape")
+){
       
       document.body.classList.toggle("iphone-stats-open");
       
@@ -579,14 +579,14 @@ function createNumberTable() {
   
   table.innerHTML = "";
   
-  const isIphone =
-    document.body.classList.contains("iphone-mode") &&
-    window.matchMedia("(orientation: landscape)").matches;
+const isPhoneLandscape =
+  document.body.classList.contains("phone") &&
+  document.body.classList.contains("landscape");
   
   // ===============================
   // iPhone横 → 2カラム
   // ===============================
-  if (isIphone) {
+  if (isPhoneLandscape) {
     
     const leftColumn = document.createElement("div");
     leftColumn.className = "number-column";
@@ -995,4 +995,32 @@ function resetGame() {
   renderRounds();          // ラウンド表示更新
   updateStats();           // Stats更新
   updateNextGameButton();  // ボタン状態更新
+}
+
+
+
+function updateDeviceClass() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  
+  const isLandscape = width > height;
+  
+  document.body.classList.remove(
+    "phone",
+    "tablet",
+    "desktop",
+    "landscape"
+  );
+  
+  if (width <= 900) {
+    document.body.classList.add("phone");
+  } else if (width <= 1200) {
+    document.body.classList.add("tablet");
+  } else {
+    document.body.classList.add("desktop");
+  }
+  
+  if (isLandscape) {
+    document.body.classList.add("landscape");
+  }
 }

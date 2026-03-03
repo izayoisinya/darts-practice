@@ -318,7 +318,6 @@ body.phone.landscape .stats-area {
   flex: unset;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
     width: 80px;
   min-width: 80px;
   overflow: hidden;

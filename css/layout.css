@@ -651,6 +651,10 @@ body.menu-open .container {
   pointer-events: none;
 }
 
+body.menu-open .number-table {
+  pointer-events: none;
+}
+
 body.menu-open::after {
   content: "";
   position: fixed;

@@ -661,7 +661,7 @@ body.menu-open::after {
   z-index: 5000;
 }
 
-.side-menu::before {
+body.side-menu::before {
   
   content: "";
   

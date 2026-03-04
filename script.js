@@ -72,7 +72,7 @@ window.addEventListener("orientationchange", () => {
   }
 
 window.addEventListener("resize", () => {
-  detectDevice();
+  
   createNumberTable();
 });
 
@@ -153,6 +153,18 @@ function registerEvents() {
   }
   
 });
+
+document.querySelectorAll(".side-menu button").forEach(btn => {
+  
+  btn.addEventListener("click", () => {
+    
+    document
+      .getElementById("sideMenu")
+      .classList.remove("open")
+    
+  })
+  
+})
 
 }
 
@@ -1062,18 +1074,8 @@ function detectDevice() {
 
 
 // =================================
-// 初期判定（ページ読み込み時）
-// =================================
-detectDevice();
-
-
-// =================================
 // 画面サイズ変更時（回転・リサイズ）
 // =================================
-// 向き変更・画面サイズ変更時に
-// デバイスクラスを更新する
-window.addEventListener("resize", detectDevice);
-
 
 /* ========================= */
 /* SWIPE MENU */
@@ -1088,18 +1090,17 @@ document.addEventListener("touchstart", (e) => {
 })
 
 
-document.addEventListener("touchmove", (e) => {
+document.addEventListener("touchend", (e) => {
   
-  const currentX = e.touches[0].clientX
+  const currentX = e.changedTouches[0].clientX
   const diff = startX - currentX
+  const sideMenu = document.getElementById("sideMenu")
   
-  /* 右端スワイプ */
+  if (!sideMenu) return
   
   if (startX > window.innerWidth - 40 && diff < -60) {
     
-    document
-      .getElementById("sideMenu")
-      .classList.add("open")
+    sideMenu.classList.add("open")
     
   }
   
@@ -1112,6 +1113,8 @@ document.addEventListener("click", (e) => {
   
   const menu = document.getElementById("sideMenu")
   
+  if (!menu) return
+  
   if (!menu.contains(e.target)) {
     
     menu.classList.remove("open")
@@ -1120,15 +1123,3 @@ document.addEventListener("click", (e) => {
   
 })
 
-
-document.querySelectorAll(".side-menu button").forEach(btn => {
-  
-  btn.addEventListener("click", () => {
-    
-    document
-      .getElementById("sideMenu")
-      .classList.remove("open")
-    
-  })
-  
-})

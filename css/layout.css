@@ -691,12 +691,17 @@ body.menu-open .menu-overlay {
 
 body.menu-open .menu-edge {
   display: none;
+  pointer-events: none;
+}
+
+.menu-edge {
+  z-index: 1100;
 }
 
 .side-menu {
-  z-index: 1000;
+  z-index: 1200;
 }
 
 .menu-overlay {
-  z-index: 900;
+  z-index: 1000;
 }

@@ -1098,7 +1098,7 @@ document.addEventListener("touchend", (e) => {
   
   if (!sideMenu) return
   
-  if (startX > window.innerWidth - 40 && diff < -60) {
+  if (startX > window.innerWidth - 40 ) {
     
     sideMenu.classList.add("open")
     

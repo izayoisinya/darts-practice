@@ -388,7 +388,7 @@ body.phone.landscape.iphone-stats-open .stats-detail {
 body.phone.portrait .container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1.4fr 0.6fr;
+  grid-template-rows: 1fr min-content;
   max-height: 320px;
   gap: 12px;
 }
@@ -405,10 +405,16 @@ body.phone.portrait .input-area {
   grid-row: 1;
 }
 
+body.phone.portrait .round-area,
+body.phone.portrait .input-area {
+  height: 100%;
+}
+
 /* Stats */
 body.phone.portrait .stats-area {
   grid-column: 1 / span 2;
   grid-row: 2;
+  max-height: 260px;
 }
 
 body.phone.portrait .number-table {

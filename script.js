@@ -311,10 +311,6 @@ function renderRounds() {
       <span class="round-score">${roundScore}</span>
     `;
     
-    row.addEventListener("click", () => {
-  row.classList.toggle("open");
-});
-    
     // DOMへ追加
     container.appendChild(row);
   });

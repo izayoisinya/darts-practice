@@ -434,7 +434,8 @@ body.phone.portrait .number-row {
   display: none;
 }
 
-.round.open .round-darts {
+/* Rounds展開時は全表示 */
+body.phone.portrait.round-open .round-darts {
   display: flex;
 }
 

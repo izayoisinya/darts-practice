@@ -20,6 +20,8 @@ let lockedRound = -1;
 // 将来「履歴一覧」を作るための配列
 let sessions = [];
 
+let startX = 0
+
 // ===============================
 // ===== ゲーム状態管理オブジェクト
 // ===============================
@@ -167,6 +169,34 @@ document.querySelectorAll(".side-menu button").forEach(btn => {
   
 })
 
+// =========================
+// SWIPE MENU
+// =========================
+
+const menuEdge = document.querySelector(".menu-edge")
+
+if (menuEdge) {
+  
+  menuEdge.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].clientX
+  })
+  
+  menuEdge.addEventListener("touchend", (e) => {
+    
+    const currentX = e.changedTouches[0].clientX
+    const diff = startX - currentX
+    
+    const sideMenu = document.getElementById("sideMenu")
+    
+    if (diff < -40) {
+      sideMenu.classList.add("open")
+      document.body.classList.add("menu-open")
+    }
+    
+  })
+  
+}
+
 }
 
 
@@ -207,6 +237,8 @@ function addDart(value, multiplier, special = null) {
   if (game.currentDart === 3) {
     game.currentDart = 0;
     game.currentRound++;
+    
+    drawScoreChart();
   }
   
   
@@ -562,20 +594,12 @@ if (awardsContainer) {
   });
 }
   
-  
-  // ------------------------------------------
-  // ⑤ グラフ再描画
-  // ------------------------------------------
-  // ラウンドスコアの変化を反映
-  drawScoreChart();
-  
   // Compact表示更新
 const setCompact = (id, value) => {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
 };
 
-setCompact("bullCountCompact", stats.bullCount);
 setCompact("bullPercentCompact", stats.bullRate.toFixed(1) + "%");
 
 setCompact("innerBullsCompact", stats.innerBullCount);
@@ -1079,34 +1103,6 @@ function detectDevice() {
   
 }
 
-
-// =================================
-// 画面サイズ変更時（回転・リサイズ）
-// =================================
-
-/* ========================= */
-/* SWIPE MENU */
-/* ========================= */
-
-const menuEdge = document.querySelector(".menu-edge")
-
-menuEdge.addEventListener("touchstart", (e) => {
-  startX = e.touches[0].clientX
-})
-
-menuEdge.addEventListener("touchend", (e) => {
-  
-  const currentX = e.changedTouches[0].clientX
-  const diff = startX - currentX
-  
-  const sideMenu = document.getElementById("sideMenu")
-  
-  if (diff < -40) {
-    sideMenu.classList.add("open")
-    document.body.classList.add("menu-open")
-  }
-  
-})
 
 /* タップで閉じる */
 

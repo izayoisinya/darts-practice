@@ -661,6 +661,20 @@ body.menu-open::after {
   z-index: 5000;
 }
 
+.side-menu::before {
+  
+  content: "";
+  
+  position: absolute;
+  
+  top: 0;
+  left: -40px;
+  
+  width: 40px;
+  height: 100%;
+  
+}
+
 .menu-overlay {
   position: fixed;
   top: 0;

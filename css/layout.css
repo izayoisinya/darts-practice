@@ -376,27 +376,47 @@ body.phone.landscape.iphone-stats-open .stats-detail {
 }
 
 
+/* ===================================================== */
+/* 04. TABLET LANDSCAPE                                  */
+/* ===================================================== */
 
-@media (min-width: 1024px) {
-  .number-table {
-    width: 100%;
-    display: block;
-  }
+body.tablet.landscape .container {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 0.9fr;
+  gap: 16px;
+}
 
-  .number-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    width: 100%;
-  }
+body.tablet.landscape .round-area {
+  min-width: 320px;
+}
 
-  .number-row button {
-    width: 100%;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+body.tablet.landscape .input-area {
+  min-width: 280px;
+}
+
+body.tablet.landscape .stats-area {
+  min-width: 220px;
 }
 
 
+/* ===================================================== */
+/* 05. DESKTOP                                           */
+/* ===================================================== */
+
+body.desktop .number-table {
+  display: block;
+}
+
+body.desktop .number-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+body.desktop .number-row button {
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -612,6 +612,24 @@ body.desktop .number-row button {
   z-index: 1000;
 }
 
+/* =============================== */
+/* MENU EDGE (右端タッチエリア) */
+/* =============================== */
+
+.menu-edge {
+  
+  position: fixed;
+  
+  top: 0;
+  right: 0;
+  
+  width: 60px;
+  height: 100dvh;
+  
+  z-index: 900;
+  
+}
+
 
 /* 開いた状態 */
 
@@ -676,20 +694,18 @@ body.menu-open .menu-overlay {
   display: block;
 }
 
-.menu-edge {
-  
-  position: fixed;
-  
-  top: 0;
-  right: 0;
-  
-  width: 60px;
-  height: 100dvh;
-  
-  z-index: 900;
-  
-}
-
 body.menu-open .menu-edge {
   display: none;
+}
+
+.menu-edge {
+  z-index: 900;
+}
+
+.side-menu {
+  z-index: 1000;
+}
+
+.menu-overlay {
+  z-index: 800;
 }

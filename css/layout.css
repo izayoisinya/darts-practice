@@ -413,6 +413,9 @@ body.phone.portrait .input-area {
 body.phone.portrait .stats-area {
   grid-column: 1 / span 2;
   grid-row: 2;
+  
+   max-height: 220px;
+ overflow-y: auto;
 }
 
 body.phone.portrait .number-table {
@@ -441,6 +444,7 @@ body.phone.portrait .number-row {
 
 body.phone.portrait.round-open .container {
   grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
 }
 
 body.phone.portrait.round-open .input-area {

@@ -141,6 +141,8 @@ function registerEvents() {
     
   });
   
+  const roundArea = document.querySelector(".round-area");
+  
   roundArea.addEventListener("click", () => {
   
   if (
@@ -289,8 +291,6 @@ function renderRounds() {
       
       return `<span class="dart${cls}">${dart.score}</span>`;
     };
-    
-    const roundArea = document.querySelector(".round-area");
     
     // ------------------------------------------
     // HTML構築

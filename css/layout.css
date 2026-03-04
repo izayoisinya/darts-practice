@@ -646,6 +646,20 @@ body.desktop .number-row button {
   cursor: pointer;
 }
 
+.side-menu::before {
+  
+  content: "";
+  
+  position: absolute;
+  
+  top: 0;
+  left: -60px;
+  
+  width: 60px;
+  height: 100%;
+  
+}
+
 body.menu-open .container {
   pointer-events: none;
 }
@@ -659,20 +673,6 @@ body.menu-open::after {
   height: 100%;
   background: rgba(0, 0, 0, .35);
   z-index: 5000;
-}
-
-.side-menu::before {
-  
-  content: "";
-  
-  position: fixed;
-  
-  top: 0;
-  left: -40px;
-  
-  width: 40px;
-  height: 100%;
-  
 }
 
 .menu-overlay {

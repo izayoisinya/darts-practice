@@ -1123,3 +1123,18 @@ document.addEventListener("click", (e) => {
   
 })
 
+
+document
+  .getElementById("menuOverlay")
+  .addEventListener("click", () => {
+    
+    document
+      .getElementById("sideMenu")
+      .classList.remove("open")
+    
+    document.body.classList.remove("menu-open")
+    
+  })
+
+
+

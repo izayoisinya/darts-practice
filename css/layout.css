@@ -381,6 +381,55 @@ body.phone.landscape.iphone-stats-open .stats-detail {
   display: block;
 }
 
+/* ===================================================== */
+/* PHONE PORTRAIT                                        */
+/* ===================================================== */
+
+body.phone.portrait .container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 12px;
+}
+
+/* Rounds */
+body.phone.portrait .round-area {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* Input */
+body.phone.portrait .input-area {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Stats */
+body.phone.portrait .stats-area {
+  grid-column: 1 / span 2;
+  grid-row: 2;
+}
+
+body.phone.portrait .number-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.phone.portrait .number-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 6px;
+}
+
+.round .round-darts {
+  display: none;
+}
+
+.round.open .round-darts {
+  display: flex;
+}
+
 
 /* ===================================================== */
 /* 04. TABLET LANDSCAPE                                  */

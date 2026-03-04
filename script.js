@@ -1019,16 +1019,10 @@ const body = document.body;
 // ===============================
 function detectDevice() {
   
-  // 現在の画面横幅を取得
-  // レスポンシブ判定に使用
+  // 画面横幅取得
   const w = window.innerWidth;
   
-  
-  // --------------------------------
-  // 既存のデバイスクラスをすべて削除
-  // --------------------------------
-  // 毎回リセットしてから付け直すことで
-  // クラスの重複を防ぐ
+  // クラスリセット
   body.classList.remove(
     "phone",
     "tablet",
@@ -1037,44 +1031,31 @@ function detectDevice() {
     "landscape"
   );
   
+  // -------------------------
+  // デバイス判定
+  // -------------------------
   
-  // --------------------------------
-  // デバイス種類判定
-  // --------------------------------
-  // 横幅ベースで3段階に分類
+  const isMobile =
+    /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent);
   
-  // スマートフォン
-  if (w < 900) {
+  if (isMobile) {
     body.classList.add("phone");
   }
-  
-  // タブレット
   else if (w < 1200) {
     body.classList.add("tablet");
   }
-  
-  // デスクトップ
   else {
     body.classList.add("desktop");
   }
   
-  
-  // --------------------------------
+  // -------------------------
   // 画面向き判定
-  // --------------------------------
-  // CSSメディアクエリと同じ判定方法
-  // Safariなどでも安定して動作する
+  // -------------------------
   
   if (window.matchMedia("(orientation: portrait)").matches) {
-    
-    // 縦向き
     body.classList.add("portrait");
-    
   } else {
-    
-    // 横向き
     body.classList.add("landscape");
-    
   }
   
 }

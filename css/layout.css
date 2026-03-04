@@ -51,7 +51,7 @@
   height: calc(100dvh - var(--header-height));
 
   overflow: hidden;
-padding: 0 20px 10px 25px;
+padding: 0 20px 10px 20px;
   
 }
 
@@ -633,7 +633,7 @@ body.desktop .number-row button {
 
 .side-menu button {
   
-  height: 44px;
+  height: 100%;
   
   border: none;
   border-radius: 10px;

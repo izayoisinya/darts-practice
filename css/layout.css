@@ -581,3 +581,67 @@ body.desktop .number-row button {
   align-items: center;
   justify-content: center;
 }
+
+/* =============================== */
+/* SIDE MENU */
+/* =============================== */
+
+.side-menu {
+  
+  position: fixed;
+  
+  top: 0;
+  right: -230px;
+  
+  width: 260px;
+  height: 100dvh;
+  
+  background: #151922;
+  
+  box-shadow:
+    -10px 0 30px rgba(0, 0, 0, 0.6);
+  
+  padding: 20px;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  transition: right 0.25s ease;
+  
+  z-index: 1000;
+}
+
+
+/* 開いた状態 */
+
+.side-menu.open {
+  right: 0;
+}
+
+
+/* header */
+
+.menu-header {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+
+/* buttons */
+
+.side-menu button {
+  
+  height: 44px;
+  
+  border: none;
+  border-radius: 10px;
+  
+  background: #1c212b;
+  color: white;
+  
+  font-size: 15px;
+  
+  cursor: pointer;
+}

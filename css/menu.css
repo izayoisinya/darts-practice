@@ -1,0 +1,135 @@
+/* ============================== */
+/* MENU PAGE */
+/* ============================== */
+
+body {
+  background: #0f1115;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+
+/* ============================== */
+/* HEADER */
+/* ============================== */
+
+.header {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  font-size: 22px;
+  font-weight: 600;
+  
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+
+/* ============================== */
+/* MAIN */
+/* ============================== */
+
+.menu-container {
+  flex: 1;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  padding: 24px;
+}
+
+
+/* ============================== */
+/* MENU PANEL */
+/* ============================== */
+
+.menu-list {
+  
+  width: 320px;
+  
+  background: #151922;
+  
+  border-radius: 18px;
+  
+  padding: 28px;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+
+/* ============================== */
+/* MENU BUTTON */
+/* ============================== */
+
+.menu-list button {
+  
+  height: 54px;
+  
+  font-size: 16px;
+  font-weight: 500;
+  
+  border: none;
+  border-radius: 10px;
+  
+  background: #1c212b;
+  
+  color: white;
+  
+  cursor: pointer;
+  
+  transition:
+    background 0.15s,
+    transform 0.05s;
+}
+
+
+/* hover */
+
+.menu-list button:hover {
+  background: #252b36;
+}
+
+
+/* press */
+
+.menu-list button:active {
+  transform: scale(0.97);
+}
+
+
+/* disabled */
+
+.menu-list button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+
+/* ============================== */
+/* FOOTER */
+/* ============================== */
+
+.footer {
+  
+  height: 44px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  font-size: 12px;
+  
+  opacity: 0.45;
+  
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}

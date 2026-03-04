@@ -1073,3 +1073,62 @@ detectDevice();
 // 向き変更・画面サイズ変更時に
 // デバイスクラスを更新する
 window.addEventListener("resize", detectDevice);
+
+
+/* ========================= */
+/* SWIPE MENU */
+/* ========================= */
+
+let startX = 0
+
+document.addEventListener("touchstart", (e) => {
+  
+  startX = e.touches[0].clientX
+  
+})
+
+
+document.addEventListener("touchmove", (e) => {
+  
+  const currentX = e.touches[0].clientX
+  const diff = startX - currentX
+  
+  /* 右端スワイプ */
+  
+  if (startX > window.innerWidth - 40 && diff < -60) {
+    
+    document
+      .getElementById("sideMenu")
+      .classList.add("open")
+    
+  }
+  
+})
+
+
+/* タップで閉じる */
+
+document.addEventListener("click", (e) => {
+  
+  const menu = document.getElementById("sideMenu")
+  
+  if (!menu.contains(e.target)) {
+    
+    menu.classList.remove("open")
+    
+  }
+  
+})
+
+
+document.querySelectorAll(".side-menu button").forEach(btn => {
+  
+  btn.addEventListener("click", () => {
+    
+    document
+      .getElementById("sideMenu")
+      .classList.remove("open")
+    
+  })
+  
+})

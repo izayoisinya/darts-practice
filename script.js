@@ -1098,11 +1098,12 @@ document.addEventListener("touchend", (e) => {
   
   if (!sideMenu) return
   
-  if (startX > window.innerWidth - 40 ) {
-    
-    sideMenu.classList.add("open")
-    
-  }
+  if (startX > window.innerWidth - 40) {
+  
+  sideMenu.classList.add("open")
+  document.body.classList.add("menu-open")
+  
+}
   
 })
 
@@ -1118,23 +1119,26 @@ document.addEventListener("click", (e) => {
   if (!menu.contains(e.target)) {
     
     menu.classList.remove("open")
+    document.body.classList.remove("menu-open")
     
   }
   
 })
 
 
-document
-  .getElementById("menuOverlay")
-  .addEventListener("click", () => {
+
+const overlay = document.getElementById("menuOverlay")
+
+if (overlay) {
+  
+  overlay.addEventListener("click", () => {
     
-    document
-      .getElementById("sideMenu")
-      .classList.remove("open")
-    
+    document.getElementById("sideMenu").classList.remove("open")
     document.body.classList.remove("menu-open")
     
   })
+  
+}
 
 
 

@@ -1044,7 +1044,7 @@ function detectDevice() {
   // 横幅ベースで3段階に分類
   
   // スマートフォン
-  if (w < 768) {
+  if (w < 900) {
     body.classList.add("phone");
   }
   

@@ -424,6 +424,45 @@ body.tablet.landscape .number-row {
 }
 
 /* ===================================================== */
+/* 05. TABLET PORTRAIT                                   */
+/* ===================================================== */
+
+body.tablet.portrait .container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 0.8fr;
+  gap: 16px;
+}
+
+/* エリア配置 */
+
+body.tablet.portrait .round-area {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+body.tablet.portrait .input-area {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+body.tablet.portrait .stats-area {
+  grid-column: 1 / span 2;
+  grid-row: 2;
+}
+
+body.tablet.portrait .number-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: column;
+  gap: 12px 24px;
+}
+
+body.tablet.portrait .number-column {
+  display: contents;
+}
+
+/* ===================================================== */
 /* 05. DESKTOP                                           */
 /* ===================================================== */
 

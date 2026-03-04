@@ -388,7 +388,8 @@ body.phone.landscape.iphone-stats-open .stats-detail {
 body.phone.portrait .container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr 0.55fr;
+  max-height: 320px;
   gap: 12px;
 }
 

@@ -51,8 +51,7 @@
   height: calc(100dvh - var(--header-height));
 
   overflow: hidden;
-margin-right: 25px;
-padding: 0 20px 10px;
+padding: 0 20px 10px 25px;
   
 }
 
@@ -645,6 +644,10 @@ body.desktop .number-row button {
   font-size: 15px;
   
   cursor: pointer;
+}
+
+body.menu-open .container {
+  pointer-events: none;
 }
 
 body.menu-open .container {

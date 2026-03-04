@@ -267,6 +267,12 @@
 }
 
 .number-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.number-row button {
   width: 100%;
 }
 

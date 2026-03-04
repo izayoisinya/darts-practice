@@ -661,11 +661,11 @@ body.menu-open::after {
   z-index: 5000;
 }
 
-body.side-menu::before {
+.side-menu::before {
   
   content: "";
   
-  position: absolute;
+  position: fixed;
   
   top: 0;
   left: -40px;

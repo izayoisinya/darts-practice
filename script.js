@@ -49,37 +49,39 @@ const game = {
 
 // DOM構築完了後に実行
 document.addEventListener("DOMContentLoaded", () => {
-
- detectDevice();
-
+  
+  // デバイス判定
+  detectDevice();
+  
   // ゲーム初期化（状態作成＋描画）
   init();
-
+  
   // イベント登録（クリック処理など）
   registerEvents();
-
-// 画面回転時にStatsを閉じる
-window.addEventListener("orientationchange", () => {
-  document.body.classList.remove("iphone-stats-open");
-});
-
-  // PWA用 ServiceWorker 登録
+  
+  // ===== 画面回転・サイズ変更 =====
+  
+  window.addEventListener("resize", refreshLayout);
+  window.addEventListener("orientationchange", refreshLayout);
+  
+  // ===== 画面回転時にStatsを閉じる =====
+  
+  window.addEventListener("orientationchange", () => {
+    document.body.classList.remove("iphone-stats-open");
+  });
+  
+  // ===== PWA ServiceWorker =====
+  
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
       .register("./sw.js")
       .then(() => console.log("SW registered"))
       .catch(err => console.log("SW error", err));
   }
-
-window.addEventListener("resize", () => {
   
-  createNumberTable();
-});
-
 });
 
 
-// ===============================
 // ===== ゲーム初期化処理 ========
 // ===============================
 function init() {
@@ -1031,43 +1033,49 @@ const body = document.body;
 // ===============================
 function detectDevice() {
   
-  // 画面横幅取得
-  const w = window.innerWidth;
+  const w = window.innerWidth
+  const h = window.innerHeight
   
-  // クラスリセット
   body.classList.remove(
     "phone",
     "tablet",
     "desktop",
     "portrait",
     "landscape"
-  );
+  )
   
-  // -------------------------
+  const ua = navigator.userAgent
+  
+  const isIPad =
+    ua.includes("iPad") ||
+    (ua.includes("Macintosh") && "ontouchend" in document)
+  
+  const isIPhone =
+    /iPhone/i.test(ua)
+  
+  const isAndroid =
+    /Android/i.test(ua)
+  
   // デバイス判定
-  // -------------------------
-  
-  const isMobile =
-    /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent);
-  
-  if (isMobile) {
-    body.classList.add("phone");
-  }
-  else if (w < 1200) {
-    body.classList.add("tablet");
-  }
-  else {
-    body.classList.add("desktop");
-  }
-  
-  // -------------------------
-  // 画面向き判定
-  // -------------------------
-  
-  if (window.matchMedia("(orientation: portrait)").matches) {
-    body.classList.add("portrait");
+  if (isIPhone || (isAndroid && w < 768)) {
+    
+    body.classList.add("phone")
+    
+  } else if (isIPad || (isAndroid && w >= 768) || w < 1200) {
+    
+    body.classList.add("tablet")
+    
   } else {
-    body.classList.add("landscape");
+    
+    body.classList.add("desktop")
+    
+  }
+  
+  // 向き判定
+  if (h > w) {
+    body.classList.add("portrait")
+  } else {
+    body.classList.add("landscape")
   }
   
 }
@@ -1139,6 +1147,16 @@ if (overlay) {
   })
   
 }
+
+
+function refreshLayout() {
+  
+  detectDevice()
+  createNumberTable()
+  drawScoreChart()
+  
+}
+
 
 
 

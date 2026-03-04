@@ -51,8 +51,9 @@
   height: calc(100dvh - var(--header-height));
 
   overflow: hidden;
-
-  padding: 0 20px 20px;
+margin-right: 25px;
+padding: 0 260px 20px 20px;
+  
 }
 
 /* Columns */
@@ -591,7 +592,7 @@ body.desktop .number-row button {
   position: fixed;
   
   top: 0;
-  right: -230px;
+  right: -240px;
   
   width: 260px;
   height: 100dvh;

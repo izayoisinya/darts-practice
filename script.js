@@ -49,8 +49,8 @@ const game = {
 
 // DOM構築完了後に実行
 document.addEventListener("DOMContentLoaded", () => {
-  
-  updateDeviceClass(); 
+
+ detectDevice();
 
   // ゲーム初期化（状態作成＋描画）
   init();
@@ -72,11 +72,9 @@ window.addEventListener("orientationchange", () => {
   }
 
 window.addEventListener("resize", () => {
-  updateDeviceClass();
+  detectDevice();
   createNumberTable();
 });
-
-updateDeviceClass();
 
 });
 
@@ -999,28 +997,86 @@ function resetGame() {
 
 
 
-function updateDeviceClass() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+
+// body要素を取得（毎回querySelectorしないため）
+const body = document.body;
+
+
+// ===============================
+// デバイス判定関数
+// ===============================
+function detectDevice() {
   
-  const isLandscape = width > height;
+  // 現在の画面横幅を取得
+  // レスポンシブ判定に使用
+  const w = window.innerWidth;
   
-  document.body.classList.remove(
+  
+  // --------------------------------
+  // 既存のデバイスクラスをすべて削除
+  // --------------------------------
+  // 毎回リセットしてから付け直すことで
+  // クラスの重複を防ぐ
+  body.classList.remove(
     "phone",
     "tablet",
     "desktop",
+    "portrait",
     "landscape"
   );
   
-  if (width <= 900) {
-    document.body.classList.add("phone");
-  } else if (width <= 1200) {
-    document.body.classList.add("tablet");
-  } else {
-    document.body.classList.add("desktop");
+  
+  // --------------------------------
+  // デバイス種類判定
+  // --------------------------------
+  // 横幅ベースで3段階に分類
+  
+  // スマートフォン
+  if (w < 768) {
+    body.classList.add("phone");
   }
   
-  if (isLandscape) {
-    document.body.classList.add("landscape");
+  // タブレット
+  else if (w < 1200) {
+    body.classList.add("tablet");
   }
+  
+  // デスクトップ
+  else {
+    body.classList.add("desktop");
+  }
+  
+  
+  // --------------------------------
+  // 画面向き判定
+  // --------------------------------
+  // CSSメディアクエリと同じ判定方法
+  // Safariなどでも安定して動作する
+  
+  if (window.matchMedia("(orientation: portrait)").matches) {
+    
+    // 縦向き
+    body.classList.add("portrait");
+    
+  } else {
+    
+    // 横向き
+    body.classList.add("landscape");
+    
+  }
+  
 }
+
+
+// =================================
+// 初期判定（ページ読み込み時）
+// =================================
+detectDevice();
+
+
+// =================================
+// 画面サイズ変更時（回転・リサイズ）
+// =================================
+// 向き変更・画面サイズ変更時に
+// デバイスクラスを更新する
+window.addEventListener("resize", detectDevice);

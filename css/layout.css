@@ -646,20 +646,6 @@ body.desktop .number-row button {
   cursor: pointer;
 }
 
-.side-menu::before {
-  
-  content: "";
-  
-  position: absolute;
-  
-  top: 0;
-  left: -60px;
-  
-  width: 60px;
-  height: 100%;
-  
-}
-
 body.menu-open .container {
   pointer-events: none;
 }
@@ -688,4 +674,22 @@ body.menu-open::after {
 
 body.menu-open .menu-overlay {
   display: block;
+}
+
+.menu-edge {
+  
+  position: fixed;
+  
+  top: 0;
+  right: 0;
+  
+  width: 60px;
+  height: 100dvh;
+  
+  z-index: 900;
+  
+}
+
+body.menu-open .menu-edge {
+  display: none;
 }

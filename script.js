@@ -81,7 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
 });
 
-
 // ===== ゲーム初期化処理 ========
 // ===============================
 function init() {
@@ -1089,32 +1088,25 @@ function detectDevice() {
 /* SWIPE MENU */
 /* ========================= */
 
-let startX = 0
+const menuEdge = document.querySelector(".menu-edge")
 
-document.addEventListener("touchstart", (e) => {
-  
+menuEdge.addEventListener("touchstart", (e) => {
   startX = e.touches[0].clientX
-  
 })
 
-
-document.addEventListener("touchend", (e) => {
+menuEdge.addEventListener("touchend", (e) => {
   
   const currentX = e.changedTouches[0].clientX
   const diff = startX - currentX
+  
   const sideMenu = document.getElementById("sideMenu")
   
-  if (!sideMenu) return
-  
-  if (startX > window.innerWidth - 40) {
-  
-  sideMenu.classList.add("open")
-  document.body.classList.add("menu-open")
-  
-}
+  if (diff < -40) {
+    sideMenu.classList.add("open")
+    document.body.classList.add("menu-open")
+  }
   
 })
-
 
 /* タップで閉じる */
 

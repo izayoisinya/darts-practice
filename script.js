@@ -20,7 +20,7 @@ let lockedRound = -1;
 // 将来「履歴一覧」を作るための配列
 let sessions = [];
 
-let startX = 0
+let startX = null
 
 // ===============================
 // ===== ゲーム状態管理オブジェクト
@@ -64,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== 画面回転・サイズ変更 =====
   
   window.addEventListener("resize", refreshLayout);
-  window.addEventListener("orientationchange", refreshLayout);
   
   // ===== 画面回転時にStatsを閉じる =====
   
@@ -161,9 +160,11 @@ document.querySelectorAll(".side-menu button").forEach(btn => {
   
   btn.addEventListener("click", () => {
     
-    document
-      .getElementById("sideMenu")
-      .classList.remove("open")
+    const menu = document.getElementById("sideMenu")
+    
+    menu.classList.remove("open")
+    
+    document.body.classList.remove("menu-open")
     
   })
   
@@ -192,6 +193,19 @@ if (menuEdge) {
       sideMenu.classList.add("open")
       document.body.classList.add("menu-open")
     }
+    
+  })
+  
+}
+
+const overlay = document.getElementById("menuOverlay")
+
+if (overlay) {
+  
+  overlay.addEventListener("click", () => {
+    
+    document.getElementById("sideMenu").classList.remove("open")
+    document.body.classList.remove("menu-open")
     
   })
   
@@ -283,6 +297,8 @@ function undoDart() {
   updateStats();
   saveGame();
   updateNextGameButton();
+  
+  drawScoreChart()
 }
 
 
@@ -531,24 +547,19 @@ set("totalDarts", stats.totalDarts);
   
   // Bulls
 set("bullCount", stats.bullCount);
-set("bullCountCompact", stats.bullCount);
 
 // Inner
 set("innerBulls", stats.innerBullCount);
-set("innerBullsCompact", stats.innerBullCount);
 
 // PPD
 set("ppd", stats.ppd.toFixed(2));
-set("ppdCompact", stats.ppd.toFixed(2));
 
 // Avg
 set("roundAvg", stats.roundAvg.toFixed(1));
-set("roundAvgCompact", stats.roundAvg.toFixed(1));
 
 // Max
 set("maxRound", stats.maxRound);
-set("maxRoundCompact", stats.maxRound);
-  
+
   // ------------------------------------------
   // ④ バー表示更新（CSS幅変更）
   // ------------------------------------------
@@ -1109,10 +1120,14 @@ function detectDevice() {
 document.addEventListener("click", (e) => {
   
   const menu = document.getElementById("sideMenu")
+  const edge = document.querySelector(".menu-edge")
   
   if (!menu) return
   
-  if (!menu.contains(e.target)) {
+  if (
+    !menu.contains(e.target) &&
+    !edge.contains(e.target)
+  ) {
     
     menu.classList.remove("open")
     document.body.classList.remove("menu-open")
@@ -1122,19 +1137,6 @@ document.addEventListener("click", (e) => {
 })
 
 
-
-const overlay = document.getElementById("menuOverlay")
-
-if (overlay) {
-  
-  overlay.addEventListener("click", () => {
-    
-    document.getElementById("sideMenu").classList.remove("open")
-    document.body.classList.remove("menu-open")
-    
-  })
-  
-}
 
 
 function refreshLayout() {

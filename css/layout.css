@@ -402,15 +402,25 @@ body.tablet.landscape .stats-area {
 /* TABLET LANDSCAPE - INPUT 2 COLUMN                    */
 /* ===================================================== */
 
+/* TABLET LANDSCAPE - INPUT */
+
 body.tablet.landscape .number-table {
-  display: flex;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(10, 1fr); /* ← ここ重要 */
+  gap: 12px 24px;
+  height: 100%; /* ← これも重要 */
 }
 
 body.tablet.landscape .number-column {
-  flex: 1;
+  display: contents;
 }
 
+body.tablet.landscape .number-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+}
 
 /* ===================================================== */
 /* 05. DESKTOP                                           */

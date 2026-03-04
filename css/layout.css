@@ -388,7 +388,7 @@ body.phone.landscape.iphone-stats-open .stats-detail {
 body.phone.portrait .container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 0.55fr;
+  grid-template-rows: 1.4fr 0.6fr;
   max-height: 320px;
   gap: 12px;
 }
@@ -429,6 +429,26 @@ body.phone.portrait .number-row {
 
 .round.open .round-darts {
   display: flex;
+}
+
+/* ================================= */
+/* PHONE PORTRAIT - ROUNDS OPEN      */
+/* ================================= */
+
+body.phone.portrait.round-open .container {
+  grid-template-columns: 1fr;
+}
+
+body.phone.portrait.round-open .input-area {
+  display: none;
+}
+
+body.phone.portrait.round-open .round-area {
+  grid-column: 1;
+}
+
+body.phone.portrait.round-open .stats-area {
+  grid-column: 1;
 }
 
 

@@ -140,6 +140,18 @@ function registerEvents() {
     }
     
   });
+  
+  roundArea.addEventListener("click", () => {
+  
+  if (
+    document.body.classList.contains("phone") &&
+    document.body.classList.contains("portrait")
+  ) {
+    document.body.classList.toggle("round-open");
+  }
+  
+});
+
 }
 
 
@@ -278,6 +290,7 @@ function renderRounds() {
       return `<span class="dart${cls}">${dart.score}</span>`;
     };
     
+    const roundArea = document.querySelector(".round-area");
     
     // ------------------------------------------
     // HTML構築

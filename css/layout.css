@@ -408,6 +408,7 @@ body.tablet.landscape .number-table {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: repeat(10, 1fr); /* ← ここ重要 */
+  grid-auto-flow: column;
   gap: 12px 24px;
   height: 100%; /* ← これも重要 */
 }

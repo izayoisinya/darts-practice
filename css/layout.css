@@ -391,7 +391,7 @@ body.phone.portrait .container {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr min-content;
   gap: 12px;
-  padding: 5px 0 20px 10px;
+  padding: 5px 25px 10px 0;
 }
 
 /* Rounds */

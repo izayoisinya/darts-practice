@@ -22,6 +22,7 @@ let sessions = [];
 
 let startX = null
 
+
 // ===============================
 // ===== ゲーム状態管理オブジェクト
 // ===============================
@@ -174,6 +175,8 @@ document.querySelectorAll(".side-menu button").forEach(btn => {
 // SWIPE MENU
 // =========================
 
+
+
 const menuEdge = document.querySelector(".menu-edge")
 
 if (menuEdge) {
@@ -182,21 +185,34 @@ if (menuEdge) {
     startX = e.touches[0].clientX
   })
   
-  menuEdge.addEventListener("touchend", (e) => {
+  menuEdge.addEventListener("touchmove", (e) => {
     
-    const currentX = e.changedTouches[0].clientX
+    const currentX = e.touches[0].clientX
     const diff = startX - currentX
     
-    const sideMenu = document.getElementById("sideMenu")
-    
     if (diff < -40) {
+      
+      const sideMenu = document.getElementById("sideMenu")
+      
       sideMenu.classList.add("open")
       document.body.classList.add("menu-open")
+      
     }
     
   })
   
+  // ★追加（タップで開く）
+  menuEdge.addEventListener("click", () => {
+    
+    const sideMenu = document.getElementById("sideMenu")
+    
+    sideMenu.classList.add("open")
+    document.body.classList.add("menu-open")
+    
+  })
+  
 }
+
 
 const overlay = document.getElementById("menuOverlay")
 
@@ -210,6 +226,12 @@ if (overlay) {
   })
   
 }
+
+document.querySelectorAll("[data-link]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    location.href = btn.dataset.link
+  })
+})
 
 }
 
@@ -1119,6 +1141,8 @@ function detectDevice() {
 
 document.addEventListener("click", (e) => {
   
+  if (!document.body.classList.contains("menu-open")) return;
+  
   const menu = document.getElementById("sideMenu")
   const edge = document.querySelector(".menu-edge")
   
@@ -1146,6 +1170,9 @@ function refreshLayout() {
   drawScoreChart()
   
 }
+
+
+
 
 
 

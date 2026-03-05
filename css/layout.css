@@ -602,7 +602,7 @@ body.desktop .number-row button {
   box-shadow:
     -10px 0 30px rgba(0, 0, 0, 0.6);
   
-  padding: 20;
+  padding: 20px;
   
   display: flex;
   flex-direction: column;
@@ -622,10 +622,12 @@ body.desktop .number-row button {
   position: fixed;
   
   top: 0;
-  right: -20px;
+  right: 0;
   
-  width: 40px;
+  width: 24px;
   height: 100dvh;
+  
+  transform: translateX(12px); /* 半分外へ */
   
   z-index: 1100;
   

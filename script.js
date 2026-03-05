@@ -172,38 +172,16 @@ document.querySelectorAll(".side-menu button").forEach(btn => {
 })
 
 // =========================
-// SWIPE MENU
+// MENU
 // =========================
-
-
-
-const menuEdge = document.querySelector(".menu-edge")
-
-if (menuEdge) {
-  
-  menuEdge.addEventListener("click", () => {
-    
-    const sideMenu = document.getElementById("sideMenu")
-    
-    sideMenu.classList.add("open")
-    document.body.classList.add("menu-open")
-    
-  })
-  
-}
-
-
 const overlay = document.getElementById("menuOverlay")
+const menu = document.getElementById("sideMenu")
 
-if (overlay) {
-  
+if (overlay && menu) {
   overlay.addEventListener("click", () => {
-    
-    document.getElementById("sideMenu").classList.remove("open")
+    menu.classList.remove("open")
     document.body.classList.remove("menu-open")
-    
   })
-  
 }
 
 document.querySelectorAll("[data-link]").forEach(btn => {
@@ -1123,13 +1101,11 @@ document.addEventListener("click", (e) => {
   if (!document.body.classList.contains("menu-open")) return;
   
   const menu = document.getElementById("sideMenu")
-  const edge = document.querySelector(".menu-edge")
-  
+
   if (!menu) return
   
   if (
-    !menu.contains(e.target) &&
-    !edge.contains(e.target)
+    !menu.contains(e.target) 
   ) {
     
     menu.classList.remove("open")

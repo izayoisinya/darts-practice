@@ -81,6 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
   
 });
 
+
+
 // ===== ゲーム初期化処理 ========
 // ===============================
 function init() {

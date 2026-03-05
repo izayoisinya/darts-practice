@@ -20,8 +20,6 @@ let lockedRound = -1;
 // 将来「履歴一覧」を作るための配列
 let sessions = [];
 
-let startX = null
-
 
 // ===============================
 // ===== ゲーム状態管理オブジェクト
@@ -181,27 +179,6 @@ const menuEdge = document.querySelector(".menu-edge")
 
 if (menuEdge) {
   
-  menuEdge.addEventListener("touchstart", (e) => {
-    startX = e.touches[0].clientX
-  })
-  
-  menuEdge.addEventListener("touchmove", (e) => {
-    
-    const currentX = e.touches[0].clientX
-    const diff = startX - currentX
-    
-    if (diff < -40) {
-      
-      const sideMenu = document.getElementById("sideMenu")
-      
-      sideMenu.classList.add("open")
-      document.body.classList.add("menu-open")
-      
-    }
-    
-  })
-  
-  // ★追加（タップで開く）
   menuEdge.addEventListener("click", () => {
     
     const sideMenu = document.getElementById("sideMenu")

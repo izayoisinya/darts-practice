@@ -10,14 +10,18 @@
     />
 
     <meta name="theme-color" content="#0f1115" />
-    
+
     <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Darts Practice" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Darts Practice" />
 
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/menu.css" />
     <link rel="stylesheet" href="css/theme.css" />
   </head>
 
@@ -47,7 +51,7 @@
       <section class="round-area">
         <h2>Rounds</h2>
         <div class="round-list">
-          <div role="list" id="roundContainer"></div>
+          <div id="roundContainer"></div>
         </div>
       </section>
 
@@ -157,41 +161,35 @@
 
           <h3>Awards</h3>
           <div id="awardsContainer"></div>
-          
+
           <hr class="stats-divider" />
 
-<h3>Score Graph</h3>
-<canvas id="scoreChart"></canvas>
-
-
+          <h3>Score Graph</h3>
+          <canvas id="scoreChart"></canvas>
         </div>
       </section>
     </main>
-    
+
     <div id="menuOverlay" class="menu-overlay"></div>
-    
+
     <!-- ================= MENU DRAWER ================= -->
 
-<div id="sideMenu" class="side-menu" role="navigation">
-  
-  <div class="menu-header">
-    Menu
-  </div>
-  
-<button data-link="index.html">
-  Main Menu
-</button>
-  
-  <button onclick="location.href='countup.html'">
-    CountUp
-  </button>
-  
-  <button disabled>
-    Cricket
-  </button>
-  
-</div>
+    <div id="sideMenu" class="side-menu" role="navigation">
+      <div class="menu-header">Menu</div>
 
-    <script src="script.js"></script>
+      <button data-link="index.html">Main Menu</button>
+
+      <button onclick="location.href = 'countup.html'">CountUp</button>
+
+      <button disabled>Cricket</button>
+    </div>
+
+    <script src="js/state.js" defer></script>
+    <script src="js/storage.js" defer></script>
+    <script src="js/stats.js" defer></script>
+    <script src="js/chart.js" defer></script>
+    <script src="js/ui.js" defer></script>
+    <script src="js/game.js" defer></script>
+    <script src="js/main.js" defer></script>
   </body>
 </html>

@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== 画面回転・サイズ変更 =====
   
   window.addEventListener("resize", refreshLayout);
+  window.addEventListener("orientationchange", refreshLayout)
   
   // ===== 画面回転時にStatsを閉じる =====
   
@@ -63,8 +64,9 @@ drawScoreChart()
 // ===============================
 function registerEvents() {
   
-  const menu = document.getElementById("sideMenu")
   const overlay = document.getElementById("menuOverlay")
+  const edge = document.getElementById("menuEdge")
+  const menu = document.getElementById("sideMenu")
   
   const nextBtn = document.getElementById("nextGameBtn")
   if (nextBtn) {
@@ -72,25 +74,13 @@ function registerEvents() {
   }
   
   const statsArea = document.querySelector(".stats-area")
-  
-  statsArea.addEventListener("click", (e) => {
-    
-    if (e.target.closest(".stats-detail")) return
-    
-    if (
-      document.body.classList.contains("phone") &&
-      document.body.classList.contains("landscape")
-    ) {
-      
-      document.body.classList.toggle("iphone-stats-open")
-      
-      setTimeout(() => {
-        drawScoreChart()
-      }, 300)
-      
-    }
-    
+
+if (edge) {
+  edge.addEventListener("click", () => {
+    menu.classList.add("open")
+    document.body.classList.add("menu-open")
   })
+}
   
   const roundArea = document.querySelector(".round-area")
   

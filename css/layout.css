@@ -383,7 +383,6 @@ body.phone.landscape .stats-detail,
 body.phone.landscape .stats-compact {
   overflow-y: auto;
   flex: 1;
-  display: none;
 }
 
 body.phone.landscape .stats-detail {

@@ -48,7 +48,6 @@
   gap: 20px;
   align-items: stretch;
 
-  height: auto;
   min-height: calc(100dvh - var(--header-height));
 
   overflow: hidden;
@@ -308,7 +307,7 @@ body.phone .stats-area {
 body.phone.landscape .container {
   display: grid;
   grid-template-columns: 1fr 1fr 80px;
-  gap: 8;
+  gap: 8px;
   transition: grid-template-columns 0.3s ease;
 }
 
@@ -623,14 +622,33 @@ body.desktop .number-row button {
   position: fixed;
   
   top: 0;
-  right: -6;
+  right: 0;
   
-  width: 24px;
+  width: 40px;
   height: 100dvh;
+  
+  background: transparent;
   
   z-index: 1100;
   
 }
+
+.menu-edge::before {
+  
+  content: "";
+  
+  position: absolute;
+  
+  top: 0;
+  right: 0;
+  
+  width: 2px;
+  height: 100%;
+  
+  background: rgba(255, 255, 255, .08);
+  
+}
+
 
 body.menu-open .menu-edge {
   display: none;

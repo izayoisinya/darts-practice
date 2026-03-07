@@ -459,6 +459,7 @@ body.phone.portrait .stats-area {
 
 body.phone.portrait .stats-detail {
   overflow-y: auto;
+  display: flex;
 }
 
 body.phone.portrait .number-table {

@@ -273,8 +273,8 @@ padding: 0 20px 10px 20px;
   width: 100%;
 }
 
-#scoreChart {
-  height: 220px;
+body.phone.landscape #scoreChart {
+  height: 180px;
   width: 100%;
 }
 
@@ -627,8 +627,6 @@ body.desktop .number-row button {
   
   width: 24px;
   height: 100dvh;
-  
-  transform: translateX(12px); /* 半分外へ */
   
   z-index: 1100;
   

@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // デバイス判定
   detectDevice();
   
+  refreshLayout()
+  
   // ゲーム初期化（状態作成＋描画）
   init();
   
@@ -22,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== 画面回転時にStatsを閉じる =====
   
   window.addEventListener("orientationchange", () => {
-    document.body.classList.remove("iphone-stats-open");
+    body.classList.remove("iphone-stats-open")
   });
   
   // ===== PWA ServiceWorker =====
@@ -54,8 +56,9 @@ function init() {
 
   renderRounds()
   updateStats()
+  drawScoreChart()
   updateNextGameButton()
-drawScoreChart()
+
 }
 
 
@@ -72,42 +75,42 @@ function registerEvents() {
   if (nextBtn) {
     nextBtn.addEventListener("click", resetGame)
   }
-  
-  const statsArea = document.querySelector(".stats-area")
 
-if (edge) {
+if (edge && menu) {
   edge.addEventListener("click", () => {
     menu.classList.add("open")
-    document.body.classList.add("menu-open")
+    body.classList.add("menu-open")
   })
 }
   
   const roundArea = document.querySelector(".round-area")
-  
+
+if (roundArea) {
   roundArea.addEventListener("click", () => {
     
     if (
-      document.body.classList.contains("phone") &&
-      document.body.classList.contains("portrait")
-    ) {
-      document.body.classList.toggle("round-open")
+  body.classList.contains("phone") &&
+  body.classList.contains("portrait")
+) {
+      body.classList.toggle("round-open")
     }
     
   })
+}
   
   
   // ===== side menu =====
   
-  document.querySelectorAll(".side-menu button").forEach(btn => {
+if (menu) {
+  menu.querySelectorAll("button").forEach(btn => {
     
     btn.addEventListener("click", () => {
-      
       menu.classList.remove("open")
-      document.body.classList.remove("menu-open")
-      
+      body.classList.remove("menu-open")
     })
     
   })
+}
   
   
   if (overlay && menu) {
@@ -115,7 +118,7 @@ if (edge) {
     overlay.addEventListener("click", () => {
       
       menu.classList.remove("open")
-      document.body.classList.remove("menu-open")
+      body.classList.remove("menu-open")
       
     })
     

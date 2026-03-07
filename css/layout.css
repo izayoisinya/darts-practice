@@ -3,7 +3,7 @@
 /* ================================= */
 
 :root {
-  --header-height: 80px;
+  --header-height: 60px;
   --header-padding-x: 40px;
 }
 
@@ -21,6 +21,11 @@ html, body {
   padding: 5px 20px;
   display: flex;
   align-items: center;
+  border-bottom: none;
+}
+
+.score-value {
+  font-size: 48px;
 }
 
 .score-panel {
@@ -56,11 +61,12 @@ html, body {
   gap: 20px;
   align-items: stretch;
 
-  min-height: calc(100dvh - var(--header-height));
+   min-height: calc(
+    100dvh - var(--header-height) - env(safe-area-inset-top)
+  );
 
   overflow: hidden;
   padding: 5px 12px 10px 12px;
-  
   
 }
 

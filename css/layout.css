@@ -397,6 +397,15 @@ body:not(.phone.landscape) .stats-compact {
   display: none;
 }
 
+.stats-compact {
+  display: none;
+}
+
+/* スマホ横だけコンパクト表示 */
+body.phone.landscape .stats-compact {
+  display: flex;
+}
+
 /* ===================================================== */
 /* PHONE PORTRAIT                                        */
 /* ===================================================== */

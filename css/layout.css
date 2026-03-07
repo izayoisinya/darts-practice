@@ -398,6 +398,7 @@ body.phone.landscape.iphone-stats-open .stats-compact {
 body.phone.landscape.iphone-stats-open .stats-detail {
   opacity: 1;
   transform: translateX(0);
+  display: flex;
 }
 
 body:not(.phone.landscape) .stats-compact {

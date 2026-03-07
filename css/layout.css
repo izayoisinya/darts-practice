@@ -59,7 +59,7 @@ html, body {
   min-height: calc(100dvh - var(--header-height));
 
   overflow: hidden;
-  padding: 0 12px 10px 12px;
+  padding: 5px 12px 10px 12px;
   
   
 }

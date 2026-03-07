@@ -3,7 +3,7 @@
 /* ================================= */
 
 :root {
-  --header-height: 120px;
+  --header-height: 80px;
   --header-padding-x: 40px;
 }
 
@@ -309,6 +309,8 @@ body.phone.landscape .container {
   grid-template-columns: 1fr 1fr 80px;
   gap: 8px;
   transition: grid-template-columns 0.3s ease;
+  padding-left: 0;
+padding-right: 0;
 }
 
 body.phone.landscape .number-table {

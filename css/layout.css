@@ -59,8 +59,8 @@ html, body {
   min-height: calc(100dvh - var(--header-height));
 
   overflow: hidden;
-padding: 0 12px 10px 12px;
-  width:100vw;
+  padding: 0 12px 10px 12px;
+  
   
 }
 
@@ -319,7 +319,7 @@ body.phone.landscape .container {
   gap: 8px;
   transition: grid-template-columns 0.3s ease;
   padding-left: 0;
-padding-right: 0;
+  padding-right: 0;
 }
 
 body.phone.landscape .number-table {
@@ -379,6 +379,7 @@ body.phone.landscape .stats-detail,
 body.phone.landscape .stats-compact {
   overflow-y: auto;
   flex: 1;
+  display: none;
 }
 
 body.phone.landscape .stats-detail {

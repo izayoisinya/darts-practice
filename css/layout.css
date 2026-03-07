@@ -400,10 +400,6 @@ body.phone.landscape.iphone-stats-open .stats-detail {
   display: flex;
 }
 
-body:not(.phone.landscape) .stats-compact {
-  display: none;
-}
-
 .stats-compact {
   transition: opacity 0.2s ease;
 }
@@ -459,7 +455,6 @@ body.phone.portrait .stats-area {
 
 body.phone.portrait .stats-detail {
   overflow-y: auto;
-  display: flex;
 }
 
 body.phone.portrait .number-table {

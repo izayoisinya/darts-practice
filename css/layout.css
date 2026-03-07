@@ -315,7 +315,7 @@ body.phone .stats-area {
 /* phone 横だけ特別レイアウト */
 body.phone.landscape .container {
   display: grid;
-  grid-template-columns: 0.8fr 0.8fr 80px;
+  grid-template-columns: 0.8fr 0.8fr 100px;
   gap: 8px;
   transition: grid-template-columns 0.3s ease;
   padding: 5px 20px 0 0;

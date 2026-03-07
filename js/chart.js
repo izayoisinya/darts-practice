@@ -21,7 +21,7 @@ function drawScoreChart() {
   const graphHeight = height - padding * 2;
   
   const maxScore = 180
-  const stepX = graphWidth / (game.totalRounds - 1);
+  const stepX = graphWidth / (TOTAL_ROUNDS - 1);
   
   // ===== ラウンドスコア取得 =====
   const roundScores = game.rounds.map(round =>
@@ -122,7 +122,7 @@ function drawScoreChart() {
   ctx.fillStyle = "rgba(255,255,255,0.4)";
   ctx.font = "12px sans-serif";
   
-  for (let i = 0; i < game.totalRounds; i++) {
+  for (let i = 0; i < TOTAL_ROUNDS; i++) {
     const x = padding + stepX * i;
     ctx.fillText(
       "R" + (i + 1),

@@ -70,6 +70,7 @@ function registerEvents() {
   const overlay = document.getElementById("menuOverlay")
   const edge = document.getElementById("menuEdge")
   const menu = document.getElementById("sideMenu")
+  const statsArea = document.querySelector(".stats-area")
   
   const nextBtn = document.getElementById("nextGameBtn")
   if (nextBtn) {
@@ -93,6 +94,19 @@ if (roundArea) {
   body.classList.contains("portrait")
 ) {
       body.classList.toggle("round-open")
+    }
+    
+  })
+}
+
+if (statsArea) {
+  statsArea.addEventListener("click", () => {
+    
+    if (
+      body.classList.contains("phone") &&
+      body.classList.contains("landscape")
+    ) {
+      body.classList.toggle("iphone-stats-open")
     }
     
   })

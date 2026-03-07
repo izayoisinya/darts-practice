@@ -173,10 +173,6 @@ html, body {
   font-weight: 600;
 }
 
-.stats-compact {
-  display: none;
-}
-
 .stats-main {
   display: flex;
   flex-direction: column;
@@ -397,6 +393,10 @@ body.phone.landscape.iphone-stats-open .stats-detail {
   display: block;
 }
 
+body:not(.phone.landscape) .stats-compact {
+  display: none;
+}
+
 /* ===================================================== */
 /* PHONE PORTRAIT                                        */
 /* ===================================================== */
@@ -458,6 +458,10 @@ body.phone.portrait .number-row {
 }
 
 .round .round-darts {
+  display: flex;
+}
+
+body.phone.portrait .round-darts {
   display: none;
 }
 

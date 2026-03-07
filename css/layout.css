@@ -418,6 +418,10 @@ body.phone.portrait .round-area {
   cursor: pointer;
 }
 
+body.phone.portrait .round {
+  grid-template-columns: 60px 1fr;
+}
+
 body.phone.portrait.round-open .round-area {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;

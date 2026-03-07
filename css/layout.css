@@ -95,6 +95,7 @@ html, body {
 }
 .input-area {
   flex: 1;
+  transition: width 0.35s ease, opacity 0.25s ease;
 }
 .stats-area {
   flex: 1;
@@ -152,6 +153,9 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .stat-row {
@@ -350,6 +354,7 @@ body.phone.landscape.iphone-stats-open .input-area {
   padding: 0;
   width: 0;
   overflow: hidden;
+  opacity: 0;
 }
 
 body.phone.landscape.iphone-stats-open .stats-area {
@@ -387,14 +392,20 @@ body.phone.landscape .stats-detail {
 
 body.phone.landscape.iphone-stats-open .stats-compact {
   display: none;
+  opacity: 0;
 }
 
 body.phone.landscape.iphone-stats-open .stats-detail {
-  display: block;
+  opacity: 1;
+  transform: translateX(0);
 }
 
 body:not(.phone.landscape) .stats-compact {
   display: none;
+}
+
+.stats-compact {
+  transition: opacity 0.2s ease;
 }
 
 /* スマホ横だけコンパクト表示 */

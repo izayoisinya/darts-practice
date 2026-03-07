@@ -49,10 +49,10 @@
   align-items: stretch;
 
   height: auto;
-  min-height: calc(100vh - var(--header-height));
+  min-height: calc(100dvh - var(--header-height));
 
   overflow: hidden;
-padding: 0 20px 10px 20px;
+padding: 0 12px 10px 12px;
   
 }
 
@@ -308,7 +308,7 @@ body.phone .stats-area {
 body.phone.landscape .container {
   display: grid;
   grid-template-columns: 1fr 1fr 80px;
-  gap: 0;
+  gap: 8;
   transition: grid-template-columns 0.3s ease;
 }
 
@@ -623,7 +623,7 @@ body.desktop .number-row button {
   position: fixed;
   
   top: 0;
-  right: 0;
+  right: -24;
   
   width: 24px;
   height: 100dvh;

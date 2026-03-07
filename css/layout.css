@@ -153,9 +153,6 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  opacity: 0;
-  transform: translateX(20px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .stat-row {
@@ -376,6 +373,7 @@ body.phone.landscape .stats-compact {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: opacity 0.2s ease;
 }
 
 /* 中身だけスクロール */
@@ -387,6 +385,7 @@ body.phone.landscape .stats-compact {
 
 body.phone.landscape .stats-detail {
   display: none;
+  transform: translateX(20px);
 }
 
 body.phone.landscape.iphone-stats-open .stats-compact {
@@ -397,15 +396,6 @@ body.phone.landscape.iphone-stats-open .stats-compact {
 body.phone.landscape.iphone-stats-open .stats-detail {
   opacity: 1;
   transform: translateX(0);
-  display: flex;
-}
-
-.stats-compact {
-  transition: opacity 0.2s ease;
-}
-
-/* スマホ横だけコンパクト表示 */
-body.phone.landscape .stats-compact {
   display: flex;
 }
 
@@ -453,6 +443,10 @@ body.phone.portrait .stats-area {
   flex-direction: column;
 }
 
+body.phone.portrait .stats-compact {
+  display: none;
+}
+
 body.phone.portrait .stats-detail {
   overflow-y: auto;
 }
@@ -467,10 +461,6 @@ body.phone.portrait .number-row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: 6px;
-}
-
-.round .round-darts {
-  display: flex;
 }
 
 body.phone.portrait .round-darts {
@@ -743,10 +733,6 @@ body.menu-open .menu-overlay {
 body.menu-open .menu-edge {
   display: none;
   pointer-events: none;
-}
-
-.menu-edge {
-  z-index: 1100;
 }
 
 .side-menu {

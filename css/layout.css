@@ -73,6 +73,7 @@ html, body {
   min-height: 0;
   min-width: 0;
   overflow: hidden;
+  padding: 8px 20px 20px 20px;
 }
 
 .number-table {
@@ -90,6 +91,7 @@ html, body {
 }
 .stats-area {
   flex: 1;
+  overflow-y: auto;
 }
 
 /* Scroll areas */
@@ -97,11 +99,6 @@ html, body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-}
-
-.stats-area {
-  overflow-y: auto;
-  padding: 8px 20px 20px 20px;
 }
 
 /* Rounds */

@@ -472,6 +472,10 @@ body.phone.portrait.round-open .round-darts {
   display: flex;
 }
 
+body.phone.portrait .round-separator {
+  display: none;
+}
+
 /* ================================= */
 /* PHONE PORTRAIT - ROUNDS OPEN      */
 /* ================================= */

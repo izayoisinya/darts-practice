@@ -229,19 +229,15 @@ function detectDevice() {
     /Android/i.test(ua)
   
   // デバイス判定
-  if (isIPhone || (isAndroid && w < 768)) {
-    
-    body.classList.add("phone")
-    
-  } else if (isIPad || (isAndroid && w >= 768) || w < 1200) {
-    
-    body.classList.add("tablet")
-    
-  } else {
-    
-    body.classList.add("desktop")
-    
-  }
+if (isIPhone || isAndroid) {
+  body.classList.add("phone")
+}
+else if (isIPad || w < 1200) {
+  body.classList.add("tablet")
+}
+else {
+  body.classList.add("desktop")
+}
   
   // 向き判定
   if (h > w) {

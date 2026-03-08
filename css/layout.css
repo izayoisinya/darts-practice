@@ -483,6 +483,9 @@ body.phone.portrait .round-separator {
 /* ================================= */
 /* PHONE PORTRAIT - ROUNDS OPEN      */
 /* ================================= */
+body.tablet .stats-compact {
+  display: none !important;
+}
 
 body.phone.portrait.round-open .container {
   grid-template-columns: 1fr;
@@ -610,6 +613,10 @@ body.desktop .number-row button {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+body.desktop .stats-compact {
+  display: none !important;
 }
 
 /* =============================== */

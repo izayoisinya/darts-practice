@@ -32,7 +32,7 @@ html, body {
   min-height: var(--header-height);
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 16px;
   width: 100%;
   padding: 0 var(--header-padding-x);
   border-radius: 20px;
@@ -46,7 +46,7 @@ html, body {
 }
 
 .score-block {
-  min-width: 260px;
+  min-width: 0;
 }
 
 .next-button {
@@ -309,10 +309,6 @@ body.phone {
   --header-padding-x: 20px;
 }
 
-body.phone .score-panel {
-  gap: 16px;
-}
-
 body.phone .round-area {
   flex: 1.4;
 }
@@ -435,7 +431,7 @@ body.phone.portrait .score-panel {
 }
 
 body.phone.portrait .score-value {
-  font-size: 40px;
+  font-size: 46px;
 }
 
 body.phone.portrait .darts-block {

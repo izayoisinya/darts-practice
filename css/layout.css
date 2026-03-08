@@ -173,7 +173,7 @@ html, body {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 12px;
-  padding: 6px 0;
+  padding: 3px 0;
 }
 
 .stat-row .label {
@@ -190,8 +190,8 @@ html, body {
 .stats-main {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
 .stat-line {
@@ -212,7 +212,7 @@ html, body {
 }
 
 .stats-area h2 {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .stats-area h3 {
@@ -238,17 +238,17 @@ html, body {
 .kpi-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
 }
 
 .kpi-label {
-  font-size: 12px;
+  font-size: 11px;
   opacity: 0.6;
   letter-spacing: 1px;
 }
 
 .kpi-value {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
 }
 
@@ -262,7 +262,7 @@ html, body {
 .bar-bg {
   height: 4px;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  border-radius: 3px;
   overflow: hidden;
 }
 
@@ -348,9 +348,10 @@ body.phone.landscape .number-column {
 body.phone.landscape .stats-area {
   flex: unset;
   display: flex;
+  padding: 12px;
   flex-direction: column;
-    width: 80px;
-  min-width: 80px;
+    width: 100px;
+  min-width: 100px;
   overflow: hidden;
 }
 
@@ -387,6 +388,10 @@ body.phone.landscape .stats-compact {
   flex-direction: column;
   gap: 8px;
   transition: opacity 0.2s ease;
+}
+
+body.phone.landscape .stats-compact .kpi-value {
+  font-size: 18px;
 }
 
 /* 中身だけスクロール */

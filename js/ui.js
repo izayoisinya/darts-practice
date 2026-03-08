@@ -1,11 +1,10 @@
 // ===============================
 // ===== ダーツ1本描画 ==========
 // ===============================
-function renderDart(dart, roundIndex, dartIndex) {
+function renderDart(dart) {
   
   if (!dart) {
-    return `<span class="dart"
-      onclick="editDart(${roundIndex}, ${dartIndex})">-</span>`
+    return `<span class="dart">-</span>`
   }
   
   let cls = ""
@@ -16,8 +15,7 @@ function renderDart(dart, roundIndex, dartIndex) {
   else if (dart.multiplier === 3) cls = " triple"
   else if (dart.multiplier === 2) cls = " double"
   
-  return `<span class="dart${cls}"
-    onclick="editDart(${roundIndex}, ${dartIndex})">
+  return `<span class="dart${cls}">
     ${dart.score}
   </span>`
 }
@@ -47,11 +45,9 @@ function renderRounds() {
       <span class="round-label">R${index + 1}</span>
 
       <span class="round-darts">
-        ${renderDart(round[0], index, 0)}
-        <span class="divider">|</span>
-        ${renderDart(round[1], index, 1)}
-        <span class="divider">|</span>
-        ${renderDart(round[2], index, 2)}
+        ${ renderDart(round[0]) }
+${ renderDart(round[1]) }
+${ renderDart(round[2]) }
       </span>
 
       <span class="round-separator">||</span>

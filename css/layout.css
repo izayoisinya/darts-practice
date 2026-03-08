@@ -504,6 +504,10 @@ body.phone.portrait .round-darts {
   display: none;
 }
 
+body.phone.portrait .round-separator {
+  display: none !important;
+}
+
 /* Rounds展開時は全表示 */
 body.phone.portrait.round-open .round-darts {
   display: flex;

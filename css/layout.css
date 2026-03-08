@@ -305,7 +305,7 @@ body.phone.landscape #scoreChart {
 /* ===================================================== */
 /* レイアウト調整 */
 body.phone {
-  --header-height: 70px;
+  --header-height: 60px;
   --header-padding-x: 28px;
 }
 
@@ -319,7 +319,7 @@ body.phone .input-area {
 /* phone 縦は普通表示 */
 body.phone .stats-area {
   flex: 1;
-  padding: 8px 20px 20px 20px;
+  padding: 0 20px 20px 20px;
 }
 
 /* ===================================================== */
@@ -328,7 +328,7 @@ body.phone .stats-area {
 /* phone 横だけ特別レイアウト */
 body.phone.landscape .container {
   display: grid;
-  grid-template-columns: 0.8fr 0.8fr 100px;
+  grid-template-columns: 45% 45% 100px;
   gap: 8px;
   transition: grid-template-columns 0.3s ease;
   padding: 5px 20px 0 0;
@@ -420,7 +420,7 @@ body.phone.portrait .container {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr min-content;
   gap: 12px;
-  padding: 5px 25px 10px 0;
+  padding: 0 25px 10px 0;
 }
 
 /* Rounds */

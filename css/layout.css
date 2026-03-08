@@ -119,6 +119,7 @@ html, body {
 .round-darts {
   display: flex;
   align-items: center;
+  gap: 6px;
 }
 
 .round-score {
@@ -457,6 +458,7 @@ body.phone.portrait .round-score {
 
 body.phone.portrait .round {
   grid-template-columns: 60px 1fr 60px;
+  min-height: 48px;
 }
 
 body.phone.portrait.round-open .round-area {
@@ -479,7 +481,7 @@ body.phone.portrait .input-area {
 body.phone.portrait .stats-area {
   grid-column: 1 / span 2;
   grid-row: 2;
-  max-height: 220px;
+  height: 260px;
   display: flex;
   flex-direction: column;
 }

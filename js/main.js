@@ -28,13 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
   // ===== PWA ServiceWorker =====
-  
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker
-      .register("./sw.js")
-      .then(() => console.log("SW registered"))
-      .catch(err => console.log("SW error", err));
-  }
+
+// if ("serviceWorker" in navigator) {
+//   navigator.serviceWorker
+//     .register("./sw.js")
+//     .then(() => console.log("SW registered"))
+//     .catch(err => console.log("SW error", err));
+// }
   
 });
 
@@ -138,11 +138,7 @@ if (menu) {
     
   }
   
-  const resetBtn = document.getElementById("resetGameBtn")
-
-if (resetBtn) {
-  resetBtn.addEventListener("click", forceResetGame)
-}
+  
   
   
   document.querySelectorAll("[data-link]").forEach(btn => {

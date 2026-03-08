@@ -273,6 +273,7 @@ function forceResetGame() {
   if (!confirm("ゲームデータをリセットしますか？")) return
   
   localStorage.removeItem("dartsPractice")
+  localStorage.removeItem("dartsSessions")
   
   location.reload()
   

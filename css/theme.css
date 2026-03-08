@@ -209,8 +209,10 @@ button {
 }
 
 button:hover {
-  background: #222a35;
-  box-shadow: 0 0 8px rgb(var(--accent-rgb) / 0.2);
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.35),
+    0 0 10px rgb(var(--accent-rgb) / 0.2);
 }
 
 button:active {

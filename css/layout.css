@@ -462,7 +462,6 @@ body.phone.portrait .round {
 }
 
 body.phone.portrait.round-open .round-area {
-  background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
 }
 

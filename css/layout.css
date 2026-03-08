@@ -452,7 +452,7 @@ body.phone.portrait .round-area {
 }
 
 body.phone.portrait .round {
-  grid-template-columns: 60px 1fr;
+  grid-template-columns: 60px 1fr 60px;
 }
 
 body.phone.portrait.round-open .round-area {

@@ -428,18 +428,18 @@ body.phone.portrait .container {
 }
 
 body.phone.portrait .score-panel {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
 body.phone.portrait .score-value {
-  font-size: 42px;
+  font-size: 40px;
 }
 
 body.phone.portrait .darts-block {
-  flex-direction: row;
-  gap: 12px;
+  display: none;
 }
 
 body.phone.portrait .next-button {

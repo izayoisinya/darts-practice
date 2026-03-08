@@ -218,28 +218,33 @@ function detectDevice() {
   
   const ua = navigator.userAgent
   
+  const isIPhone = /iPhone/i.test(ua)
   const isIPad =
-    ua.includes("iPad") ||
+    /iPad/i.test(ua) ||
     (ua.includes("Macintosh") && "ontouchend" in document)
   
-  const isIPhone =
-    /iPhone/i.test(ua)
+  const isAndroid = /Android/i.test(ua)
   
-  const isAndroid =
-    /Android/i.test(ua)
+  // ===== デバイス判定 =====
   
-  // デバイス判定
-if (isIPhone || isAndroid) {
-  body.classList.add("phone")
-}
-else if (isIPad || w < 1200) {
-  body.classList.add("tablet")
-}
-else {
-  body.classList.add("desktop")
-}
+  if (isIPhone) {
+    body.classList.add("phone")
+  }
   
-  // 向き判定
+  else if (isAndroid && w < 900) {
+    body.classList.add("phone")
+  }
+  
+  else if (isAndroid || isIPad) {
+    body.classList.add("tablet")
+  }
+  
+  else {
+    body.classList.add("desktop")
+  }
+  
+  // ===== 向き判定 =====
+  
   if (h > w) {
     body.classList.add("portrait")
   } else {

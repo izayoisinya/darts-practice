@@ -13,50 +13,48 @@ function renderDart(dart) {
   else if (dart.multiplier === 3) cls = " triple"
   else if (dart.multiplier === 2) cls = " double"
   
-  return `<span class="dart${cls}">${dart.score}</span>`
+  return `<span class="dart${cls}"
+    onclick="editDart(${roundIndex}, ${dartIndex})">
+    ${dart.score}
+  </span>`
+}
+
+
+function editDart(r, d) {
+  
+  if (r !== game.currentRound) return
+  
+  game.rounds[r][d] = null
+  
+  renderRounds()
+  updateStats()
+  drawScoreChart()
+  saveGame()
 }
 
 
 // ===============================
 // ===== ラウンド描画 ============
 // ===============================
-function renderRounds() {
+function renderDart(dart, roundIndex, dartIndex) {
   
-  const container = document.getElementById("roundContainer")
-  if (!container) return
+  if (!dart) {
+    return `<span class="dart"
+      onclick="editDart(${roundIndex}, ${dartIndex})">-</span>`
+  }
   
-  container.innerHTML = ""
+  let cls = ""
   
-  game.rounds.forEach((round, index) => {
-    
-    const row = document.createElement("div")
-    row.className = "round"
-    
-    const roundScore = round.reduce(
-      (sum, d) => sum + (d ? d.score : 0),
-      0
-    )
-    
-    row.innerHTML = `
-      <span class="round-label">R${index + 1}</span>
-
-      <span class="round-darts">
-        ${renderDart(round[0])}
-        <span class="divider">|</span>
-        ${renderDart(round[1])}
-        <span class="divider">|</span>
-        ${renderDart(round[2])}
-      </span>
-
-      <span class="round-separator">||</span>
-
-      <span class="round-score">${roundScore}</span>
-    `
-    
-    container.appendChild(row)
-    
-  })
+  if (dart.score === 0) cls = " miss"
+  else if (dart.special === "innerBull") cls = " inner-bull"
+  else if (dart.special === "outerBull") cls = " outer-bull"
+  else if (dart.multiplier === 3) cls = " triple"
+  else if (dart.multiplier === 2) cls = " double"
   
+  return `<span class="dart${cls}"
+    onclick="editDart(${roundIndex}, ${dartIndex})">
+    ${dart.score}
+  </span>`
 }
 
 

@@ -354,7 +354,6 @@ body.phone.landscape .stats-area {
   min-width: 100px;
   overflow: hidden;
   box-sizing: border-box;
-  margin-right: 40px;
 }
 
 /* 横で開いた状態 */

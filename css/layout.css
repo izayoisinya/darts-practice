@@ -306,7 +306,11 @@ body.phone.landscape #scoreChart {
 /* レイアウト調整 */
 body.phone {
   --header-height: 60px;
-  --header-padding-x: 28px;
+  --header-padding-x: 20px;
+}
+
+body.phone .score-panel {
+  gap: 16px;
 }
 
 body.phone .round-area {
@@ -421,6 +425,27 @@ body.phone.portrait .container {
   grid-template-rows: 1fr min-content;
   gap: 12px;
   padding: 0 25px 10px 0;
+}
+
+body.phone.portrait .score-panel {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+body.phone.portrait .score-value {
+  font-size: 42px;
+}
+
+body.phone.portrait .darts-block {
+  flex-direction: row;
+  gap: 12px;
+}
+
+body.phone.portrait .next-button {
+  width: 120px;
+  height: 36px;
+  font-size: 14px;
 }
 
 /* Rounds */

@@ -540,7 +540,7 @@ body.tablet .stats-compact {
 
 body.phone.portrait.round-open .container {
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 260px;
+  grid-template-rows: minmax(0, 1fr) 260px;
 }
 
 body.phone.portrait.round-open .input-area {

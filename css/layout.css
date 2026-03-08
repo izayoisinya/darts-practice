@@ -348,7 +348,7 @@ body.phone.landscape .number-column {
 body.phone.landscape .stats-area {
   flex: unset;
   display: flex;
-  padding: 12px;
+  padding: 25px;
   flex-direction: column;
     width: 100px;
   min-width: 100px;

@@ -1,41 +1,6 @@
 // ===============================
 // ===== ダーツ1本描画 ==========
 // ===============================
-function renderDart(dart) {
-  
-  if (!dart) return `<span class="dart">-</span>`
-  
-  let cls = ""
-  
-  if (dart.score === 0) cls = " miss"
-  else if (dart.special === "innerBull") cls = " inner-bull"
-  else if (dart.special === "outerBull") cls = " outer-bull"
-  else if (dart.multiplier === 3) cls = " triple"
-  else if (dart.multiplier === 2) cls = " double"
-  
-  return `<span class="dart${cls}"
-    onclick="editDart(${roundIndex}, ${dartIndex})">
-    ${dart.score}
-  </span>`
-}
-
-
-function editDart(r, d) {
-  
-  if (r !== game.currentRound) return
-  
-  game.rounds[r][d] = null
-  
-  renderRounds()
-  updateStats()
-  drawScoreChart()
-  saveGame()
-}
-
-
-// ===============================
-// ===== ラウンド描画 ============
-// ===============================
 function renderDart(dart, roundIndex, dartIndex) {
   
   if (!dart) {
@@ -55,6 +20,49 @@ function renderDart(dart, roundIndex, dartIndex) {
     onclick="editDart(${roundIndex}, ${dartIndex})">
     ${dart.score}
   </span>`
+}
+
+
+// ===============================
+// ===== ラウンド描画 ============
+// ===============================
+function renderRounds() {
+  
+  const container = document.getElementById("roundContainer")
+  if (!container) return
+  
+  container.innerHTML = ""
+  
+  game.rounds.forEach((round, index) => {
+    
+    const row = document.createElement("div")
+    row.className = "round"
+    
+    const roundScore = round.reduce(
+      (sum, d) => sum + (d ? d.score : 0),
+      0
+    )
+    
+    row.innerHTML = `
+      <span class="round-label">R${index + 1}</span>
+
+      <span class="round-darts">
+        ${renderDart(round[0], index, 0)}
+        <span class="divider">|</span>
+        ${renderDart(round[1], index, 1)}
+        <span class="divider">|</span>
+        ${renderDart(round[2], index, 2)}
+      </span>
+
+      <span class="round-separator">||</span>
+
+      <span class="round-score">${roundScore}</span>
+    `
+    
+    container.appendChild(row)
+    
+  })
+  
 }
 
 
@@ -259,3 +267,14 @@ function refreshLayout() {
   drawScoreChart()
   
 }
+
+function forceResetGame() {
+  
+  if (!confirm("ゲームデータをリセットしますか？")) return
+  
+  localStorage.removeItem("dartsPractice")
+  
+  location.reload()
+  
+}
+

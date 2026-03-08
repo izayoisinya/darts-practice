@@ -419,7 +419,7 @@ body.phone.landscape.iphone-stats-open .stats-detail {
 body.phone.portrait .container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 280px;
+  grid-template-rows: 1fr 260px;
   gap: 12px;
   padding: 0 25px 10px 0;
 }

@@ -144,11 +144,11 @@ function updateStats() {
   
   // ===== Header =====
   $("totalScore").textContent = stats.totalScore
-  $("totalDarts").textContent = stats.totalDarts
   
   // ===== Basic =====
   $("bullCount").textContent = stats.bullCount
   $("innerBulls").textContent = stats.innerBullCount
+  $("totalDartsStat").textContent = stats.totalDarts
   
   $("ppd").textContent = stats.ppd.toFixed(2)
   $("roundAvg").textContent = stats.roundAvg.toFixed(1)

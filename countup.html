@@ -34,11 +34,6 @@
           <div class="score-value" id="totalScore">0</div>
         </div>
 
-        <div class="darts-block">
-          <div class="total-label">TOTAL DARTS</div>
-          <div class="sub-value" id="totalDarts">0</div>
-        </div>
-
         <button type="button" id="nextGameBtn" class="next-button" disabled>
           NEXT GAME
         </button>
@@ -111,22 +106,29 @@
         <!-- 詳細表示 -->
         <div class="stats-detail">
           <!-- ===== KPI行 ===== -->
-          <div class="stats-kpi">
-            <div class="kpi-item">
-              <span class="kpi-label">PPD</span>
-              <span class="kpi-value" id="ppd">0.00</span>
-            </div>
-
-            <div class="kpi-item">
-              <span class="kpi-label">AVG</span>
-              <span class="kpi-value" id="roundAvg">0.0</span>
-            </div>
-
-            <div class="kpi-item">
-              <span class="kpi-label">MAX</span>
-              <span class="kpi-value" id="maxRound">0</span>
-            </div>
-          </div>
+<div class="stats-kpi">
+  
+  <div class="kpi-item">
+    <div class="kpi-label">PPD</div>
+    <div class="kpi-value" id="ppd">0</div>
+  </div>
+  
+  <div class="kpi-item">
+    <div class="kpi-label">TOTAL</div>
+    <div class="kpi-value" id="totalDartsStat">0</div>
+  </div>
+  
+  <div class="kpi-item">
+    <div class="kpi-label">AVG</div>
+    <div class="kpi-value" id="roundAvg">0</div>
+  </div>
+  
+  <div class="kpi-item">
+    <div class="kpi-label">MAX</div>
+    <div class="kpi-value" id="maxRound">0</div>
+  </div>
+  
+</div>
 
           <hr class="stats-divider" />
 

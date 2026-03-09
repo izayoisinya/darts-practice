@@ -96,6 +96,21 @@ function calculateStats() {
   const ppd = totalDarts ?
     totalScore / totalDarts :
     0;
+    
+    
+  const sameTriple =
+  round.every(d => d.multiplier === 3) &&
+  round[0].number === round[1].number &&
+  round[1].number === round[2].number
+
+if (sameTriple) threeInTheBed++
+
+
+const triples = round.filter(d => d.multiplier === 3)
+
+const uniqueNumbers = new Set(triples.map(d => d.number))
+
+if (uniqueNumbers.size === 3) whiteHorse++
 
 
   // ------------------------------------------
@@ -172,4 +187,25 @@ function updateStats() {
   $("bullPercent").textContent = stats.bullRate.toFixed(1) + "%"
   $("innerBullPercent").textContent = stats.innerBullRate.toFixed(1) + "%"
   
+  // ===== Awards =====
+function showAward(id, value) {
+  const el = document.getElementById(id)
+  
+  if (value > 0) {
+    el.style.display = "flex"
+  }
+}
+
+$("hatTrick").textContent = stats.hatTrick
+$("lowTon").textContent = stats.lowTon
+$("highTon").textContent = stats.highTon
+$("ton80").textContent = stats.ton80
+$("threeInTheBlack").textContent = stats.threeInTheBlack
+
+showAward("award-hattrick", stats.hatTrick)
+showAward("award-lowton", stats.lowTon)
+showAward("award-highton", stats.highTon)
+showAward("award-ton80", stats.ton80)
+showAward("award-threeblack", stats.threeInTheBlack)
+
 }

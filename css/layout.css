@@ -226,6 +226,13 @@ html, body {
   margin-top: 0;
 }
 
+.award-row {
+  display: none;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
 /* ===== KPI行 ===== */
 .stats-kpi {
   display: grid;

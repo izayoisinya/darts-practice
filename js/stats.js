@@ -19,6 +19,8 @@ function calculateStats() {
   let highTon = 0;
   let ton80 = 0;
   let threeInTheBlack = 0;
+  let threeInTheBed = 0;
+  let whiteHorse = 0;
 
   
   // ------------------------------------------
@@ -86,6 +88,29 @@ function calculateStats() {
         else if (roundScore >= 100 && roundScore <= 149) lowTon++;
       }
     }
+    
+    // ------------------------
+// 3 in the Bed
+// ------------------------
+const sameTriple =
+  round.every(d => d.multiplier === 3) &&
+  round[0].number === round[1].number &&
+  round[1].number === round[2].number
+
+if (sameTriple) threeInTheBed++
+
+// ------------------------
+// White Horse
+// ------------------------
+const triples = round.filter(d => d.multiplier === 3)
+
+const uniqueNumbers = new Set(
+  triples.map(d => d.number)
+)
+
+if (triples.length === 3 && uniqueNumbers.size === 3) {
+  whiteHorse++
+}
 
   });
 
@@ -97,21 +122,6 @@ function calculateStats() {
     totalScore / totalDarts :
     0;
     
-    
-  const sameTriple =
-  round.every(d => d.multiplier === 3) &&
-  round[0].number === round[1].number &&
-  round[1].number === round[2].number
-
-if (sameTriple) threeInTheBed++
-
-
-const triples = round.filter(d => d.multiplier === 3)
-
-const uniqueNumbers = new Set(triples.map(d => d.number))
-
-if (uniqueNumbers.size === 3) whiteHorse++
-
 
   // ------------------------------------------
   // ⑦ 結果返却
@@ -143,7 +153,9 @@ if (uniqueNumbers.size === 3) whiteHorse++
     lowTon,
     highTon,
     ton80,
-    threeInTheBlack
+    threeInTheBlack,
+    threeInTheBed,
+whiteHorse
   };
 }
 

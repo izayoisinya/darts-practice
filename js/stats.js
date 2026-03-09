@@ -90,24 +90,24 @@ function calculateStats() {
       
       // 3 in the Bed
 const bedTriples = round.filter(d =>
-  d && d.multiplier === 3 && d.number >= 16 && d.number <= 20
+  d && d.multiplier === 3 && d.score >= 48 && d.score <= 60
 )
 
 if (
   bedTriples.length === 3 &&
-  bedTriples[0].number === bedTriples[1].number &&
-  bedTriples[1].number === bedTriples[2].number
+  bedTriples[0].score === bedTriples[1].score &&
+  bedTriples[1].score === bedTriples[2].score
 ) {
   threeInTheBed++
 }
 
 // White Horse
 const horseTriples = round.filter(d =>
-  d && d.multiplier === 3 && d.number >= 16 && d.number <= 20
+  d && d.multiplier === 3 && d.score >= 48 && d.score <= 60
 )
 
 const horseNumbers = new Set(
-  horseTriples.map(d => d.number)
+  horseTriples.map(d => d.score)
 )
 
 if (horseTriples.length === 3 && horseNumbers.size === 3) {
@@ -204,19 +204,7 @@ function updateStats() {
   $("innerBullPercent").textContent = stats.innerBullRate.toFixed(1) + "%"
   
   // ===== Awards =====
-function showAward(id, value) {
-  
-  const el = document.getElementById(id)
-  
-  if (!el) return
-  
-  if (value > 0) {
-    el.style.display = "flex"
-  } else {
-    el.style.display = "none"
-  }
-  
-}
+
 
 $("hatTrick").textContent = stats.hatTrick
 $("lowTon").textContent = stats.lowTon
@@ -234,4 +222,18 @@ showAward("award-threeblack", stats.threeInTheBlack)
 showAward("award-threebed", stats.threeInTheBed)
 showAward("award-whitehorse", stats.whiteHorse)
 
+}
+
+function showAward(id, value) {
+  
+  const el = document.getElementById(id)
+  
+  if (!el) return
+  
+  if (value > 0) {
+    el.style.display = "flex"
+  } else {
+    el.style.display = "none"
+  }
+  
 }

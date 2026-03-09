@@ -11,6 +11,11 @@ function drawScoreChart() {
   
   const ctx = canvas.getContext("2d");
   
+  const accent =
+  getComputedStyle(document.documentElement)
+  .getPropertyValue("--accent")
+  .trim() || "#00ffc8";
+  
   const width = canvas.width = canvas.offsetWidth;
   const height = canvas.height = 220;
   
@@ -112,7 +117,7 @@ function drawScoreChart() {
       ctx.shadowBlur = 0;
     }
     
-    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.arc(x, y, 6, 0, Math.PI * 2);
     ctx.fill();
   });
   

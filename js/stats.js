@@ -89,22 +89,28 @@ function calculateStats() {
       }
       
       // 3 in the Bed
-const sameTriple =
-  round.length === 3 &&
-  round.every(d => d && d.multiplier === 3) &&
-  round[0].number === round[1].number &&
-  round[1].number === round[2].number
-
-if (sameTriple) threeInTheBed++
-
-// White Horse
-const triples = round.filter(d => d && d.multiplier === 3)
-
-const uniqueNumbers = new Set(
-  triples.map(d => d.number)
+const bedTriples = round.filter(d =>
+  d && d.multiplier === 3 && d.number >= 16 && d.number <= 20
 )
 
-if (triples.length === 3 && uniqueNumbers.size === 3) {
+if (
+  bedTriples.length === 3 &&
+  bedTriples[0].number === bedTriples[1].number &&
+  bedTriples[1].number === bedTriples[2].number
+) {
+  threeInTheBed++
+}
+
+// White Horse
+const horseTriples = round.filter(d =>
+  d && d.multiplier === 3 && d.number >= 16 && d.number <= 20
+)
+
+const horseNumbers = new Set(
+  horseTriples.map(d => d.number)
+)
+
+if (horseTriples.length === 3 && horseNumbers.size === 3) {
   whiteHorse++
 }
 

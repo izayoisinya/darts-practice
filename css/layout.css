@@ -365,7 +365,7 @@ body.phone .stats-area {
 /* phone 横だけ特別レイアウト */
 body.phone.landscape .container {
   display: grid;
-  grid-template-columns: 40% 45% 100px;
+  grid-template-columns: 40% 40% 100px;
   gap: 8px;
   transition: grid-template-columns 0.3s ease;
   padding: 5px 60px 0 05px;
@@ -385,7 +385,7 @@ body.phone.landscape .stats-area {
   flex: unset;
   display: flex;
   flex-direction: column;
-  padding: 40px;
+  padding: 20px;
   width: 100px;
   min-width: 100px;
   overflow: hidden;

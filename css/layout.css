@@ -365,7 +365,7 @@ body.phone .stats-area {
 /* phone 横だけ特別レイアウト */
 body.phone.landscape .container {
   display: grid;
-  grid-template-columns: 45% 45% 100px;
+  grid-template-columns: 40% 45% 100px;
   gap: 8px;
   transition: grid-template-columns 0.3s ease;
   padding: 5px 60px 0 05px;
@@ -394,7 +394,7 @@ body.phone.landscape .stats-area {
 
 /* 横で開いた状態 */
 body.phone.landscape.iphone-stats-open .container {
-  grid-template-columns: 45% 0px 55%;
+  grid-template-columns: 40% 0px 60%;
 }
 
 body.phone.landscape.iphone-stats-open .input-area {

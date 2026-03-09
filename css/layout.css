@@ -233,6 +233,35 @@ html, body {
   font-size: 14px;
 }
 
+.awards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.award-card {
+  background: #1c212c;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, .4),
+    inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+
+.award-title {
+  font-size: 12px;
+  opacity: .7;
+}
+
+.award-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
 /* ===== KPI行 ===== */
 .stats-kpi {
   display: grid;
@@ -655,6 +684,11 @@ body.tablet.portrait .number-table {
 
 body.tablet.portrait .number-column {
   display: contents;
+}
+
+body.tablet.portrait .stats-kpi {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 /* ===================================================== */

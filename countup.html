@@ -133,70 +133,78 @@
           <hr class="stats-divider" />
 
           <!-- ===== Bull系 ===== -->
-          <div class="bull-group">
-            <div class="stat-row">
-              <span class="label">
-                Bulls <span class="count" id="bullCount">0</span>
-              </span>
-
-              <div class="bar-bg">
-                <div class="bar-fill" id="bullRateBar"></div>
-              </div>
-
-              <span class="percent" id="bullPercent">0.0%</span>
-            </div>
-
-            <div class="stat-row">
-              <span class="label">
-                Inner <span class="count" id="innerBulls">0</span>
-              </span>
-
-              <div class="bar-bg">
-                <div class="bar-fill inner" id="innerBullRateBar"></div>
-              </div>
-
-              <span class="percent" id="innerBullPercent">0.0%</span>
-            </div>
-          </div>
+     <div class="stats-kpi">
+  
+  <div class="kpi-item">
+    <div class="kpi-label">PPD</div>
+    <div class="kpi-value" id="ppd"></div>
+  </div>
+  
+  <div class="kpi-item">
+    <div class="kpi-label">TOTAL</div>
+    <div class="kpi-value" id="totalDartsStat"></div>
+  </div>
+  
+  <div class="kpi-item">
+    <div class="kpi-label">Bulls</div>
+    <div class="kpi-value" id="bullCount"></div>
+  </div>
+  
+  <div class="kpi-item">
+    <div class="kpi-label">AVG</div>
+    <div class="kpi-value" id="roundAvg"></div>
+  </div>
+  
+  <div class="kpi-item">
+    <div class="kpi-label">MAX</div>
+    <div class="kpi-value" id="maxRound"></div>
+  </div>
+  
+  <div class="kpi-item">
+    <div class="kpi-label">Inner</div>
+    <div class="kpi-value" id="innerBulls"></div>
+  </div>
+  
+</div>
 
           <hr class="stats-divider" />
 
-          <div class="awards">
+<div class="awards">
   
-  <div class="award-row" id="award-hattrick">
-    <span>Hat Trick</span>
-    <span id="hatTrick">0</span>
+  <div class="award-card" id="award-hattrick">
+    <div class="award-title">Hat Trick</div>
+    <div class="award-value" id="hatTrick">0</div>
   </div>
   
-  <div class="award-row" id="award-lowton">
-    <span>Low Ton</span>
-    <span id="lowTon">0</span>
+  <div class="award-card" id="award-threeblack">
+    <div class="award-title">3 in the Black</div>
+    <div class="award-value" id="threeInTheBlack">0</div>
   </div>
   
-  <div class="award-row" id="award-highton">
-    <span>High Ton</span>
-    <span id="highTon">0</span>
+  <div class="award-card" id="award-ton80">
+    <div class="award-title">Ton 80</div>
+    <div class="award-value" id="ton80">0</div>
   </div>
   
-  <div class="award-row" id="award-ton80">
-    <span>Ton 80</span>
-    <span id="ton80">0</span>
+  <div class="award-card" id="award-highton">
+    <div class="award-title">High Ton</div>
+    <div class="award-value" id="highTon">0</div>
   </div>
   
-  <div class="award-row" id="award-threeblack">
-    <span>3 in the Black</span>
-    <span id="threeInTheBlack">0</span>
+  <div class="award-card" id="award-lowton">
+    <div class="award-title">Low Ton</div>
+    <div class="award-value" id="lowTon">0</div>
   </div>
   
-  <div class="award-row" id="award-threebed">
-  <span>3 in the Bed</span>
-  <span id="threeInTheBed">0</span>
-</div>
-
-<div class="award-row" id="award-whitehorse">
-  <span>White Horse</span>
-  <span id="whiteHorse">0</span>
-</div>
+  <div class="award-card" id="award-threebed">
+    <div class="award-title">3 in the Bed</div>
+    <div class="award-value" id="threeInTheBed">0</div>
+  </div>
+  
+  <div class="award-card" id="award-whitehorse">
+    <div class="award-title">White Horse</div>
+    <div class="award-value" id="whiteHorse">0</div>
+  </div>
   
 </div>
 

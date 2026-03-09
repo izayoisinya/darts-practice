@@ -87,22 +87,18 @@ function calculateStats() {
         else if (roundScore >= 151 && roundScore <= 179) highTon++;
         else if (roundScore >= 100 && roundScore <= 149) lowTon++;
       }
-    }
-    
-    // ------------------------
-// 3 in the Bed
-// ------------------------
+      
+      // 3 in the Bed
 const sameTriple =
-  round.every(d => d.multiplier === 3) &&
+  round.length === 3 &&
+  round.every(d => d && d.multiplier === 3) &&
   round[0].number === round[1].number &&
   round[1].number === round[2].number
 
 if (sameTriple) threeInTheBed++
 
-// ------------------------
 // White Horse
-// ------------------------
-const triples = round.filter(d => d.multiplier === 3)
+const triples = round.filter(d => d && d.multiplier === 3)
 
 const uniqueNumbers = new Set(
   triples.map(d => d.number)
@@ -112,6 +108,8 @@ if (triples.length === 3 && uniqueNumbers.size === 3) {
   whiteHorse++
 }
 
+    }
+    
   });
 
 

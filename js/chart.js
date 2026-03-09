@@ -21,7 +21,7 @@ function drawScoreChart() {
   ctx.clearRect(0, 0, width, height);
   
   // ★修正①
-  const padding = 40;
+  const padding = 50;
   
   const graphWidth = width - padding * 2;
   const graphHeight = height - padding * 2;

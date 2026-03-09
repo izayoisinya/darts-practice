@@ -1,185 +1,204 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Darts Practice</title>
+<head>
+<meta charset="UTF-8" />
+<title>Darts Practice</title>
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-    />
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+/>
 
-    <meta name="theme-color" content="#0f1115" />
+<meta name="theme-color" content="#0f1115" />
 
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
-    <meta name="apple-mobile-web-app-title" content="Darts Practice" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta
+name="apple-mobile-web-app-status-bar-style"
+content="black-translucent"
+/>
+<meta name="apple-mobile-web-app-title" content="Darts Practice" />
 
-    <link rel="manifest" href="manifest.json" />
-    <link rel="stylesheet" href="css/base.css" />
-    <link rel="stylesheet" href="css/layout.css" />
-    <link rel="stylesheet" href="css/menu.css" />
-    <link rel="stylesheet" href="css/theme.css" />
-  </head>
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="css/base.css" />
+<link rel="stylesheet" href="css/layout.css" />
+<link rel="stylesheet" href="css/menu.css" />
+<link rel="stylesheet" href="css/theme.css" />
+</head>
 
-  <body>
-    <!-- ================= HEADER ================= -->
-    <header class="header">
-      <div class="score-panel">
-        <div class="score-block">
-          
-          <div class="score-value" id="totalScore">0</div>
-        </div>
+<body>
+<!-- ================= HEADER ================= -->
+<header class="header">
+<div class="score-panel">
+<div class="score-block">
 
-        <button type="button" id="nextGameBtn" class="next-button" disabled>
-          NEXT GAME
-        </button>
-      </div>
-    </header>
+<div class="score-value" id="totalScore">0</div>
+</div>
 
-    <!-- ================= MAIN ================= -->
-    <main class="container">
-      <!-- ===== ROUNDS ===== -->
-      <section class="round-area">
-        <h2>Rounds</h2>
-        <div class="round-list">
-          <div id="roundContainer"></div>
-        </div>
-      </section>
+<button type="button" id="nextGameBtn" class="next-button" disabled>
+NEXT GAME
+</button>
+</div>
+</header>
 
-      <!-- ===== INPUT ===== -->
-      <section class="input-area">
-        <h2>Input</h2>
+<!-- ================= MAIN ================= -->
+<main class="container">
+<!-- ===== ROUNDS ===== -->
+<section class="round-area">
+<h2>Rounds</h2>
+<div class="round-list">
+<div id="roundContainer"></div>
+</div>
+</section>
 
-        <button type="button" class="bull-setting">
-          <span class="label">Bull Mode</span>
-          <span class="value">FAT</span>
-        </button>
+<!-- ===== INPUT ===== -->
+<section class="input-area">
+<h2>Input</h2>
 
-        <div class="top-buttons">
-          <button type="button" data-display="Bull">Bull</button>
-          <button type="button" data-display="InBull">In</button>
-          <button type="button" data-display="Miss">Miss</button>
-          <button type="button" id="undoBtn">戻る</button>
-        </div>
+<button type="button" class="bull-setting">
+<span class="label">Bull Mode</span>
+<span class="value">FAT</span>
+</button>
 
-        <div id="numberTable" class="number-table"></div>
-      </section>
+<div class="top-buttons">
+<button type="button" data-display="Bull">Bull</button>
+<button type="button" data-display="InBull">In</button>
+<button type="button" data-display="Miss">Miss</button>
+<button type="button" id="undoBtn">戻る</button>
+</div>
 
-      <!-- ===== STATS ===== -->
-      <section class="stats-area">
-        <h2>Stats</h2>
+<div id="numberTable" class="number-table"></div>
+</section>
 
-        <!-- コンパクト表示 -->
-        <div class="stats-compact">
-          <div class="compact-block">
-            <div class="compact-label">Bulls</div>
-            <div class="compact-value" id="bullCountCompact">0</div>
-            <div class="compact-sub" id="bullPercentCompact">0.0%</div>
-          </div>
+<!-- ===== STATS ===== -->
+<section class="stats-area">
+<h2>Stats</h2>
 
-          <div class="compact-block">
-            <div class="compact-label">Inner</div>
-            <div class="compact-value" id="innerBullsCompact">0</div>
-            <div class="compact-sub" id="innerBullPercentCompact">0.0%</div>
-          </div>
+<!-- コンパクト表示 -->
+<div class="stats-compact">
+<div class="compact-block">
+<div class="compact-label">Bulls</div>
+<div class="compact-value" id="bullCountCompact">0</div>
+<div class="compact-sub" id="bullPercentCompact">0.0%</div>
+</div>
 
-          <div class="compact-block">
-            <div class="compact-label">PPD</div>
-            <div class="compact-value" id="ppdCompact">0.00</div>
-          </div>
+<div class="compact-block">
+<div class="compact-label">Inner</div>
+<div class="compact-value" id="innerBullsCompact">0</div>
+<div class="compact-sub" id="innerBullPercentCompact">0.0%</div>
+</div>
 
-          <div class="compact-block">
-            <div class="compact-label">Avg</div>
-            <div class="compact-value" id="roundAvgCompact">0.00</div>
-          </div>
+<div class="compact-block">
+<div class="compact-label">PPD</div>
+<div class="compact-value" id="ppdCompact">0.00</div>
+</div>
 
-          <div class="compact-block">
-            <div class="compact-label">Max</div>
-            <div class="compact-value" id="maxRoundCompact">0</div>
-          </div>
-        </div>
+<div class="compact-block">
+<div class="compact-label">Avg</div>
+<div class="compact-value" id="roundAvgCompact">0.00</div>
+</div>
 
-        <!-- 詳細表示 -->
-        <div class="stats-detail">
-          <!-- ===== KPI行 ===== -->
+<div class="compact-block">
+<div class="compact-label">Max</div>
+<div class="compact-value" id="maxRoundCompact">0</div>
+</div>
+</div>
+
+<!-- 詳細表示 -->
+<div class="stats-detail">
+<!-- ===== KPI行 ===== -->
 <div class="stats-kpi">
+
+<div class="kpi-item">
+<div class="kpi-label">PPD</div>
+<div class="kpi-value" id="ppd">0</div>
+</div>
+
+<div class="kpi-item">
+<div class="kpi-label">TOTAL</div>
+<div class="kpi-value" id="totalDartsStat">0</div>
+</div>
+
+<div class="kpi-item">
+<div class="kpi-label">AVG</div>
+<div class="kpi-value" id="roundAvg">0</div>
+</div>
+
+<div class="kpi-item">
+<div class="kpi-label">MAX</div>
+<div class="kpi-value" id="maxRound">0</div>
+</div>
+
+</div>
+
+<hr class="stats-divider" />
+
+<!-- ===== Bull系 ===== -->
+<div class="bull-group">
+<div class="stat-row">
+<span class="label">
+Bulls <span class="count" id="bullCount">0</span>
+</span>
+
+<div class="bar-bg">
+<div class="bar-fill" id="bullRateBar"></div>
+</div>
+
+<span class="percent" id="bullPercent">0.0%</span>
+</div>
+
+<div class="stat-row">
+<span class="label">
+Inner <span class="count" id="innerBulls">0</span>
+</span>
+
+<div class="bar-bg">
+<div class="bar-fill inner" id="innerBullRateBar"></div>
+</div>
+
+<span class="percent" id="innerBullPercent">0.0%</span>
+</div>
+</div>
+
+<hr class="stats-divider" />
+
+          <h3>Awards</h3>
+          <div id="awardsContainer"></div>
+          <div class="awards">
   
-  <div class="kpi-item">
-    <div class="kpi-label">PPD</div>
-    <div class="kpi-value" id="ppd"></div>
+  <div class="award-row" id="award-hattrick">
+    <span>Hat Trick</span>
+    <span id="hatTrick">0</span>
   </div>
   
-  <div class="kpi-item">
-    <div class="kpi-label">TOTAL</div>
-    <div class="kpi-value" id="totalDartsStat"></div>
+  <div class="award-row" id="award-lowton">
+    <span>Low Ton</span>
+    <span id="lowTon">0</span>
   </div>
   
-  <div class="kpi-item">
-    <div class="kpi-label">Bulls</div>
-    <div class="kpi-value" id="bullCount"></div>
+  <div class="award-row" id="award-highton">
+    <span>High Ton</span>
+    <span id="highTon">0</span>
   </div>
   
-  <div class="kpi-item">
-    <div class="kpi-label">AVG</div>
-    <div class="kpi-value" id="roundAvg"></div>
+  <div class="award-row" id="award-ton80">
+    <span>Ton 80</span>
+    <span id="ton80">0</span>
   </div>
   
-  <div class="kpi-item">
-    <div class="kpi-label">MAX</div>
-    <div class="kpi-value" id="maxRound"></div>
-  </div>
-  
-  <div class="kpi-item">
-    <div class="kpi-label">Inner</div>
-    <div class="kpi-value" id="innerBulls"></div>
+  <div class="award-row" id="award-threeblack">
+    <span>3 in the Black</span>
+    <span id="threeInTheBlack">0</span>
   </div>
   
 </div>
 
-          <hr class="stats-divider" />
+<hr class="stats-divider" />
 
-          <!-- ===== Bull系 ===== -->
-          <div class="bull-group">
-            <div class="stat-row">
-              <span class="label">
-                Bulls <span class="count" id="bullCount">0</span>
-              </span>
-
-              <div class="bar-bg">
-                <div class="bar-fill" id="bullRateBar"></div>
-              </div>
-
-              <span class="percent" id="bullPercent">0.0%</span>
-            </div>
-
-            <div class="stat-row">
-              <span class="label">
-                Inner <span class="count" id="innerBulls">0</span>
-              </span>
-
-              <div class="bar-bg">
-                <div class="bar-fill inner" id="innerBullRateBar"></div>
-              </div>
-
-              <span class="percent" id="innerBullPercent">0.0%</span>
-            </div>
-          </div>
-
-          <hr class="stats-divider" />
-
-
-
-          <hr class="stats-divider" />
-
-          <h3>Score Graph</h3>
-          <canvas id="scoreChart"></canvas>
-        </div>
-      </section>
-    </main>
+<h3>Score Graph</h3>
+<canvas id="scoreChart"></canvas>
+</div>
+</section>
+</main>
 
 <div id="menuOverlay" class="menu-overlay"></div>
 
@@ -188,33 +207,33 @@
 <div id="menuEdge" class="menu-edge"></div>
 
 <div id="sideMenu" class="side-menu" role="navigation">
-  
-  <div class="menu-header">Menu</div>
-  
-  <button data-link="index.html">
-    Main Menu
-  </button>
-  
-  <button data-link="countup.html">
-    CountUp
-  </button>
-  
-  <button disabled>
-    Cricket
-  </button>
-  
-<button onclick="forceResetGame()">
-  Reset Game
+
+<div class="menu-header">Menu</div>
+
+<button data-link="index.html">
+Main Menu
 </button>
-  
+
+<button data-link="countup.html">
+CountUp
+</button>
+
+<button disabled>
+Cricket
+</button>
+
+<button onclick="forceResetGame()">
+Reset Game
+</button>
+
 </div>
 
-    <script src="js/state.js" defer></script>
-    <script src="js/storage.js" defer></script>
-    <script src="js/stats.js" defer></script>
-    <script src="js/chart.js" defer></script>
-    <script src="js/ui.js" defer></script>
-    <script src="js/game.js" defer></script>
-    <script src="js/main.js" defer></script>
-  </body>
+<script src="js/state.js" defer></script>
+<script src="js/storage.js" defer></script>
+<script src="js/stats.js" defer></script>
+<script src="js/chart.js" defer></script>
+<script src="js/ui.js" defer></script>
+<script src="js/game.js" defer></script>
+<script src="js/main.js" defer></script>
+</body>
 </html>

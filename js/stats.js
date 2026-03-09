@@ -201,11 +201,17 @@ function updateStats() {
   
   // ===== Awards =====
 function showAward(id, value) {
+  
   const el = document.getElementById(id)
+  
+  if (!el) return
   
   if (value > 0) {
     el.style.display = "flex"
+  } else {
+    el.style.display = "none"
   }
+  
 }
 
 $("hatTrick").textContent = stats.hatTrick
@@ -213,11 +219,15 @@ $("lowTon").textContent = stats.lowTon
 $("highTon").textContent = stats.highTon
 $("ton80").textContent = stats.ton80
 $("threeInTheBlack").textContent = stats.threeInTheBlack
+$("threeInTheBed").textContent = stats.threeInTheBed
+$("whiteHorse").textContent = stats.whiteHorse
 
 showAward("award-hattrick", stats.hatTrick)
 showAward("award-lowton", stats.lowTon)
 showAward("award-highton", stats.highTon)
 showAward("award-ton80", stats.ton80)
 showAward("award-threeblack", stats.threeInTheBlack)
+showAward("award-threebed", stats.threeInTheBed)
+showAward("award-whitehorse", stats.whiteHorse)
 
 }

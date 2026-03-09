@@ -6,22 +6,23 @@ function drawScoreChart() {
   const canvas = document.getElementById("scoreChart");
   if (!canvas) return;
   
-  // 👇 追加
   if (!canvas.offsetWidth || !canvas.offsetHeight) return;
   
   const ctx = canvas.getContext("2d");
   
   const accent =
-  getComputedStyle(document.documentElement)
-  .getPropertyValue("--accent")
-  .trim() || "#00ffc8";
+    getComputedStyle(document.documentElement)
+    .getPropertyValue("--accent")
+    .trim() || "#00ffc8";
   
   const width = canvas.width = canvas.offsetWidth;
   const height = canvas.height = 220;
   
   ctx.clearRect(0, 0, width, height);
   
-  const padding = 25;
+  // ★修正①
+  const padding = 40;
+  
   const graphWidth = width - padding * 2;
   const graphHeight = height - padding * 2;
   
@@ -40,7 +41,7 @@ function drawScoreChart() {
     Math.max(...validScores) :
     0;
   
-  // ===== ① 横グリッド（点数目盛り）=====
+  // ===== 横グリッド =====
   ctx.strokeStyle = "rgba(255,255,255,0.08)";
   ctx.lineWidth = 1;
   
@@ -58,21 +59,19 @@ function drawScoreChart() {
     ctx.lineTo(width - padding, y);
     ctx.stroke();
     
-    // 縦軸ラベル
+    // ★修正②
     ctx.fillStyle = "rgba(255,255,255,0.4)";
     ctx.font = "12px sans-serif";
     ctx.fillText(
       Math.round(value),
-      5,
+      10,
       y + 4
     );
   }
   
-  // ===== ② 折れ線 =====
+  // ===== 折れ線 =====
   ctx.beginPath();
   ctx.lineWidth = 2;
-  
-  
   ctx.strokeStyle = accent;
   
   let started = false;
@@ -96,7 +95,7 @@ function drawScoreChart() {
   
   ctx.stroke();
   
-  // ===== ③ 各ポイント描画 =====
+  // ===== ポイント =====
   roundScores.forEach((score, i) => {
     
     if (score === null) return;
@@ -123,16 +122,18 @@ function drawScoreChart() {
   
   ctx.shadowBlur = 0;
   
-  // ===== ④ 横軸ラベル（R1〜R8）=====
+  // ===== 横軸ラベル =====
   ctx.fillStyle = "rgba(255,255,255,0.4)";
   ctx.font = "12px sans-serif";
   
   for (let i = 0; i < TOTAL_ROUNDS; i++) {
     const x = padding + stepX * i;
+    
+    // ★修正③
     ctx.fillText(
       "R" + (i + 1),
       x - 10,
-      height - 10
+      height - 5
     );
   }
 }

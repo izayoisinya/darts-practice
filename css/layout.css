@@ -368,7 +368,7 @@ body.phone.landscape .container {
   grid-template-columns: 45% 45% 100px;
   gap: 8px;
   transition: grid-template-columns 0.3s ease;
-  padding: 5px 40px 0 10px;
+  padding: 5px 60px 0 05px;
 }
 
 body.phone.landscape .number-table {
@@ -385,7 +385,7 @@ body.phone.landscape .stats-area {
   flex: unset;
   display: flex;
   flex-direction: column;
-  padding: 30px;
+  padding: 40px;
   width: 100px;
   min-width: 100px;
   overflow: hidden;

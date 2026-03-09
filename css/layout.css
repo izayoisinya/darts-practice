@@ -686,11 +686,6 @@ body.tablet.portrait .number-column {
   display: contents;
 }
 
-body.tablet.portrait .stats-kpi {
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
 /* ===================================================== */
 /* 05. DESKTOP                                           */
 /* ===================================================== */

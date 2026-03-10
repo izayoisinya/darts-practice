@@ -516,6 +516,12 @@ body.phone.landscape .top-buttons {
   margin-top: 0;
 }
 
+body.phone.landscape .top-buttons button {
+  height: 36px;
+  padding: 0;
+  font-size: 14px;
+}
+
 
 /* ===== Stats (closed) ===== */
 

@@ -373,6 +373,7 @@ body.phone.landscape .container {
 
 body.phone.landscape .round {
   grid-template-columns: 40px 1fr 30px 45px;
+  min-width: 0;
 }
 
 body.phone.landscape .dart {
@@ -475,7 +476,7 @@ body.phone.landscape.iphone-stats-open .stats-detail {
 }
 
 body.phone.landscape .stats-compact {
-  display: grid;
+  display: flex;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }

@@ -2,6 +2,11 @@
 /* MENU PAGE */
 /* ============================== */
 
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   background: #0f1115;
   color: white;

@@ -474,10 +474,6 @@ body.phone.landscape .round-darts {
 }
 
 body.phone.landscape .dart {
-  width: 40px;
-  height: 30px;
-
-  font-size: 13px;
   padding: 4px 0;
 }
 

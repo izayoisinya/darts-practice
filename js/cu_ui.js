@@ -1,3 +1,12 @@
+function updateUI() {
+  updateStats()
+  renderRounds()
+  updateNextGameButton()
+  drawScoreChart()
+  saveGame()
+}
+
+
 // ===============================
 // ===== ダーツ1本描画 ==========
 // ===============================
@@ -200,27 +209,5 @@ function setupTopButtons() {
 }
 
 
-function refreshLayout() {
-  
-  detectDevice()
-  
-  if (typeof createNumberTable === "function") {
-    createNumberTable()
-  }
-  
-  if (typeof drawScoreChart === "function") {
-    drawScoreChart()
-  }
-  
-}
-function forceResetGame() {
-  
-  if (!confirm("ゲームデータをリセットしますか？")) return
-  
-  localStorage.removeItem("dartsPractice")
-  localStorage.removeItem("dartsSessions")
-  
-  location.reload()
-  
-}
+
 

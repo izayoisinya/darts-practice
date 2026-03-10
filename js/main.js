@@ -1,23 +1,23 @@
 // ===============================
 // ===== 初期化 ==================
 // ===============================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", initApp)
+
+function initApp() {
   
-  detectDevice();
+  detectDevice()
   refreshLayout()
   
-  const isGamePage = document.getElementById("roundContainer")
-  
-if (isGamePage) {
-  initGame()
-}
+  if (document.getElementById("roundContainer")) {
+    initGame()
+  }
   
   registerEvents()
   
   window.addEventListener("resize", refreshLayout)
   window.addEventListener("orientationchange", refreshLayout)
   
-})
+}
 
 
 // ===============================

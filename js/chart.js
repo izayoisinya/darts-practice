@@ -10,24 +10,17 @@ function drawScoreChart() {
   
   const ctx = canvas.getContext("2d");
   
-  const accent =
-    getComputedStyle(document.documentElement)
-    .getPropertyValue("--accent")
-    .trim() || "#00ffc8";
-  
-  const width = canvas.width = canvas.offsetWidth;
-  const height = canvas.height = 220;
-  
-  ctx.clearRect(0, 0, width, height);
-  
-  // ★修正①
-  const padding = 50;
-  
-  const graphWidth = width - padding * 2;
-  const graphHeight = height - padding * 2;
-  
-  const maxScore = 180
-  const stepX = graphWidth / (TOTAL_ROUNDS - 1);
+const width = canvas.width = canvas.offsetWidth
+const height = canvas.height = canvas.offsetHeight
+
+const padding = 50
+
+const graphWidth = width - padding * 2
+const graphHeight = height - padding * 2
+
+  const stepX = TOTAL_ROUNDS > 1 ?
+  graphWidth / (TOTAL_ROUNDS - 1) :
+  0
   
   // ===== ラウンドスコア取得 =====
   const roundScores = game.rounds.map(round =>

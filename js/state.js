@@ -2,27 +2,29 @@
 // ===== グローバル状態 =========
 // ===============================
 
-const body = document.body
-
-const accent = getComputedStyle(document.documentElement) .getPropertyValue("--accent") .trim()
-
 // ラウンド数
-window.TOTAL_ROUNDS = 8
+const TOTAL_ROUNDS = 8
+
+// 最大スコア
+const MAX_SCORE = 180
+
+// UIカラー
+const accent = getComputedStyle(document.documentElement)
+  .getPropertyValue("--accent")
+  .trim()
 
 // Bullモード
-window.bullMode = "fat"
+let bullMode = "fat"
 
 // Undoロック
-window.lockedRound = -1
+let lockedRound = -1
 
 // セッション履歴
-window.sessions = []
+let sessions = []
 
 // ゲーム状態
-window.game = {
+const game = {
   rounds: [],
   currentRound: 0,
   currentDart: 0
 }
-
-window.body = document.body

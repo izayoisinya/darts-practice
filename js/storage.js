@@ -1,13 +1,12 @@
 const SAVE_KEY = "dartsPractice"
 
-
 function saveGame() {
   
   const data = {
     rounds: game.rounds,
     currentRound: game.currentRound,
     currentDart: game.currentDart,
-    lockedRound: game.lockedRound
+    lockedRound: lockedRound
   }
   
   localStorage.setItem(SAVE_KEY, JSON.stringify(data))
@@ -32,6 +31,6 @@ function loadGame() {
   game.rounds = data.rounds
   game.currentRound = data.currentRound
   game.currentDart = data.currentDart
-  game.lockedRound = data.lockedRound ?? -1
+  lockedRound = data.lockedRound ?? -1
   
 }

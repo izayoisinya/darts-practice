@@ -407,7 +407,7 @@ body.phone.landscape .container {
 }
 
 body.phone.landscape .round {
-  grid-template-columns: 50px auto;
+  grid-template-columns: 50px max-content auto;
 column-gap: 8px;
   gap: 4px;
 }

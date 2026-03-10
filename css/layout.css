@@ -507,6 +507,14 @@ body.phone.landscape .number-row {
   gap: 6px;
 }
 
+body.phone.landscape .bull-setting {
+  margin-bottom: 0;
+}
+
+body.phone.landscape .top-buttons {
+  margin-top: 0;
+}
+
 
 /* ===== Stats (closed) ===== */
 

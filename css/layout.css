@@ -689,13 +689,26 @@ body.phone.portrait .input-area {
 body.phone.portrait .number-table {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
 }
 
 body.phone.portrait .number-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 6px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2px;
+}
+
+body.phone.portrait .bull-setting {
+  padding: 4px 12px;
+}
+
+body.phone.portrait .top-buttons {
+  margin-bottom: 4px;
+}
+
+body.phone.portrait .top-buttons button {
+  padding: 6px 0;
+  font-size: 14px;
 }
 
 /* ================= Stats ================= */

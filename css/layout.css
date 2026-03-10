@@ -133,10 +133,20 @@ html, body {
 }
 
 .dart {
+  width: 46px;
+  height: 34px;
+  font-size: 15px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  border-radius: 8px;
+  
   background: #1c212c;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 2px 4px rgba(0, 0, 0, 0.4);
+    inset 0 1px 0 rgba(255, 255, 255, .05),
+    0 2px 4px rgba(0, 0, 0, .4);
 }
 
 /* Input */
@@ -381,8 +391,9 @@ body.phone.landscape .round {
 }
 
 body.phone.landscape .dart {
-  width: 38px;
-  font-size: 12px;
+  width: 40px;
+  height: 30px;
+  font-size: 13px;
   padding: 4px 0;
 }
 

@@ -376,7 +376,7 @@ body.phone.landscape .container {
 }
 
 body.phone.landscape .round {
-  grid-template-columns: 40px 1fr 45px;
+  grid-template-columns: 80% 1fr 20%;
   gap: 4px;
 }
 

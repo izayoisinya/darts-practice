@@ -371,6 +371,10 @@ body.phone.landscape .container {
   padding: 5px 40px 0 5px;
 }
 
+body.phone.landscape .score-value {
+  font-size: 36px;
+}
+
 body.phone.landscape .number-table {
   display: flex;
   gap: 12px;

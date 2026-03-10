@@ -387,11 +387,13 @@ body.phone.landscape .stats-area {
   flex-direction: column;
   overflow: hidden;
   box-sizing: border-box;
+  padding: 0 20px 0 0;
 }
 
 /* 横で開いた状態 */
 body.phone.landscape.iphone-stats-open .container {
   grid-template-columns: 40% 0px 60%;
+  padding: 0 20px 0 0;
 }
 
 body.phone.landscape.iphone-stats-open .input-area {

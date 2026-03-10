@@ -15,17 +15,17 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Header */
+
+/* ================================= */
+/* ============== HEADER =========== */
+/* ================================= */
+
 .header {
   height: var(--header-height);
   padding: 0 20px;
   display: flex;
   align-items: center;
   border-bottom: none;
-}
-
-.score-value {
-  font-size: 48px;
 }
 
 .score-panel {
@@ -36,6 +36,10 @@ html, body {
   width: 100%;
   padding: 0 var(--header-padding-x);
   border-radius: 20px;
+}
+
+.score-value {
+  font-size: 48px;
 }
 
 .score-block,
@@ -55,18 +59,26 @@ html, body {
   height: 48px;
 }
 
-/* Main layout */
+
+/* ================================= */
+/* ============== MAIN ============= */
+/* ================================= */
+
 .container {
   display: flex;
   gap: 20px;
   align-items: stretch;
 
   height: calc(100dvh - var(--header-height));
-
   overflow: hidden;
+
   padding: 5px 20px 10px 20px;
-  
 }
+
+
+/* ================================= */
+/* ============ SCROLL ============= */
+/* ================================= */
 
 .round-list,
 .number-table,
@@ -80,17 +92,36 @@ html, body {
   display: none;
 }
 
-/* Columns */
+
+/* ================================= */
+/* ============= COLUMNS =========== */
+/* ================================= */
+
 .round-area,
 .input-area,
 .stats-area {
   display: flex;
   flex-direction: column;
+
   min-height: 0;
   min-width: 0;
+
   overflow: hidden;
+
   padding: 8px 20px 20px 20px;
   border-bottom: none;
+}
+
+.round-area { flex: 1.5; }
+.input-area { flex: 1; }
+.stats-area { flex: 1; }
+
+.input-area {
+  transition: width 0.35s ease, opacity 0.25s ease;
+}
+
+.stats-area {
+  overflow-y: auto;
 }
 
 .number-table {
@@ -100,35 +131,40 @@ html, body {
   overflow-y: auto;
 }
 
-.round-area {
-  flex: 1.5;
-}
-.input-area {
-  flex: 1;
-  transition: width 0.35s ease, opacity 0.25s ease;
-}
-.stats-area {
-  flex: 1;
-  overflow-y: auto;
-}
-
-/* Scroll areas */
 .round-list {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
 }
 
-/* Rounds */
+
+/* ================================= */
+/* ============== ROUNDS =========== */
+/* ================================= */
+
 .round {
   display: grid;
   grid-template-columns: 50px max-content auto;
+
   column-gap: 8px;
   gap: 4px;
+
   align-items: center;
+
   padding: 6px 0;
   border-bottom: 1px solid rgba(255,255,255,0.06);
+
   min-width: 0;
+}
+
+.round-label {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+
+  color: var(--accent);
+
+  text-shadow: 0 0 6px rgba(0,255,200,.35);
 }
 
 .round-darts {
@@ -141,51 +177,53 @@ html, body {
 .round-score {
   font-weight: 700;
   color: var(--accent);
+
   font-variant-numeric: tabular-nums;
+
   justify-self: end;
   white-space: nowrap;
 }
 
-.round-label {
-  
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  
-  color: var(--accent);
-  
-  text-shadow: 0 0 6px rgba(0, 255, 200, .35);
-  
-}
+
+/* ================================= */
+/* ============== DARTS ============ */
+/* ================================= */
 
 .dart {
   width: 46px;
   height: 34px;
   font-size: 15px;
-  
+
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   border-radius: 8px;
-  
+
   background: #1c212c;
+
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .05),
-    0 2px 4px rgba(0, 0, 0, .4);
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 2px 4px rgba(0,0,0,.4);
 }
 
-/* Input */
+
+/* ================================= */
+/* ============== INPUT ============ */
+/* ================================= */
+
 .bull-setting {
   display: flex;
   justify-content: space-between;
+
   padding: 8px 12px;
   margin-bottom: 8px;
 }
 
 .top-buttons {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4,1fr);
+
   gap: 8px;
   margin-bottom: 8px;
 }
@@ -194,61 +232,25 @@ html, body {
   padding: 10px 0;
 }
 
-/* Stats */
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 0;
+.number-column {
+  width: 100%;
 }
+
+.number-row {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+}
+
+
+/* ================================= */
+/* ============== STATS ============ */
+/* ================================= */
 
 .stats-detail {
   display: flex;
   flex-direction: column;
   gap: 4px;
-}
-
-.stat-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-  padding: 3px 0;
-}
-
-.stat-row .label {
-  font-size: 14px;
-  opacity: 0.85;
-  white-space: nowrap;
-}
-
-.stat-row .count {
-  margin-left: 6px;
-  font-weight: 600;
-}
-
-.stats-main {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.stat-line {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.stat-line .label {
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-.stat-line .value {
-  font-size: 18px;
-  font-weight: 600;
-  color: #00ffc8;
 }
 
 .stats-area h2 {
@@ -266,47 +268,56 @@ html, body {
   margin-top: 0;
 }
 
-.award-row {
-  display: none;
-  justify-content: space-between;
-  padding: 4px 0;
-  font-size: 14px;
-}
 
-.awards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 8px;
-}
+/* ================================= */
+/* ============== STAT ROW ========= */
+/* ================================= */
 
-.award-card {
-  background: #1c212c;
-  border-radius: 10px;
-  padding: 10px;
+.stat-item {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, .4),
-    inset 0 1px 0 rgba(255, 255, 255, .05);
+
+  padding: 4px 0;
 }
 
-.award-title {
-  font-size: 12px;
-  opacity: .7;
+.stat-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+
+  align-items: center;
+  gap: 12px;
+
+  padding: 3px 0;
 }
 
-.award-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--accent);
+.stat-row .label {
+  font-size: 14px;
+  opacity: 0.85;
+  white-space: nowrap;
 }
 
-/* ===== KPI行 ===== */
+.stat-row .count {
+  margin-left: 6px;
+  font-weight: 600;
+}
+
+.stat-row .percent {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+
+/* ================================= */
+/* ============== KPI ============== */
+/* ================================= */
+
 .stats-kpi {
   display: grid;
   grid-template-columns: 1fr 1fr;
+
   gap: 10px;
+
   text-align: center;
   margin-bottom: 10px;
 }
@@ -328,16 +339,15 @@ html, body {
   font-weight: 700;
 }
 
-/* 区切り線 */
-.stats-divider {
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin: 4px 0;
-}
+
+/* ================================= */
+/* ============== BARS ============= */
+/* ================================= */
 
 .bar-bg {
   height: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.1);
+
   border-radius: 3px;
   overflow: hidden;
 }
@@ -345,27 +355,74 @@ html, body {
 .bar-fill {
   height: 100%;
   width: 0%;
-  transition: width 0.3s ease;
+
+  transition: width .3s ease;
 }
 
 .bar-fill.inner {
   background: #4da3ff;
 }
 
-.stat-row .percent {
-  font-size: 13px;
-  opacity: 0.8;
-}
 
-.number-column {
-  width: 100%;
-}
+/* ================================= */
+/* ============== AWARDS =========== */
+/* ================================= */
 
-.number-row {
+.awards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
+
   gap: 8px;
 }
+
+.award-card {
+  background: #1c212c;
+  border-radius: 10px;
+
+  padding: 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  box-shadow:
+    0 2px 6px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.award-title {
+  font-size: 12px;
+  opacity: .7;
+}
+
+.award-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.award-row {
+  display: none;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+
+/* ================================= */
+/* ============== DIVIDER ========== */
+/* ================================= */
+
+.stats-divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin: 4px 0;
+}
+
+
+/* ================================= */
+/* ============== GRAPH ============ */
+/* ================================= */
 
 body.phone.landscape #scoreChart {
   height: 180px;
@@ -376,53 +433,56 @@ body.phone.landscape #scoreChart {
 /* ===================================================== */
 /* 02. PHONE (COMMON)                                    */
 /* ===================================================== */
-/* レイアウト調整 */
+
 body.phone {
   --header-height: 60px;
   --header-padding-x: 20px;
 }
 
-body.phone .round-area {
-  flex: 1.4;
-}
-body.phone .input-area {
-  flex: 1;
-}
+body.phone .round-area { flex: 1.4; }
+body.phone .input-area { flex: 1; }
+body.phone .stats-area { flex: 1; }
 
-/* phone 縦は普通表示 */
-body.phone .stats-area {
-  flex: 1;
-}
 
 /* ===================================================== */
 /* 03. PHONE LANDSCAPE                                   */
 /* ===================================================== */
-/* phone 横だけ特別レイアウト */
+
+/* ===== Layout ===== */
+
 body.phone.landscape .container {
   display: grid;
   grid-template-columns: 40% 40% 20%;
+
   gap: 8px;
-  transition: grid-template-columns 0.3s ease;
   padding: 5px 40px 0 5px;
-  
+
+  transition: grid-template-columns 0.3s ease;
 }
+
+
+/* ===== Rounds ===== */
 
 body.phone.landscape .round {
   grid-template-columns: 50px max-content auto;
-column-gap: 8px;
+  column-gap: 8px;
+  gap: 4px;
+}
+
+body.phone.landscape .round-darts {
   gap: 4px;
 }
 
 body.phone.landscape .dart {
   width: 40px;
   height: 30px;
+
   font-size: 13px;
   padding: 4px 0;
 }
 
-body.phone.landscape .round-darts {
-  gap: 4px;
-}　
+
+/* ===== Header ===== */
 
 body.phone.landscape h2 {
   font-size: 16px;
@@ -433,6 +493,9 @@ body.phone.landscape .score-value {
   font-size: 36px;
 }
 
+
+/* ===== Input ===== */
+
 body.phone.landscape .number-table {
   display: flex;
   gap: 12px;
@@ -442,16 +505,28 @@ body.phone.landscape .number-column {
   flex: 1;
 }
 
-/* 横で閉じた状態 */
+body.phone.landscape .number-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+
+/* ===== Stats (closed) ===== */
+
 body.phone.landscape .stats-area {
   flex: unset;
+
   display: flex;
   flex-direction: column;
+
   overflow: hidden;
   box-sizing: border-box;
 }
 
-/* 横で開いた状態 */
+
+/* ===== Stats (open) ===== */
+
 body.phone.landscape.iphone-stats-open .container {
   grid-template-columns: 40% 0px 60%;
   padding: 5px 40px 0 5px;
@@ -459,8 +534,10 @@ body.phone.landscape.iphone-stats-open .container {
 
 body.phone.landscape.iphone-stats-open .input-area {
   flex: 0;
-  padding: 0;
+
   width: 0;
+  padding: 0;
+
   overflow: hidden;
   opacity: 0;
 }
@@ -472,17 +549,15 @@ body.phone.landscape.iphone-stats-open .stats-area {
   min-width: 0;
 }
 
-body.phone.landscape .number-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 6px;
-}
 
-/* Compact表示制御 */
+/* ===== Compact Stats ===== */
+
 body.phone.landscape .stats-compact {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
   gap: 8px;
+
   transition: opacity 0.2s ease;
 }
 
@@ -490,11 +565,17 @@ body.phone.landscape .stats-compact .kpi-value {
   font-size: 18px;
 }
 
-/* 中身だけスクロール */
+body.phone.landscape .stats-compact .compact-block:nth-child(n+3) {
+  grid-column: 1 / span 2;
+}
+
+
+/* ===== Scroll Control ===== */
+
 body.phone.landscape .stats-detail,
 body.phone.landscape .stats-compact {
-  overflow-y: auto;
   flex: 1;
+  overflow-y: auto;
 }
 
 body.phone.landscape .stats-detail {
@@ -502,26 +583,21 @@ body.phone.landscape .stats-detail {
   transform: translateX(20px);
 }
 
+
+/* ===== Toggle View ===== */
+
 body.phone.landscape.iphone-stats-open .stats-compact {
   display: none;
   opacity: 0;
 }
 
 body.phone.landscape.iphone-stats-open .stats-detail {
+  display: flex;
+
   opacity: 1;
   transform: translateX(0);
-  display: flex;
 }
 
-body.phone.landscape .stats-compact {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-body.phone.landscape .stats-compact .compact-block:nth-child(n+3) {
-  grid-column: 1 / span 2;
-}
 
 /* ===================================================== */
 /* PHONE PORTRAIT                                        */
@@ -529,11 +605,13 @@ body.phone.landscape .stats-compact .compact-block:nth-child(n+3) {
 
 body.phone.portrait .container {
   display: grid;
-grid-template-columns: 1fr 1fr;
-grid-template-rows: minmax(0, 1fr) 260px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, 1fr) 260px;
   gap: 12px;
   padding: 0 25px 10px 0;
 }
+
+/* Header */
 
 body.phone.portrait .score-panel {
   display: flex;
@@ -556,40 +634,61 @@ body.phone.portrait .next-button {
   font-size: 14px;
 }
 
-/* Rounds */
+/* ================= Rounds ================= */
+
 body.phone.portrait .round-area {
   grid-column: 1;
   grid-row: 1;
   cursor: pointer;
-}
-
-body.phone.portrait .round-score {
-  justify-self: end;
-text-align: right;
+  height: 100%;
+  overflow: hidden;
 }
 
 body.phone.portrait .round {
   grid-template-columns: 50px auto;
-column-gap: 8px;
+  column-gap: 8px;
   min-height: 0;
 }
 
-body.phone.portrait.round-open .round-area {
-  border-radius: 12px;
+body.phone.portrait .round-score {
+  justify-self: end;
+  text-align: right;
 }
 
-/* Input */
-body.phone.portrait .input-area {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-body.phone.portrait .round-area,
-body.phone.portrait .input-area {
+body.phone.portrait .round-list {
   height: 100%;
 }
 
-/* Stats */
+body.phone.portrait .round-darts {
+  display: none;
+}
+
+body.phone.portrait .round-separator {
+  display: none !important;
+}
+
+/* ================= Input ================= */
+
+body.phone.portrait .input-area {
+  grid-column: 2;
+  grid-row: 1;
+  height: 100%;
+}
+
+body.phone.portrait .number-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.phone.portrait .number-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 6px;
+}
+
+/* ================= Stats ================= */
+
 body.phone.portrait .stats-area {
   grid-column: 1 / span 2;
   grid-row: 2;
@@ -606,50 +705,10 @@ body.phone.portrait .stats-detail {
   overflow-y: auto;
 }
 
-body.phone.portrait .number-table {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 
-body.phone.portrait .number-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 6px;
-}
-
-body.phone.portrait .round-darts {
-  display: none;
-}
-
-body.phone.portrait .round-area {
-  height: 100%;
-  overflow: hidden;
-}
-
-body.phone.portrait .round-list {
-  height: 100%;
-}
-
-body.phone.portrait .round-separator {
-  display: none !important;
-}
-
-/* Rounds展開時は全表示 */
-body.phone.portrait.round-open .round-darts {
-  display: flex;
-}
-
-body.phone.portrait .round-separator {
-  display: none;
-}
-
-/* ================================= */
-/* PHONE PORTRAIT - ROUNDS OPEN      */
-/* ================================= */
-body.tablet .stats-compact {
-  display: none !important;
-}
+/* ===================================================== */
+/* PHONE PORTRAIT - ROUNDS OPEN                          */
+/* ===================================================== */
 
 body.phone.portrait.round-open .container {
   grid-template-columns: 1fr;
@@ -662,10 +721,21 @@ body.phone.portrait.round-open .input-area {
 
 body.phone.portrait.round-open .round-area {
   grid-column: 1;
+  border-radius: 12px;
 }
 
 body.phone.portrait.round-open .stats-area {
   grid-column: 1;
+}
+
+body.phone.portrait.round-open .round-darts {
+  display: flex;
+}
+
+/* Tabletではcompact非表示 */
+
+body.tablet .stats-compact {
+  display: none !important;
 }
 
 

@@ -42,10 +42,10 @@ const graphHeight = height - padding * 2
   
   for (let i = 0; i <= gridSteps; i++) {
     
-    const value = (maxScore / gridSteps) * i;
+    const value = (MAX_SCORE / gridSteps) * i;
     const y =
       height - padding -
-      (value / maxScore) * graphHeight;
+      (value / MAX_SCORE) * graphHeight;
     
     ctx.beginPath();
     ctx.moveTo(padding, y);
@@ -76,7 +76,7 @@ const graphHeight = height - padding * 2
     const x = padding + stepX * i;
     const y =
       height - padding -
-      (score / maxScore) * graphHeight;
+      (score / MAX_SCORE) * graphHeight;
     
     if (!started) {
       ctx.moveTo(x, y);
@@ -96,7 +96,7 @@ const graphHeight = height - padding * 2
     const x = padding + stepX * i;
     const y =
       height - padding -
-      (score / maxScore) * graphHeight;
+      (score / MAX_SCORE) * graphHeight;
     
     ctx.beginPath();
     

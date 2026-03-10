@@ -3,11 +3,12 @@ const SAVE_KEY = "dartsPractice"
 function saveGame() {
   
   const data = {
-    rounds: game.rounds,
-    currentRound: game.currentRound,
-    currentDart: game.currentDart,
-    lockedRound: lockedRound
-  }
+  gameType: "countup",
+  rounds: game.rounds,
+  currentRound: game.currentRound,
+  currentDart: game.currentDart,
+  lockedRound: lockedRound
+}
   
   localStorage.setItem(SAVE_KEY, JSON.stringify(data))
   

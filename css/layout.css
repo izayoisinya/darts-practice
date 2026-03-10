@@ -21,7 +21,8 @@ html, body {
 /* ================================= */
 
 .header {
-  height: var(--header-height);
+  height: calc(var(--header-height) + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
   padding: 0 20px;
   display: flex;
   align-items: center;

@@ -369,6 +369,12 @@ body.phone.landscape .container {
   gap: 8px;
   transition: grid-template-columns 0.3s ease;
   padding: 5px 40px 0 5px;
+  
+}
+
+body.phone.landscape h2 {
+  font-size: 16px;
+  margin-bottom: 6px;
 }
 
 body.phone.landscape .score-value {

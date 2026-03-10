@@ -205,47 +205,29 @@ function setupTopButtons() {
 // ===============================
 function detectDevice() {
   
-  const w = window.innerWidth
-  const h = window.innerHeight
-  
-  body.classList.remove(
-    "phone",
-    "tablet",
-    "desktop",
-    "portrait",
-    "landscape"
-  )
-  
+  const body = document.body
   const ua = navigator.userAgent
   
-  const isIPhone = /iPhone/i.test(ua)
-  const isIPad =
-    /iPad/i.test(ua) ||
-    (ua.includes("Macintosh") && "ontouchend" in document)
+  body.classList.remove(
+    "phone", "tablet", "desktop", "portrait", "landscape"
+  )
   
-  const isAndroid = /Android/i.test(ua)
+  const isPhone =
+    /iPhone|Android.*Mobile/i.test(ua)
   
-  // ===== デバイス判定 =====
+  const isTablet =
+    /iPad|Android(?!.*Mobile)/i.test(ua)
   
-if (isIPhone || isAndroid) {
-  body.classList.add("phone")
-}
-else if (isIPad) {
-  body.classList.add("tablet")
-}
-else {
-  body.classList.add("desktop")
-}
+  if (isPhone) body.classList.add("phone")
+  else if (isTablet) body.classList.add("tablet")
+  else body.classList.add("desktop")
   
-  // ===== 向き判定 =====
-  
-  if (h > w) {
+  if (window.innerHeight > window.innerWidth)
     body.classList.add("portrait")
-  } else {
+  else
     body.classList.add("landscape")
-  }
-  
 }
+  
 
 
 function refreshLayout() {

@@ -574,6 +574,7 @@ column-gap: 8px;
 }
 
 body.phone.portrait.round-open .round-area {
+  grid-template-columns: 50px max-content auto;
   border-radius: 12px;
 }
 

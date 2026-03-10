@@ -414,8 +414,7 @@ body.phone.landscape.iphone-stats-open .input-area {
 
 body.phone.landscape.iphone-stats-open .stats-area {
   flex: 1;
-  padding: 24px;
-  
+
   width: auto;
   min-width: 0;
 }

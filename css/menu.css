@@ -118,6 +118,7 @@ body.phone.landscape .menu-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+  width: min(420px, 90vw);
 }
 
 

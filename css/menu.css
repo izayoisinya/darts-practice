@@ -42,10 +42,11 @@ body {
   padding: 24px;
 }
 
-body.phone.landscape .menu-list {
+body.phone.landscape .menu-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 12px;
+  width: min(420px, 90vw);
 }
 
 

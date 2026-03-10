@@ -25,6 +25,22 @@ body {
   color: var(--text-main);
 }
 
+h2 {
+  margin: 0 0 12px 0;
+  padding-bottom: 6px;
+  
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  
+  color: var(--accent);
+  
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  
+  text-shadow:
+    0 0 4px rgb(var(--accent-rgb) / 0.5);
+}
+
 /* Header */
 .header {
   background: var(--bg-panel);

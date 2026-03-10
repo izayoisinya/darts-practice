@@ -1,65 +1,23 @@
 // ===============================
 // ===== 初期化 ==================
 // ===============================
-
-// DOM構築完了後に実行
 document.addEventListener("DOMContentLoaded", () => {
   
-  // デバイス判定
   detectDevice();
-  
   refreshLayout()
   
-  // ゲーム初期化（状態作成＋描画）
-  init();
+  const isGamePage = document.getElementById("roundContainer")
   
-  // イベント登録（クリック処理など）
-  registerEvents();
+if (isGamePage) {
+  initGame()
+}
   
-  // ===== 画面回転・サイズ変更 =====
+  registerEvents()
   
-  window.addEventListener("resize", refreshLayout);
+  window.addEventListener("resize", refreshLayout)
   window.addEventListener("orientationchange", refreshLayout)
   
-  // ===== 画面回転時にStatsを閉じる =====
-  
-  window.addEventListener("orientationchange", () => {
-    body.classList.remove("iphone-stats-open")
-  });
-  
-  // ===== PWA ServiceWorker =====
-
-// if ("serviceWorker" in navigator) {
-//   navigator.serviceWorker
-//     .register("./sw.js")
-//     .then(() => console.log("SW registered"))
-//     .catch(err => console.log("SW error", err));
-// }
-  
-});
-
-
-// ===============================
-// ===== ゲーム初期化処理 ========
-// ===============================
-function init() {
-
-  game.rounds = Array.from(
-    { length: TOTAL_ROUNDS },
-    () => [null, null, null]
-  )
-
-  loadGame()
-
-  createNumberTable()
-  setupTopButtons()
-
-  renderRounds()
-  updateStats()
-  drawScoreChart()
-  updateNextGameButton()
-
-}
+})
 
 
 // ===============================

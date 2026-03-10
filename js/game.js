@@ -6,6 +6,25 @@ function updateUI() {
   saveGame()
 }
 
+function initGame() {
+
+  game.rounds = Array.from(
+    { length: TOTAL_ROUNDS },
+    () => [null, null, null]
+  )
+
+  loadGame()
+
+  createNumberTable()
+  setupTopButtons()
+
+  renderRounds()
+  updateStats()
+  drawScoreChart()
+  updateNextGameButton()
+
+}
+
 // ===============================
 // ===== ダーツ追加 ==============
 // ===============================

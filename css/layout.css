@@ -143,6 +143,7 @@ html, body {
   color: var(--accent);
   font-variant-numeric: tabular-nums;
   justify-self: end;
+  white-space: nowrap;
 }
 
 .round-label {
@@ -574,7 +575,6 @@ column-gap: 8px;
 }
 
 body.phone.portrait.round-open .round-area {
-  grid-template-columns: 50px max-content auto;
   border-radius: 12px;
 }
 

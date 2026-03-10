@@ -115,6 +115,7 @@ html, body {
   align-items: center;
   padding: 6px 0;
   border-bottom: 1px solid rgba(255,255,255,0.06);
+  min-width: 0;
 }
 
 .round-darts {
@@ -375,7 +376,6 @@ body.phone.landscape .container {
 body.phone.landscape .round {
   grid-template-columns: 40px auto 45px;
   gap: 4px;
-  min-width: 0;
 }
 
 body.phone.landscape .dart {

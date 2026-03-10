@@ -564,6 +564,7 @@ body.phone.portrait .round-area {
 
 body.phone.portrait .round-score {
   justify-self: end;
+text-align: right;
 }
 
 body.phone.portrait .round {

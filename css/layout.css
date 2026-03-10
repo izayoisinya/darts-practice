@@ -508,7 +508,8 @@ body.phone.landscape .number-row {
 }
 
 body.phone.landscape .bull-setting {
-  margin-bottom: 0;
+  padding: 0 12px;
+  margin-bottom: 5px;
 }
 
 body.phone.landscape .top-buttons {

@@ -68,6 +68,18 @@ html, body {
   
 }
 
+.round-list,
+.number-table,
+.stats-area {
+  scrollbar-width: none;
+}
+
+.round-list::-webkit-scrollbar,
+.number-table::-webkit-scrollbar,
+.stats-area::-webkit-scrollbar {
+  display: none;
+}
+
 /* Columns */
 .round-area,
 .input-area,
@@ -110,7 +122,8 @@ html, body {
 /* Rounds */
 .round {
   display: grid;
-  grid-template-columns: 60px 1fr 60px;
+  grid-template-columns: 50px max-content 50px;
+  column-gap: 8px;
   gap: 4px;
   align-items: center;
   padding: 6px 0;
@@ -130,6 +143,13 @@ html, body {
   color: var(--accent);
   font-variant-numeric: tabular-nums;
   justify-self: end;
+}
+
+.round-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 1px;
 }
 
 .dart {
@@ -386,7 +406,8 @@ body.phone.landscape .container {
 }
 
 body.phone.landscape .round {
-  grid-template-columns: 60px 1fr 30px;
+  grid-template-columns: 50px max-content 50px;
+column-gap: 8px;
   gap: 4px;
 }
 
@@ -545,7 +566,8 @@ body.phone.portrait .round-score {
 }
 
 body.phone.portrait .round {
-  grid-template-columns: 60px 1fr 60px;
+  grid-template-columns: 50px max-content 50px;
+column-gap: 8px;
   min-height: 48px;
 }
 

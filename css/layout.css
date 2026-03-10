@@ -356,7 +356,6 @@ body.phone .input-area {
 /* phone 縦は普通表示 */
 body.phone .stats-area {
   flex: 1;
-  padding: 0 20px 20px 20px;
 }
 
 /* ===================================================== */

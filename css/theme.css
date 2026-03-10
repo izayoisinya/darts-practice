@@ -310,8 +310,12 @@ button[data-display="Bull"]:hover {
 
 .stats-compact {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.stats-compact .compact-block:nth-child(n+3) {
+  grid-column: 1 / span 2;
 }
 
 .compact-block {

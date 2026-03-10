@@ -146,10 +146,15 @@ html, body {
 }
 
 .round-label {
-  font-size: 13px;
+  
+  font-size: 14px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.55);
   letter-spacing: 1px;
+  
+  color: var(--accent);
+  
+  text-shadow: 0 0 6px rgba(0, 255, 200, .35);
+  
 }
 
 .dart {

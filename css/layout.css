@@ -366,29 +366,6 @@ html, body {
   gap: 8px;
 }
 
-.number-row button {
-  
-  border-radius: 8px;
-  
-  background: #1c212c;
-  
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .05),
-    0 2px 4px rgba(0, 0, 0, .4);
-  
-  border: 1px solid rgba(255, 255, 255, .05);
-  
-}
-
-.number-row button:active {
-  
-  transform: translateY(1px);
-  
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, .6);
-  
-}
-
 body.phone.landscape #scoreChart {
   height: 180px;
   width: 100%;
@@ -430,7 +407,7 @@ body.phone.landscape .container {
 }
 
 body.phone.landscape .round {
-  grid-template-columns: 50px max-content 50px;
+  grid-template-columns: 50px max-content auto;
 column-gap: 8px;
   gap: 4px;
 }
@@ -590,7 +567,7 @@ body.phone.portrait .round-score {
 }
 
 body.phone.portrait .round {
-  grid-template-columns: 50px max-content 50px;
+  grid-template-columns: 50px max-content auto;
 column-gap: 8px;
   min-height: 48px;
 }

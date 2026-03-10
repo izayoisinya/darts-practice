@@ -50,8 +50,6 @@ ${ renderDart(round[1]) }
 ${ renderDart(round[2]) }
       </span>
 
-      <span class="round-separator">||</span>
-
       <span class="round-score">${roundScore}</span>
     `
     

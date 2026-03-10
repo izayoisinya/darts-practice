@@ -11,7 +11,7 @@ function drawScoreChart() {
   const ctx = canvas.getContext("2d");
   
 const width = canvas.width = canvas.offsetWidth
-const height = canvas.height = canvas.offsetHeight
+const height = canvas.height = canvas.offsetHeight || 220
 
 const padding = 50
 
@@ -29,10 +29,13 @@ const graphHeight = height - padding * 2
     null
   );
   
-  const validScores = roundScores.filter(s => s !== null);
-  const maxRoundScore = validScores.length ?
-    Math.max(...validScores) :
-    0;
+const validScores = roundScores.filter(s => s !== null);
+
+const maxRoundScore = validScores.length ?
+  Math.max(...validScores) :
+  0;
+  
+
   
   // ===== 横グリッド =====
   ctx.strokeStyle = "rgba(255,255,255,0.08)";
@@ -100,7 +103,7 @@ const graphHeight = height - padding * 2
     
     ctx.beginPath();
     
-    if (score === maxRoundScore) {
+    if (maxRoundScore > 0 && score === maxRoundScore) {
       ctx.fillStyle = "#ffcc00";
       ctx.shadowColor = "#ffcc00";
       ctx.shadowBlur = 10;

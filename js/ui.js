@@ -227,21 +227,15 @@ function detectDevice() {
   
   // ===== デバイス判定 =====
   
-  if (isIPhone) {
-    body.classList.add("phone")
-  }
-  
-  else if (isAndroid && w < 900) {
-    body.classList.add("phone")
-  }
-  
-  else if (isAndroid || isIPad) {
-    body.classList.add("tablet")
-  }
-  
-  else {
-    body.classList.add("desktop")
-  }
+if (isIPhone || isAndroid) {
+  body.classList.add("phone")
+}
+else if (isIPad) {
+  body.classList.add("tablet")
+}
+else {
+  body.classList.add("desktop")
+}
   
   // ===== 向き判定 =====
   

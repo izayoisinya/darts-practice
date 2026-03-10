@@ -203,11 +203,16 @@ function setupTopButtons() {
 function refreshLayout() {
   
   detectDevice()
-  createNumberTable()
-  drawScoreChart()
+  
+  if (typeof createNumberTable === "function") {
+    createNumberTable()
+  }
+  
+  if (typeof drawScoreChart === "function") {
+    drawScoreChart()
+  }
   
 }
-
 function forceResetGame() {
   
   if (!confirm("ゲームデータをリセットしますか？")) return

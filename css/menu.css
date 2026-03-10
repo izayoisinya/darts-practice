@@ -42,6 +42,16 @@ body {
   padding: 24px;
 }
 
+body.phone.landscape .side-menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+body.phone.landscape .menu-header {
+  grid-column: 1 / span 2;
+}
+
 
 /* ============================== */
 /* MENU PANEL */

@@ -460,6 +460,16 @@ body.phone.landscape.iphone-stats-open .stats-detail {
   display: flex;
 }
 
+body.phone.landscape .stats-compact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+body.phone.landscape .stats-compact .compact-block:nth-child(n+3) {
+  grid-column: 1 / span 2;
+}
+
 /* ===================================================== */
 /* PHONE PORTRAIT                                        */
 /* ===================================================== */

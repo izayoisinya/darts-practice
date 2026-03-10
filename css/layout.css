@@ -110,7 +110,7 @@ html, body {
 /* Rounds */
 .round {
   display: grid;
-  grid-template-columns: 60px auto 60px;
+  grid-template-columns: 60px 1fr 60px;
   gap: 4px;
   align-items: center;
   padding: 6px 0;
@@ -122,12 +122,14 @@ html, body {
   display: flex;
   align-items: center;
   gap: 6px;
+  justify-content: flex-start;
 }
 
 .round-score {
   font-weight: 700;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
+  justify-self: end;
 }
 
 .dart {
@@ -374,7 +376,7 @@ body.phone.landscape .container {
 }
 
 body.phone.landscape .round {
-  grid-template-columns: 40px auto 45px;
+  grid-template-columns: 40px 1fr 45px;
   gap: 4px;
 }
 
@@ -532,7 +534,7 @@ body.phone.portrait .round-score {
 }
 
 body.phone.portrait .round {
-  grid-template-columns: 60px auto 60px;
+  grid-template-columns: 60px 1fr 60px;
   min-height: 48px;
 }
 

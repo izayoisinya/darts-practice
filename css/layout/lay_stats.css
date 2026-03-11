@@ -11,8 +11,6 @@
 }
 
 .stats-detail {
-  display: flex;
-  flex-direction: column;
   gap: 4px;
 }
 
@@ -27,6 +25,19 @@
 
 .stats-area canvas {
   display: block;
+}
+
+.stats-area h2 {
+  position: sticky;
+  top: 0;
+  
+  background: var(--bg-panel);
+  
+  z-index: 5;
+}
+
+.stats-left {
+  min-height: 0;
 }
 
 

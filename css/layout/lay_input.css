@@ -73,7 +73,7 @@
   
   grid-template-columns: repeat(3, 1fr);
   
-  gap: 8px;
+  gap: 6px;
 }
 
 
@@ -83,7 +83,7 @@
 
 .number-row button {
   
-  padding: 8px 0;
+  padding: 7px 0;
   
   font-size: 14px;
   

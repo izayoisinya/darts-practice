@@ -23,7 +23,7 @@
 .round {
   display: grid;
   
-  grid-template-columns: 80px max-content auto;
+  grid-template-columns: 60px max-content auto;
   
   column-gap: 8px;
   row-gap: 4px;
@@ -43,7 +43,7 @@
 /* ================================= */
 
 .round-label {
-  font-size: 14px;
+  font-size: 24px;
   font-weight: 600;
   
   letter-spacing: 1px;
@@ -90,6 +90,7 @@
 /* ================================= */
 
 .round-score {
+  font-size: 24px;
   font-weight: 700;
   
   color: var(--accent);

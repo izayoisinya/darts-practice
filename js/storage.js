@@ -17,7 +17,7 @@ function saveGame() {
 
 function loadGame() {
   
-  const data = localStorage.getItem("dartsPractice")
+  const data = localStorage.getItem(SAVE_KEY)
   if (!data) return false
   
   const saved = JSON.parse(data)
@@ -25,6 +25,7 @@ function loadGame() {
   game.rounds = saved.rounds
   game.currentRound = saved.currentRound
   game.currentDart = saved.currentDart
+  lockedRound = saved.lockedRound ?? -1
   
   return true
 }

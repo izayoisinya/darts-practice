@@ -75,17 +75,3 @@ function setupLinks() {
   
 }
 
-
-document.addEventListener("DOMContentLoaded", () => {
-  
-  detectDevice()
-  
-  setupLinks()
-  
-  refreshLayout()
-  
-  window.addEventListener("resize", refreshLayout)
-  
-  window.addEventListener("orientationchange", refreshLayout)
-  
-})

@@ -2,25 +2,28 @@
 /* ============== HEADER =========== */
 /* ================================= */
 
+/* ===== Header Layout ===== */
+
 .header {
   height: calc(var(--header-height) + env(safe-area-inset-top));
   padding: env(safe-area-inset-top) 20px 0 20px;
+
   display: flex;
   align-items: center;
 }
 
 .score-panel {
   min-height: var(--header-height);
+
   display: flex;
   align-items: center;
   gap: 16px;
-  width: 100%;
-  padding: 0 var(--header-padding-x);
-  border-radius: 20px;
-}
 
-.score-value {
-  font-size: 48px;
+  width: 100%;
+
+  padding: 0 var(--header-padding-x);
+
+  border-radius: 20px;
 }
 
 .score-block,
@@ -36,6 +39,98 @@
 
 .next-button {
   margin-left: auto;
+
   width: 160px;
   height: 48px;
+}
+
+
+/* ================================= */
+/* ============== SCORE ============ */
+/* ================================= */
+
+.total-label {
+  font-size: 12px;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.score-value {
+  font-size: 64px;
+  font-weight: 800;
+
+  color: var(--accent);
+
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+
+  text-shadow:
+    0 0 8px rgb(var(--accent-rgb) / 0.8),
+    0 0 20px rgb(var(--accent-rgb) / 0.7),
+    0 0 40px rgb(var(--accent-rgb) / 0.5),
+    0 0 80px rgb(var(--accent-rgb) / 0.3);
+}
+
+.sub-value {
+  font-size: 32px;
+  font-weight: 600;
+
+  color: var(--accent);
+}
+
+
+/* ================================= */
+/* ============== THEME ============ */
+/* ================================= */
+
+.header {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-main);
+}
+
+.score-panel {
+  background: linear-gradient(
+    135deg,
+    rgb(var(--accent-rgb) / 0.1),
+    rgb(var(--accent-rgb) / 0.02)
+  );
+
+  border: 1px solid rgb(var(--accent-rgb) / 0.15);
+}
+
+
+/* ================================= */
+/* ============== BUTTON =========== */
+/* ================================= */
+
+.next-button {
+  border-radius: 20px;
+
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+
+  background: transparent;
+  color: var(--accent);
+
+  border: 2px solid var(--accent);
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.next-button:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+.next-button:disabled {
+  opacity: 0.4;
+
+  background: #1c212c;
+  border-color: #2b313d;
+
+  color: #666;
+  cursor: not-allowed;
 }

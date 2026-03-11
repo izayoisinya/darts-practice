@@ -7,6 +7,11 @@
   --header-padding-x: 40px;
 }
 
+
+/* ================================= */
+/* ============== RESET ============ */
+/* ================================= */
+
 html,
 body {
   margin: 0;
@@ -55,6 +60,7 @@ body {
 .round-area,
 .input-area,
 .stats-area {
+
   display: flex;
   flex-direction: column;
 
@@ -64,21 +70,20 @@ body {
   overflow: hidden;
 
   padding: 8px 20px 20px 20px;
+
+  background: var(--bg-panel);
+  border: 1px solid var(--border-main);
+  border-radius: 18px;
 }
 
 
 /* ================================= */
-/* ============== INPUT ============ */
+/* ============== AREA MODIFIERS === */
 /* ================================= */
 
 .input-area {
-  transition: width 0.35s ease, opacity 0.25s ease;
+  transition: width .35s ease, opacity .25s ease;
 }
-
-
-/* ================================= */
-/* ============== STATS ============ */
-/* ================================= */
 
 .stats-area {
   overflow-y: auto;

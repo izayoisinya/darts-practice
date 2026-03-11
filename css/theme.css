@@ -1,6 +1,11 @@
 /* ================================= */
 /* ============ THEME ============== */
 /* ================================= */
+
+/* ================================= */
+/* ============ VARIABLES ========== */
+/* ================================= */
+
 :root {
   --bg-main: #0f1115;
   --bg-panel: #11151c;
@@ -20,10 +25,20 @@
   --text-muted: #8b949e;
 }
 
+
+/* ================================= */
+/* ============== BASE ============= */
+/* ================================= */
+
 body {
   background: var(--bg-main);
   color: var(--text-main);
 }
+
+
+/* ================================= */
+/* ============ TYPOGRAPHY ========= */
+/* ================================= */
 
 h2 {
   margin: 0 0 12px 0;
@@ -37,103 +52,14 @@ h2 {
   
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   
-  text-shadow:
-    0 0 4px rgb(var(--accent-rgb) / 0.5);
+  text-shadow: 0 0 4px rgb(var(--accent-rgb) / 0.5);
 }
 
-/* Header */
-.header {
-  background: var(--bg-panel);
-  border-bottom: 1px solid var(--border-main);
-}
 
-.score-panel {
-  background: linear-gradient(135deg,
-      rgb(var(--accent-rgb) / 0.1),
-      rgb(var(--accent-rgb) / 0.02));
-  border: 1px solid rgb(var(--accent-rgb) / 0.15);
-}
+/* ================================= */
+/* ============ DART COLORS ======== */
+/* ================================= */
 
-.total-label {
-  font-size: 12px;
-  letter-spacing: 1px;
-  margin-bottom: 6px;
-}
-
-.score-value {
-  font-size: 64px;
-  font-weight: 800;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  text-shadow:
-    0 0 8px rgb(var(--accent-rgb) / 0.8),
-    0 0 20px rgb(var(--accent-rgb) / 0.7),
-    0 0 40px rgb(var(--accent-rgb) / 0.5),
-    0 0 80px rgb(var(--accent-rgb) / 0.3);
-}
-
-.sub-value {
-  font-size: 32px;
-  font-weight: 600;
-  color: var(--accent);
-}
-
-/* Buttons */
-.next-button {
-  border-radius: 20px;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  background: transparent;
-  color: var(--accent);
-  border: 2px solid var(--accent);
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.next-button:hover {
-  background: var(--accent);
-  color: #000;
-}
-
-.next-button:disabled {
-  opacity: 0.4;
-  background: #1c212c;
-  border-color: #2b313d;
-  color: #666;
-  cursor: not-allowed;
-}
-
-/* Columns */
-.round-area,
-.input-area,
-.stats-area {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-main);
-  border-radius: 18px;
-}
-
-.round-score {
-  color: var(--accent);
-  font-weight: 600;
-  text-align: right;
-}
-
-.dart {
-  width: 55px;
-  text-align: center;
-  padding: 6px 0;
-  background: #1c212c;
-  border-radius: 8px;
-}
-
-.divider {
-  margin: 0 14px;
-  color: #6b7280;
-}
-
-/* Dart colors */
 .dart.outer-bull {
   background: #002b24;
   color: var(--accent);
@@ -159,85 +85,45 @@ h2 {
   color: var(--accent-blue);
 }
 
-/* Input */
-.bull-setting {
-  background: #161a22;
-  border: 1px solid #222733;
-  border-radius: 12px;
-}
 
-.top-buttons button {
-  border-radius: 12px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* Stats */
-.label {
-  font-size: 14px;
-  opacity: 0.6;
-}
-
-.value {
-  font-size: 18px;
-  font-weight: 700;
-  color: #69f0ae;
-}
-
-.stat-item {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* iPhone theme */
-body.iphone-mode .stats-toggle {
-  border-radius: 50%;
-  background: var(--accent);
-  color: #000;
-  border: none;
-  font-weight: bold;
-  font-size: 18px;
-  z-index: 999;
-}
-
-body.iphone-mode .score-value {
-  font-size: 38px;
-}
-
-body.iphone-mode .sub-value {
-  font-size: 20px;
-}
-
-body.iphone-mode .stats-area {
-  border: none;
-}
-
-body.iphone-mode.iphone-stats-open .stats-area {
-  border: 1px solid #222733;
-}
+/* ================================= */
+/* ============ BUTTON BASE ======== */
+/* ================================= */
 
 button {
   background: var(--bg-soft);
   color: var(--text-main);
+  
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  transition: all 0.2s ease;
+  
+  transition: all .2s ease;
 }
 
 button:hover {
   transform: translateY(-1px);
+  
   box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.35),
-    0 0 10px rgb(var(--accent-rgb) / 0.2);
+    0 4px 12px rgba(0, 0, 0, .35),
+    0 0 10px rgb(var(--accent-rgb) / .2);
 }
 
 button:active {
-  transform: scale(0.97);
+  transform: scale(.97);
 }
+
+
+/* ================================= */
+/* ========== BUTTON VARIANTS ====== */
+/* ================================= */
 
 button[data-display="Bull"] {
   color: var(--accent);
   background: #003c33;
+}
+
+button[data-display="Bull"]:hover {
+  box-shadow: 0 0 12px rgb(var(--accent-rgb) / .5);
 }
 
 button[data-display="InBull"] {
@@ -255,113 +141,37 @@ button[data-display="Miss"] {
   color: #9aa8ff;
 }
 
-button[data-display="Bull"]:hover {
-  box-shadow: 0 0 12px rgb(var(--accent-rgb) / 0.5);
-}
 
-.kpi-value {
-  color: var(--accent);
-}
+/* ================================= */
+/* ============ IPHONE MODE ======== */
+/* ================================= */
 
-.bar-fill {
+body.iphone-mode .stats-toggle {
+  border-radius: 50%;
+  
   background: var(--accent);
-}
-
-/* Hover統一 */
-.number-row button:hover {
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
-}
-
-.number-row button:nth-child(2):hover {
-  box-shadow: 0 0 12px rgba(255, 90, 90, 0.5);
-}
-
-.number-row button:nth-child(3):hover {
-  box-shadow: 0 0 12px rgba(77, 171, 255, 0.5);
-}
-
-.number-row button {
+  color: #000;
   
-  background: #1a1f27;
-  padding: 8px 0;
-  font-size: 14px;
+  border: none;
   
-  border-radius: 8px;
-  
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .05),
-    0 2px 4px rgba(0, 0, 0, .4);
-  
-}
-
-.number-row button:active {
-  
-  transform: translateY(1px);
-  
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, .6);
-  
-}
-
-/* Single */
-.number-row button:first-child {
-  background: linear-gradient(145deg, #1f2630, #141922);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-main);
-}
-
-/* Double */
-.number-row button:nth-child(2) {
-  background: rgba(255, 90, 90, 0.08);
-  border: 1px solid rgba(255, 90, 90, 0.4);
-  color: var(--danger);
-}
-
-/* Triple */
-.number-row button:nth-child(3) {
-  background: rgba(77, 171, 255, 0.08);
-  border: 1px solid rgba(77, 171, 255, 0.4);
-  color: var(--accent-blue);
-}
-
-.stats-compact {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-}
-
-.compact-block {
-  background: #1c212c;
-  border-radius: 10px;
-  
-  padding: 8px 6px;
-  
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 2px 4px rgba(0, 0, 0, 0.4);
-}
-
-.compact-label {
-  font-size: 10px;
-  letter-spacing: 1px;
-  opacity: 0.6;
-}
-
-.compact-value {
   font-size: 18px;
-  font-weight: 700;
-  color: var(--accent);
+  font-weight: bold;
   
-  text-shadow:
-    0 0 6px rgb(var(--accent-rgb) / 0.5);
+  z-index: 999;
 }
 
-.compact-sub {
-  font-size: 10px;
-  opacity: 0.7;
+body.iphone-mode .score-value {
+  font-size: 38px;
+}
+
+body.iphone-mode .sub-value {
+  font-size: 20px;
+}
+
+body.iphone-mode .stats-area {
+  border: none;
+}
+
+body.iphone-mode.iphone-stats-open .stats-area {
+  border: 1px solid #222733;
 }

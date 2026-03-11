@@ -1,5 +1,3 @@
-
-
 function initGame() {
 
   game.rounds = Array.from(
@@ -49,13 +47,4 @@ function addDart(value, multiplier, special = null) {
   updateUI()
   
 }
-
-
-
-
-
-
-
-
-
 

@@ -32,7 +32,7 @@ function registerEvents() {
   
   const nextBtn = document.getElementById("nextGameBtn")
   if (nextBtn) {
-    nextBtn.addEventListener("click", resetGame)
+    nextBtn.addEventListener("click", nextGame)
   }
 
 if (edge && menu) {
@@ -70,7 +70,6 @@ if (statsArea) {
   })
 }
   
-  
   // ===== side menu =====
   
 if (menu) {
@@ -84,7 +83,6 @@ if (menu) {
   })
 }
   
-  
   if (overlay && menu) {
     
     overlay.addEventListener("click", () => {
@@ -95,9 +93,6 @@ if (menu) {
     })
     
   }
-  
-  
-  
   
   document.querySelectorAll("[data-link]").forEach(btn => {
     

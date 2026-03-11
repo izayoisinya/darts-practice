@@ -299,6 +299,11 @@
   overflow-y: auto;
 }
 
+.phone.portrait #scoreChart {
+  width: 100%;
+  height: 280px;
+}
+
 
 /* ===================================================== */
 /* PHONE PORTRAIT - ROUNDS OPEN                          */

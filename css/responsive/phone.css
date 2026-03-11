@@ -228,13 +228,15 @@
 }
 
 .phone.portrait .round-label {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
 }
 
 .phone.portrait .round-score {
   justify-self: end;
   text-align: right;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .phone.portrait .round-list {

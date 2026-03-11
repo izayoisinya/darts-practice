@@ -182,7 +182,7 @@
 /* ===== Header ===== */
 
 .phone.portrait h2 {
-  font-size: 16px;
+  font-size: 24px;
   margin-bottom: 6px;
 }
 
@@ -242,6 +242,11 @@
 
 .phone.portrait .round-separator {
   display: none !important;
+}
+
+.phone.portrait .dart {
+  width: 50px;
+  height: 32px;
 }
 
 

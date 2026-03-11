@@ -38,7 +38,7 @@ body {
   gap: 20px;
 
   height: calc(
-    100dvh - var(--header-height) - env(safe-area-inset-top) - 10px
+    100dvh - var(--header-height) - env(safe-area-inset-top) - 20px
   );
 
   margin-top: env(safe-area-inset-top);

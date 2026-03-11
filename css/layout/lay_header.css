@@ -5,10 +5,10 @@
 /* ===== Header Layout ===== */
 
 .header {
-  height: calc(var(--header-height) + env(safe-area-inset-top));
+  height: calc(var(--header-height) + env(safe-area-inset-top) + 20px);
   padding: env(safe-area-inset-top) 20px 0 20px;
   
-  margin-bottom: 10px;
+  margin-bottom: 1px;
 
   display: flex;
   align-items: center;

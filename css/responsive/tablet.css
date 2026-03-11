@@ -1,0 +1,74 @@
+/* ===================================================== */
+/* TABLET COMMON                                         */
+/* ===================================================== */
+
+.tablet .stats-compact {
+  display: none !important;
+}
+
+
+/* ===================================================== */
+/* TABLET LANDSCAPE                                      */
+/* ===================================================== */
+
+.tablet.landscape .container {
+
+  grid-template-columns: 1.2fr 1.2fr 0.8fr;
+
+  gap: 16px;
+}
+
+.tablet.landscape .round-area { min-width: 320px; }
+.tablet.landscape .input-area { min-width: 280px; }
+.tablet.landscape .stats-area { min-width: 220px; }
+
+
+/* ===================================================== */
+/* TABLET PORTRAIT                                       */
+/* ===================================================== */
+
+.tablet.portrait .container {
+
+  grid-template-columns: 1fr 1fr;
+
+  grid-template-rows: 1fr 0.6fr;
+
+  grid-template-areas:
+    "round input"
+    "stats stats";
+
+  gap: 16px;
+}
+
+
+/* ===================================================== */
+/* TABLET INPUT                                          */
+/* ===================================================== */
+
+.tablet .number-table {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  grid-template-rows: repeat(10,1fr);
+
+  grid-auto-flow: column;
+
+  gap: 12px 24px;
+
+  height: 100%;
+}
+
+.tablet .number-column {
+  display: contents;
+}
+
+.tablet .number-row {
+
+  display: grid;
+
+  grid-template-columns: repeat(3,1fr);
+
+  align-items: center;
+}

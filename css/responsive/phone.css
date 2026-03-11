@@ -1,0 +1,311 @@
+/* ===================================================== */
+/* PHONE COMMON                                          */
+/* ===================================================== */
+
+.phone {
+  --header-height: 60px;
+  --header-padding-x: 20px;
+}
+
+/* ===================================================== */
+/* PHONE LANDSCAPE                                       */
+/* ===================================================== */
+
+/* ===== Layout ===== */
+
+.phone.landscape .container {
+  
+  grid-template-columns: 40% 40% 20%;
+  
+  gap: 8px;
+  
+  padding: 5px 40px 0 5px;
+  
+  transition: grid-template-columns .3s ease;
+}
+
+
+/* ===== Header ===== */
+
+.phone.landscape h2 {
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.phone.landscape .score-value {
+  font-size: 36px;
+}
+
+
+/* ===== Rounds ===== */
+
+.phone.landscape .round {
+  grid-template-columns: 50px max-content auto;
+
+  column-gap: 8px;
+  row-gap: 4px;
+}
+
+.phone.landscape .round-darts {
+  gap: 4px;
+}
+
+.phone.landscape .dart {
+  padding: 4px 0;
+}
+
+
+/* ===== Input ===== */
+
+.phone.landscape .number-table {
+  display: flex;
+  gap: 12px;
+}
+
+.phone.landscape .number-column {
+  flex: 1;
+}
+
+.phone.landscape .number-row {
+  grid-template-columns: repeat(3,1fr);
+  gap: 6px;
+}
+
+.phone.landscape .bull-setting {
+  padding: 2px 12px;
+  margin-bottom: 0;
+}
+
+.phone.landscape .top-buttons {
+  margin-top: 0;
+}
+
+.phone.landscape .top-buttons button {
+  height: 30px;
+  padding: 0;
+  font-size: 14px;
+}
+
+
+/* ===== Stats ===== */
+
+.phone.landscape .stats-area {
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.phone.landscape .stats-compact {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px;
+
+  transition: opacity .2s ease;
+}
+
+.phone.landscape .stats-compact .kpi-value {
+  font-size: 18px;
+}
+
+.phone.landscape .stats-compact .compact-block:nth-child(n+3) {
+  grid-column: 1 / span 2;
+}
+
+.phone.landscape .stats-detail,
+.phone.landscape .stats-compact {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.phone.landscape .stats-detail {
+  display: none;
+  transform: translateX(20px);
+}
+
+
+/* ===================================================== */
+/* PHONE LANDSCAPE - STATS OPEN                          */
+/* ===================================================== */
+
+.phone.landscape.iphone-stats-open .container {
+  grid-template-columns: 40% 0 60%;
+}
+
+.phone.landscape.iphone-stats-open .input-area {
+  width: 0;
+  padding: 0;
+
+  overflow: hidden;
+  opacity: 0;
+}
+
+.phone.landscape.iphone-stats-open .stats-area {
+  min-width: 0;
+}
+
+.phone.landscape.iphone-stats-open .stats-compact {
+  display: none;
+  opacity: 0;
+}
+
+.phone.landscape.iphone-stats-open .stats-detail {
+  display: flex;
+
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
+/* ===================================================== */
+/* PHONE PORTRAIT                                        */
+/* ===================================================== */
+
+/* ===== Layout ===== */
+
+.phone.portrait .container {
+  
+  grid-template-columns: 1fr 1fr;
+  
+  grid-template-areas:
+    "round input"
+    "stats stats";
+  
+  gap: 12px;
+  
+  padding: 0 25px 10px 0;
+}
+
+
+/* ===== Header ===== */
+
+.phone.portrait .score-panel {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.phone.portrait .score-value {
+  font-size: 46px;
+}
+
+.phone.portrait .darts-block {
+  display: none;
+}
+
+.phone.portrait .next-button {
+  width: 120px;
+  height: 36px;
+
+  font-size: 14px;
+}
+
+
+/* ===== Rounds ===== */
+
+.phone.portrait .round-area {
+  cursor: pointer;
+
+  height: 100%;
+  overflow: hidden;
+}
+
+.phone.portrait .round {
+  grid-template-columns: 50px auto;
+  column-gap: 8px;
+
+  min-height: 48px;
+}
+
+.phone.portrait .round-score {
+  justify-self: end;
+  text-align: right;
+}
+
+.phone.portrait .round-list {
+  height: 100%;
+}
+
+.phone.portrait .round-darts {
+  display: none;
+}
+
+.phone.portrait .round-separator {
+  display: none !important;
+}
+
+
+/* ===== Input ===== */
+
+.phone.portrait .number-table {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.phone.portrait .number-row {
+  grid-template-columns: repeat(3,1fr);
+  gap: 2px;
+}
+
+.phone.portrait .bull-setting {
+  padding: 4px 12px;
+}
+
+.phone.portrait .top-buttons {
+  margin-bottom: 4px;
+}
+
+.phone.portrait .top-buttons button {
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+
+/* ===== Stats ===== */
+
+.phone.portrait .stats-area {
+  overflow-y: auto;
+}
+
+.phone.portrait .stats-compact {
+  display: none;
+}
+
+.phone.portrait .stats-detail {
+  overflow-y: auto;
+}
+
+
+/* ===================================================== */
+/* PHONE PORTRAIT - ROUNDS OPEN                          */
+/* ===================================================== */
+
+.phone.portrait.round-open .container {
+  
+  grid-template-columns: 1fr;
+  
+  grid-template-areas:
+    "round"
+    "stats";
+}
+
+.phone.portrait.round-open .input-area {
+  display: none;
+}
+
+.phone.portrait.round-open .round-area {
+  border-radius: 12px;
+}
+
+.phone.portrait.round-open .round-darts {
+  display: flex;
+}
+
+.phone.portrait.round-open .round {
+  grid-template-columns: 50px max-content auto;
+}

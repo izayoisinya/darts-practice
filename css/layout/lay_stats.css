@@ -1,0 +1,191 @@
+/* ================================= */
+/* ============== STATS AREA ======= */
+/* ================================= */
+
+.stats-area {
+  scrollbar-width: none;
+}
+
+.stats-area::-webkit-scrollbar {
+  display: none;
+}
+
+.stats-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stats-area h2 {
+  margin-bottom: 4px;
+}
+
+.stats-area h3 {
+  margin: 2px 0 2px 0;
+  font-size: 18px;
+}
+
+.stats-area canvas {
+  display: block;
+}
+
+/* ================================= */
+/* ============== KPI ============== */
+/* ================================= */
+
+.stats-kpi {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  
+  gap: 10px;
+  
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.kpi-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-label {
+  font-size: 11px;
+  opacity: 0.6;
+  letter-spacing: 1px;
+}
+
+.kpi-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ================================= */
+/* ============== STAT ROW ========= */
+/* ================================= */
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  padding: 4px 0;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  
+  align-items: center;
+  gap: 12px;
+  
+  padding: 3px 0;
+}
+
+.stat-row .label {
+  font-size: 14px;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.stat-row .count {
+  margin-left: 6px;
+  font-weight: 600;
+}
+
+.stat-row .percent {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* ================================= */
+/* ============== BARS ============= */
+/* ================================= */
+
+.bar-bg {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  width: 0%;
+  
+  transition: width .3s ease;
+}
+
+.bar-fill.inner {
+  background: #4da3ff;
+}
+
+/* ================================= */
+/* ============== AWARDS =========== */
+/* ================================= */
+
+.awards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  
+  gap: 8px;
+}
+
+.award-card {
+  background: #1c212c;
+  
+  border-radius: 10px;
+  
+  padding: 10px;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, .4),
+    inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+
+.award-title {
+  font-size: 12px;
+  opacity: .7;
+}
+
+.award-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.award-row {
+  display: none;
+  
+  justify-content: space-between;
+  padding: 4px 0;
+  
+  font-size: 14px;
+}
+
+/* ================================= */
+/* ============== DIVIDER ========== */
+/* ================================= */
+
+.stats-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  
+  margin: 4px 0;
+}
+
+/* ================================= */
+/* ============== GRAPH ============ */
+/* ================================= */
+
+#scoreChart {
+  width: 100%;
+}
+
+.phone.landscape #scoreChart {
+  height: 180px;
+}

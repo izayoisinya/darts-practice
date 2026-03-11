@@ -1,0 +1,41 @@
+/* ================================= */
+/* ============== HEADER =========== */
+/* ================================= */
+
+.header {
+  height: calc(var(--header-height) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 20px 0 20px;
+  display: flex;
+  align-items: center;
+}
+
+.score-panel {
+  min-height: var(--header-height);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 0 var(--header-padding-x);
+  border-radius: 20px;
+}
+
+.score-value {
+  font-size: 48px;
+}
+
+.score-block,
+.darts-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.score-block {
+  min-width: 0;
+}
+
+.next-button {
+  margin-left: auto;
+  width: 160px;
+  height: 48px;
+}

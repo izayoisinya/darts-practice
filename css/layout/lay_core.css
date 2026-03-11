@@ -1,0 +1,85 @@
+/* ================================= */
+/* ============ LAYOUT CORE ======== */
+/* ================================= */
+
+:root {
+  --header-height: 60px;
+  --header-padding-x: 40px;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+
+  width: 100vw;
+  max-width: 100vw;
+
+  overflow-x: hidden;
+}
+
+
+/* ================================= */
+/* ============== MAIN ============= */
+/* ================================= */
+
+.container {
+  display: grid;
+
+  grid-template-columns: 1.5fr 1fr 1fr;
+
+  grid-template-areas:
+    "round input stats";
+
+  gap: 20px;
+
+  height: calc(100dvh - var(--header-height));
+
+  padding: 5px 20px 10px 20px;
+}
+
+
+/* ================================= */
+/* ============== AREAS ============ */
+/* ================================= */
+
+.round-area { grid-area: round; }
+.input-area { grid-area: input; }
+.stats-area { grid-area: stats; }
+
+
+/* ================================= */
+/* ============== PANELS =========== */
+/* ================================= */
+
+.round-area,
+.input-area,
+.stats-area {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 0;
+  min-width: 0;
+
+  overflow: hidden;
+
+  padding: 8px 20px 20px 20px;
+}
+
+
+/* ================================= */
+/* ============== INPUT ============ */
+/* ================================= */
+
+.input-area {
+  transition: width 0.35s ease, opacity 0.25s ease;
+}
+
+
+/* ================================= */
+/* ============== STATS ============ */
+/* ================================= */
+
+.stats-area {
+  overflow-y: auto;
+}

@@ -1,0 +1,52 @@
+/* ===================================================== */
+/* DESKTOP COMMON                                        */
+/* ===================================================== */
+
+.desktop .stats-compact {
+  display: none;
+}
+
+
+/* ===================================================== */
+/* DESKTOP LAYOUT                                        */
+/* ===================================================== */
+
+.desktop .container {
+  
+  grid-template-columns: 1.5fr 1fr 1fr;
+  
+  gap: 20px;
+}
+
+
+/* ===================================================== */
+/* DESKTOP INPUT                                         */
+/* ===================================================== */
+
+.desktop .number-table {
+  
+  display: grid;
+  
+  grid-template-columns: 1fr 1fr;
+  
+  grid-template-rows: repeat(10, 1fr);
+  
+  grid-auto-flow: column;
+  
+  gap: 12px 24px;
+  
+  height: 100%;
+}
+
+.desktop .number-column {
+  display: contents;
+}
+
+.desktop .number-row {
+  
+  display: grid;
+  
+  grid-template-columns: repeat(3, 1fr);
+  
+  align-items: center;
+}

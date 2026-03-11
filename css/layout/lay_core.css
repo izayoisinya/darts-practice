@@ -32,13 +32,16 @@ body {
   display: grid;
 
   grid-template-columns: 1.5fr 1fr 1fr;
-
   grid-template-areas:
     "round input stats";
 
   gap: 20px;
 
-  height: calc(100dvh - var(--header-height));
+  height: calc(
+    100dvh - var(--header-height) - env(safe-area-inset-top) - 10px
+  );
+
+  margin-top: env(safe-area-inset-top);
 
   padding: 5px 20px 10px 20px;
 }

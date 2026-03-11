@@ -1,8 +1,8 @@
 function updateUI() {
-  updateStats()
   renderRounds()
-  updateNextGameButton()
+  updateStats()
   drawScoreChart()
+  updateNextGameButton()
   saveGame()
 }
 

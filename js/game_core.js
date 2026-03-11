@@ -12,7 +12,9 @@ function nextGame() {
   
   if (!isGameComplete()) return
   
-  initGame(false) // ← ここ重要
+  localStorage.removeItem("dartsPractice")
+  
+  initGame(false)
   
 }
 

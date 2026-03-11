@@ -17,21 +17,14 @@ function saveGame() {
 
 function loadGame() {
   
-  const saved = localStorage.getItem(SAVE_KEY)
+  const data = localStorage.getItem("dartsPractice")
+  if (!data) return false
   
-  if (!saved) return
+  const saved = JSON.parse(data)
   
-  let data
+  game.rounds = saved.rounds
+  game.currentRound = saved.currentRound
+  game.currentDart = saved.currentDart
   
-  try {
-    data = JSON.parse(saved)
-  } catch {
-    return
-  }
-  
-  game.rounds = data.rounds
-  game.currentRound = data.currentRound
-  game.currentDart = data.currentDart
-  lockedRound = data.lockedRound ?? -1
-  
+  return true
 }

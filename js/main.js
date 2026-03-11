@@ -9,7 +9,7 @@ function initApp() {
   refreshLayout()
   
   if (document.getElementById("roundContainer")) {
-    initGame()
+    initGame(true)
   }
   
   registerEvents()

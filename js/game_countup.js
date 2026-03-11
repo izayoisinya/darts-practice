@@ -1,11 +1,17 @@
-function initGame() {
+function initGame(load = true) {
 
   game.rounds = Array.from(
     { length: TOTAL_ROUNDS },
     () => [null, null, null]
   )
 
-  loadGame()
+  game.currentRound = 0
+  game.currentDart = 0
+  lockedRound = -1
+
+  if (load) {
+    loadGame()
+  }
 
   createNumberTable()
   setupTopButtons()

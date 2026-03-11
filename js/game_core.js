@@ -12,9 +12,7 @@ function nextGame() {
   
   if (!isGameComplete()) return
   
-  if (typeof initGame === "function") {
-    initGame()
-  }
+  initGame(false) // ← ここ重要
   
 }
 

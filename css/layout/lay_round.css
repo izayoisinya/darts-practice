@@ -23,7 +23,7 @@
 .round {
   display: grid;
   
-  grid-template-columns: 50px max-content auto;
+  grid-template-columns: 80px max-content auto;
   
   column-gap: 8px;
   row-gap: 4px;
@@ -90,7 +90,7 @@
 /* ================================= */
 
 .round-score {
-  font-weight: 400;
+  font-weight: 700;
   
   color: var(--accent);
   

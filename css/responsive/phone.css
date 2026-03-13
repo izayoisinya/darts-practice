@@ -158,6 +158,26 @@
   transform: translateX(0);
 }
 
+.phone.landscape.iphone-stats-open .stats-left {
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 10px;
+  flex: 1;
+}
+
+.phone.landscape.iphone-stats-open .stats-right {
+  display: flex;
+  flex-direction: column;
+  
+  justify-content: flex-start;
+}
+
+.phone.landscape.iphone-stats-open .stats-kpi,
+.phone.landscape.iphone-stats-open .bull-group,
+.phone.landscape.iphone-stats-open .awards,
+.phone.landscape.iphone-stats-open .stats-divider {
+  grid-column: 1;
+}
 
 /* ===================================================== */
 /* PHONE PORTRAIT                                        */

@@ -150,7 +150,9 @@
 }
 
 .phone.landscape.iphone-stats-open .stats-detail {
-  display: flex;
+  display: grid;
+  
+  grid-template-columns: 1fr 1fr;
 
   opacity: 1;
   transform: translateX(0);

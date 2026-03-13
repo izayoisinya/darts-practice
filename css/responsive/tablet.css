@@ -73,6 +73,10 @@
   justify-content: flex-start;
 }
 
+.tablet.portrait .stats-right h3 {
+  margin: 0 0 6px 0;
+}
+
 .tablet.portrait .stats-kpi,
 .tablet.portrait .bull-group,
 .tablet.portrait .awards,
@@ -82,7 +86,7 @@
 
 .tablet.portrait #scoreChart {
   width: 100%;
-  height: 280px;
+  height: 200px;
 }
 
 /* ===================================================== */

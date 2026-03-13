@@ -27,10 +27,10 @@ function detectDevice() {
   const isIPhone = /iPhone/i.test(ua)
   const isAndroid = /Android/i.test(ua)
   
-  if (isIPhone || (isAndroid && w < 768)) {
+  if (isIPhone || (isAndroid && w < 1500)) {
     body.classList.add("phone")
   }
-  else if (isIPad || (isAndroid && w >= 768) || w < 1200) {
+  else if (isIPad || (isAndroid && w >= 1500) || w < 1600) {
     body.classList.add("tablet")
   }
   else {

@@ -179,10 +179,6 @@
   grid-column: 1;
 }
 
-.phone.landscape.iphone-stats-open #scoreChart {
-  width: 100%;
-  height: 200px;
-}
 
 /* ===================================================== */
 /* PHONE PORTRAIT                                        */
@@ -324,11 +320,6 @@
 
 .phone.portrait .stats-detail {
   overflow-y: auto;
-}
-
-.phone.portrait #scoreChart {
-  width: 100%;
-  height: 280px;
 }
 
 

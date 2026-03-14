@@ -84,8 +84,8 @@ function calculateStats() {
 
       if (!allBull) {
         if (roundScore === 180) ton80++;
-        else if (roundScore >= 151 && roundScore <= 179) highTon++;
-        else if (roundScore >= 100 && roundScore <= 149) lowTon++;
+        else if (roundScore >= 151 && roundScore <= 177) highTon++;
+        else if (roundScore >= 100 && roundScore <= 150) lowTon++;
       }
       
       // 3 in the Bed

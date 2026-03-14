@@ -50,8 +50,6 @@ function refreshLayout() {
   
   detectDevice()
   
-  drawScoreChart()
-  
   if (typeof createNumberTable === "function") {
     createNumberTable()
   }

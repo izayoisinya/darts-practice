@@ -91,7 +91,7 @@
 
 .stat-row {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 40px 20px 200px 40px;
   
   align-items: center;
   

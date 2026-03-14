@@ -128,10 +128,6 @@ body {
   
 }
 
-.phone.landscape .menu-list {
-    grid-template-columns: 1fr 1fr;
-  }
-
 
 
 /* ============================== */

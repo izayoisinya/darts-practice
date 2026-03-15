@@ -67,16 +67,26 @@ function registerEvents() {
   
   // ===== stats open (phone landscape) =====
   
-  if (statsArea) {
-    statsArea.addEventListener("click", () => {
-      if (
-        body.classList.contains("phone") &&
-        body.classList.contains("landscape")
-      ) {
-        body.classList.toggle("iphone-stats-open")
-      }
-    })
-  }
+if (statsArea) {
+  statsArea.addEventListener("click", () => {
+    
+    if (
+      body.classList.contains("phone") &&
+      body.classList.contains("landscape")
+    ) {
+      
+      body.classList.toggle("iphone-stats-open")
+      
+      setTimeout(() => {
+        if (typeof drawScoreChart === "function") {
+          drawScoreChart()
+        }
+      }, 50)
+      
+    }
+    
+  })
+}
   
   // ===== side menu =====
   

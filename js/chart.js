@@ -13,7 +13,9 @@ function drawScoreChart() {
 const width = canvas.width = canvas.offsetWidth
 const height = canvas.height = canvas.offsetHeight || 220
 
-const padding = 50
+const padding = 45
+const paddingTop = 5
+const paddingBottom = 0
 
 const graphWidth = width - padding * 2
 const graphHeight = height - padding * 2

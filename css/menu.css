@@ -59,11 +59,11 @@ body {
   
   border-radius: 18px;
   
-  padding: 28px;
+  padding: 20px;
   
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, .04),
@@ -77,7 +77,7 @@ body {
 
 .menu-list button {
   
-  height: 54px;
+  height: 36px;
   
   font-size: 16px;
   font-weight: 500;

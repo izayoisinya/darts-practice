@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+<title>Darts Data</title>
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/theme.css">
+
+<style>
+
+.data-container{
+max-width:600px;
+margin:auto;
+padding:20px;
+display:flex;
+flex-direction:column;
+gap:16px;
+}
+
+.data-card{
+
+background:#1c212c;
+
+padding:14px;
+
+border-radius:12px;
+
+display:flex;
+justify-content:space-between;
+}
+
+.data-title{
+opacity:.7;
+}
+
+.data-value{
+font-weight:700;
+color:var(--accent);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+<h1>Statistics</h1>
+</header>
+
+<main class="data-container" id="dataContainer"></main>
+
+<script src="js/data.js"></script>
+
+</body>
+</html>

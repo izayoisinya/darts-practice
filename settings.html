@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+<title>Darts Settings</title>
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/theme.css">
+
+<style>
+
+.settings-container{
+max-width:420px;
+margin:auto;
+padding:20px;
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+
+.setting-group{
+display:flex;
+flex-direction:column;
+gap:6px;
+}
+
+.setting-group select{
+padding:10px;
+border-radius:10px;
+background:#1c212c;
+color:white;
+border:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+<h1>Settings</h1>
+</header>
+
+<main class="settings-container">
+
+<div class="setting-group">
+
+<label>Bull Mode</label>
+
+<select id="bullModeSetting">
+<option value="fat">SEPARATE (50/25)</option>
+<option value="double">FAT (50/50)</option>
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Rounds</label>
+
+<select id="roundSetting">
+<option value="8">8</option>
+<option value="10">10</option>
+<option value="15">15</option>
+</select>
+
+</div>
+
+</main>
+
+<script src="js/settings.js"></script>
+
+</body>
+</html>

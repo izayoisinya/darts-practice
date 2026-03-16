@@ -7,10 +7,29 @@
 <title>Darts Data</title>
 
 <meta name="viewport"
-content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+content="width=device-width, initial-scale=1.0,
+maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<meta name="theme-color" content="#0f1115">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style"
+content="black-translucent">
+
+<meta name="apple-mobile-web-app-title"
+content="Darts Practice">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<link rel="manifest" href="manifest.json">
 
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/theme.css">
+
+<link rel="stylesheet" href="css/menu.css" />
+
+<link rel="stylesheet" href="css/layout/lay_core.css" />
+<link rel="stylesheet" href="css/layout/lay_menu.css" />
 
 <style>
 
@@ -56,7 +75,33 @@ color:var(--accent);
 
 <main class="data-container" id="dataContainer"></main>
 
-<script src="js/data.js"></script>
+    <div id="menuOverlay" class="menu-overlay"></div>
+    
+    <!-- ================= MENU DRAWER ================= -->
+    
+    <div id="menuEdge" class="menu-edge"></div>
+    
+    <div id="sideMenu" class="side-menu" role="navigation">
+      <div class="menu-header">Menu</div>
+      
+      <button data-link="index.html">Main Menu</button>
+      
+      <button data-link="countup.html">CountUp</button>
+      
+      <button disabled>01(Coming Soon)</button>
+      
+      <button disabled>Cricket(Coming Soon)</button>
+      
+      <button onclick="location.href='data.html'">Data</button>
+      
+      <button onclick="location.href='settings.html'">Settings</button>
+      
+      <button onclick="forceResetGame()">Reset Game</button>
+    </div>
+
+<script src="js/data.js" defer></script>
+    <script src="js/core.js" defer></script>
+    <script src="js/main.js" defer></script>
 
 </body>
 </html>

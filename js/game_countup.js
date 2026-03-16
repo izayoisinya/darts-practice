@@ -1,5 +1,14 @@
 function initGame(load = true) {
 
+  // ===== Settings読み込み =====
+  const settings = JSON.parse(
+    localStorage.getItem("dartsSettings")
+  ) || {}
+
+  if (settings.bullMode) {
+    bullMode = settings.bullMode
+  }
+
   if (load && loadGame()) {
     // セーブデータ読み込み成功
   } else {
@@ -21,6 +30,8 @@ function initGame(load = true) {
   updateStats()
   drawScoreChart()
   updateNextGameButton()
+  
+  updateBullModeUI()
 
 }
 

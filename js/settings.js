@@ -5,20 +5,17 @@ function loadSettings() {
   const settings = JSON.parse(
     localStorage.getItem(SETTINGS_KEY)
   ) || {
-    bullMode: "fat",
-    rounds: 8
+    bullMode: "fat"
   }
   
   document.getElementById("bullModeSetting").value = settings.bullMode
-  document.getElementById("roundSetting").value = settings.rounds
   
 }
 
 function saveSettings() {
   
   const settings = {
-    bullMode: document.getElementById("bullModeSetting").value,
-    rounds: Number(document.getElementById("roundSetting").value)
+    bullMode: document.getElementById("bullModeSetting").value
   }
   
   localStorage.setItem(
@@ -26,18 +23,19 @@ function saveSettings() {
     JSON.stringify(settings)
   )
   
-}
-
-function resetData() {
-  
-  if (!confirm("すべてのデータを削除しますか？")) return
+  // ===== ゲームリセット =====
   
   localStorage.removeItem("dartsPractice")
-  localStorage.removeItem("dartsSessions")
   
-  alert("データを削除しました")
+  alert("設定を変更したため現在のゲームをリセットしました")
   
 }
+
+document
+  .getElementById("bullModeSetting")
+  .addEventListener("change", saveSettings)
+
+loadSettings()
 
 document
   .getElementById("bullModeSetting")

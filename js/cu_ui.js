@@ -185,12 +185,14 @@ function setupTopButtons() {
         
         // Bull
         if (type === "Bull") {
-          addDart(
-            25,
-            bullMode === "fat" ? 2 : 1,
-            "outerBull"
-          );
-        }
+  
+  if (bullMode === "fat") {
+    addDart(25, 2, "outerBull") // 50
+  } else {
+    addDart(25, 1, "outerBull") // 25
+  }
+  
+}
         
         
         // Inner Bull
@@ -208,6 +210,16 @@ function setupTopButtons() {
     });
 }
 
-
+function updateBullModeUI() {
+  
+  const el = document.querySelector(".bull-setting .value")
+  
+  if (!el) return
+  
+  el.textContent = bullMode === "fat" ?
+    "FAT" :
+    "SEPARATE"
+  
+}
 
 

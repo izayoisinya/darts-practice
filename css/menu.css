@@ -97,7 +97,7 @@ body {
 
 .phone.landscape .opt-list {
   display: flex;
-  width: min(420px, 90vw);
+  width: min(320px, 90vw);
   height: 200px;
   gap: 14px;
 }

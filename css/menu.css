@@ -40,11 +40,20 @@ body {
 .menu-container {
   flex: 1;
   
-  display: flex;
+  display: grid;
+  gap: 20px;
   align-items: center;
   justify-content: center;
   
   padding: 24px;
+}
+
+.phone.portrait .menu-container {
+  grid-template-columns: 1fr;
+}
+
+.phone.landscape .menu-container {
+  grid-template-columns: 1fr 1fr;
 }
 
 /* ============================== */
@@ -68,6 +77,18 @@ body {
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, .04),
     0 10px 30px rgba(0, 0, 0, .6);
+}
+
+.phone.portrait .menu-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.phone.landscape .menu-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(420px, 90vw);
+  gap: 14px;
 }
 
 
@@ -118,17 +139,7 @@ body {
   cursor: default;
 }
 
-.phone.portrait .menu-list {
-  display: flex;
-  flex-direction: column;
-}
 
-.phone.landscape .menu-list {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: min(420px, 90vw);
-  gap: 14px;
-}
 
 /* ============================== */
 /* FOOTER */

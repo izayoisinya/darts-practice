@@ -88,8 +88,7 @@ body {
 }
 
 .phone.landscape .game-list {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   width: min(320px, 90vw);
   height: 200px;
   gap: 14px;

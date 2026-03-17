@@ -61,7 +61,8 @@ body {
 /* MENU PANEL */
 /* ============================== */
 
-.menu-list {
+.game-list,
+.opt-list {
   
   width: min(320px, 90vw);
   
@@ -80,14 +81,22 @@ body {
     0 10px 30px rgba(0, 0, 0, .6);
 }
 
-.phone.portrait .menu-list {
+.phone.portrait .game-list,
+.phone.portrait .opt-list {
   display: flex;
   flex-direction: column;
 }
 
-.phone.landscape .menu-list {
+.phone.landscape .game-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  width: min(420px, 90vw);
+  height: 300px;
+  gap: 14px;
+}
+
+.phone.landscape .opt-list {
+  display: flex;
   width: min(420px, 90vw);
   height: 300px;
   gap: 14px;

@@ -51,12 +51,10 @@ body {
 
 .phone.portrait .menu-container {
   grid-template-columns: 1fr;
-  justify-content: center;
 }
 
 .phone.landscape .menu-container {
   grid-template-columns: 1fr 1fr;
-  justify-content: center;
 }
 
 /* ============================== */
@@ -85,6 +83,7 @@ body {
 .phone.portrait .menu-list {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .phone.landscape .menu-list {
@@ -92,6 +91,7 @@ body {
   grid-template-columns: 1fr 1fr;
   width: min(420px, 90vw);
   gap: 14px;
+  justify-content: center;
 }
 
 

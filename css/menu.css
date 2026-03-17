@@ -91,14 +91,14 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: min(420px, 90vw);
-  height: 100px;
+  height: 200px;
   gap: 14px;
 }
 
 .phone.landscape .opt-list {
   display: flex;
   width: min(420px, 90vw);
-  height: 100px;
+  height: 200px;
   gap: 14px;
 }
 

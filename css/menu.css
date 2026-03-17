@@ -51,6 +51,7 @@ body {
 
 .phone.portrait .menu-container {
   grid-template-columns: 1fr;
+  align-items: center;
 }
 
 .phone.landscape .menu-container {

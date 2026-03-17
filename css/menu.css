@@ -91,14 +91,14 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: min(420px, 90vw);
-  height: 300px;
+  height: 100px;
   gap: 14px;
 }
 
 .phone.landscape .opt-list {
   display: flex;
   width: min(420px, 90vw);
-  height: 300px;
+  height: 100px;
   gap: 14px;
 }
 
@@ -107,7 +107,8 @@ body {
 /* MENU BUTTON */
 /* ============================== */
 
-.menu-list button {
+.game-list button,
+.opt-list button {
   
   height: 36px;
   
@@ -130,22 +131,22 @@ body {
 
 
 /* hover */
-
-.menu-list button:hover {
+.game-list button:hover,
+.opt-list button:hover {
   background: #252b36;
 }
 
 
 /* press */
-
-.menu-list button:active {
+.game-list button:active,
+.opt-list button:active {
   transform: scale(0.97);
 }
 
 
 /* disabled */
-
-.menu-list button:disabled {
+.game-list button:disable,
+.opt-list button:disabled {
   opacity: 0.35;
   cursor: default;
 }

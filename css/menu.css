@@ -90,7 +90,7 @@ body {
 .phone.landscape .game-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  width: min(420px, 90vw);
+  width: min(320px, 90vw);
   height: 200px;
   gap: 14px;
 }

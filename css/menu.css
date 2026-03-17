@@ -51,10 +51,12 @@ body {
 
 .phone.portrait .menu-container {
   grid-template-columns: 1fr;
+  justify-content: center;
 }
 
 .phone.landscape .menu-container {
   grid-template-columns: 1fr 1fr;
+  justify-content: center;
 }
 
 /* ============================== */

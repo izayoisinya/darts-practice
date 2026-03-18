@@ -12,9 +12,13 @@ function nextGame() {
   
   if (!isGameComplete()) return
   
+  saveSession()
+  
   localStorage.removeItem("dartsPractice")
   
   initGame(false)
+  
+  updateUI() // ←保険
   
 }
 

@@ -29,3 +29,34 @@ function loadGame() {
   
   return true
 }
+
+
+function saveSession() {
+
+  const sessions = JSON.parse(
+    localStorage.getItem("dartsSessions")
+  ) || []
+
+  const totalScore = game.rounds.reduce((sum, round) =>
+    sum + round.reduce((rSum, d) => rSum + (d?.score || 0), 0)
+  , 0)
+
+  const totalDarts = game.rounds.flat().filter(d => d).length
+
+  const ppd = totalDarts
+    ? (totalScore / totalDarts)
+    : 0
+
+  sessions.push({
+    date: Date.now(),
+    score: totalScore,
+    ppd: Number(ppd.toFixed(2)),
+    rounds: JSON.parse(JSON.stringify(game.rounds))
+  })
+
+  localStorage.setItem(
+    "dartsSessions",
+    JSON.stringify(sessions)
+  )
+
+}

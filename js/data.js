@@ -43,7 +43,7 @@ function addStat(container, title, value) {
   container.appendChild(row)
 }
 
-loadStats()
+
 
 
 function loadSessions() {
@@ -97,4 +97,9 @@ function loadSessions() {
   
 }
 
-loadSessions()
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadStats()
+  loadSessions()
+})

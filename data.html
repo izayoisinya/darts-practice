@@ -26,12 +26,17 @@ content="Darts Practice">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/theme.css">
 
-<link rel="stylesheet" href="css/menu.css" />
+
 
 <link rel="stylesheet" href="css/layout/lay_core.css" />
 <link rel="stylesheet" href="css/layout/lay_menu.css" />
 
 <style>
+
+main {
+  height: calc(100dvh - 80px); /* header分引く */
+  overflow-y: auto;
+}
 
 .data-container{
 max-width:600px;
@@ -61,6 +66,10 @@ opacity:.7;
 .data-value{
 font-weight:700;
 color:var(--accent);
+}
+
+#sessionsContainer {
+  min-height: 100px;
 }
 
 </style>

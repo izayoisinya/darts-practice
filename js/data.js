@@ -70,6 +70,8 @@ function loadSessions() {
   
   reversed.forEach((s, index) => {
     
+    const t = s.tripleHits || {}
+
     const div = document.createElement("div")
     
     div.style.marginBottom = "20px"
@@ -83,12 +85,34 @@ function loadSessions() {
       return `R${i+1}: ${score}`
     }).join("<br>")
     
+    const bullRate = s.bulls && s.rounds ?
+    ((s.bulls / s.rounds.flat().filter(d => d).length) * 100).toFixed(1) :
+    "-"
+    
+    const tripleText = [20, 19, 18, 17, 16, 15]
+      .map(n => `T${n}: ${t[n] ?? 0}`)
+      .join(" ")
+    
     div.innerHTML = `
       <div><strong>Game ${gameNumber}</strong></div>
+      
       <div>Score: ${s.score}</div>
       <div>PPD: ${s.ppd}</div>
-      <div>${new Date(s.date).toLocaleString()}</div>
+      <div>Round Avg: ${s.roundAvg ?? "-"}</div>
+      
+      <div>Bulls: ${s.bulls ?? "-"}</div>
+      <div>Inner Bulls: ${s.innerBulls ?? "-"}</div>
+      
+      <div>Bull Rate: ${ s.bullRate ?? "-" }</div>
+      <div>Inner Rate: ${s.innerRate ?? "-"}%</div>
+      
+      <div>--- Triple ---</div> 
+      <div>${tripleText}</div>
+      
       <div style="margin-top:6px">${roundsText}</div>
+      
+      <div>${new Date(s.date).toLocaleString()}</div>
+
     `
     
     container.appendChild(div)

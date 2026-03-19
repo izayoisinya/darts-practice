@@ -15,48 +15,12 @@ function loadStats() {
     return
   }
   
-  let filtered = sessions
+  const games = sessions.length
   
-  const now = new Date()
-  
-  if (mode !== "game") {
-    
-    filtered = sessions.filter(s => {
-      const d = new Date(s.date)
-      
-      if (mode === "day") {
-        return d.toDateString() === now.toDateString()
-      }
-      
-      if (mode === "week") {
-        const start = new Date(now)
-        start.setDate(now.getDate() - now.getDay())
-        return d >= start
-      }
-      
-      if (mode === "month") {
-        return d.getFullYear() === now.getFullYear() &&
-          d.getMonth() === now.getMonth()
-      }
-      
-      if (mode === "year") {
-        return d.getFullYear() === now.getFullYear()
-      }
-      
-    })
-  }
-  
-  if (!filtered.length) {
-    container.innerHTML = "<p>No data</p>"
-    return
-  }
-  
-  const games = filtered.length
-  
-  const bestGame = Math.max(...filtered.map(s => s.score))
+  const bestGame = Math.max(...sessions.map(s => s.score))
   
   const avgPPD = (
-    filtered.reduce((a, b) => a + b.ppd, 0) / games
+    sessions.reduce((a, b) => a + b.ppd, 0) / games
   ).toFixed(2)
   
   addStat(container, "Games Played", games)

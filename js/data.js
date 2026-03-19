@@ -1,7 +1,7 @@
 let currentPage = 1
 const PAGE_SIZE = 10
 
-function loadStats(mode = "game") {
+function loadStats() {
   
   const sessions = JSON.parse(
     localStorage.getItem("dartsSessions")
@@ -63,6 +63,7 @@ function loadStats(mode = "game") {
   addStat(container, "Best Game", bestGame)
   addStat(container, "Average PPD", avgPPD)
 }
+
 
 function addStat(container, title, value) {
   
@@ -153,12 +154,6 @@ function loadSessions() {
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadStats()
-  loadSessions()
-})
-
-
 function groupSessions(sessions, mode) {
   
   const groups = {}
@@ -170,7 +165,7 @@ function groupSessions(sessions, mode) {
     let key
     
     if (mode === "day") {
-      key = date.toISOString().slice(0, 10)
+      key = getLocalDateKey(date)
     }
     
     if (mode === "week") {
@@ -180,7 +175,7 @@ function groupSessions(sessions, mode) {
       const first = new Date(date)
       first.setDate(date.getDate() + diff)
       
-      key = first.toISOString().slice(0, 10)
+      key = getLocalDateKey(first)
     }
     
     if (mode === "month") {
@@ -296,10 +291,8 @@ function renderView() {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadStats()
-  renderView() // ← loadSessionsの代わり
+  renderView()
 })
-
 
 
 function generateTestData(days = 60) {
@@ -308,7 +301,7 @@ function generateTestData(days = 60) {
   
   const now = new Date()
   
-  for (let i = 69; i >= 0; i--) {
+  for (let i = days - 1; i >= 0; i--) {
     
     const date = new Date(now)
     date.setDate(now.getDate() - i)
@@ -414,6 +407,14 @@ function changePage(page) {
 }
 
 
+function getLocalDateKey(date) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  return `${y}-${m}-${d}`
+}
+
+
 function getWeekRange(date) {
   
   const d = new Date(date)
@@ -432,10 +433,6 @@ function getWeekRange(date) {
   return { start, end }
 }
 
-
-function formatDate(date) {
-  return `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
-}
 
 function formatShort(date, withYear = true) {
   const m = date.getMonth() + 1

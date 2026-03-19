@@ -84,6 +84,19 @@ color:var(--accent);
 
 <main class="data-container">
   
+  <button onclick="generateTestData(30)">
+  テストデータ生成
+  </button>
+  
+  <div style="display:flex; gap:6px; margin:10px">
+    <button onclick="changeView('game')">Game</button>
+  
+    <button onclick="changeView('day')">Day</button>
+    <button onclick="changeView('week')">Week</button>
+    <button onclick="changeView('month')">Month</button>
+    <button onclick="changeView('year')">Year</button>
+  </div>
+    
   <section id="statsContainer"></section>
   
   <section id="sessionsContainer"></section>

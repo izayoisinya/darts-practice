@@ -1,11 +1,13 @@
-function loadStats() {
+let currentPage = 1
+const PAGE_SIZE = 10
+
+function loadStats(mode = "game") {
   
   const sessions = JSON.parse(
     localStorage.getItem("dartsSessions")
   ) || []
   
   const container = document.getElementById("statsContainer")
-  
   container.innerHTML = ""
   
   if (!sessions.length) {
@@ -13,20 +15,53 @@ function loadStats() {
     return
   }
   
-  const games = sessions.length
+  let filtered = sessions
   
-  const bestGame = Math.max(
-    ...sessions.map(s => s.score)
-  )
+  const now = new Date()
+  
+  if (mode !== "game") {
+    
+    filtered = sessions.filter(s => {
+      const d = new Date(s.date)
+      
+      if (mode === "day") {
+        return d.toDateString() === now.toDateString()
+      }
+      
+      if (mode === "week") {
+        const start = new Date(now)
+        start.setDate(now.getDate() - now.getDay())
+        return d >= start
+      }
+      
+      if (mode === "month") {
+        return d.getFullYear() === now.getFullYear() &&
+          d.getMonth() === now.getMonth()
+      }
+      
+      if (mode === "year") {
+        return d.getFullYear() === now.getFullYear()
+      }
+      
+    })
+  }
+  
+  if (!filtered.length) {
+    container.innerHTML = "<p>No data</p>"
+    return
+  }
+  
+  const games = filtered.length
+  
+  const bestGame = Math.max(...filtered.map(s => s.score))
   
   const avgPPD = (
-    sessions.reduce((a, b) => a + b.ppd, 0) / games
+    filtered.reduce((a, b) => a + b.ppd, 0) / games
   ).toFixed(2)
   
   addStat(container, "Games Played", games)
   addStat(container, "Best Game", bestGame)
   addStat(container, "Average PPD", avgPPD)
-  
 }
 
 function addStat(container, title, value) {
@@ -44,8 +79,6 @@ function addStat(container, title, value) {
 }
 
 
-
-
 function loadSessions() {
   
   const sessions = JSON.parse(
@@ -53,7 +86,6 @@ function loadSessions() {
   ) || []
   
   const container = document.getElementById("sessionsContainer")
-  
   container.innerHTML = ""
   
   if (!sessions.length) {
@@ -61,69 +93,354 @@ function loadSessions() {
     return
   }
   
-  const MAX_DISPLAY = 30
+  const reversed = sessions.slice().reverse()
   
-  const reversed = sessions
-    .slice()
-    .reverse()
-    .slice(0, MAX_DISPLAY)
+  const start = (currentPage - 1) * PAGE_SIZE
+  const end = start + PAGE_SIZE
   
-  reversed.forEach((s, index) => {
-    
-    const t = s.tripleHits || {}
-
-    const div = document.createElement("div")
-    
-    div.style.marginBottom = "20px"
-    div.style.padding = "10px"
-    div.style.border = "1px solid #333"
-    
-    const gameNumber = sessions.length - index
-    
-    const roundsText = s.rounds.map((r, i) => {
-      const score = r.reduce((sum, d) => sum + (d?.score || 0), 0)
-      return `R${i+1}: ${score}`
-    }).join("<br>")
-    
-    const bullRate = s.bulls && s.rounds ?
-    ((s.bulls / s.rounds.flat().filter(d => d).length) * 100).toFixed(1) :
-    "-"
-    
-    const tripleText = [20, 19, 18, 17, 16, 15]
-      .map(n => `T${n}: ${t[n] ?? 0}`)
-      .join(" ")
-    
-    div.innerHTML = `
-      <div><strong>Game ${gameNumber}</strong></div>
-      
-      <div>Score: ${s.score}</div>
-      <div>PPD: ${s.ppd}</div>
-      <div>Round Avg: ${s.roundAvg ?? "-"}</div>
-      
-      <div>Bulls: ${s.bulls ?? "-"}</div>
-      <div>Inner Bulls: ${s.innerBulls ?? "-"}</div>
-      
-      <div>Bull Rate: ${ s.bullRate ?? "-" }</div>
-      <div>Inner Rate: ${s.innerRate ?? "-"}%</div>
-      
-      <div>--- Triple ---</div> 
-      <div>${tripleText}</div>
-      
-      <div style="margin-top:6px">${roundsText}</div>
-      
-      <div>${new Date(s.date).toLocaleString()}</div>
-
-    `
-    
-    container.appendChild(div)
-    
-  })
+  const pageData = reversed.slice(start, end)
   
+  pageData.forEach((s, index) => {
+  
+  const t = s.tripleHits || {}
+  
+  const div = document.createElement("div")
+  
+  div.style.marginBottom = "20px"
+  div.style.padding = "10px"
+  div.style.border = "1px solid #333"
+  
+  const globalIndex = start + index
+  const gameNumber = sessions.length - globalIndex
+  
+  const roundsText = s.rounds.map((r, i) => {
+    const score = r.reduce((sum, d) => sum + (d?.score || 0), 0)
+    return `R${i+1}: ${score}`
+  }).join("<br>")
+  
+  div.innerHTML = `
+    <div><strong>Game ${gameNumber}</strong></div>
+    
+    <div>Score: ${s.score}</div>
+    <div>PPD: ${s.ppd}</div>
+    <div>Round Avg: ${s.roundAvg ?? "-"}</div>
+    
+    <div>Bulls: ${s.bulls ?? "-"}</div>
+    <div>Inner Bulls: ${s.innerBulls ?? "-"}</div>
+    
+    <div>Bull Rate: ${s.bullRate ?? "-"}%</div>
+    <div>Inner Rate: ${s.innerRate ?? "-"}%</div>
+    
+    <div>--- Triple ---</div>
+    <div>
+      T20: ${t[20] ?? 0}
+      T19: ${t[19] ?? 0}
+      T18: ${t[18] ?? 0}
+      T17: ${t[17] ?? 0}
+      T16: ${t[16] ?? 0}
+      T15: ${t[15] ?? 0}
+    </div>
+    
+    <div style="margin-top:6px">${roundsText}</div>
+    
+    <div>${new Date(s.date).toLocaleString()}</div>
+  `
+  
+  container.appendChild(div)
+})
+  
+  renderPagination(sessions.length)
 }
-
 
 
 document.addEventListener("DOMContentLoaded", () => {
   loadStats()
   loadSessions()
 })
+
+
+function groupSessions(sessions, mode) {
+  
+  const groups = {}
+  
+  sessions.forEach(s => {
+    
+    const date = new Date(s.date)
+    
+    let key
+    
+    if (mode === "day") {
+      key = date.toISOString().slice(0, 10)
+    }
+    
+    if (mode === "week") {
+      const day = date.getDay()
+      const diff = (day === 0 ? -6 : 1 - day)
+      
+      const first = new Date(date)
+      first.setDate(date.getDate() + diff)
+      
+      key = first.toISOString().slice(0, 10)
+    }
+    
+    if (mode === "month") {
+      key = `${date.getFullYear()}-${date.getMonth()+1}`
+    }
+    
+    if (mode === "year") {
+      key = `${date.getFullYear()}`
+    }
+    
+    if (!groups[key]) groups[key] = []
+    groups[key].push(s)
+    
+  })
+  
+  return groups
+}
+
+
+function calcSummary(list) {
+  
+  const games = list.length
+  
+  const totalScore = list.reduce((sum, s) => sum + s.score, 0)
+  
+  const avgScore = totalScore / games
+  
+  const avgPPD = list.reduce((sum, s) => sum + s.ppd, 0) / games
+  
+  const totalBulls = list.reduce((sum, s) => sum + (s.bulls || 0), 0)
+  
+  return {
+    games,
+    avgPPD: avgPPD.toFixed(2),
+    totalBulls,
+    avgScore: avgScore.toFixed(1)
+  }
+}
+
+
+function renderGrouped(mode) {
+  
+  const sessions = JSON.parse(
+    localStorage.getItem("dartsSessions")
+  ) || []
+  
+  const container = document.getElementById("sessionsContainer")
+  container.innerHTML = ""
+  
+  const groups = groupSessions(sessions, mode)
+  
+  Object.entries(groups)
+    .sort((a, b) => new Date(b[0]) - new Date(a[0]))
+    .forEach(([key, list]) => {
+      
+      const summary = calcSummary(list)
+      
+      let label = key
+      
+      if (mode === "week") {
+        const { start, end } = getWeekRange(new Date(key))
+        label = `${formatShort(start)}〜${formatShort(end, false)}`
+      }
+      
+      if (mode === "month") {
+        const [y, m] = key.split("-")
+        label = `${y}/${m}`
+      }
+      
+      if (mode === "year") {
+        label = `${key}年`
+      }
+      
+      const div = document.createElement("div")
+      
+      div.innerHTML = `
+        <div style="margin-bottom:12px;border:1px solid #333;padding:10px">
+          <strong>${label}</strong><br>
+          Games: ${summary.games}<br>
+          Avg Score: ${summary.avgScore}<br>
+          Avg PPD: ${summary.avgPPD}<br>
+          Bulls: ${summary.totalBulls}
+        </div>
+      `
+      
+      container.appendChild(div)
+    })
+}
+
+
+let viewMode = "game" // ← 追加
+
+function changeView(mode) {
+  viewMode = mode
+  renderView()
+}
+
+
+function renderView() {
+  
+  const statsContainer = document.getElementById("statsContainer")
+  
+  if (viewMode === "game") {
+    statsContainer.style.display = "block"
+    loadStats(viewMode)
+    loadSessions()
+  } else {
+    statsContainer.style.display = "none"
+    renderGrouped(viewMode)
+  }
+  
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadStats()
+  renderView() // ← loadSessionsの代わり
+})
+
+
+
+function generateTestData(days = 60) {
+  
+  const sessions = []
+  
+  const now = new Date()
+  
+  for (let i = 69; i >= 0; i--) {
+    
+    const date = new Date(now)
+    date.setDate(now.getDate() - i)
+    
+    const gamesPerDay = Math.floor(Math.random() * 3) + 1
+    
+    for (let g = 0; g < gamesPerDay; g++) {
+      
+      const score = Math.floor(Math.random() * 600) + 600
+      const darts = 24
+      
+      const ppd = score / darts
+      
+      const bulls = Math.floor(Math.random() * 10)
+      const innerBulls = Math.floor(bulls * Math.random())
+      
+      const tripleHits = {}
+      
+      for (let n = 15; n <= 20; n++) {
+        tripleHits[n] = Math.floor(Math.random() * 5)
+      }
+      
+      sessions.push({
+        date: date.getTime(),
+        
+        score,
+        ppd: Number(ppd.toFixed(2)),
+        
+        bulls,
+        innerBulls,
+        
+        bullRate: Number(((bulls / darts) * 100).toFixed(1)),
+        innerRate: bulls ?
+          Number(((innerBulls / bulls) * 100).toFixed(1)) :
+          0,
+        
+        roundAvg: Number((score / 8).toFixed(1)),
+        
+        tripleHits,
+        
+        rounds: Array.from({ length: 8 }, () => [
+          { score: 20 },
+          { score: 20 },
+          { score: 20 }
+        ])
+      })
+      
+    }
+  }
+  
+  localStorage.setItem("dartsSessions", JSON.stringify(sessions))
+  
+  console.log("テストデータ生成完了:", sessions.length)
+}
+
+
+function renderPagination(total) {
+  
+  const totalPages = Math.ceil(total / PAGE_SIZE)
+  
+  let html = `
+    <div style="display:flex; gap:10px; margin:20px 0; justify-content:center;">
+  `
+  
+  html += `
+    <button onclick="changePage(${currentPage - 1})"
+      ${currentPage === 1 ? "disabled" : ""}>
+      Prev
+    </button>
+  `
+  
+  html += `
+    <span>${currentPage} / ${totalPages}</span>
+  `
+  
+  html += `
+    <button onclick="changePage(${currentPage + 1})"
+      ${currentPage === totalPages ? "disabled" : ""}>
+      Next
+    </button>
+  `
+  
+  html += `</div>`
+  
+  document.getElementById("sessionsContainer")
+    .insertAdjacentHTML("beforeend", html)
+}
+
+
+function changePage(page) {
+  
+  const sessions = JSON.parse(
+    localStorage.getItem("dartsSessions")
+  ) || []
+  
+  const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
+  
+  if (page < 1 || page > totalPages) return
+  
+  currentPage = page
+  
+  loadSessions()
+}
+
+
+function getWeekRange(date) {
+  
+  const d = new Date(date)
+  
+  const day = d.getDay() // 0(日)〜6(土)
+  
+  // 月曜始まりにする場合
+  const diffToMonday = (day === 0 ? -6 : 1 - day)
+  
+  const start = new Date(d)
+  start.setDate(d.getDate() + diffToMonday)
+  
+  const end = new Date(start)
+  end.setDate(start.getDate() + 6)
+  
+  return { start, end }
+}
+
+
+function formatDate(date) {
+  return `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
+}
+
+function formatShort(date, withYear = true) {
+  const m = date.getMonth() + 1
+  const d = date.getDate()
+  return withYear ?
+    `${date.getFullYear()}/${m}/${d}` :
+    `${m}/${d}`
+}

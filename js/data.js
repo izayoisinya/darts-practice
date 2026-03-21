@@ -589,7 +589,7 @@ function displayDetailPage() {
       <div>PPD: ${game.ppd}</div>
       <div>Bulls: ${game.bulls ?? "-"}</div>
       <div>Inner Bulls: ${game.innerBulls ?? "-"}</div>
-      <div>T20: ${t[20] ?? 0} / T19: ${t[19] ?? 0} / T18: ${t[18] ?? 0}</div>
+      <div>T20: ${t[20] ?? 0} / T19: ${t[19] ?? 0} / T18: ${t[18] ?? 0} / T17: ${t[17] ?? 0} / T16: ${t[16] ?? 0} / T15: ${t[15] ?? 0}</div>
     `
     container.appendChild(gameDiv)
   })

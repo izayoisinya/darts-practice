@@ -180,58 +180,6 @@ function calcSummary(list) {
 }
 
 
-function renderGrouped(mode) {
-  
-  const sessions = JSON.parse(
-    localStorage.getItem("dartsSessions")
-  ) || []
-  
-  const container = document.getElementById("sessionsContainer")
-  container.innerHTML = ""
-  
-  const groups = groupSessions(sessions, mode)
-  
-  Object.entries(groups)
-    .sort((a, b) => new Date(b[0]) - new Date(a[0]))
-    .forEach(([key, list]) => {
-      
-      const summary = calcSummary(list)
-      
-      let label = key
-      
-      if (mode === "week") {
-        const { start, end } = getWeekRange(new Date(key))
-        label = `${formatShort(start)}〜${formatShort(end, false)}`
-      }
-      
-      if (mode === "month") {
-        const [y, m] = key.split("-")
-        label = `${y}/${m}`
-      }
-      
-      if (mode === "year") {
-        label = `${key}年`
-      }
-      
-      const div = document.createElement("div")
-      
-      div.innerHTML = `
-        <div style="margin-bottom:12px;border:1px solid #333;padding:10px;cursor:pointer;">
-          <strong>${label}</strong><br>
-          Games: ${summary.games}<br>
-          Avg Score: ${summary.avgScore}<br>
-          Avg PPD: ${summary.avgPPD}<br>
-          Bulls: ${summary.totalBulls}
-        </div>
-      `
-      
-      div.querySelector("div").onclick = () => showGameDetails(key, list)
-      
-      container.appendChild(div)
-    })
-}
-
-
 let viewMode = "game" 
 
 function changeView(mode) {

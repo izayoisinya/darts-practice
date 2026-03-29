@@ -59,8 +59,13 @@ content="Darts Practice">
       <span>Darts Practice</span>
     </footer>
 
-    <script src="js/core.js" defer></script>
-    <script src="js/main.js" defer></script>
+<!-- コア機能（最初に読み込む） -->
+<script src="js/core/state.js" defer></script>
+<script src="js/core/core.js" defer></script>
+<script src="js/core/storage.js" defer></script>
+
+<!-- 初期化（最後に読み込む） -->
+<script src="js/init/main.js" defer></script>
     
   </body>
   

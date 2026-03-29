@@ -114,9 +114,29 @@ border:none;
       <button onclick="forceResetGame()">Reset Game</button>
     </div>
 
-<script src="js/settings.js" defer></script>
-    <script src="js/core.js" defer></script>
-    <script src="js/main.js" defer></script>
+<!-- コア機能（最初に読み込む） -->
+<script src="js/core/state.js" defer></script>
+<script src="js/core/core.js" defer></script>
+<script src="js/core/storage.js" defer></script>
+
+<!-- ゲーム関連 -->
+<script src="js/game/stats.js" defer></script>
+<script src="js/game/game_core.js" defer></script>
+<script src="js/game/game_countup.js" defer></script>
+<script src="js/game/cu_ui.js" defer></script>
+
+<!-- データ関連 -->
+<script src="js/data/data_loader.js" defer></script>
+<script src="js/data/data_grouped.js" defer></script>
+<script src="js/data/data_detail.js" defer></script>
+<script src="js/data/data.js" defer></script>
+
+<!-- UI -->
+<script src="js/ui/chart.js" defer></script>
+<script src="js/ui/settings.js" defer></script>
+
+<!-- 初期化（最後に読み込む） -->
+<script src="js/init/main.js" defer></script>
 
 </body>
 </html>

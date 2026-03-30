@@ -1,142 +1,132 @@
 <!DOCTYPE html>
 <html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Darts Settings</title>
 
-<head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0,
+                maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
 
-<meta charset="UTF-8">
-<title>Darts Settings</title>
+    <meta name="theme-color" content="#0f1115" />
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0,
-maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
 
-<meta name="theme-color" content="#0f1115">
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
 
-<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Darts Practice" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
 
-<meta name="apple-mobile-web-app-status-bar-style"
-content="black-translucent">
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/theme.css" />
 
-<meta name="apple-mobile-web-app-title"
-content="Darts Practice">
-<link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="css/layout/lay_core.css" />
+    <link rel="stylesheet" href="css/layout/lay_menu.css" />
 
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/theme.css">
+    <style>
+      .settings-container {
+        max-width: 420px;
+        margin: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
 
-<link rel="stylesheet" href="css/layout/lay_core.css" />
-<link rel="stylesheet" href="css/layout/lay_menu.css" />
+      .setting-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
 
-<style>
+      .setting-group select {
+        padding: 10px;
+        border-radius: 10px;
+        background: #1c212c;
+        color: white;
+        border: none;
+      }
+    </style>
+  </head>
 
-.settings-container{
-max-width:420px;
-margin:auto;
-padding:20px;
-display:flex;
-flex-direction:column;
-gap:20px;
-}
+  <body>
+    <header class="header">
+      <h1>Settings</h1>
+    </header>
 
-.setting-group{
-display:flex;
-flex-direction:column;
-gap:6px;
-}
+    <main class="settings-container">
+      <div class="setting-group">
+        <label>Bull Mode</label>
 
-.setting-group select{
-padding:10px;
-border-radius:10px;
-background:#1c212c;
-color:white;
-border:none;
-}
+        <select id="bullModeSetting">
+          <option value="fat">FAT (50/50)</option>
+          <option value="double">SEPARATE (50/25)</option>
+        </select>
+      </div>
 
-</style>
+      <div class="setting-group">
+        <label>Rounds</label>
 
-</head>
-
-<body>
-
-<header class="header">
-<h1>Settings</h1>
-</header>
-
-<main class="settings-container">
-
-<div class="setting-group">
-
-<label>Bull Mode</label>
-
-<select id="bullModeSetting">
-<option value="fat">FAT (50/50)</option>
-<option value="double">SEPARATE (50/25)</option>
-</select>
-
-</div>
-
-<div class="setting-group">
-
-<label>Rounds</label>
-
-<select id="roundSetting" disabled>
-<option value="8">8</option>
-<option value="10">10</option>
-<option value="15">15</option>
-</select>
-
-</div>
-
-</main>
+        <select id="roundSetting" disabled>
+          <option value="8">8</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+        </select>
+      </div>
+    </main>
 
     <div id="menuOverlay" class="menu-overlay"></div>
-    
+
     <!-- ================= MENU DRAWER ================= -->
-    
+
     <div id="menuEdge" class="menu-edge"></div>
-    
+
     <div id="sideMenu" class="side-menu" role="navigation">
       <div class="menu-header">Menu</div>
-      
+
       <button data-link="index.html">Main Menu</button>
-      
+
       <button data-link="countup.html">CountUp</button>
-      
+
       <button disabled>01(Coming Soon)</button>
-      
+
       <button disabled>Cricket(Coming Soon)</button>
-      
-      <button onclick="location.href='data.html'">Data</button>
-      
-      <button onclick="location.href='settings.html'">Settings</button>
-      
+
+      <button onclick="location.href = 'data.html'">Data</button>
+
+      <button onclick="location.href = 'settings.html'">Settings</button>
+
       <button onclick="forceResetGame()">Reset Game</button>
     </div>
 
-<!-- コア機能（最初に読み込む） -->
-<script src="js/core/state.js" defer></script>
-<script src="js/core/core.js" defer></script>
-<script src="js/core/storage.js" defer></script>
+    <!-- コア機能（最初に読み込む） -->
+    <script src="js/core/state.js" defer></script>
+    <script src="js/core/core.js" defer></script>
+    <script src="js/core/storage.js" defer></script>
 
-<!-- ゲーム関連 -->
-<script src="js/game/stats.js" defer></script>
-<script src="js/game/game_core.js" defer></script>
-<script src="js/game/game_countup.js" defer></script>
-<script src="js/game/cu_ui.js" defer></script>
+    <!-- ゲーム関連 -->
+    <script src="js/game/stats.js" defer></script>
+    <script src="js/game/game_core.js" defer></script>
+    <script src="js/game/game_countup.js" defer></script>
+    <script src="js/game/cu_ui.js" defer></script>
 
-<!-- データ関連 -->
-<script src="js/data/data_loader.js" defer></script>
-<script src="js/data/data_grouped.js" defer></script>
-<script src="js/data/data_detail.js" defer></script>
-<script src="js/data/data.js" defer></script>
+    <!-- データ関連 -->
+    <script src="js/data/data_loader.js" defer></script>
+    <script src="js/data/data_grouped.js" defer></script>
+    <script src="js/data/data_detail.js" defer></script>
+    <script src="js/data/data.js" defer></script>
 
-<!-- UI -->
-<script src="js/ui/chart.js" defer></script>
-<script src="js/ui/settings.js" defer></script>
+    <!-- UI -->
+    <script src="js/ui/chart.js" defer></script>
+    <script src="js/ui/settings.js" defer></script>
 
-<!-- 初期化（最後に読み込む） -->
-<script src="js/init/main.js" defer></script>
-
-</body>
+    <!-- 初期化（最後に読み込む） -->
+    <script src="js/init/main.js" defer></script>
+  </body>
 </html>

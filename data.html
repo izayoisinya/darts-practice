@@ -1,144 +1,134 @@
 <!DOCTYPE html>
 <html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Darts Data</title>
 
-<head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0,
+                maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
 
-<meta charset="UTF-8">
-<title>Darts Data</title>
+    <meta name="theme-color" content="#0f1115" />
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0,
-maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
 
-<meta name="theme-color" content="#0f1115">
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
 
-<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Darts Practice" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
 
-<meta name="apple-mobile-web-app-status-bar-style"
-content="black-translucent">
+    <link rel="manifest" href="manifest.json" />
 
-<meta name="apple-mobile-web-app-title"
-content="Darts Practice">
-<link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/theme.css" />
 
-<link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/layout/lay_core.css" />
+    <link rel="stylesheet" href="css/layout/lay_menu.css" />
 
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/theme.css">
+    <style>
+      main {
+        height: calc(100dvh - 80px); /* header分引く */
+        overflow-y: auto;
+      }
 
+      .data-container {
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
 
+      .data-card {
+        background: #1c212c;
 
-<link rel="stylesheet" href="css/layout/lay_core.css" />
-<link rel="stylesheet" href="css/layout/lay_menu.css" />
+        padding: 14px;
 
-<style>
+        border-radius: 12px;
 
-main {
-  height: calc(100dvh - 80px); /* header分引く */
-  overflow-y: auto;
-}
+        display: flex;
+        justify-content: space-between;
+      }
 
-.data-container{
-max-width:600px;
-margin:auto;
-padding:20px;
-display:flex;
-flex-direction:column;
-gap:16px;
-}
+      .data-title {
+        opacity: 0.7;
+      }
 
-.data-card{
+      .data-value {
+        font-weight: 700;
+        color: var(--accent);
+      }
 
-background:#1c212c;
+      #sessionsContainer {
+        min-height: 100px;
+      }
+    </style>
+  </head>
 
-padding:14px;
+  <body>
+    <header class="header">
+      <h1>Statistics</h1>
+    </header>
 
-border-radius:12px;
+    <main class="data-container">
+      <div style="display: flex; gap: 6px; margin: 10px">
+        <button onclick="changeView('game')">Game</button>
 
-display:flex;
-justify-content:space-between;
-}
+        <button onclick="changeView('day')">Day</button>
+        <button onclick="changeView('week')">Week</button>
+        <button onclick="changeView('month')">Month</button>
+        <button onclick="changeView('year')">Year</button>
+      </div>
 
-.data-title{
-opacity:.7;
-}
+      <section id="statsContainer"></section>
 
-.data-value{
-font-weight:700;
-color:var(--accent);
-}
-
-#sessionsContainer {
-  min-height: 100px;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<header class="header">
-<h1>Statistics</h1>
-</header>
-
-<main class="data-container">
-  
-  <div style="display:flex; gap:6px; margin:10px">
-    <button onclick="changeView('game')">Game</button>
-  
-    <button onclick="changeView('day')">Day</button>
-    <button onclick="changeView('week')">Week</button>
-    <button onclick="changeView('month')">Month</button>
-    <button onclick="changeView('year')">Year</button>
-  </div>
-    
-  <section id="statsContainer"></section>
-  
-  <section id="sessionsContainer"></section>
-  
-</main>
+      <section id="sessionsContainer"></section>
+    </main>
 
     <div id="menuOverlay" class="menu-overlay"></div>
-    
+
     <!-- ================= MENU DRAWER ================= -->
-    
+
     <div id="menuEdge" class="menu-edge"></div>
-    
+
     <div id="sideMenu" class="side-menu" role="navigation">
       <div class="menu-header">Menu</div>
-      
+
       <button data-link="index.html">Main Menu</button>
-      
+
       <button data-link="countup.html">CountUp</button>
-      
+
       <button disabled>01(Coming Soon)</button>
-      
+
       <button disabled>Cricket(Coming Soon)</button>
-      
-      <button onclick="location.href='data.html'">Data</button>
-      
-      <button onclick="location.href='settings.html'">Settings</button>
-      
+
+      <button onclick="location.href = 'data.html'">Data</button>
+
+      <button onclick="location.href = 'settings.html'">Settings</button>
+
       <button onclick="forceResetGame()">Reset Game</button>
-      
+
       <button onclick="generateTestData(30)">テストデータ生成</button>
-      
     </div>
 
-<!-- コア機能（最初に読み込む） -->
-<script src="js/core/state.js" defer></script>
-<script src="js/core/core.js" defer></script>
-<script src="js/core/storage.js" defer></script>
+    <!-- コア機能（最初に読み込む） -->
+    <script src="js/core/state.js" defer></script>
+    <script src="js/core/core.js" defer></script>
+    <script src="js/core/storage.js" defer></script>
 
-<!-- データ関連 -->
-<script src="js/data/data_loader.js" defer></script>
-<script src="js/data/data_grouped.js" defer></script>
-<script src="js/data/data_detail.js" defer></script>
-<script src="js/data/data.js" defer></script>
+    <!-- データ関連 -->
+    <script src="js/data/data_loader.js" defer></script>
+    <script src="js/data/data_grouped.js" defer></script>
+    <script src="js/data/data_detail.js" defer></script>
+    <script src="js/data/data.js" defer></script>
 
-<!-- 初期化（最後に読み込む） -->
-<script src="js/init/main.js" defer></script>
-
-</body>
+    <!-- 初期化（最後に読み込む） -->
+    <script src="js/init/main.js" defer></script>
+  </body>
 </html>

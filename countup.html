@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <html lang="ja">
-  
   <head>
-    
     <meta charset="UTF-8" />
     <title>Darts Practice</title>
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0,
-maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0,
+                maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
 
-<meta name="theme-color" content="#0f1115">
+    <meta name="theme-color" content="#0f1115" />
 
-<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
 
-<meta name="apple-mobile-web-app-status-bar-style"
-content="black-translucent">
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
 
-<meta name="apple-mobile-web-app-title"
-content="Darts Practice">
-<link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-title" content="Darts Practice" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
 
-<meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes" />
 
-<link rel="manifest" href="manifest.json">
-    
+    <link rel="manifest" href="manifest.json" />
+
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/theme.css" />
 
@@ -38,14 +39,11 @@ content="Darts Practice">
     <link rel="stylesheet" href="css/responsive/phone.css" />
     <link rel="stylesheet" href="css/responsive/tablet.css" />
     <link rel="stylesheet" href="css/responsive/desktop.css" />
-    
   </head>
 
   <body>
-    
     <!-- ================= HEADER ================= -->
     <header class="header">
-      
       <div class="score-panel">
         <div class="score-block">
           <div class="score-value" id="totalScore">0</div>
@@ -55,12 +53,10 @@ content="Darts Practice">
           NEXT GAME
         </button>
       </div>
-      
     </header>
 
     <!-- ================= MAIN ================= -->
     <main class="container">
-      
       <!-- ===== ROUNDS ===== -->
       <section class="round-area">
         <h2>Rounds</h2>
@@ -124,110 +120,103 @@ content="Darts Practice">
 
         <!-- 詳細表示 -->
         <div class="stats-detail">
-          
           <div class="stats-left">
-          
-          <!-- ===== KPI行 ===== -->
-          <div class="stats-kpi">
-            <div class="kpi-item">
-              <div class="kpi-label">PPD</div>
-              <div class="kpi-value" id="ppd">0</div>
-            </div>
-
-            <div class="kpi-item">
-              <div class="kpi-label">TOTAL</div>
-              <div class="kpi-value" id="totalDartsStat">0</div>
-            </div>
-
-            <div class="kpi-item">
-              <div class="kpi-label">AVG</div>
-              <div class="kpi-value" id="roundAvg">0</div>
-            </div>
-
-            <div class="kpi-item">
-              <div class="kpi-label">MAX</div>
-              <div class="kpi-value" id="maxRound">0</div>
-            </div>
-          </div>
-
-          <hr class="stats-divider" />
-
-          <!-- ===== Bull系 ===== -->
-          <div class="bull-group">
-            <div class="stat-row">
-              <span class="label">Bulls</span>
-              <span class="count" id="bullCount">0</span>
-
-              <div class="bar-bg">
-                <div class="bar-fill" id="bullRateBar"></div>
+            <!-- ===== KPI行 ===== -->
+            <div class="stats-kpi">
+              <div class="kpi-item">
+                <div class="kpi-label">PPD</div>
+                <div class="kpi-value" id="ppd">0</div>
               </div>
 
-              <span class="percent" id="bullPercent">0.0%</span>
-            </div>
-
-            <div class="stat-row">
-              <span class="label">Inner</span>
-              <span class="count" id="innerBulls">0</span>
-
-              <div class="bar-bg">
-                <div class="bar-fill inner" id="innerBullRateBar"></div>
+              <div class="kpi-item">
+                <div class="kpi-label">TOTAL</div>
+                <div class="kpi-value" id="totalDartsStat">0</div>
               </div>
 
-              <span class="percent" id="innerBullPercent">0.0%</span>
+              <div class="kpi-item">
+                <div class="kpi-label">AVG</div>
+                <div class="kpi-value" id="roundAvg">0</div>
+              </div>
+
+              <div class="kpi-item">
+                <div class="kpi-label">MAX</div>
+                <div class="kpi-value" id="maxRound">0</div>
+              </div>
+            </div>
+
+            <hr class="stats-divider" />
+
+            <!-- ===== Bull系 ===== -->
+            <div class="bull-group">
+              <div class="stat-row">
+                <span class="label">Bulls</span>
+                <span class="count" id="bullCount">0</span>
+
+                <div class="bar-bg">
+                  <div class="bar-fill" id="bullRateBar"></div>
+                </div>
+
+                <span class="percent" id="bullPercent">0.0%</span>
+              </div>
+
+              <div class="stat-row">
+                <span class="label">Inner</span>
+                <span class="count" id="innerBulls">0</span>
+
+                <div class="bar-bg">
+                  <div class="bar-fill inner" id="innerBullRateBar"></div>
+                </div>
+
+                <span class="percent" id="innerBullPercent">0.0%</span>
+              </div>
+            </div>
+
+            <hr class="stats-divider" />
+
+            <div class="awards">
+              <div class="award-card" id="award-hattrick">
+                <div class="award-title">Hat Trick</div>
+                <div class="award-value" id="hatTrick">0</div>
+              </div>
+
+              <div class="award-card" id="award-threeblack">
+                <div class="award-title">3 in the Black</div>
+                <div class="award-value" id="threeInTheBlack">0</div>
+              </div>
+
+              <div class="award-card" id="award-ton80">
+                <div class="award-title">Ton 80</div>
+                <div class="award-value" id="ton80">0</div>
+              </div>
+
+              <div class="award-card" id="award-highton">
+                <div class="award-title">High Ton</div>
+                <div class="award-value" id="highTon">0</div>
+              </div>
+
+              <div class="award-card" id="award-lowton">
+                <div class="award-title">Low Ton</div>
+                <div class="award-value" id="lowTon">0</div>
+              </div>
+
+              <div class="award-card" id="award-threebed">
+                <div class="award-title">3 in the Bed</div>
+                <div class="award-value" id="threeInTheBed">0</div>
+              </div>
+
+              <div class="award-card" id="award-whitehorse">
+                <div class="award-title">White Horse</div>
+                <div class="award-value" id="whiteHorse">0</div>
+              </div>
             </div>
           </div>
 
-          <hr class="stats-divider" />
-
-          <div class="awards">
-            <div class="award-card" id="award-hattrick">
-              <div class="award-title">Hat Trick</div>
-              <div class="award-value" id="hatTrick">0</div>
-            </div>
-
-            <div class="award-card" id="award-threeblack">
-              <div class="award-title">3 in the Black</div>
-              <div class="award-value" id="threeInTheBlack">0</div>
-            </div>
-
-            <div class="award-card" id="award-ton80">
-              <div class="award-title">Ton 80</div>
-              <div class="award-value" id="ton80">0</div>
-            </div>
-
-            <div class="award-card" id="award-highton">
-              <div class="award-title">High Ton</div>
-              <div class="award-value" id="highTon">0</div>
-            </div>
-
-            <div class="award-card" id="award-lowton">
-              <div class="award-title">Low Ton</div>
-              <div class="award-value" id="lowTon">0</div>
-            </div>
-
-            <div class="award-card" id="award-threebed">
-              <div class="award-title">3 in the Bed</div>
-              <div class="award-value" id="threeInTheBed">0</div>
-            </div>
-
-            <div class="award-card" id="award-whitehorse">
-              <div class="award-title">White Horse</div>
-              <div class="award-value" id="whiteHorse">0</div>
-            </div>
+          <div class="stats-right">
+            <h3>Score Graph</h3>
+            <canvas id="scoreChart"></canvas>
           </div>
-
-          </div>
-          
-          
-<div class="stats-right">
-  
-  <h3>Score Graph</h3>
-  <canvas id="scoreChart"></canvas>
-  
-</div>
         </div>
       </section>
-      
     </main>
 
     <div id="menuOverlay" class="menu-overlay"></div>
@@ -247,37 +236,35 @@ content="Darts Practice">
 
       <button disabled>Cricket(Coming Soon)</button>
 
-      <button onclick="location.href='data.html'">Data</button>
+      <button onclick="location.href = 'data.html'">Data</button>
 
-      <button onclick="location.href='settings.html'">Settings</button>
+      <button onclick="location.href = 'settings.html'">Settings</button>
 
       <button onclick="forceResetGame()">Reset Game</button>
     </div>
 
-<!-- コア機能（最初に読み込む） -->
-<script src="js/core/state.js" defer></script>
-<script src="js/core/core.js" defer></script>
-<script src="js/core/storage.js" defer></script>
+    <!-- コア機能（最初に読み込む） -->
+    <script src="js/core/state.js" defer></script>
+    <script src="js/core/core.js" defer></script>
+    <script src="js/core/storage.js" defer></script>
 
-<!-- ゲーム関連 -->
-<script src="js/game/stats.js" defer></script>
-<script src="js/game/game_core.js" defer></script>
-<script src="js/game/game_countup.js" defer></script>
-<script src="js/game/cu_ui.js" defer></script>
+    <!-- ゲーム関連 -->
+    <script src="js/game/stats.js" defer></script>
+    <script src="js/game/game_core.js" defer></script>
+    <script src="js/game/game_countup.js" defer></script>
+    <script src="js/game/cu_ui.js" defer></script>
 
-<!-- データ関連 -->
-<script src="js/data/data_loader.js" defer></script>
-<script src="js/data/data_grouped.js" defer></script>
-<script src="js/data/data_detail.js" defer></script>
-<script src="js/data/data.js" defer></script>
+    <!-- データ関連 -->
+    <script src="js/data/data_loader.js" defer></script>
+    <script src="js/data/data_grouped.js" defer></script>
+    <script src="js/data/data_detail.js" defer></script>
+    <script src="js/data/data.js" defer></script>
 
-<!-- UI -->
-<script src="js/ui/chart.js" defer></script>
-<script src="js/ui/settings.js" defer></script>
+    <!-- UI -->
+    <script src="js/ui/chart.js" defer></script>
+    <script src="js/ui/settings.js" defer></script>
 
-<!-- 初期化（最後に読み込む） -->
-<script src="js/init/main.js" defer></script>
-    
+    <!-- 初期化（最後に読み込む） -->
+    <script src="js/init/main.js" defer></script>
   </body>
-  
 </html>

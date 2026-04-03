@@ -1,10 +1,23 @@
-let currentPage = 1
-const PAGE_SIZE = 10
 let viewMode = "game" 
 
 function changeView(mode) {
-  viewMode = mode
-  renderView()
+  if (mode === 'game') {
+    // Game ビューに戻す
+    currentPage = 1
+    groupedPageMode = 'game'
+    
+    const sessions = JSON.parse(
+      localStorage.getItem("dartsSessions")
+    ) || []
+    
+    const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
+    
+    loadSessions()
+    updatePaginationUI(totalPages)
+  } else {
+    // Group ビュー（Day/Week/Month/Year）
+    displayGroupView(mode)
+  }
 }
 
 function renderView() {

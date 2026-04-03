@@ -1,11 +1,6 @@
 // ============================================
 // グループビュー用ページネーション
 // ============================================
-
-let groupedPageMode = null // "day", "week", "month", "year"
-let groupedPageNumber = 1
-let groupedPageData = null
-
 function renderGroupedPaginated(mode) {
   
   const sessions = JSON.parse(
@@ -79,40 +74,18 @@ function displayGroupedPage(mode, sortedEntries) {
 }
 
 function renderGroupedPagination(total) {
-  
   const PAGE_SIZE = 10
   const totalPages = Math.ceil(total / PAGE_SIZE)
   
-  let html = `
-    <div style="display:flex; gap:10px; margin:20px 0; justify-content:center;">
-  `
+  document.getElementById('pageInfo').textContent = 
+    `${groupedPageNumber} / ${totalPages}`
   
-  html += `
-    <button onclick="changeGroupedPage(${groupedPageNumber - 1})"
-      ${groupedPageNumber === 1 ? "disabled" : ""}>
-      Prev
-    </button>
-  `
-  
-  html += `
-    <span>${groupedPageNumber} / ${totalPages}</span>
-  `
-  
-  html += `
-    <button onclick="changeGroupedPage(${groupedPageNumber + 1})"
-      ${groupedPageNumber === totalPages ? "disabled" : ""}>
-      Next
-    </button>
-  `
-  
-  html += `</div>`
-  
-  document.getElementById("sessionsContainer")
-    .insertAdjacentHTML("beforeend", html)
+  document.getElementById('prevBtn').disabled = groupedPageNumber === 1
+  document.getElementById('nextBtn').disabled = groupedPageNumber === totalPages
 }
 
+
 function changeGroupedPage(page) {
-  
   const PAGE_SIZE = 10
   const totalPages = Math.ceil(groupedPageData.length / PAGE_SIZE)
   
@@ -120,4 +93,27 @@ function changeGroupedPage(page) {
   
   groupedPageNumber = page
   displayGroupedPage(groupedPageMode, groupedPageData)
+}
+
+// グループビュー（Day/Week/Month/Year）を表示する際に呼び出す
+function displayGroupView(mode) {
+  groupedPageMode = mode
+  groupedPageNumber = 1
+  
+  const sessions = JSON.parse(
+    localStorage.getItem("dartsSessions")
+  ) || []
+  
+  // モードに応じたグループ化
+  const groups = groupSessions(sessions, mode)
+  const sortedEntries = Object.entries(groups)
+    .sort((a, b) => new Date(b[0]) - new Date(a[0]))
+  
+  groupedPageData = sortedEntries
+  
+  // ページネーションを更新
+  if (groupedPageData && groupedPageData.length > 0) {
+    renderGroupedPagination(groupedPageData.length)
+    displayGroupedPage(mode, groupedPageData)
+  }
 }

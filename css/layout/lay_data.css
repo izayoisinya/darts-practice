@@ -2,7 +2,20 @@ main {
   height: calc(100dvh - 80px); /* header分引く */
   overflow-y: auto;
   max-width: auto;
-  padding: 5px 35px 5px 20px;
+  padding: 10px 35px 140px 20px;
+}
+
+.header {
+  height: calc(var(--header-height) + env(safe-area-inset-top) + 20px);
+  padding: env(safe-area-inset-top) 25px 0 20px;
+  
+  margin-bottom: 1px;
+  
+  display: flex;
+  align-items: center;
+ 
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-main); 
 }
 
 .data-container {
@@ -10,8 +23,6 @@ main {
   flex-direction: column;
   height: 100%;
   gap: 1rem;
-  
-  padding-bottom: 80px; /* フッターの高さ分 */
 }
 
 .data-card {
@@ -50,9 +61,11 @@ main {
   flex: 1;
 }
 
+/* 右側：タブボタン */
 .tabs-container {
   display: flex;
-  align-items: center;
+  gap: 0.5rem;
+  padding: 5px 20px 5px 40px;
 }
 
 .tabs-container button {
@@ -81,7 +94,7 @@ main {
   align-items: center;
   
   /* 高さ調節 */
-  height: 60px;          /* 最小高さ */
+  height: 60px;
   
   padding: 20px;
   gap: 20px;
@@ -102,6 +115,7 @@ main {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  padding: 5px 20px 5px 0;
 }
 
 .pagination button {
@@ -125,8 +139,3 @@ main {
   text-align: center;
 }
 
-/* 右側：タブボタン */
-.tabs-container {
-  display: flex;
-  gap: 0.5rem;
-}

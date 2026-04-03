@@ -180,37 +180,31 @@ function renderPagination(total) {
   document.getElementById("paginationContainer").innerHTML = html
 }
 
-function changePage(page) {
-  
-  const sessions = JSON.parse(
-    localStorage.getItem("dartsSessions")
-  ) || []
-  
-  const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
-  
-  if (page < 1 || page > totalPages) return
-  
-  currentPage = page
-  
-  loadSessions()
-}
-
 function changePage(direction) {
-  const sessions = JSON.parse(
-    localStorage.getItem("dartsSessions")
-  ) || []
-  
-  const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
-  
-  // Prev か Next で判定
-  if (direction === 'Prev') {
-    if (currentPage > 1) currentPage--
-  } else if (direction === 'Next') {
-    if (currentPage < totalPages) currentPage++
+  if (groupedPageMode === 'game') {
+    // Game ビュー
+    const sessions = JSON.parse(
+      localStorage.getItem("dartsSessions")
+    ) || []
+    const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
+    
+    if (direction === 'Prev' && currentPage > 1) currentPage--
+    if (direction === 'Next' && currentPage < totalPages) currentPage++
+    
+    loadSessions()
+    updatePaginationUI(totalPages)
+  } else {
+    // Group ビュー
+    if (!groupedPageData || groupedPageData.length === 0) return
+    
+    const totalPages = Math.ceil(groupedPageData.length / PAGE_SIZE)
+    let newPage = groupedPageNumber
+    
+    if (direction === 'Prev') newPage--
+    if (direction === 'Next') newPage++
+    
+    changeGroupedPage(newPage)
   }
-  
-  loadSessions() // ページのデータ再読み込み
-  updatePaginationUI(totalPages) // UI更新
 }
 
 function updatePaginationUI(totalPages) {
@@ -223,7 +217,23 @@ function updatePaginationUI(totalPages) {
   document.getElementById('nextBtn').disabled = currentPage === totalPages
 }
 
-// 初期化（Data画面を開いた時）
+// グローバル変数の初期化
+// ❌ これらを削除（既に定義されている）
+// let groupedPageNumber = 1
+// let PAGE_SIZE = 10
+
+// ✅ 1回だけ定義する場合はここで
+let currentPage = 1
+let groupedPageNumber = 1
+let groupedPageMode = 'game'
+let groupedPageData = []
+const PAGE_SIZE = 10 // let ではなく const で1回だけ定義
+
+// ページロード時の初期化
+window.addEventListener('DOMContentLoaded', () => {
+  initDataPage()
+})
+
 function initDataPage() {
   const sessions = JSON.parse(
     localStorage.getItem("dartsSessions")
@@ -232,6 +242,10 @@ function initDataPage() {
   const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
   
   currentPage = 1
+  groupedPageMode = 'game'
+  groupedPageData = []
+  
   loadSessions()
   updatePaginationUI(totalPages)
 }
+

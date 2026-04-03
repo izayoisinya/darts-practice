@@ -43,12 +43,20 @@
   <section id="statsContainer"></section>
   <section id="sessionsContainer"></section>
   <!-- タブボタンを右下に配置 -->
+  <!-- フッター：ページネーションとタブを同じ行に配置 -->
+<div class="footer-bar">
+  <div class="pagination">
+    <button onclick="prevPage()">Prev</button>
+    <span class="page-info">1 / 15</span>
+    <button onclick="nextPage()">Next</button>
+  </div>
   <div class="tabs-container">
     <button onclick="changeView('game')">Game</button>
     <button onclick="changeView('day')">Day</button>
     <button onclick="changeView('week')">Week</button>
     <button onclick="changeView('month')">Month</button>
     <button onclick="changeView('year')">Year</button>
+  </div>
   </div>
 </main>
 

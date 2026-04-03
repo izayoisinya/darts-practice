@@ -67,8 +67,6 @@ function loadSessions() {
     
     container.appendChild(div)
   })
-  
-  renderPagination(sessions.length)
 }
 
 function groupSessions(sessions, mode) {
@@ -164,35 +162,22 @@ function formatShort(date, withYear = true) {
 }
 
 function renderPagination(total) {
-  
   const totalPages = Math.ceil(total / PAGE_SIZE)
   
   let html = `
-    <div style="display:flex; gap:10px; margin:20px 0; justify-content:center;">
-  `
-  
-  html += `
     <button onclick="changePage(${currentPage - 1})"
       ${currentPage === 1 ? "disabled" : ""}>
       Prev
     </button>
-  `
-  
-  html += `
     <span>${currentPage} / ${totalPages}</span>
-  `
-  
-  html += `
     <button onclick="changePage(${currentPage + 1})"
       ${currentPage === totalPages ? "disabled" : ""}>
       Next
     </button>
   `
   
-  html += `</div>`
-  
-  document.getElementById("sessionsContainer")
-    .insertAdjacentHTML("beforeend", html)
+  // footer に入れる
+  document.getElementById("paginationContainer").innerHTML = html
 }
 
 function changePage(page) {
@@ -208,4 +193,45 @@ function changePage(page) {
   currentPage = page
   
   loadSessions()
+}
+
+function changePage(direction) {
+  const sessions = JSON.parse(
+    localStorage.getItem("dartsSessions")
+  ) || []
+  
+  const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
+  
+  // Prev か Next で判定
+  if (direction === 'Prev') {
+    if (currentPage > 1) currentPage--
+  } else if (direction === 'Next') {
+    if (currentPage < totalPages) currentPage++
+  }
+  
+  loadSessions() // ページのデータ再読み込み
+  updatePaginationUI(totalPages) // UI更新
+}
+
+function updatePaginationUI(totalPages) {
+  // ページ情報を更新
+  document.getElementById('pageInfo').textContent =
+    `${currentPage} / ${totalPages}`
+  
+  // ボタンの有効/無効を切り替え
+  document.getElementById('prevBtn').disabled = currentPage === 1
+  document.getElementById('nextBtn').disabled = currentPage === totalPages
+}
+
+// 初期化（Data画面を開いた時）
+function initDataPage() {
+  const sessions = JSON.parse(
+    localStorage.getItem("dartsSessions")
+  ) || []
+  
+  const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
+  
+  currentPage = 1
+  loadSessions()
+  updatePaginationUI(totalPages)
 }

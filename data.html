@@ -34,7 +34,7 @@
     
   </head>
 
-  <body>
+  <body onload="initDataPage()">
     <header class="header">
       <h1>Statistics</h1>
     </header>
@@ -45,10 +45,10 @@
   <!-- タブボタンを右下に配置 -->
   <!-- フッター：ページネーションとタブを同じ行に配置 -->
 <div class="footer-bar">
-  <div class="pagination">
-    <button onclick="prevPage()">Prev</button>
-    <span class="page-info">1 / 15</span>
-    <button onclick="nextPage()">Next</button>
+  <div class="pagination" id="paginationContainer">
+    <button id="prevBtn" onclick="changePage('Prev')">Prev</button>
+    <span class="page-info" id="pageInfo"></span>
+    <button id="nextBtn" onclick="changePage('Next')">Next</button>
   </div>
   <div class="tabs-container">
     <button onclick="changeView('game')">Game</button>

@@ -22,6 +22,7 @@ function changeView(mode) {
     
     const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
     
+    loadStats()
     loadSessions()
     updatePaginationUI(totalPages)
     drawGameScoresChart()

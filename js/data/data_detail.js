@@ -14,6 +14,17 @@ function showGameDetails(dateKey, gamesList) {
   const chartContainer = document.getElementById("chartContainer")
   chartContainer.style.display = "block"
   
+  const statsContainer = document.getElementById("statsContainer")
+  statsContainer.style.display = "block"
+  statsContainer.innerHTML = ""
+  
+  // グループ期間のスタッツを表示
+  const summary = calcSummary(gamesList)
+  addStat(statsContainer, "Games Played", summary.games)
+  addStat(statsContainer, "Avg Score", summary.avgScore)
+  addStat(statsContainer, "Avg PPD", summary.avgPPD)
+  addStat(statsContainer, "Total Bulls", summary.totalBulls)
+  
   displayDetailPage()
 }
 
@@ -113,6 +124,10 @@ function backToSummary() {
   
   const chartContainer = document.getElementById("chartContainer")
   chartContainer.style.display = "none"
+  
+  const statsContainer = document.getElementById("statsContainer")
+  statsContainer.style.display = "none"
+  
   selectedDayData = null
 
   if (groupedPageMode && groupedPageMode !== 'game' && groupedPageData.length > 0) {

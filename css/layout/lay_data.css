@@ -25,15 +25,22 @@ main {
   gap: 1rem;
 }
 
+#statsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.6rem;
+}
+
 .data-card {
   background: #1c212c;
 
-  padding: 14px;
+  padding: 10px 12px;
 
   border-radius: 12px;
 
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .data-title {

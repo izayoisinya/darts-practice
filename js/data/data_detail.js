@@ -43,7 +43,9 @@ function displayDetailPage() {
   pageData.forEach((game, idx) => {
     const gameDiv = document.createElement("div")
     const t = game.tripleHits || {}
-    const gameNumber = start + idx + 1
+    const totalGames = selectedDayData.gamesList.length
+    const globalIndex = start + idx
+    const gameNumber = totalGames - globalIndex
     const roundsText = (game.rounds || [])
       .map((r, i) => {
         const score = (r || []).reduce((sum, d) => sum + (d?.score || 0), 0)

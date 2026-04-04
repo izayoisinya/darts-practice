@@ -1,6 +1,9 @@
 // ============================================
 // グループビュー用ページネーション
 // ============================================
+const GROUP_NOTE_KEY = "dartsDayNotesV2"
+let groupNoteEditingImage = null
+
 function renderGroupedPaginated(mode) {
   
   const sessions = JSON.parse(
@@ -22,6 +25,7 @@ function renderGroupedPaginated(mode) {
 }
 
 function displayGroupedPage(mode, sortedEntries) {
+  ensureGroupNoteModalWired()
   
   const container = document.getElementById("sessionsContainer")
   container.innerHTML = ""
@@ -31,6 +35,8 @@ function displayGroupedPage(mode, sortedEntries) {
   const end = start + PAGE_SIZE
   
   const pageData = sortedEntries.slice(start, end)
+
+  updateGroupedLeftCalendar(mode, pageData)
   
   // グループカードを表示
   pageData.forEach(([key, list]) => {
@@ -52,20 +58,51 @@ function displayGroupedPage(mode, sortedEntries) {
     if (mode === "year") {
       label = `${key}年`
     }
+
+    const dayKeys = getDayKeysFromSessions(list)
+    const noteInfo = buildGroupNotePreview(mode, key, dayKeys)
+    const tagChips = (noteInfo.tags || [])
+      .slice(0, 4)
+      .map(t => `<span class="group-note-chip">#${escapeHtml(t)}</span>`)
+      .join("")
+    const commentPreview = noteInfo.comment ? escapeHtml(noteInfo.comment).slice(0, 80) : ""
+    const imageBadge = noteInfo.hasImage ? '<span class="group-note-image-badge">IMG</span>' : ''
     
     const div = document.createElement("div")
-    
+    div.className = "group-card"
     div.innerHTML = `
-      <div style="margin-bottom:12px;border:1px solid #333;padding:10px;cursor:pointer;">
-        <strong>${label}</strong><br>
-        Games: ${summary.games}<br>
-        Avg Score: ${summary.avgScore}<br>
-        Avg PPD: ${summary.avgPPD}<br>
-        Bulls: ${summary.totalBulls}
+      <div class="group-card-header">
+        <span class="group-card-label">${label}</span>
+        <div class="group-card-header-right">
+          ${imageBadge}
+          <span class="group-card-games">${summary.games} Games</span>
+          ${mode === "day" ? '<button class="group-note-edit-btn" type="button">Memo</button>' : ""}
+        </div>
       </div>
+      <div class="group-card-body">
+        <div class="group-kpi-item">
+          <span class="group-kpi-label">Avg Score</span>
+          <span class="group-kpi-value">${summary.avgScore}</span>
+        </div>
+        <div class="group-kpi-item">
+          <span class="group-kpi-label">Avg PPD</span>
+          <span class="group-kpi-value">${summary.avgPPD}</span>
+        </div>
+        <div class="group-kpi-item">
+          <span class="group-kpi-label">Bulls</span>
+          <span class="group-kpi-value">${summary.totalBulls}</span>
+        </div>
+      </div>
+      ${commentPreview || tagChips ? `<div class="group-note-preview"><div class="group-note-preview-text">${commentPreview}</div><div class="group-note-chip-row">${tagChips}</div></div>` : ""}
     `
-    
-    div.querySelector("div").onclick = () => showGameDetails(key, list)
+    div.onclick = () => showGameDetails(key, list)
+    const memoBtn = div.querySelector(".group-note-edit-btn")
+    if (memoBtn) {
+      memoBtn.onclick = ev => {
+        ev.stopPropagation()
+        openDayNoteEditor(key, label)
+      }
+    }
     container.appendChild(div)
   })
   
@@ -115,5 +152,341 @@ function displayGroupView(mode) {
   if (groupedPageData && groupedPageData.length > 0) {
     renderGroupedPagination(groupedPageData.length)
     displayGroupedPage(mode, groupedPageData)
+  } else {
+    const calendarContainer = document.getElementById("calendarContainer")
+    if (calendarContainer) {
+      calendarContainer.style.display = "none"
+      calendarContainer.innerHTML = ""
+    }
   }
+}
+
+function updateGroupedLeftCalendar(mode, pageData) {
+  const calendarContainer = document.getElementById("calendarContainer")
+  if (!calendarContainer) return
+
+  if (!pageData || pageData.length === 0) {
+    calendarContainer.style.display = "none"
+    calendarContainer.innerHTML = ""
+    return
+  }
+
+  const gameDates = {}
+  pageData.forEach(([, list]) => {
+    ;(list || []).forEach(g => {
+      if (!g || !g.date) return
+      const d = new Date(g.date)
+      if (Number.isNaN(d.getTime())) return
+      const key = getLocalDateKey(d)
+      gameDates[key] = (gameDates[key] || 0) + 1
+    })
+  })
+
+  calendarContainer.style.display = "block"
+
+  if (mode === "year") {
+    const firstYear = parseInt(pageData[0][0], 10)
+    if (typeof renderYearCalendar === "function" && !Number.isNaN(firstYear)) {
+      const cal = renderYearCalendar(firstYear, gameDates)
+      const stats = renderTagStats(mode, pageData)
+      calendarContainer.innerHTML = `${cal}${stats}`
+    } else {
+      calendarContainer.innerHTML = ""
+    }
+    return
+  }
+
+  let year = null
+  let month = null
+  const firstKey = pageData[0][0]
+
+  if (mode === "month") {
+    const parts = firstKey.split("-")
+    year = parseInt(parts[0], 10)
+    month = parseInt(parts[1], 10)
+  } else {
+    const d = new Date(firstKey)
+    if (!Number.isNaN(d.getTime())) {
+      year = d.getFullYear()
+      month = d.getMonth() + 1
+    }
+  }
+
+  if (Number.isNaN(year) || Number.isNaN(month) || !year || !month) {
+    calendarContainer.innerHTML = ""
+    return
+  }
+
+  const highlightSet = new Set()
+  if (mode === "day") {
+    pageData.forEach(([key]) => highlightSet.add(key))
+  }
+  if (mode === "week") {
+    pageData.forEach(([key]) => {
+      const { start } = getWeekRange(new Date(key))
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start)
+        d.setDate(start.getDate() + i)
+        highlightSet.add(getLocalDateKey(d))
+      }
+    })
+  }
+  if (mode === "month") {
+    pageData.forEach(([key]) => {
+      const parts = key.split("-")
+      const y = parseInt(parts[0], 10)
+      const m = parseInt(parts[1], 10)
+      if (y !== year || m !== month) return
+      const lastDay = new Date(y, m, 0).getDate()
+      for (let d = 1; d <= lastDay; d++) {
+        highlightSet.add(`${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`)
+      }
+    })
+  }
+
+  const cal = renderGroupedMonthCalendar(year, month, highlightSet, gameDates)
+  const stats = renderTagStats(mode, pageData)
+  calendarContainer.innerHTML = `${cal}${stats}`
+}
+
+function renderGroupedMonthCalendar(year, month, highlightSet, gameDates) {
+  const dayLabels = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+
+  const firstDate = new Date(year, month - 1, 1)
+  let startOffset = firstDate.getDay()
+  startOffset = startOffset === 0 ? 6 : startOffset - 1
+
+  const daysInMonth = new Date(year, month, 0).getDate()
+  let cells = dayLabels.map(d => `<div class="cal-header-day">${d}</div>`).join("")
+
+  for (let i = 0; i < startOffset; i++) {
+    cells += '<div class="cal-day cal-empty"></div>'
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`
+    const inRange = highlightSet.has(dateStr)
+    const hasGames = (gameDates[dateStr] || 0) > 0
+    let cls = "cal-day"
+    if (inRange) cls += " cal-highlight"
+    if (hasGames && !inRange) cls += " cal-has-games"
+    const dot = hasGames ? '<span class="cal-dot"></span>' : ""
+    cells += `<div class="${cls}"><span class="cal-day-num">${d}</span>${dot}</div>`
+  }
+
+  return `<div class="cal-wrap"><div class="cal-title">${year}年${month}月</div><div class="cal-grid">${cells}</div></div>`
+}
+
+function getAllDayNotes() {
+  const notes = JSON.parse(localStorage.getItem(GROUP_NOTE_KEY) || "{}")
+  // 旧形式(mode別)のうちdayだけは読めるように後方互換
+  if (notes && notes.day && typeof notes.day === "object") {
+    return notes.day
+  }
+  return notes || {}
+}
+
+function saveAllDayNotes(notes) {
+  localStorage.setItem(GROUP_NOTE_KEY, JSON.stringify(notes))
+}
+
+function getDayNote(dayKey) {
+  const notes = getAllDayNotes()
+  return notes[dayKey] || { comment: "", tags: [], imageData: "" }
+}
+
+function setDayNote(dayKey, note) {
+  const notes = getAllDayNotes()
+  notes[dayKey] = {
+    comment: note.comment || "",
+    tags: note.tags || [],
+    imageData: note.imageData || "",
+    updatedAt: Date.now()
+  }
+  saveAllDayNotes(notes)
+}
+
+function getDayKeysFromSessions(list) {
+  const set = new Set()
+  ;(list || []).forEach(s => {
+    if (!s || !s.date) return
+    const d = new Date(s.date)
+    if (Number.isNaN(d.getTime())) return
+    set.add(getLocalDateKey(d))
+  })
+  return [...set].sort()
+}
+
+function buildGroupNotePreview(mode, key, dayKeys) {
+  if (mode === "day") {
+    const note = getDayNote(key)
+    return {
+      comment: note.comment || "",
+      tags: note.tags || [],
+      hasImage: !!note.imageData
+    }
+  }
+
+  const comments = []
+  const tags = new Set()
+  let hasImage = false
+  let noteCount = 0
+
+  ;(dayKeys || []).forEach(dayKey => {
+    const note = getDayNote(dayKey)
+    if (note.comment || (note.tags || []).length || note.imageData) {
+      noteCount++
+    }
+    if (note.comment) comments.push(note.comment)
+    ;(note.tags || []).forEach(t => tags.add(t))
+    if (note.imageData) hasImage = true
+  })
+
+  return {
+    comment: noteCount ? `配下Dayメモ: ${noteCount}件` : "",
+    tags: [...tags],
+    hasImage
+  }
+}
+
+function parseTags(raw) {
+  return [...new Set((raw || "")
+    .split(/[\s,、，]+/)
+    .map(t => t.trim().replace(/^#/, ""))
+    .filter(Boolean))]
+}
+
+function extractHashTags(comment) {
+  const matches = String(comment || "").match(/#([^\s#.,、，]+)/g) || []
+  return [...new Set(matches.map(m => m.replace(/^#/, "").trim()).filter(Boolean))]
+}
+
+function renderTagStats(mode, pageData) {
+  const counts = {}
+  ;(pageData || []).forEach(([key, list]) => {
+    const dayKeys = mode === "day" ? [key] : getDayKeysFromSessions(list)
+    dayKeys.forEach(dayKey => {
+      const note = getDayNote(dayKey)
+      ;(note.tags || []).forEach(tag => {
+        counts[tag] = (counts[tag] || 0) + 1
+      })
+    })
+  })
+  const rows = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+
+  if (!rows.length) {
+    return '<div class="tag-stats-card"><div class="tag-stats-title">Tag Stats</div><div class="tag-stats-empty">タグはまだありません</div></div>'
+  }
+
+  const items = rows
+    .map(([tag, count]) => `<div class="tag-stats-row"><span>#${escapeHtml(tag)}</span><strong>${count}</strong></div>`)
+    .join("")
+  return `<div class="tag-stats-card"><div class="tag-stats-title">Tag Stats</div>${items}</div>`
+}
+
+function ensureGroupNoteModalWired() {
+  const modal = document.getElementById("groupNoteModal")
+  if (!modal || modal.dataset.wired === "1") return
+
+  const closeBtn = document.getElementById("groupNoteCloseBtn")
+  const saveBtn = document.getElementById("groupNoteSaveBtn")
+  const deleteImageBtn = document.getElementById("groupNoteDeleteImageBtn")
+  const imageInput = document.getElementById("groupNoteImageInput")
+
+  closeBtn.onclick = closeGroupNoteEditor
+  modal.onclick = ev => {
+    if (ev.target === modal) closeGroupNoteEditor()
+  }
+
+  deleteImageBtn.onclick = () => {
+    groupNoteEditingImage = ""
+    const preview = document.getElementById("groupNotePreview")
+    preview.style.display = "none"
+    preview.src = ""
+    imageInput.value = ""
+  }
+
+  imageInput.onchange = async ev => {
+    const file = ev.target.files && ev.target.files[0]
+    if (!file) return
+    groupNoteEditingImage = await fileToDataUrl(file)
+    const preview = document.getElementById("groupNotePreview")
+    preview.src = groupNoteEditingImage
+    preview.style.display = "block"
+  }
+
+  saveBtn.onclick = () => {
+    const dayKey = modal.dataset.dayKey
+    if (!dayKey) return
+
+    const comment = document.getElementById("groupNoteComment").value.trim()
+    const tagInput = document.getElementById("groupNoteTags").value
+    const tags = [...new Set([...parseTags(tagInput), ...extractHashTags(comment)])]
+
+    setDayNote(dayKey, {
+      comment,
+      tags,
+      imageData: groupNoteEditingImage || ""
+    })
+
+    closeGroupNoteEditor()
+    displayGroupedPage(groupedPageMode, groupedPageData)
+  }
+
+  modal.dataset.wired = "1"
+}
+
+function openDayNoteEditor(dayKey, label) {
+  ensureGroupNoteModalWired()
+  const modal = document.getElementById("groupNoteModal")
+  const title = document.getElementById("groupNoteTitle")
+  const comment = document.getElementById("groupNoteComment")
+  const tags = document.getElementById("groupNoteTags")
+  const preview = document.getElementById("groupNotePreview")
+  const imageInput = document.getElementById("groupNoteImageInput")
+
+  const note = getDayNote(dayKey)
+
+  modal.dataset.dayKey = dayKey
+  title.textContent = `${label} Memo`
+  comment.value = note.comment || ""
+  tags.value = (note.tags || []).join(", ")
+  groupNoteEditingImage = note.imageData || ""
+  imageInput.value = ""
+
+  if (groupNoteEditingImage) {
+    preview.src = groupNoteEditingImage
+    preview.style.display = "block"
+  } else {
+    preview.src = ""
+    preview.style.display = "none"
+  }
+
+  modal.style.display = "flex"
+}
+
+function closeGroupNoteEditor() {
+  const modal = document.getElementById("groupNoteModal")
+  if (!modal) return
+  modal.style.display = "none"
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
 }

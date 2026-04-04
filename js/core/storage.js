@@ -36,22 +36,34 @@ function saveSession() {
   const sessions = JSON.parse(
     localStorage.getItem("dartsSessions")
   ) || []
+
+  const calculated = typeof calculateStats === "function" ?
+    calculateStats() :
+    null
   
   const darts = game.rounds.flat().filter(d => d)
   
-  const totalScore = darts.reduce((sum, d) => sum + d.score, 0)
+  const totalScore = calculated ?
+    calculated.totalScore :
+    darts.reduce((sum, d) => sum + d.score, 0)
   const totalDarts = darts.length
   
-  const ppd = totalDarts ? (totalScore / totalDarts) : 0
+  const ppd = calculated ?
+    calculated.ppd :
+    (totalDarts ? (totalScore / totalDarts) : 0)
   
   // ===== Bulls =====
-  const bulls = darts.filter(d =>
-    d.special === "innerBull" || d.special === "outerBull"
-  ).length
+  const bulls = calculated ?
+    calculated.bullCount :
+    darts.filter(d =>
+      d.special === "innerBull" || d.special === "outerBull"
+    ).length
   
-  const innerBulls = darts.filter(d =>
-    d.special === "innerBull"
-  ).length
+  const innerBulls = calculated ?
+    calculated.innerBullCount :
+    darts.filter(d =>
+      d.special === "innerBull"
+    ).length
   
   // ===== Triple =====
   const tripleHits = {}
@@ -68,19 +80,38 @@ function saveSession() {
   
   const validRounds = roundScores.filter(s => s > 0)
   
-  const roundAvg = validRounds.length ?
-    validRounds.reduce((a, b) => a + b, 0) / validRounds.length :
-    0
+  const roundAvg = calculated ?
+    calculated.roundAvg :
+    (validRounds.length ?
+      validRounds.reduce((a, b) => a + b, 0) / validRounds.length :
+      0)
   
   // ===== Bull Rate =====
-  const bullRate = totalDarts ?
-    (bulls / totalDarts) * 100 :
-    0
+  const bullRate = calculated ?
+    calculated.bullRate :
+    (totalDarts ?
+      (bulls / totalDarts) * 100 :
+      0)
     
   // ===== Inner Rate =====
-  const innerRate = totalDarts ?
-    (innerBulls / totalDarts) * 100 :
-    0
+  const innerRate = calculated ?
+    calculated.innerBullRate :
+    (totalDarts ?
+      (innerBulls / totalDarts) * 100 :
+      0)
+
+  const awards = {
+    hatTrick: calculated?.hatTrick ?? 0,
+    lowTon: calculated?.lowTon ?? 0,
+    highTon: calculated?.highTon ?? 0,
+    ton80: calculated?.ton80 ?? 0,
+    threeInTheBlack: calculated?.threeInTheBlack ?? 0,
+    threeInTheBed: calculated?.threeInTheBed ?? 0,
+    whiteHorse: calculated?.whiteHorse ?? 0
+  }
+
+  const totalAwards = Object.values(awards)
+    .reduce((sum, count) => sum + count, 0)
   
   sessions.push({
   date: Date.now(),
@@ -96,6 +127,9 @@ function saveSession() {
   roundAvg: Number(roundAvg.toFixed(1)),
   
   tripleHits,
+
+  awards,
+  totalAwards,
 
   rounds: JSON.parse(JSON.stringify(game.rounds))
   })

@@ -52,9 +52,117 @@ function createRoundChartHtml(rounds) {
   </svg>`
 }
 
+function calculateAwardsFromRounds(rounds) {
+  const awards = {
+    hatTrick: 0,
+    lowTon: 0,
+    highTon: 0,
+    ton80: 0,
+    threeInTheBlack: 0,
+    threeInTheBed: 0,
+    whiteHorse: 0
+  }
+
+  ;(rounds || []).forEach(round => {
+    const valid = (round || []).filter(d => d)
+    if (valid.length !== 3) return
+
+    const roundScore = valid.reduce((sum, d) => sum + (d.score || 0), 0)
+    const allBull = valid.every(d =>
+      d.special === "outerBull" || d.special === "innerBull"
+    )
+    const allInner = valid.every(d => d.special === "innerBull")
+
+    if (allBull) awards.hatTrick++
+    if (allInner) awards.threeInTheBlack++
+
+    if (!allBull) {
+      if (roundScore === 180) awards.ton80++
+      else if (roundScore >= 151 && roundScore <= 177) awards.highTon++
+      else if (roundScore >= 100 && roundScore <= 150) awards.lowTon++
+    }
+
+    const bedTriples = valid.filter(d =>
+      d.multiplier === 3 && d.score >= 45 && d.score <= 60
+    )
+    if (
+      bedTriples.length === 3 &&
+      bedTriples[0].score === bedTriples[1].score &&
+      bedTriples[1].score === bedTriples[2].score
+    ) {
+      awards.threeInTheBed++
+    }
+
+    const horseTriples = valid.filter(d =>
+      d.multiplier === 3 && d.score >= 45 && d.score <= 60
+    )
+    const horseNumbers = new Set(horseTriples.map(d => d.score))
+    if (horseTriples.length === 3 && horseNumbers.size === 3) {
+      awards.whiteHorse++
+    }
+  })
+
+  return awards
+}
+
+function getSessionAwards(session) {
+  const base = {
+    hatTrick: 0,
+    lowTon: 0,
+    highTon: 0,
+    ton80: 0,
+    threeInTheBlack: 0,
+    threeInTheBed: 0,
+    whiteHorse: 0
+  }
+
+  if (session && session.awards) {
+    return { ...base, ...session.awards }
+  }
+
+  return { ...base, ...calculateAwardsFromRounds(session?.rounds || []) }
+}
+
+function getSessionTotalAwards(session) {
+  if (typeof session?.totalAwards === "number") {
+    return session.totalAwards
+  }
+
+  return Object.values(getSessionAwards(session))
+    .reduce((sum, count) => sum + count, 0)
+}
+
+function createAwardsHtml(session) {
+  const awards = getSessionAwards(session)
+  const awardDefs = [
+    ["Hat Trick", awards.hatTrick],
+    ["3 in the Black", awards.threeInTheBlack],
+    ["Ton 80", awards.ton80],
+    ["High Ton", awards.highTon],
+    ["Low Ton", awards.lowTon],
+    ["3 in the Bed", awards.threeInTheBed],
+    ["White Horse", awards.whiteHorse]
+  ]
+
+  const activeAwards = awardDefs.filter(([, count]) => count > 0)
+  if (!activeAwards.length) {
+    return '<div class="session-awards-empty">No Awards</div>'
+  }
+
+  return activeAwards
+    .map(([label, count]) => `
+      <div class="session-award-item">
+        <span class="session-award-label">${label}</span>
+        <span class="session-award-count">${count}</span>
+      </div>
+    `)
+    .join("")
+}
+
 function createSessionCardHtml(session, gameNumber) {
   const t = session.tripleHits || {}
   const roundChartHtml = createRoundChartHtml(session.rounds)
+  const awardsHtml = createAwardsHtml(session)
   const tripleHtml = `
     <div class="session-triple-grid">
       <div class="session-triple-item"><span class="session-triple-label">20:</span><span class="session-triple-value">${t[20] ?? 0}</span></div>
@@ -121,6 +229,11 @@ function createSessionCardHtml(session, gameNumber) {
           <div class="round-chart">${roundChartHtml}</div>
         </div>
       </div>
+    </div>
+
+    <div class="session-meta-block session-awards-block">
+      <div class="session-meta-title">Awards</div>
+      <div class="session-awards-grid">${awardsHtml}</div>
     </div>
   `
 }
@@ -209,12 +322,32 @@ function calcSummary(list) {
   const avgPPD = list.reduce((sum, s) => sum + s.ppd, 0) / games
   
   const totalBulls = list.reduce((sum, s) => sum + (s.bulls || 0), 0)
+  const awardCounts = list.reduce((acc, s) => {
+    const awards = getSessionAwards(s)
+    acc.hatTrick += awards.hatTrick || 0
+    acc.threeInTheBlack += awards.threeInTheBlack || 0
+    acc.ton80 += awards.ton80 || 0
+    acc.highTon += awards.highTon || 0
+    acc.lowTon += awards.lowTon || 0
+    acc.threeInTheBed += awards.threeInTheBed || 0
+    acc.whiteHorse += awards.whiteHorse || 0
+    return acc
+  }, {
+    hatTrick: 0,
+    threeInTheBlack: 0,
+    ton80: 0,
+    highTon: 0,
+    lowTon: 0,
+    threeInTheBed: 0,
+    whiteHorse: 0
+  })
   
   return {
     games,
     avgPPD: avgPPD.toFixed(2),
     totalBulls,
-    avgScore: avgScore.toFixed(1)
+    avgScore: avgScore.toFixed(1),
+    awardCounts
   }
 }
 

@@ -40,9 +40,22 @@
 <main class="data-container">
   <div id="leftPanel">
     <section id="statsContainer"></section>
+    <section id="calendarContainer" style="display:none;"></section>
     <section id="chartContainer" style="display:none;">
       <h3>Score Trend (Last 30 Games)</h3>
       <canvas id="scoreChart"></canvas>
+
+      <div id="rangeChartSection" class="range-chart-section" style="display:none;">
+        <h3>Score Trend (Selected Period)</h3>
+        <div class="range-chart-controls">
+          <label for="rangeStartDate">Start</label>
+          <input id="rangeStartDate" type="date" />
+          <label for="rangeEndDate">End</label>
+          <input id="rangeEndDate" type="date" />
+          <button id="rangeApplyBtn" type="button">Apply</button>
+        </div>
+        <canvas id="rangeScoreChart"></canvas>
+      </div>
     </section>
   </div>
   <div id="rightPanel">
@@ -65,6 +78,30 @@
 </div>
 </div>
 </main>
+
+    <div id="groupNoteModal" class="group-note-modal" style="display:none;">
+      <div class="group-note-dialog">
+        <div class="group-note-header">
+          <h3 id="groupNoteTitle">Group Memo</h3>
+          <button id="groupNoteCloseBtn" type="button">×</button>
+        </div>
+
+        <label class="group-note-label" for="groupNoteComment">Comment</label>
+        <textarea id="groupNoteComment" rows="5" placeholder="その日の調子、設定変更、飲酒有無などをメモ"></textarea>
+
+        <label class="group-note-label" for="groupNoteTags">Tags (comma or space)</label>
+        <input id="groupNoteTags" type="text" placeholder="例: 飲酒, 重いバレル, グリップ浅め" />
+
+        <label class="group-note-label" for="groupNoteImageInput">Setup Image</label>
+        <input id="groupNoteImageInput" type="file" accept="image/*" />
+        <img id="groupNotePreview" class="group-note-preview-image" alt="preview" style="display:none;" />
+
+        <div class="group-note-actions">
+          <button id="groupNoteDeleteImageBtn" type="button">画像削除</button>
+          <button id="groupNoteSaveBtn" type="button">保存</button>
+        </div>
+      </div>
+    </div>
 
     <div id="menuOverlay" class="menu-overlay"></div>
 

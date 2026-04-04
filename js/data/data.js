@@ -11,7 +11,7 @@ function changeView(mode) {
 
   if (mode === 'game') {
     // Game ビューに戻す
-    statsContainer.style.display = "block"
+    statsContainer.style.display = "flex"
     chartContainer.style.display = "block"
     currentPage = 1
     groupedPageMode = 'game'
@@ -41,7 +41,7 @@ function renderView() {
   const chartContainer = document.getElementById("chartContainer")
   
   if (viewMode === "game") {
-    statsContainer.style.display = "block"
+    statsContainer.style.display = "flex"
     chartContainer.style.display = "block"
     loadStats(viewMode)
     loadSessions()

@@ -15,7 +15,7 @@ function showGameDetails(dateKey, gamesList) {
   chartContainer.style.display = "block"
   
   const statsContainer = document.getElementById("statsContainer")
-  statsContainer.style.display = "block"
+  statsContainer.style.display = "flex"
   statsContainer.innerHTML = ""
   
   // グループ期間のスタッツを表示

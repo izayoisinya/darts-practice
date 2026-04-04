@@ -38,12 +38,16 @@
     </header>
 
 <main class="data-container">
-  <section id="statsContainer"></section>
-  <section id="chartContainer" style="display:none;">
-    <h3 style="margin:16px 0 8px;">Score Trend (Last 30 Games)</h3>
-    <canvas id="scoreChart" style="width:100%; height:220px; border:1px solid #333; border-radius:4px;"></canvas>
-  </section>
-  <section id="sessionsContainer"></section>
+  <div id="leftPanel">
+    <section id="statsContainer"></section>
+    <section id="chartContainer" style="display:none;">
+      <h3>Score Trend (Last 30 Games)</h3>
+      <canvas id="scoreChart"></canvas>
+    </section>
+  </div>
+  <div id="rightPanel">
+    <section id="sessionsContainer"></section>
+  </div>
   <!-- タブボタンを右下に配置 -->
   <!-- フッター：ページネーションとタブを同じ行に配置 -->
 <div class="footer-bar">

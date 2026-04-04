@@ -59,42 +59,23 @@ function displayDetailPage() {
     `
     container.appendChild(gameDiv)
   })
-  
-  // ページネーション
-  renderDetailPagination(selectedDayData.gamesList.length)
+
+  updateDetailPaginationUI()
 }
 
-function renderDetailPagination(total) {
-  
-  const PAGE_SIZE = 10
-  const totalPages = Math.ceil(total / PAGE_SIZE)
-  
-  let html = `
-    <div style="display:flex; gap:10px; margin:20px 0; justify-content:center;">
-  `
-  
-  html += `
-    <button onclick="changeDetailPage(${detailPageNumber - 1})"
-      ${detailPageNumber === 1 ? "disabled" : ""}>
-      Prev
-    </button>
-  `
-  
-  html += `
-    <span>${detailPageNumber} / ${totalPages}</span>
-  `
-  
-  html += `
-    <button onclick="changeDetailPage(${detailPageNumber + 1})"
-      ${detailPageNumber === totalPages ? "disabled" : ""}>
-      Next
-    </button>
-  `
-  
-  html += `</div>`
-  
-  document.getElementById("sessionsContainer")
-    .insertAdjacentHTML("beforeend", html)
+function updateDetailPaginationUI() {
+  if (!selectedDayData || !selectedDayData.gamesList) return
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(selectedDayData.gamesList.length / PAGE_SIZE)
+  )
+
+  document.getElementById('pageInfo').textContent =
+    `${detailPageNumber} / ${totalPages}`
+
+  document.getElementById('prevBtn').disabled = detailPageNumber === 1
+  document.getElementById('nextBtn').disabled = detailPageNumber === totalPages
 }
 
 function changeDetailPage(page) {

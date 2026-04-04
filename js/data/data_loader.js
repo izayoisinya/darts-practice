@@ -181,6 +181,22 @@ function renderPagination(total) {
 }
 
 function changePage(direction) {
+  if (detailViewMode && selectedDayData && selectedDayData.gamesList) {
+    const totalPages = Math.max(
+      1,
+      Math.ceil(selectedDayData.gamesList.length / PAGE_SIZE)
+    )
+    let newPage = detailPageNumber
+
+    if (direction === 'Prev') newPage--
+    if (direction === 'Next') newPage++
+
+    if (newPage >= 1 && newPage <= totalPages) {
+      changeDetailPage(newPage)
+    }
+    return
+  }
+
   if (groupedPageMode === 'game') {
     // Game ビュー
     const sessions = JSON.parse(

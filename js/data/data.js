@@ -5,9 +5,12 @@ function changeView(mode) {
   detailViewMode = false
   selectedDayData = null
   detailPageNumber = 1
+  
+  const statsContainer = document.getElementById("statsContainer")
 
   if (mode === 'game') {
     // Game ビューに戻す
+    statsContainer.style.display = "block"
     currentPage = 1
     groupedPageMode = 'game'
     
@@ -21,6 +24,7 @@ function changeView(mode) {
     updatePaginationUI(totalPages)
   } else {
     // Group ビュー（Day/Week/Month/Year）
+    statsContainer.style.display = "none"
     displayGroupView(mode)
     window.scrollTo(0, 0)
   }

@@ -1,6 +1,8 @@
 let viewMode = "game" 
 
 function changeView(mode) {
+  viewMode = mode
+
   if (mode === 'game') {
     // Game ビューに戻す
     currentPage = 1

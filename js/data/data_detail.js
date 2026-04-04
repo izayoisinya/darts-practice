@@ -111,5 +111,12 @@ function changeDetailPage(page) {
 function backToSummary() {
   detailViewMode = false
   selectedDayData = null
+
+  if (groupedPageMode && groupedPageMode !== 'game' && groupedPageData.length > 0) {
+    displayGroupedPage(groupedPageMode, groupedPageData)
+    renderGroupedPagination(groupedPageData.length)
+    return
+  }
+
   renderView()
 }

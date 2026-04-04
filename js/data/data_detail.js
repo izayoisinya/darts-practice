@@ -11,6 +11,9 @@ function showGameDetails(dateKey, gamesList) {
   selectedDayData = { dateKey, gamesList }
   detailPageNumber = 1
   
+  const chartContainer = document.getElementById("chartContainer")
+  chartContainer.style.display = "block"
+  
   displayDetailPage()
 }
 
@@ -76,6 +79,7 @@ function displayDetailPage() {
   })
 
   updateDetailPaginationUI()
+  drawDetailGroupChart(selectedDayData.gamesList)
 }
 
 function updateDetailPaginationUI() {
@@ -106,6 +110,9 @@ function changeDetailPage(page) {
 
 function backToSummary() {
   detailViewMode = false
+  
+  const chartContainer = document.getElementById("chartContainer")
+  chartContainer.style.display = "none"
   selectedDayData = null
 
   if (groupedPageMode && groupedPageMode !== 'game' && groupedPageData.length > 0) {

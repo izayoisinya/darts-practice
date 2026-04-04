@@ -7,10 +7,12 @@ function changeView(mode) {
   detailPageNumber = 1
   
   const statsContainer = document.getElementById("statsContainer")
+  const chartContainer = document.getElementById("chartContainer")
 
   if (mode === 'game') {
     // Game ビューに戻す
     statsContainer.style.display = "block"
+    chartContainer.style.display = "block"
     currentPage = 1
     groupedPageMode = 'game'
     
@@ -22,9 +24,11 @@ function changeView(mode) {
     
     loadSessions()
     updatePaginationUI(totalPages)
+    drawGameScoresChart()
   } else {
     // Group ビュー（Day/Week/Month/Year）
     statsContainer.style.display = "none"
+    chartContainer.style.display = "none"
     displayGroupView(mode)
     window.scrollTo(0, 0)
   }
@@ -33,14 +37,18 @@ function changeView(mode) {
 function renderView() {
   
   const statsContainer = document.getElementById("statsContainer")
+  const chartContainer = document.getElementById("chartContainer")
   
   if (viewMode === "game") {
     statsContainer.style.display = "block"
+    chartContainer.style.display = "block"
     loadStats(viewMode)
     loadSessions()
+    drawGameScoresChart()
   } else {
     statsContainer.style.display = "none"
-    renderGroupedPaginated(viewMode) // ← ここを変更
+    chartContainer.style.display = "none"
+    renderGroupedPaginated(viewMode)
   }
   
 }
@@ -150,4 +158,179 @@ function generateTestData(days = 60) {
   localStorage.setItem("dartsSessions", JSON.stringify(sessions))
   
   console.log("テストデータ生成完了:", sessions.length)
+}
+
+function drawGameScoresChart() {
+  const canvas = document.getElementById("scoreChart")
+  if (!canvas) return
+  
+  const sessions = JSON.parse(
+    localStorage.getItem("dartsSessions")
+  ) || []
+  
+  if (sessions.length === 0) {
+    const ctx = canvas.getContext("2d")
+    ctx.fillStyle = "rgba(255,255,255,0.3)"
+    ctx.fillText("No data", 10, 20)
+    return
+  }
+  
+  // 直近30試合を取得（新しい順）
+  const last30 = sessions.slice(-30).reverse()
+  const scores = last30.map(s => s.score)
+  
+  // Canvas のサイズを取得
+  if (!canvas.offsetWidth || !canvas.offsetHeight) {
+    setTimeout(() => drawGameScoresChart(), 100)
+    return
+  }
+  
+  const width = canvas.width = canvas.offsetWidth
+  const height = canvas.height = canvas.offsetHeight || 220
+  
+  const padding = 45
+  const graphWidth = width - padding * 2
+  const graphHeight = height - padding * 2
+  
+  const ctx = canvas.getContext("2d")
+  
+  // 背景をクリア
+  ctx.clearRect(0, 0, width, height)
+  
+  // スコアの最小値と最大値
+  const minScore = Math.min(...scores)
+  const maxScore = Math.max(...scores)
+  const scoreRange = maxScore - minScore || 1
+  
+  // 横グリッド（スコアラベル）
+  ctx.strokeStyle = "rgba(255,255,255,0.08)"
+  ctx.lineWidth = 1
+  
+  const gridSteps = 4
+  for (let i = 0; i <= gridSteps; i++) {
+    const value = minScore + (scoreRange / gridSteps) * i
+    const y = height - padding - (value - minScore) / scoreRange * graphHeight
+    
+    ctx.beginPath()
+    ctx.moveTo(padding, y)
+    ctx.lineTo(width - padding, y)
+    ctx.stroke()
+    
+    ctx.fillStyle = "rgba(255,255,255,0.4)"
+    ctx.font = "12px sans-serif"
+    ctx.textAlign = "right"
+    ctx.fillText(Math.round(value), padding - 5, y + 4)
+  }
+  
+  // 折れ線
+  const stepX = graphWidth / (scores.length - 1 || 1)
+  
+  ctx.beginPath()
+  ctx.lineWidth = 2
+  ctx.strokeStyle = "#4CAF50"
+  
+  scores.forEach((score, i) => {
+    const x = padding + stepX * i
+    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
+    
+    if (i === 0) {
+      ctx.moveTo(x, y)
+    } else {
+      ctx.lineTo(x, y)
+    }
+  })
+  
+  ctx.stroke()
+  
+  // ポイント
+  scores.forEach((score, i) => {
+    const x = padding + stepX * i
+    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
+    
+    ctx.beginPath()
+    ctx.arc(x, y, 3, 0, Math.PI * 2)
+    ctx.fillStyle = "#4CAF50"
+    ctx.fill()
+  })
+}
+
+function drawDetailGroupChart(gamesList) {
+  const canvas = document.getElementById("scoreChart")
+  if (!canvas || !gamesList || gamesList.length === 0) return
+  
+  // Canvas のサイズを取得
+  if (!canvas.offsetWidth || !canvas.offsetHeight) {
+    setTimeout(() => drawDetailGroupChart(gamesList), 100)
+    return
+  }
+  
+  const scores = gamesList.map(s => s.score)
+  
+  const width = canvas.width = canvas.offsetWidth
+  const height = canvas.height = canvas.offsetHeight || 220
+  
+  const padding = 45
+  const graphWidth = width - padding * 2
+  const graphHeight = height - padding * 2
+  
+  const ctx = canvas.getContext("2d")
+  
+  // 背景をクリア
+  ctx.clearRect(0, 0, width, height)
+  
+  // スコアの最小値と最大値
+  const minScore = Math.min(...scores)
+  const maxScore = Math.max(...scores)
+  const scoreRange = maxScore - minScore || 1
+  
+  // 横グリッド
+  ctx.strokeStyle = "rgba(255,255,255,0.08)"
+  ctx.lineWidth = 1
+  
+  const gridSteps = 4
+  for (let i = 0; i <= gridSteps; i++) {
+    const value = minScore + (scoreRange / gridSteps) * i
+    const y = height - padding - (value - minScore) / scoreRange * graphHeight
+    
+    ctx.beginPath()
+    ctx.moveTo(padding, y)
+    ctx.lineTo(width - padding, y)
+    ctx.stroke()
+    
+    ctx.fillStyle = "rgba(255,255,255,0.4)"
+    ctx.font = "12px sans-serif"
+    ctx.textAlign = "right"
+    ctx.fillText(Math.round(value), padding - 5, y + 4)
+  }
+  
+  // 折れ線
+  const stepX = graphWidth / (scores.length - 1 || 1)
+  
+  ctx.beginPath()
+  ctx.lineWidth = 2
+  ctx.strokeStyle = "#4CAF50"
+  
+  scores.forEach((score, i) => {
+    const x = padding + stepX * i
+    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
+    
+    if (i === 0) {
+      ctx.moveTo(x, y)
+    } else {
+      ctx.lineTo(x, y)
+    }
+  })
+  
+  ctx.stroke()
+  
+  // ポイント
+  scores.forEach((score, i) => {
+    const x = padding + stepX * i
+    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
+    
+    ctx.beginPath()
+    ctx.arc(x, y, 3, 0, Math.PI * 2)
+    ctx.fillStyle = "#4CAF50"
+    ctx.fill()
+  })
 }

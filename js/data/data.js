@@ -2,6 +2,9 @@ let viewMode = "game"
 
 function changeView(mode) {
   viewMode = mode
+  detailViewMode = false
+  selectedDayData = null
+  detailPageNumber = 1
 
   if (mode === 'game') {
     // Game ビューに戻す
@@ -19,6 +22,7 @@ function changeView(mode) {
   } else {
     // Group ビュー（Day/Week/Month/Year）
     displayGroupView(mode)
+    window.scrollTo(0, 0)
   }
 }
 

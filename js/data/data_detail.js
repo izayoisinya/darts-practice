@@ -43,6 +43,7 @@ function displayDetailPage() {
   pageData.forEach((game, idx) => {
     const gameDiv = document.createElement("div")
     const t = game.tripleHits || {}
+    const gameNumber = start + idx + 1
     
     gameDiv.style.marginBottom = "20px"
     gameDiv.style.padding = "10px"
@@ -50,7 +51,7 @@ function displayDetailPage() {
     gameDiv.style.borderRadius = "8px"
     
     gameDiv.innerHTML = `
-      <div><strong>ゲーム ${idx + 1}</strong></div>
+      <div><strong>ゲーム ${gameNumber}</strong></div>
       <div>Score: ${game.score}</div>
       <div>PPD: ${game.ppd}</div>
       <div>Bulls: ${game.bulls ?? "-"}</div>

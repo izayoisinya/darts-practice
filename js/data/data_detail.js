@@ -56,36 +56,11 @@ function displayDetailPage() {
   // ゲーム一覧
   pageData.forEach((game, idx) => {
     const gameDiv = document.createElement("div")
-    const t = game.tripleHits || {}
     const totalGames = selectedDayData.gamesList.length
     const globalIndex = start + idx
     const gameNumber = totalGames - globalIndex
-    const roundsText = (game.rounds || [])
-      .map((r, i) => {
-        const score = (r || []).reduce((sum, d) => sum + (d?.score || 0), 0)
-        return `R${i + 1}: ${score}`
-      })
-      .join("<br>")
-    
-    gameDiv.style.marginBottom = "20px"
-    gameDiv.style.padding = "10px"
-    gameDiv.style.border = "1px solid #333"
-    gameDiv.style.borderRadius = "8px"
-    
-    gameDiv.innerHTML = `
-      <div><strong>Game ${gameNumber}</strong></div>
-      <div>Score: ${game.score}</div>
-      <div>PPD: ${game.ppd}</div>
-      <div>Round Avg: ${game.roundAvg ?? "-"}</div>
-      <div>Bulls: ${game.bulls ?? "-"}</div>
-      <div>Inner Bulls: ${game.innerBulls ?? "-"}</div>
-      <div>Bull Rate: ${game.bullRate ?? "-"}%</div>
-      <div>Inner Rate: ${game.innerRate ?? "-"}%</div>
-      <div>--- Triple ---</div>
-      <div>T20: ${t[20] ?? 0} / T19: ${t[19] ?? 0} / T18: ${t[18] ?? 0} / T17: ${t[17] ?? 0} / T16: ${t[16] ?? 0} / T15: ${t[15] ?? 0}</div>
-      <div style="margin-top:6px">${roundsText}</div>
-      <div>${new Date(game.date).toLocaleString()}</div>
-    `
+    gameDiv.className = "session-card"
+    gameDiv.innerHTML = createSessionCardHtml(game, gameNumber)
     container.appendChild(gameDiv)
   })
 

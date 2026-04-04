@@ -1,3 +1,130 @@
+function createRoundChartHtml(rounds) {
+  const scores = (rounds || []).map(round =>
+    (round || []).reduce((sum, dart) => sum + (dart?.score || 0), 0)
+  )
+  const n = scores.length
+  if (n === 0) return '<svg class="round-line-chart" viewBox="0 0 240 120" preserveAspectRatio="none"></svg>'
+
+  const svgW = 240, svgH = 120
+  const mTop = 16, mRight = 8, mBottom = 20, mLeft = 8
+  const chartW = svgW - mLeft - mRight
+  const chartH = svgH - mTop - mBottom
+  const maxScore = 180
+  const xStep = n > 1 ? chartW / (n - 1) : 0
+
+  const pts = scores.map((s, i) => ({
+    x: mLeft + i * xStep,
+    y: mTop + (1 - s / maxScore) * chartH,
+    s
+  }))
+
+  const polyPoints = pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
+  const baseY = mTop + chartH
+  const areaPoints =
+    `${pts[0].x.toFixed(1)},${baseY} ` +
+    pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ') +
+    ` ${pts[n - 1].x.toFixed(1)},${baseY}`
+
+  const gridLines = [60, 120, 180].map(v => {
+    const y = (mTop + (1 - v / maxScore) * chartH).toFixed(1)
+    return `<line x1="${mLeft}" y1="${y}" x2="${svgW - mRight}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`
+  }).join('')
+
+  const valueLabels = pts.map(p =>
+    `<text x="${p.x.toFixed(1)}" y="${(p.y - 5).toFixed(1)}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.7)">${p.s}</text>`
+  ).join('')
+
+  const xLabels = pts.map((p, i) =>
+    `<text x="${p.x.toFixed(1)}" y="${svgH - 4}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.5)">R${i + 1}</text>`
+  ).join('')
+
+  const dots = pts.map(p =>
+    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="var(--accent)" stroke="#11151c" stroke-width="1.5"/>`
+  ).join('')
+
+  return `<svg class="round-line-chart" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="none">
+    ${gridLines}
+    <polygon points="${areaPoints}" fill="var(--accent)" fill-opacity="0.15"/>
+    <polyline points="${polyPoints}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${valueLabels}
+    ${xLabels}
+    ${dots}
+  </svg>`
+}
+
+function createSessionCardHtml(session, gameNumber) {
+  const t = session.tripleHits || {}
+  const roundChartHtml = createRoundChartHtml(session.rounds)
+  const tripleHtml = `
+    <div class="session-triple-grid">
+      <div class="session-triple-item"><span class="session-triple-label">20:</span><span class="session-triple-value">${t[20] ?? 0}</span></div>
+      <div class="session-triple-item"><span class="session-triple-label">17:</span><span class="session-triple-value">${t[17] ?? 0}</span></div>
+      <div class="session-triple-item"><span class="session-triple-label">19:</span><span class="session-triple-value">${t[19] ?? 0}</span></div>
+      <div class="session-triple-item"><span class="session-triple-label">16:</span><span class="session-triple-value">${t[16] ?? 0}</span></div>
+      <div class="session-triple-item"><span class="session-triple-label">18:</span><span class="session-triple-value">${t[18] ?? 0}</span></div>
+      <div class="session-triple-item"><span class="session-triple-label">15:</span><span class="session-triple-value">${t[15] ?? 0}</span></div>
+    </div>
+  `
+
+  return `
+    <div class="session-card-header">
+      <strong>Game ${gameNumber}</strong>
+      <span class="session-date">${new Date(session.date).toLocaleString()}</span>
+    </div>
+
+    <div class="session-card-body">
+      <div class="session-main-block">
+        <div class="session-kpi-grid">
+          <div class="session-kpi-item">
+            <span class="session-kpi-label">Score</span>
+            <span class="session-kpi-value">${session.score}</span>
+          </div>
+          <div class="session-kpi-item">
+            <span class="session-kpi-label">PPD</span>
+            <span class="session-kpi-value">${session.ppd}</span>
+          </div>
+          <div class="session-kpi-item">
+            <span class="session-kpi-label">Round Avg</span>
+            <span class="session-kpi-value">${session.roundAvg ?? "-"}</span>
+          </div>
+        </div>
+
+        <div class="session-rate-group">
+          <div class="stat-row session-stat-row">
+            <span class="label">Bull</span>
+            <span class="count">${session.bulls ?? 0}</span>
+            <div class="bar-bg">
+              <div class="bar-fill" style="width:${session.bullRate ?? 0}%"></div>
+            </div>
+            <span class="percent">${session.bullRate ?? 0}%</span>
+          </div>
+
+          <div class="stat-row session-stat-row">
+            <span class="label">In</span>
+            <span class="count">${session.innerBulls ?? 0}</span>
+            <div class="bar-bg">
+              <div class="bar-fill inner" style="width:${session.innerRate ?? 0}%"></div>
+            </div>
+            <span class="percent">${session.innerRate ?? 0}%</span>
+          </div>
+        </div>
+
+        <div class="session-meta-block">
+          <div class="session-meta-title">Triple</div>
+          ${tripleHtml}
+        </div>
+      </div>
+
+      <div class="session-side-block">
+        <div class="session-meta-block">
+          <div class="session-meta-title">Round Scores</div>
+          <div class="round-chart">${roundChartHtml}</div>
+        </div>
+      </div>
+    </div>
+  `
+}
+
 function loadSessions() {
   
   const sessions = JSON.parse(
@@ -20,50 +147,12 @@ function loadSessions() {
   const pageData = reversed.slice(start, end)
   
   pageData.forEach((s, index) => {
-    
-    const t = s.tripleHits || {}
-    
     const div = document.createElement("div")
-    
-    div.style.marginBottom = "20px"
-    div.style.padding = "10px"
-    div.style.border = "1px solid #333"
+    div.className = "session-card"
     
     const globalIndex = start + index
     const gameNumber = sessions.length - globalIndex
-    
-    const roundsText = s.rounds.map((r, i) => {
-      const score = r.reduce((sum, d) => sum + (d?.score || 0), 0)
-      return `R${i+1}: ${score}`
-    }).join("<br>")
-    
-    div.innerHTML = `
-    <div><strong>Game ${gameNumber}</strong></div>
-    
-    <div>Score: ${s.score}</div>
-    <div>PPD: ${s.ppd}</div>
-    <div>Round Avg: ${s.roundAvg ?? "-"}</div>
-    
-    <div>Bulls: ${s.bulls ?? "-"}</div>
-    <div>Inner Bulls: ${s.innerBulls ?? "-"}</div>
-    
-    <div>Bull Rate: ${s.bullRate ?? "-"}%</div>
-    <div>Inner Rate: ${s.innerRate ?? "-"}%</div>
-    
-    <div>--- Triple ---</div>
-    <div>
-      T20: ${t[20] ?? 0}
-      T19: ${t[19] ?? 0}
-      T18: ${t[18] ?? 0}
-      T17: ${t[17] ?? 0}
-      T16: ${t[16] ?? 0}
-      T15: ${t[15] ?? 0}
-    </div>
-    
-    <div style="margin-top:6px">${roundsText}</div>
-    
-    <div>${new Date(s.date).toLocaleString()}</div>
-  `
+    div.innerHTML = createSessionCardHtml(s, gameNumber)
     
     container.appendChild(div)
   })

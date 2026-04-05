@@ -120,10 +120,16 @@ function loadStats() {
     sessions.reduce((a, b) => a + b.ppd, 0) / games
   ).toFixed(2)
   
+  const ratings = calculateRatings(sessions)
+  const rtLabel  = `RT ${ratings.rt}  (PPD ${ratings.ppd.toFixed(2)})`
+  const phxLabel = `RATING ${ratings.phx}  (PPD ${ratings.ppd.toFixed(2)})`
+
   addStat(statsContainer, "Games Played", games)
   addStat(statsContainer, "Best Game", bestGame)
   addStat(statsContainer, "Average PPD", avgPPD)
   addStat(statsContainer, "Total Bulls", totalBulls)
+  addStat(statsContainer, "DartsLive RT ※", rtLabel)
+  addStat(statsContainer, "Phoenix ※", phxLabel)
 
   addStat(awardsContainer, "Hat Trick", awardCounts.hatTrick)
   addStat(awardsContainer, "3 in Black", awardCounts.threeInTheBlack)

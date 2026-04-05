@@ -54,12 +54,21 @@
       <div id="rangeChartSection" class="range-chart-section" style="display:none;">
         <h3>Score Trend (Selected Period)</h3>
         <div class="range-chart-controls">
-          <label for="rangeStartDate">Start</label>
-          <input id="rangeStartDate" type="date" />
-          <label for="rangeEndDate">End</label>
-          <input id="rangeEndDate" type="date" />
-          <button id="rangeApplyBtn" type="button">Apply</button>
+          <div class="range-chart-row">
+            <label for="rangeStartDate">A Start</label>
+            <input id="rangeStartDate" type="date" />
+            <label for="rangeEndDate">A End</label>
+            <input id="rangeEndDate" type="date" />
+          </div>
+          <div class="range-chart-row">
+            <label for="compareStartDate">B Start</label>
+            <input id="compareStartDate" type="date" />
+            <label for="compareEndDate">B End</label>
+            <input id="compareEndDate" type="date" />
+            <button id="rangeApplyBtn" type="button">Apply</button>
+          </div>
         </div>
+        <div id="rangeChartLegend" class="range-chart-legend" style="display:none;"></div>
         <canvas id="rangeScoreChart"></canvas>
       </div>
     </section>

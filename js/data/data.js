@@ -476,12 +476,16 @@ function wireRangeChartControls() {
 
   const startInput = document.getElementById("rangeStartDate")
   const endInput = document.getElementById("rangeEndDate")
+  const compareStartInput = document.getElementById("compareStartDate")
+  const compareEndInput = document.getElementById("compareEndDate")
   const applyBtn = document.getElementById("rangeApplyBtn")
-  if (!startInput || !endInput || !applyBtn) return
+  if (!startInput || !endInput || !compareStartInput || !compareEndInput || !applyBtn) return
 
   applyBtn.onclick = drawSelectedRangeChart
   startInput.onchange = drawSelectedRangeChart
   endInput.onchange = drawSelectedRangeChart
+  compareStartInput.onchange = drawSelectedRangeChart
+  compareEndInput.onchange = drawSelectedRangeChart
 
   rangeChartWired = true
 }
@@ -496,7 +500,9 @@ function formatDateInput(date) {
 function ensureRangeDefaults(sessions) {
   const startInput = document.getElementById("rangeStartDate")
   const endInput = document.getElementById("rangeEndDate")
-  if (!startInput || !endInput || !sessions.length) return
+  const compareStartInput = document.getElementById("compareStartDate")
+  const compareEndInput = document.getElementById("compareEndDate")
+  if (!startInput || !endInput || !compareStartInput || !compareEndInput || !sessions.length) return
 
   const sorted = sessions
     .filter(s => !Number.isNaN(new Date(s.date).getTime()))
@@ -508,8 +514,127 @@ function ensureRangeDefaults(sessions) {
   const defaultStart = new Date(last30[0].date)
   const defaultEnd = new Date(last30[last30.length - 1].date)
 
+  const dayMs = 24 * 60 * 60 * 1000
+  const durationDays = Math.max(1, Math.floor((defaultEnd - defaultStart) / dayMs) + 1)
+  const compareDefaultEnd = new Date(defaultStart.getTime() - dayMs)
+  const compareDefaultStart = new Date(compareDefaultEnd.getTime() - (durationDays - 1) * dayMs)
+
   if (!startInput.value) startInput.value = formatDateInput(defaultStart)
   if (!endInput.value) endInput.value = formatDateInput(defaultEnd)
+  if (!compareStartInput.value) compareStartInput.value = formatDateInput(compareDefaultStart)
+  if (!compareEndInput.value) compareEndInput.value = formatDateInput(compareDefaultEnd)
+}
+
+function parseDateStart(inputValue) {
+  return inputValue ? new Date(`${inputValue}T00:00:00`) : null
+}
+
+function parseDateEnd(inputValue) {
+  return inputValue ? new Date(`${inputValue}T23:59:59`) : null
+}
+
+function dayKey(date) {
+  return formatDateInput(date)
+}
+
+function dateFromDayKey(key) {
+  return new Date(`${key}T00:00:00`)
+}
+
+function addDays(date, days) {
+  return new Date(date.getTime() + days * 24 * 60 * 60 * 1000)
+}
+
+function filterSessionsByDate(sessions, startDate, endDate) {
+  return sessions.filter(s => {
+    const d = new Date(s.date)
+    if (Number.isNaN(d.getTime())) return false
+    if (startDate && d < startDate) return false
+    if (endDate && d > endDate) return false
+    return true
+  })
+}
+
+function buildDailyAverageMap(sessions) {
+  const byDay = {}
+
+  sessions.forEach(s => {
+    const d = new Date(s.date)
+    if (Number.isNaN(d.getTime())) return
+
+    const key = dayKey(d)
+    if (!byDay[key]) byDay[key] = { sum: 0, count: 0 }
+    byDay[key].sum += Number(s.score) || 0
+    byDay[key].count += 1
+  })
+
+  const avgMap = {}
+  Object.keys(byDay).forEach(key => {
+    const item = byDay[key]
+    avgMap[key] = item.count > 0 ? item.sum / item.count : null
+  })
+
+  return avgMap
+}
+
+function buildNormalizedDateSeries(startDate, endDate, avgMap, length) {
+  if (!startDate || !endDate || length <= 0) return []
+
+  const series = []
+  const startDay = dateFromDayKey(dayKey(startDate))
+  for (let i = 0; i < length; i++) {
+    const key = dayKey(addDays(startDay, i))
+    const value = Object.prototype.hasOwnProperty.call(avgMap, key) ? avgMap[key] : null
+    series.push(value)
+  }
+  return series
+}
+
+function buildDateLabels(startDate, length) {
+  if (!startDate || length <= 0) return []
+  const labels = []
+  const startDay = dateFromDayKey(dayKey(startDate))
+  for (let i = 0; i < length; i++) {
+    const d = addDays(startDay, i)
+    const m = String(d.getMonth() + 1)
+    const day = String(d.getDate())
+    labels.push(`${m}/${day}`)
+  }
+  return labels
+}
+
+function drawLineSeries(ctx, values, color, padding, height, graphHeight, minScore, scoreRange, stepX) {
+  let started = false
+  ctx.beginPath()
+  ctx.lineWidth = 2
+  ctx.strokeStyle = color
+
+  values.forEach((score, i) => {
+    if (score === null) {
+      started = false
+      return
+    }
+
+    const x = padding + stepX * i
+    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
+    if (!started) {
+      ctx.moveTo(x, y)
+      started = true
+    } else {
+      ctx.lineTo(x, y)
+    }
+  })
+  ctx.stroke()
+
+  values.forEach((score, i) => {
+    if (score === null) return
+    const x = padding + stepX * i
+    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
+    ctx.beginPath()
+    ctx.arc(x, y, 3, 0, Math.PI * 2)
+    ctx.fillStyle = color
+    ctx.fill()
+  })
 }
 
 function drawSelectedRangeChart() {
@@ -520,7 +645,10 @@ function drawSelectedRangeChart() {
   const canvas = document.getElementById("rangeScoreChart")
   const startInput = document.getElementById("rangeStartDate")
   const endInput = document.getElementById("rangeEndDate")
-  if (!canvas || !startInput || !endInput) return
+  const compareStartInput = document.getElementById("compareStartDate")
+  const compareEndInput = document.getElementById("compareEndDate")
+  const legend = document.getElementById("rangeChartLegend")
+  if (!canvas || !startInput || !endInput || !compareStartInput || !compareEndInput) return
 
   const sessions = JSON.parse(localStorage.getItem("dartsSessions")) || []
   ensureRangeDefaults(sessions)
@@ -535,30 +663,47 @@ function drawSelectedRangeChart() {
   const height = canvas.height = canvas.offsetHeight || 220
   ctx.clearRect(0, 0, width, height)
 
-  const startDate = startInput.value ? new Date(`${startInput.value}T00:00:00`) : null
-  const endDate = endInput.value ? new Date(`${endInput.value}T23:59:59`) : null
+  const startDate = parseDateStart(startInput.value)
+  const endDate = parseDateEnd(endInput.value)
+  const compareStartDate = parseDateStart(compareStartInput.value)
+  const compareEndDate = parseDateEnd(compareEndInput.value)
 
-  let filtered = sessions.filter(s => {
-    const d = new Date(s.date)
-    if (Number.isNaN(d.getTime())) return false
-    if (startDate && d < startDate) return false
-    if (endDate && d > endDate) return false
-    return true
-  }).sort((a, b) => new Date(a.date) - new Date(b.date))
-
-  const scores = filtered.map(s => s.score)
-  if (!scores.length) {
+  if ((startDate && endDate && startDate > endDate) || (compareStartDate && compareEndDate && compareStartDate > compareEndDate)) {
     ctx.fillStyle = "rgba(255,255,255,0.4)"
     ctx.font = "12px sans-serif"
-    ctx.fillText("No data in selected range", 12, 20)
+    ctx.fillText("Invalid date range", 12, 20)
+    if (legend) legend.style.display = "none"
+    return
+  }
+
+  const periodASessions = filterSessionsByDate(sessions, startDate, endDate)
+  const periodBSessions = filterSessionsByDate(sessions, compareStartDate, compareEndDate)
+
+  const avgA = buildDailyAverageMap(periodASessions)
+  const avgB = buildDailyAverageMap(periodBSessions)
+
+  const dayMs = 24 * 60 * 60 * 1000
+  const lenA = startDate && endDate ? Math.max(1, Math.floor((endDate - startDate) / dayMs) + 1) : 0
+  const lenB = compareStartDate && compareEndDate ? Math.max(1, Math.floor((compareEndDate - compareStartDate) / dayMs) + 1) : 0
+  const length = Math.max(lenA, lenB)
+
+  const seriesA = buildNormalizedDateSeries(startDate, endDate, avgA, length)
+  const seriesB = buildNormalizedDateSeries(compareStartDate, compareEndDate, avgB, length)
+
+  const allScores = [...seriesA, ...seriesB].filter(v => v !== null)
+  if (!allScores.length) {
+    ctx.fillStyle = "rgba(255,255,255,0.4)"
+    ctx.font = "12px sans-serif"
+    ctx.fillText("No data in selected ranges", 12, 20)
+    if (legend) legend.style.display = "none"
     return
   }
 
   const padding = 45
   const graphWidth = width - padding * 2
   const graphHeight = height - padding * 2
-  const minScore = Math.min(...scores)
-  const maxScore = Math.max(...scores)
+  const minScore = Math.min(...allScores)
+  const maxScore = Math.max(...allScores)
   const scoreRange = maxScore - minScore || 1
 
   ctx.strokeStyle = "rgba(255,255,255,0.08)"
@@ -578,24 +723,26 @@ function drawSelectedRangeChart() {
     ctx.fillText(Math.round(value), padding - 5, y + 4)
   }
 
-  const stepX = graphWidth / (scores.length - 1 || 1)
-  ctx.beginPath()
-  ctx.lineWidth = 2
-  ctx.strokeStyle = "#7bc96f"
-  scores.forEach((score, i) => {
+  const stepX = graphWidth / (length - 1 || 1)
+  const labels = buildDateLabels(startDate || compareStartDate, length)
+  const labelStep = Math.max(1, Math.ceil(length / 6))
+  ctx.fillStyle = "rgba(255,255,255,0.45)"
+  ctx.font = "11px sans-serif"
+  ctx.textAlign = "center"
+  labels.forEach((label, i) => {
+    if (i % labelStep !== 0 && i !== labels.length - 1) return
     const x = padding + stepX * i
-    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
-    if (i === 0) ctx.moveTo(x, y)
-    else ctx.lineTo(x, y)
+    ctx.fillText(label, x, height - 8)
   })
-  ctx.stroke()
 
-  scores.forEach((score, i) => {
-    const x = padding + stepX * i
-    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
-    ctx.beginPath()
-    ctx.arc(x, y, 3, 0, Math.PI * 2)
-    ctx.fillStyle = "#7bc96f"
-    ctx.fill()
-  })
+  drawLineSeries(ctx, seriesA, "#7bc96f", padding, height, graphHeight, minScore, scoreRange, stepX)
+  drawLineSeries(ctx, seriesB, "#4da3ff", padding, height, graphHeight, minScore, scoreRange, stepX)
+
+  if (legend) {
+    legend.innerHTML = `
+      <span class="range-chart-legend-item"><span class="range-chart-legend-swatch a"></span>A: ${startInput.value} - ${endInput.value}</span>
+      <span class="range-chart-legend-item"><span class="range-chart-legend-swatch b"></span>B: ${compareStartInput.value} - ${compareEndInput.value}</span>
+    `
+    legend.style.display = "flex"
+  }
 }

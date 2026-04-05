@@ -18,6 +18,10 @@ function showGameDetails(dateKey, gamesList) {
   statsContainer.style.display = "flex"
   statsContainer.innerHTML = ""
 
+  const awardsContainer = document.getElementById("awardsContainer")
+  awardsContainer.style.display = "flex"
+  awardsContainer.innerHTML = ""
+
   const calendarContainer = document.getElementById("calendarContainer")
   calendarContainer.style.display = "none"
   calendarContainer.innerHTML = ""
@@ -27,13 +31,14 @@ function showGameDetails(dateKey, gamesList) {
   addStat(statsContainer, "Avg Score", summary.avgScore)
   addStat(statsContainer, "Avg PPD", summary.avgPPD)
   addStat(statsContainer, "Total Bulls", summary.totalBulls)
-  addStat(statsContainer, "Hat Trick", summary.awardCounts.hatTrick)
-  addStat(statsContainer, "3 in Black", summary.awardCounts.threeInTheBlack)
-  addStat(statsContainer, "Ton 80", summary.awardCounts.ton80)
-  addStat(statsContainer, "High Ton", summary.awardCounts.highTon)
-  addStat(statsContainer, "Low Ton", summary.awardCounts.lowTon)
-  addStat(statsContainer, "3 in Bed", summary.awardCounts.threeInTheBed)
-  addStat(statsContainer, "White Horse", summary.awardCounts.whiteHorse)
+
+  addStat(awardsContainer, "Hat Trick", summary.awardCounts.hatTrick)
+  addStat(awardsContainer, "3 in Black", summary.awardCounts.threeInTheBlack)
+  addStat(awardsContainer, "Ton 80", summary.awardCounts.ton80)
+  addStat(awardsContainer, "High Ton", summary.awardCounts.highTon)
+  addStat(awardsContainer, "Low Ton", summary.awardCounts.lowTon)
+  addStat(awardsContainer, "3 in Bed", summary.awardCounts.threeInTheBed)
+  addStat(awardsContainer, "White Horse", summary.awardCounts.whiteHorse)
 
   displayDetailPage()
 }
@@ -47,7 +52,7 @@ function displayDetailPage() {
   const start = (detailPageNumber - 1) * PAGE_SIZE
   const end = start + PAGE_SIZE
   
-  const pageData = selectedDayData.gamesList.slice(start, end)
+  const pageData = selectedDayData.gamesList.slice(start, end).reverse()
   const dayNoteMap = getDayNoteMapForDetail()
 
   const label = getDetailGroupLabel(groupedPageMode, selectedDayData.dateKey)
@@ -88,8 +93,7 @@ function displayDetailPage() {
   pageData.forEach((game, idx) => {
     const gameDiv = document.createElement("div")
     const totalGames = selectedDayData.gamesList.length
-    const globalIndex = start + idx
-    const gameNumber = totalGames - globalIndex
+    const gameNumber = end - idx
 
     const tags = getSessionTagsForDetail(game, dayNoteMap)
     const tagsHtml = tags.length
@@ -182,6 +186,10 @@ function backToSummary() {
   
   const statsContainer = document.getElementById("statsContainer")
   statsContainer.style.display = "none"
+
+  const awardsContainer = document.getElementById("awardsContainer")
+  awardsContainer.style.display = "none"
+  awardsContainer.innerHTML = ""
 
   const calendarContainer = document.getElementById("calendarContainer")
   calendarContainer.style.display = "none"

@@ -166,10 +166,10 @@ function createSessionCardHtml(session, gameNumber) {
   const tripleHtml = `
     <div class="session-triple-grid">
       <div class="session-triple-item"><span class="session-triple-label">20:</span><span class="session-triple-value">${t[20] ?? 0}</span></div>
-      <div class="session-triple-item"><span class="session-triple-label">17:</span><span class="session-triple-value">${t[17] ?? 0}</span></div>
       <div class="session-triple-item"><span class="session-triple-label">19:</span><span class="session-triple-value">${t[19] ?? 0}</span></div>
-      <div class="session-triple-item"><span class="session-triple-label">16:</span><span class="session-triple-value">${t[16] ?? 0}</span></div>
       <div class="session-triple-item"><span class="session-triple-label">18:</span><span class="session-triple-value">${t[18] ?? 0}</span></div>
+      <div class="session-triple-item"><span class="session-triple-label">17:</span><span class="session-triple-value">${t[17] ?? 0}</span></div>
+      <div class="session-triple-item"><span class="session-triple-label">16:</span><span class="session-triple-value">${t[16] ?? 0}</span></div>
       <div class="session-triple-item"><span class="session-triple-label">15:</span><span class="session-triple-value">${t[15] ?? 0}</span></div>
     </div>
   `

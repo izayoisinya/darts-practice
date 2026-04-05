@@ -8,6 +8,7 @@ function changeView(mode) {
   detailPageNumber = 1
   
   const statsContainer = document.getElementById("statsContainer")
+  const awardsContainer = document.getElementById("awardsContainer")
   const chartContainer = document.getElementById("chartContainer")
   const calendarContainer = document.getElementById("calendarContainer")
   if (calendarContainer) {
@@ -18,6 +19,7 @@ function changeView(mode) {
   if (mode === 'game') {
     // Game ビューに戻す
     statsContainer.style.display = "flex"
+    awardsContainer.style.display = "flex"
     chartContainer.style.display = "block"
     currentPage = 1
     groupedPageMode = 'game'
@@ -36,6 +38,7 @@ function changeView(mode) {
   } else {
     // Group ビュー（Day/Week/Month/Year）
     statsContainer.style.display = "none"
+    awardsContainer.style.display = "none"
     chartContainer.style.display = "none"
     setRangeChartSectionVisible(false)
     displayGroupView(mode)
@@ -46,6 +49,7 @@ function changeView(mode) {
 function renderView() {
   
   const statsContainer = document.getElementById("statsContainer")
+  const awardsContainer = document.getElementById("awardsContainer")
   const chartContainer = document.getElementById("chartContainer")
   const calendarContainer = document.getElementById("calendarContainer")
   if (calendarContainer) {
@@ -55,6 +59,7 @@ function renderView() {
   
   if (viewMode === "game") {
     statsContainer.style.display = "flex"
+    awardsContainer.style.display = "flex"
     chartContainer.style.display = "block"
     setRangeChartSectionVisible(true)
     loadStats(viewMode)
@@ -62,6 +67,7 @@ function renderView() {
     drawGameScoresChart()
   } else {
     statsContainer.style.display = "none"
+    awardsContainer.style.display = "none"
     chartContainer.style.display = "none"
     setRangeChartSectionVisible(false)
     renderGroupedPaginated(viewMode)
@@ -75,11 +81,13 @@ function loadStats() {
     localStorage.getItem("dartsSessions")
   ) || []
   
-  const container = document.getElementById("statsContainer")
-  container.innerHTML = ""
+  const statsContainer = document.getElementById("statsContainer")
+  const awardsContainer = document.getElementById("awardsContainer")
+  statsContainer.innerHTML = ""
+  awardsContainer.innerHTML = ""
   
   if (!sessions.length) {
-    container.innerHTML = "<p>No data yet</p>"
+    statsContainer.innerHTML = "<p>No data yet</p>"
     return
   }
   
@@ -112,17 +120,18 @@ function loadStats() {
     sessions.reduce((a, b) => a + b.ppd, 0) / games
   ).toFixed(2)
   
-  addStat(container, "Games Played", games)
-  addStat(container, "Best Game", bestGame)
-  addStat(container, "Average PPD", avgPPD)
-  addStat(container, "Total Bulls", totalBulls)
-  addStat(container, "Hat Trick", awardCounts.hatTrick)
-  addStat(container, "3 in Black", awardCounts.threeInTheBlack)
-  addStat(container, "Ton 80", awardCounts.ton80)
-  addStat(container, "High Ton", awardCounts.highTon)
-  addStat(container, "Low Ton", awardCounts.lowTon)
-  addStat(container, "3 in Bed", awardCounts.threeInTheBed)
-  addStat(container, "White Horse", awardCounts.whiteHorse)
+  addStat(statsContainer, "Games Played", games)
+  addStat(statsContainer, "Best Game", bestGame)
+  addStat(statsContainer, "Average PPD", avgPPD)
+  addStat(statsContainer, "Total Bulls", totalBulls)
+
+  addStat(awardsContainer, "Hat Trick", awardCounts.hatTrick)
+  addStat(awardsContainer, "3 in Black", awardCounts.threeInTheBlack)
+  addStat(awardsContainer, "Ton 80", awardCounts.ton80)
+  addStat(awardsContainer, "High Ton", awardCounts.highTon)
+  addStat(awardsContainer, "Low Ton", awardCounts.lowTon)
+  addStat(awardsContainer, "3 in Bed", awardCounts.threeInTheBed)
+  addStat(awardsContainer, "White Horse", awardCounts.whiteHorse)
 }
 
 function addStat(container, title, value) {

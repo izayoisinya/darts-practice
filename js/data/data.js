@@ -428,19 +428,31 @@ function renderDetailBullRate(gamesList) {
     return sum + 24
   }, 0)
 
-  const bullRate = totalDarts > 0 ? ((totalBulls / totalDarts) * 100).toFixed(1) : "0.0"
-  const innerBullRate = totalDarts > 0 ? ((totalInnerBulls / totalDarts) * 100).toFixed(1) : "0.0"
+  const bullRateNum = totalDarts > 0 ? (totalBulls / totalDarts) * 100 : 0
+  const innerBullRateNum = totalDarts > 0 ? (totalInnerBulls / totalDarts) * 100 : 0
+  const bullRate = bullRateNum.toFixed(1)
+  const innerBullRate = innerBullRateNum.toFixed(1)
 
   section.innerHTML = `
     <div class="detail-bull-rate-title">Bull Rate (Period)</div>
     <div class="detail-bull-rate-grid">
       <div class="detail-bull-rate-item">
-        <span class="detail-bull-rate-label">Bull</span>
-        <span class="detail-bull-rate-value">${bullRate}%</span>
+        <div class="detail-bull-rate-head">
+          <span class="detail-bull-rate-label">Bull</span>
+          <span class="detail-bull-rate-value">${bullRate}%</span>
+        </div>
+        <div class="detail-bull-rate-bar-bg">
+          <div class="detail-bull-rate-bar-fill" style="width:${Math.min(100, bullRateNum).toFixed(1)}%"></div>
+        </div>
       </div>
       <div class="detail-bull-rate-item">
-        <span class="detail-bull-rate-label">Inner Bull</span>
-        <span class="detail-bull-rate-value">${innerBullRate}%</span>
+        <div class="detail-bull-rate-head">
+          <span class="detail-bull-rate-label">Inner Bull</span>
+          <span class="detail-bull-rate-value">${innerBullRate}%</span>
+        </div>
+        <div class="detail-bull-rate-bar-bg">
+          <div class="detail-bull-rate-bar-fill inner" style="width:${Math.min(100, innerBullRateNum).toFixed(1)}%"></div>
+        </div>
       </div>
     </div>
   `

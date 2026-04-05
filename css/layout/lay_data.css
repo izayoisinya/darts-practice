@@ -111,10 +111,17 @@
 .detail-bull-rate-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   padding: 8px 10px;
   border-radius: 8px;
   background: #1c212c;
+}
+
+.detail-bull-rate-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .detail-bull-rate-label {
@@ -123,10 +130,28 @@
 }
 
 .detail-bull-rate-value {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1;
   font-weight: 700;
   color: var(--accent);
+}
+
+.detail-bull-rate-bar-bg {
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.12);
+}
+
+.detail-bull-rate-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+
+.detail-bull-rate-bar-fill.inner {
+  background: #4da3ff;
 }
 
 .range-chart-section {

@@ -162,16 +162,10 @@
 
 .range-chart-controls {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.range-chart-row {
-  display: grid;
   grid-template-columns: auto 1fr auto 1fr auto;
   gap: 8px;
   align-items: center;
+  margin-bottom: 8px;
 }
 
 .range-chart-controls label {
@@ -192,51 +186,12 @@
   cursor: pointer;
 }
 
-.range-chart-legend {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 4px 0 8px;
-  font-size: 12px;
-  opacity: 0.9;
-}
-
-.range-chart-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.range-chart-legend-swatch {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.range-chart-legend-swatch.a {
-  background: #7bc96f;
-}
-
-.range-chart-legend-swatch.b {
-  background: #4da3ff;
-}
-
 #rangeScoreChart {
   display: block;
   width: 100%;
   height: 220px;
   border: 1px solid #333;
   border-radius: 4px;
-}
-
-@media (max-width: 760px) {
-  .range-chart-row {
-    grid-template-columns: auto 1fr;
-  }
-
-  .range-chart-row button {
-    grid-column: 1 / -1;
-  }
 }
 
 .data-card {

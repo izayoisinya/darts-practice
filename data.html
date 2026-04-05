@@ -38,6 +38,9 @@
     </header>
 
 <main class="data-container">
+  <div id="rightPanel">
+    <section id="sessionsContainer"></section>
+  </div>
   <div id="leftPanel">
     <section id="statsContainer"></section>
     <section id="awardsContainer"></section>
@@ -45,6 +48,8 @@
     <section id="chartContainer" style="display:none;">
       <h3>Score Trend (Last 30 Games)</h3>
       <canvas id="scoreChart"></canvas>
+
+      <div id="detailBullRateSection" class="detail-bull-rate" style="display:none;"></div>
 
       <div id="rangeChartSection" class="range-chart-section" style="display:none;">
         <h3>Score Trend (Selected Period)</h3>
@@ -58,9 +63,6 @@
         <canvas id="rangeScoreChart"></canvas>
       </div>
     </section>
-  </div>
-  <div id="rightPanel">
-    <section id="sessionsContainer"></section>
   </div>
   <!-- タブボタンを右下に配置 -->
   <!-- フッター：ページネーションとタブを同じ行に配置 -->

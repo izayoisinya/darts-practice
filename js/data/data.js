@@ -229,6 +229,7 @@ function generateTestData(days = 60) {
 function drawGameScoresChart() {
   const canvas = document.getElementById("scoreChart")
   if (!canvas) return
+  hideDetailBullRate()
   
   const sessions = JSON.parse(
     localStorage.getItem("dartsSessions")
@@ -324,8 +325,12 @@ function drawGameScoresChart() {
 
 function drawDetailGroupChart(gamesList) {
   const canvas = document.getElementById("scoreChart")
-  if (!canvas || !gamesList || gamesList.length === 0) return
+  if (!canvas || !gamesList || gamesList.length === 0) {
+    hideDetailBullRate()
+    return
+  }
   setRangeChartSectionVisible(false)
+  renderDetailBullRate(gamesList)
   
   // Canvas のサイズを取得
   if (!canvas.offsetWidth || !canvas.offsetHeight) {
@@ -402,6 +407,44 @@ function drawDetailGroupChart(gamesList) {
     ctx.fillStyle = "#4CAF50"
     ctx.fill()
   })
+}
+
+function hideDetailBullRate() {
+  const section = document.getElementById("detailBullRateSection")
+  if (!section) return
+  section.style.display = "none"
+  section.innerHTML = ""
+}
+
+function renderDetailBullRate(gamesList) {
+  const section = document.getElementById("detailBullRateSection")
+  if (!section) return
+
+  const totalBulls = gamesList.reduce((sum, game) => sum + (game?.bulls || 0), 0)
+  const totalInnerBulls = gamesList.reduce((sum, game) => sum + (game?.innerBulls || 0), 0)
+  const totalDarts = gamesList.reduce((sum, game) => {
+    const roundsCount = Array.isArray(game?.rounds) ? game.rounds.length : 0
+    if (roundsCount > 0) return sum + roundsCount * 3
+    return sum + 24
+  }, 0)
+
+  const bullRate = totalDarts > 0 ? ((totalBulls / totalDarts) * 100).toFixed(1) : "0.0"
+  const innerBullRate = totalDarts > 0 ? ((totalInnerBulls / totalDarts) * 100).toFixed(1) : "0.0"
+
+  section.innerHTML = `
+    <div class="detail-bull-rate-title">Bull Rate (Period)</div>
+    <div class="detail-bull-rate-grid">
+      <div class="detail-bull-rate-item">
+        <span class="detail-bull-rate-label">Bull</span>
+        <span class="detail-bull-rate-value">${bullRate}%</span>
+      </div>
+      <div class="detail-bull-rate-item">
+        <span class="detail-bull-rate-label">Inner Bull</span>
+        <span class="detail-bull-rate-value">${innerBullRate}%</span>
+      </div>
+    </div>
+  `
+  section.style.display = "block"
 }
 
 function setRangeChartSectionVisible(show) {

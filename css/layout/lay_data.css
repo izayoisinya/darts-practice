@@ -87,6 +87,48 @@
   border-radius: 4px;
 }
 
+.detail-bull-rate {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid #2a2f3a;
+  border-radius: 10px;
+  background: #11151c;
+}
+
+.detail-bull-rate-title {
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  opacity: 0.75;
+  margin-bottom: 8px;
+}
+
+.detail-bull-rate-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.detail-bull-rate-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #1c212c;
+}
+
+.detail-bull-rate-label {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.detail-bull-rate-value {
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--accent);
+}
+
 .range-chart-section {
   margin-top: 12px;
   padding-top: 8px;

@@ -895,6 +895,13 @@ main {
   line-height: 1;
 }
 
+@media (orientation: portrait) {
+  #statsContainer {
+    flex-wrap: wrap;
+    overflow-x: hidden;
+  }
+}
+
 @media (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) {
   .session-kpi-grid {
     gap: 8px;

@@ -6,7 +6,7 @@ function createRoundChartHtml(rounds) {
   if (n === 0) return '<svg class="round-line-chart" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid meet"></svg>'
 
   const svgW = 240, svgH = 120
-  const mTop = 16, mRight = 8, mBottom = 20, mLeft = 8
+  const mTop = 10, mRight = 8, mBottom = 14, mLeft = 8
   const chartW = svgW - mLeft - mRight
   const chartH = svgH - mTop - mBottom
   const maxScore = 180
@@ -31,11 +31,11 @@ function createRoundChartHtml(rounds) {
   }).join('')
 
   const valueLabels = pts.map(p =>
-    `<text x="${p.x.toFixed(1)}" y="${(p.y - 5).toFixed(1)}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.7)">${p.s}</text>`
+    `<text x="${p.x.toFixed(1)}" y="${(p.y - 3).toFixed(1)}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.7)">${p.s}</text>`
   ).join('')
 
   const xLabels = pts.map((p, i) =>
-    `<text x="${p.x.toFixed(1)}" y="${svgH - 4}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.5)">R${i + 1}</text>`
+    `<text x="${p.x.toFixed(1)}" y="${svgH - 2}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.5)">R${i + 1}</text>`
   ).join('')
 
   const dots = pts.map(p =>

@@ -5,6 +5,28 @@ const GROUP_NOTE_KEY = "dartsDayNotesV2"
 let groupNoteEditingImage = null
 let selectedDayTagFilter = ""
 
+// カレンダータップで日付ジャンプしたときの元モード保存
+let calendarJumpOriginMode = null
+let calendarJumpOriginData = null
+let calendarJumpOriginPage = null
+
+function jumpToCalendarDay(dateStr) {
+  const sessions = JSON.parse(localStorage.getItem("dartsSessions") || "[]")
+  const groups = groupSessions(sessions, "day")
+  const dayList = groups[dateStr] || []
+  if (!dayList.length) return
+
+  calendarJumpOriginMode = groupedPageMode
+  calendarJumpOriginData = groupedPageData
+  calendarJumpOriginPage = groupedPageNumber
+
+  groupedPageMode = "day"
+  groupedPageData = [[dateStr, dayList]]
+  groupedPageNumber = 1
+
+  showGameDetails(dateStr, dayList)
+}
+
 function getFilteredGroupedEntries(mode, entries) {
   if (mode !== "day" || !selectedDayTagFilter) return entries
 
@@ -261,7 +283,7 @@ function updateGroupedLeftCalendar(mode, allEntries, pageData) {
       const parts = key.split("-")
       const y = parseInt(parts[0], 10)
       const m = parseInt(parts[1], 10)
-      if (y !== year || m !== month) return
+      if (Number.isNaN(y) || Number.isNaN(m)) return
       const lastDay = new Date(y, m, 0).getDate()
       for (let d = 1; d <= lastDay; d++) {
         highlightSet.add(`${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`)
@@ -337,7 +359,8 @@ function renderGroupedMonthCalendar(year, month, highlightSet, gameDates) {
     if (inRange) cls += " cal-highlight"
     if (hasGames && !inRange) cls += " cal-has-games"
     const dot = hasGames ? '<span class="cal-dot"></span>' : ""
-    cells += `<div class="${cls}"><span class="cal-day-num">${d}</span>${dot}</div>`
+    const onclick = hasGames ? ` onclick="jumpToCalendarDay('${dateStr}')"` : ""
+    cells += `<div class="${cls}"${onclick}><span class="cal-day-num">${d}</span>${dot}</div>`
   }
 
   return `<div class="cal-wrap"><div class="cal-title">${year}年${month}月</div><div class="cal-grid">${cells}</div></div>`

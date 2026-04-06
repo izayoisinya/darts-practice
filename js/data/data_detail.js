@@ -295,6 +295,16 @@ function backToSummary() {
     compareLegend.innerHTML = ""
   }
 
+  // カレンダータップで来ていた場合は元のモードに戻す
+  if (calendarJumpOriginMode !== null) {
+    groupedPageMode = calendarJumpOriginMode
+    groupedPageData = calendarJumpOriginData
+    groupedPageNumber = calendarJumpOriginPage
+    calendarJumpOriginMode = null
+    calendarJumpOriginData = null
+    calendarJumpOriginPage = null
+  }
+
   if (groupedPageMode && groupedPageMode !== 'game' && groupedPageData.length > 0) {
     displayGroupedPage(groupedPageMode, groupedPageData)
     renderGroupedPagination(groupedPageData.length)
@@ -415,7 +425,8 @@ function renderMiniMonth(year, month, gameDates) {
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`
     const hasGames = (gameDates[dateStr] || 0) > 0
-    cells += `<div class="mini-cal-day${hasGames ? ' mini-has-games' : ''}">${d}</div>`
+    const onclick = hasGames ? ` onclick="jumpToCalendarDay('${dateStr}')"` : ""
+    cells += `<div class="mini-cal-day${hasGames ? ' mini-has-games' : ''}"${onclick}>${d}</div>`
   }
 
   return `<div class="mini-cal-wrap">

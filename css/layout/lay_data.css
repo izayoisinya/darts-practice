@@ -525,13 +525,15 @@ main {
 }
 
 .group-note-edit-btn {
-  padding: 4px 8px;
+  padding: 8px 16px;
   border: 1px solid #3a3f4b;
   border-radius: 8px;
   background: #1a1f29;
   color: var(--text-main);
-  font-size: 11px;
+  font-size: 12px;
   cursor: pointer;
+  min-width: 60px;
+  min-height: 36px;
 }
 
 .group-note-edit-btn:hover {
@@ -1135,7 +1137,7 @@ main {
 }
 
 .group-cal-scroll {
-  max-height: 460px;
+  max-height: 620px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -1198,6 +1200,18 @@ main {
 
 .cal-day.cal-has-games {
   background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+}
+
+.cal-day.cal-highlight {
+  cursor: pointer;
+}
+
+.mini-cal-day.mini-has-games {
+  background: rgb(var(--accent-rgb) / 0.35);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .cal-day-num {

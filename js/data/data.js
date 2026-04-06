@@ -1,12 +1,21 @@
 let viewMode = "game" 
 let rangeChartWired = false
 
+function updateViewTabs(mode) {
+  document.querySelectorAll(".tabs-container button").forEach(btn => {
+    const isActive = btn.dataset.view === mode
+    btn.classList.toggle("active", isActive)
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false")
+  })
+}
+
 function changeView(mode) {
   viewMode = mode
   detailViewMode = false
   selectedDayData = null
   detailPageNumber = 1
   hideDetailBullRate()
+  updateViewTabs(mode)
   
   const statsSection = document.getElementById("statsSection")
   const awardsSection = document.getElementById("awardsSection")
@@ -49,6 +58,7 @@ function changeView(mode) {
 
 function renderView() {
   hideDetailBullRate()
+  updateViewTabs(viewMode)
   
   const statsSection = document.getElementById("statsSection")
   const awardsSection = document.getElementById("awardsSection")

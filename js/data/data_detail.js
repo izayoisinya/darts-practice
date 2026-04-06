@@ -73,11 +73,13 @@ function setupDetailCompareControls(currentDayKey) {
   const section = document.getElementById("detailCompareSection")
   const select = document.getElementById("detailCompareSelect")
   const legend = document.getElementById("detailCompareLegend")
+  const tagsBox = document.getElementById("detailCompareTags")
   if (!section || !select) return
 
   if (groupedPageMode !== "day") {
     section.style.display = "none"
     select.innerHTML = ""
+    if (tagsBox) tagsBox.innerHTML = ""
     if (legend) {
       legend.style.display = "none"
       legend.innerHTML = ""
@@ -86,6 +88,7 @@ function setupDetailCompareControls(currentDayKey) {
   }
 
   const grouped = getSessionsGroupedByDay()
+  const noteMap = getDayNoteMapForDetail()
   const prevKeys = Object.keys(grouped)
     .filter(key => key < currentDayKey)
     .sort((a, b) => b.localeCompare(a))
@@ -94,7 +97,7 @@ function setupDetailCompareControls(currentDayKey) {
   prevKeys.forEach(key => {
     const opt = document.createElement("option")
     opt.value = key
-    opt.textContent = key
+    opt.textContent = getDetailCompareOptionLabel(key, noteMap)
     select.appendChild(opt)
   })
 
@@ -106,11 +109,57 @@ function setupDetailCompareControls(currentDayKey) {
   }
 
   section.style.display = "block"
+  renderDetailCompareTags(currentDayKey, detailCompareDayKey, noteMap)
 
   select.onchange = () => {
     detailCompareDayKey = select.value || ""
+    renderDetailCompareTags(currentDayKey, detailCompareDayKey, noteMap)
     displayDetailPage()
   }
+}
+
+function getDetailCompareOptionLabel(dayKey, noteMap) {
+  const tags = getDayTagsForDetail(dayKey, noteMap)
+  if (!tags.length) return dayKey
+  const preview = tags.slice(0, 2).map(tag => `#${tag}`).join(" ")
+  const suffix = tags.length > 2 ? ` +${tags.length - 2}` : ""
+  return `${dayKey}  ${preview}${suffix}`
+}
+
+function getDayTagsForDetail(dayKey, noteMap) {
+  const note = (noteMap || {})[dayKey] || {}
+  return Array.isArray(note.tags)
+    ? note.tags.map(tag => String(tag || "").trim()).filter(Boolean)
+    : []
+}
+
+function renderDetailCompareTags(currentDayKey, compareDayKey, noteMap) {
+  const tagsBox = document.getElementById("detailCompareTags")
+  if (!tagsBox) return
+
+  const currentTags = getDayTagsForDetail(currentDayKey, noteMap)
+  const compareTags = compareDayKey ? getDayTagsForDetail(compareDayKey, noteMap) : []
+
+  tagsBox.innerHTML = `
+    <div class="detail-compare-tag-row">
+      <span class="detail-compare-tag-label">表示中</span>
+      <div class="detail-compare-tag-chips">${renderDetailCompareTagChips(currentTags)}</div>
+    </div>
+    <div class="detail-compare-tag-row">
+      <span class="detail-compare-tag-label">比較日</span>
+      <div class="detail-compare-tag-chips">${compareDayKey ? renderDetailCompareTagChips(compareTags) : '<span class="detail-compare-tag-empty">比較なし</span>'}</div>
+    </div>
+  `
+}
+
+function renderDetailCompareTagChips(tags) {
+  if (!tags.length) {
+    return '<span class="detail-compare-tag-empty">タグなし</span>'
+  }
+
+  return tags
+    .map(tag => `<span class="group-note-chip">#${escapeHtmlDetail(tag)}</span>`)
+    .join("")
 }
 
 function displayDetailPage() {

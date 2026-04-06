@@ -64,6 +64,7 @@
           <label for="detailCompareSelect">比較日</label>
           <select id="detailCompareSelect"></select>
         </div>
+        <div id="detailCompareTags" class="detail-compare-tags"></div>
         <div id="detailCompareLegend" class="range-chart-legend" style="display:none;"></div>
       </div>
 
@@ -100,11 +101,11 @@
     <button id="nextBtn" onclick="changePage('Next')">Next</button>
   </div>
 <div class="tabs-container">
-  <button onclick="changeView('game')">Game</button>
-  <button onclick="changeView('day')">Day</button>
-  <button onclick="changeView('week')">Week</button>
-  <button onclick="changeView('month')">Month</button>
-  <button onclick="changeView('year')">Year</button>
+  <button class="active" data-view="game" onclick="changeView('game')">Game</button>
+  <button data-view="day" onclick="changeView('day')">Day</button>
+  <button data-view="week" onclick="changeView('week')">Week</button>
+  <button data-view="month" onclick="changeView('month')">Month</button>
+  <button data-view="year" onclick="changeView('year')">Year</button>
 </div>
 </div>
 </main>

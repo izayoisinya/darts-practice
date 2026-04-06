@@ -68,6 +68,21 @@ main {
   height: var(--data-footer-spacer);
 }
 
+.data-summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.data-section-title {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
 #statsContainer {
   display: flex;
   flex-wrap: nowrap;
@@ -116,18 +131,11 @@ main {
 }
 
 .detail-bull-rate {
-  margin-top: 10px;
+  margin-top: 0;
   padding: 10px 12px;
   border: 1px solid #2a2f3a;
   border-radius: 10px;
   background: #11151c;
-}
-
-.detail-bull-rate-title {
-  font-size: 12px;
-  letter-spacing: 0.4px;
-  opacity: 0.75;
-  margin-bottom: 8px;
 }
 
 .detail-bull-rate-grid {

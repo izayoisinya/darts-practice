@@ -6,9 +6,10 @@ function changeView(mode) {
   detailViewMode = false
   selectedDayData = null
   detailPageNumber = 1
+  hideDetailBullRate()
   
-  const statsContainer = document.getElementById("statsContainer")
-  const awardsContainer = document.getElementById("awardsContainer")
+  const statsSection = document.getElementById("statsSection")
+  const awardsSection = document.getElementById("awardsSection")
   const chartContainer = document.getElementById("chartContainer")
   const calendarContainer = document.getElementById("calendarContainer")
   if (calendarContainer) {
@@ -18,8 +19,8 @@ function changeView(mode) {
 
   if (mode === 'game') {
     // Game ビューに戻す
-    statsContainer.style.display = "flex"
-    awardsContainer.style.display = "flex"
+    statsSection.style.display = "flex"
+    awardsSection.style.display = "flex"
     chartContainer.style.display = "block"
     currentPage = 1
     groupedPageMode = 'game'
@@ -37,8 +38,8 @@ function changeView(mode) {
     drawGameScoresChart()
   } else {
     // Group ビュー（Day/Week/Month/Year）
-    statsContainer.style.display = "none"
-    awardsContainer.style.display = "none"
+    statsSection.style.display = "none"
+    awardsSection.style.display = "none"
     chartContainer.style.display = "none"
     setRangeChartSectionVisible(false)
     displayGroupView(mode)
@@ -47,9 +48,10 @@ function changeView(mode) {
 }
 
 function renderView() {
+  hideDetailBullRate()
   
-  const statsContainer = document.getElementById("statsContainer")
-  const awardsContainer = document.getElementById("awardsContainer")
+  const statsSection = document.getElementById("statsSection")
+  const awardsSection = document.getElementById("awardsSection")
   const chartContainer = document.getElementById("chartContainer")
   const calendarContainer = document.getElementById("calendarContainer")
   if (calendarContainer) {
@@ -58,16 +60,16 @@ function renderView() {
   }
   
   if (viewMode === "game") {
-    statsContainer.style.display = "flex"
-    awardsContainer.style.display = "flex"
+    statsSection.style.display = "flex"
+    awardsSection.style.display = "flex"
     chartContainer.style.display = "block"
     setRangeChartSectionVisible(true)
     loadStats(viewMode)
     loadSessions()
     drawGameScoresChart()
   } else {
-    statsContainer.style.display = "none"
-    awardsContainer.style.display = "none"
+    statsSection.style.display = "none"
+    awardsSection.style.display = "none"
     chartContainer.style.display = "none"
     setRangeChartSectionVisible(false)
     renderGroupedPaginated(viewMode)
@@ -480,13 +482,15 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
 }
 
 function hideDetailBullRate() {
+  const wrapper = document.getElementById("detailBullRateWrapper")
   const section = document.getElementById("detailBullRateSection")
+  if (wrapper) wrapper.style.display = "none"
   if (!section) return
-  section.style.display = "none"
   section.innerHTML = ""
 }
 
 function renderDetailBullRate(gamesList) {
+  const wrapper = document.getElementById("detailBullRateWrapper")
   const section = document.getElementById("detailBullRateSection")
   if (!section) return
 
@@ -504,7 +508,6 @@ function renderDetailBullRate(gamesList) {
   const innerBullRate = innerBullRateNum.toFixed(1)
 
   section.innerHTML = `
-    <div class="detail-bull-rate-title">Bull Rate (Period)</div>
     <div class="detail-bull-rate-grid">
       <div class="detail-bull-rate-item">
         <div class="detail-bull-rate-head">
@@ -526,7 +529,7 @@ function renderDetailBullRate(gamesList) {
       </div>
     </div>
   `
-  section.style.display = "block"
+  if (wrapper) wrapper.style.display = "flex"
 }
 
 function setRangeChartSectionVisible(show) {

@@ -16,12 +16,14 @@ function showGameDetails(dateKey, gamesList) {
   const chartContainer = document.getElementById("chartContainer")
   chartContainer.style.display = "block"
   
+  const statsSection = document.getElementById("statsSection")
+  statsSection.style.display = "flex"
   const statsContainer = document.getElementById("statsContainer")
-  statsContainer.style.display = "flex"
   statsContainer.innerHTML = ""
 
+  const awardsSection = document.getElementById("awardsSection")
+  awardsSection.style.display = "flex"
   const awardsContainer = document.getElementById("awardsContainer")
-  awardsContainer.style.display = "flex"
   awardsContainer.innerHTML = ""
 
   const calendarContainer = document.getElementById("calendarContainer")
@@ -260,15 +262,21 @@ function changeDetailPage(page) {
 
 function backToSummary() {
   detailViewMode = false
+
+  if (typeof hideDetailBullRate === "function") {
+    hideDetailBullRate()
+  }
   
   const chartContainer = document.getElementById("chartContainer")
   chartContainer.style.display = "none"
   
+  const statsSection = document.getElementById("statsSection")
+  statsSection.style.display = "none"
   const statsContainer = document.getElementById("statsContainer")
-  statsContainer.style.display = "none"
 
+  const awardsSection = document.getElementById("awardsSection")
+  awardsSection.style.display = "none"
   const awardsContainer = document.getElementById("awardsContainer")
-  awardsContainer.style.display = "none"
   awardsContainer.innerHTML = ""
 
   const calendarContainer = document.getElementById("calendarContainer")

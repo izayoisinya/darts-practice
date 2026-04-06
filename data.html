@@ -42,8 +42,18 @@
     <section id="sessionsContainer"></section>
   </div>
   <div id="leftPanel">
-    <section id="statsContainer"></section>
-    <section id="awardsContainer"></section>
+    <section id="statsSection" class="data-summary-section">
+      <h3 class="data-section-title">Stats</h3>
+      <div id="statsContainer"></div>
+    </section>
+    <section id="detailBullRateWrapper" class="data-summary-section" style="display:none;">
+      <h3 class="data-section-title">Bull Rate</h3>
+      <div id="detailBullRateSection" class="detail-bull-rate"></div>
+    </section>
+    <section id="awardsSection" class="data-summary-section">
+      <h3 class="data-section-title">Awards</h3>
+      <div id="awardsContainer"></div>
+    </section>
     <section id="calendarContainer" style="display:none;"></section>
     <section id="chartContainer" style="display:none;">
       <h3>Score Trend (Last 30 Games)</h3>
@@ -56,8 +66,6 @@
         </div>
         <div id="detailCompareLegend" class="range-chart-legend" style="display:none;"></div>
       </div>
-
-      <div id="detailBullRateSection" class="detail-bull-rate" style="display:none;"></div>
 
       <div id="rangeChartSection" class="range-chart-section" style="display:none;">
         <h3>Score Trend (Selected Period)</h3>

@@ -15,6 +15,9 @@ function changeView(mode) {
   selectedDayData = null
   detailPageNumber = 1
   hideDetailBullRate()
+  if (typeof setDataDetailViewClass === "function") {
+    setDataDetailViewClass(false)
+  }
   updateViewTabs(mode)
   
   const statsSection = document.getElementById("statsSection")
@@ -58,6 +61,9 @@ function changeView(mode) {
 
 function renderView() {
   hideDetailBullRate()
+  if (typeof setDataDetailViewClass === "function") {
+    setDataDetailViewClass(false)
+  }
   updateViewTabs(viewMode)
   
   const statsSection = document.getElementById("statsSection")
@@ -267,7 +273,7 @@ function generateTestData(days = 60) {
         
         bullRate: Number(((bulls / darts) * 100).toFixed(1)),
         innerRate: bulls ?
-          Number(((innerBulls / bulls) * 100).toFixed(1)) :
+          Number(((innerBulls / darts) * 100).toFixed(1)) :
           0,
         
         roundAvg: Number((score / 8).toFixed(1)),

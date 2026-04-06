@@ -7,8 +7,14 @@ let selectedDayData = null
 let detailPageNumber = 1
 let detailCompareDayKey = ""
 
+function setDataDetailViewClass(enabled) {
+  if (!document.body) return
+  document.body.classList.toggle("data-detail-view", Boolean(enabled))
+}
+
 function showGameDetails(dateKey, gamesList) {
   detailViewMode = true
+  setDataDetailViewClass(true)
   selectedDayData = { dateKey, gamesList }
   detailPageNumber = 1
   detailCompareDayKey = ""
@@ -311,6 +317,7 @@ function changeDetailPage(page) {
 
 function backToSummary() {
   detailViewMode = false
+  setDataDetailViewClass(false)
 
   if (typeof hideDetailBullRate === "function") {
     hideDetailBullRate()

@@ -3,7 +3,7 @@ function createRoundChartHtml(rounds) {
     (round || []).reduce((sum, dart) => sum + (dart?.score || 0), 0)
   )
   const n = scores.length
-  if (n === 0) return '<svg class="round-line-chart" viewBox="0 0 240 120" preserveAspectRatio="none"></svg>'
+  if (n === 0) return '<svg class="round-line-chart" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid meet"></svg>'
 
   const svgW = 240, svgH = 120
   const mTop = 16, mRight = 8, mBottom = 20, mLeft = 8
@@ -42,7 +42,7 @@ function createRoundChartHtml(rounds) {
     `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="var(--accent)" stroke="#11151c" stroke-width="1.5"/>`
   ).join('')
 
-  return `<svg class="round-line-chart" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="none">
+  return `<svg class="round-line-chart" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet">
     ${gridLines}
     <polygon points="${areaPoints}" fill="var(--accent)" fill-opacity="0.15"/>
     <polyline points="${polyPoints}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>

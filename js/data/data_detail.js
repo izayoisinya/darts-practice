@@ -5,11 +5,13 @@
 let detailViewMode = false
 let selectedDayData = null
 let detailPageNumber = 1
+let detailCompareDayKey = ""
 
 function showGameDetails(dateKey, gamesList) {
   detailViewMode = true
   selectedDayData = { dateKey, gamesList }
   detailPageNumber = 1
+  detailCompareDayKey = ""
   
   const chartContainer = document.getElementById("chartContainer")
   chartContainer.style.display = "block"
@@ -40,7 +42,73 @@ function showGameDetails(dateKey, gamesList) {
   addStat(awardsContainer, "3 in Bed", summary.awardCounts.threeInTheBed)
   addStat(awardsContainer, "White Horse", summary.awardCounts.whiteHorse)
 
+  // グループ詳細では、選択中グループのゲームだけでレーティングを再計算する
+  const detailRatings = gamesList.length
+    ? calculateRatings(gamesList, gamesList.length)
+    : null
+  renderRatingReference(detailRatings)
+
+  setupDetailCompareControls(dateKey)
+
   displayDetailPage()
+}
+
+function getSessionsGroupedByDay() {
+  const sessions = JSON.parse(localStorage.getItem("dartsSessions") || "[]")
+  const grouped = {}
+  ;(sessions || []).forEach(s => {
+    if (!s || !s.date) return
+    const d = new Date(s.date)
+    if (Number.isNaN(d.getTime())) return
+    const key = getLocalDateKey(d)
+    if (!grouped[key]) grouped[key] = []
+    grouped[key].push(s)
+  })
+  return grouped
+}
+
+function setupDetailCompareControls(currentDayKey) {
+  const section = document.getElementById("detailCompareSection")
+  const select = document.getElementById("detailCompareSelect")
+  const legend = document.getElementById("detailCompareLegend")
+  if (!section || !select) return
+
+  if (groupedPageMode !== "day") {
+    section.style.display = "none"
+    select.innerHTML = ""
+    if (legend) {
+      legend.style.display = "none"
+      legend.innerHTML = ""
+    }
+    return
+  }
+
+  const grouped = getSessionsGroupedByDay()
+  const prevKeys = Object.keys(grouped)
+    .filter(key => key < currentDayKey)
+    .sort((a, b) => b.localeCompare(a))
+
+  select.innerHTML = `<option value="">比較なし</option>`
+  prevKeys.forEach(key => {
+    const opt = document.createElement("option")
+    opt.value = key
+    opt.textContent = key
+    select.appendChild(opt)
+  })
+
+  if (detailCompareDayKey && prevKeys.includes(detailCompareDayKey)) {
+    select.value = detailCompareDayKey
+  } else {
+    detailCompareDayKey = ""
+    select.value = ""
+  }
+
+  section.style.display = "block"
+
+  select.onchange = () => {
+    detailCompareDayKey = select.value || ""
+    displayDetailPage()
+  }
 }
 
 function displayDetailPage() {
@@ -108,7 +176,19 @@ function displayDetailPage() {
   })
 
   updateDetailPaginationUI()
-  drawDetailGroupChart(selectedDayData.gamesList)
+
+  let compareGamesList = null
+  if (groupedPageMode === "day" && detailCompareDayKey) {
+    const grouped = getSessionsGroupedByDay()
+    compareGamesList = grouped[detailCompareDayKey] || null
+  }
+
+  drawDetailGroupChart(
+    selectedDayData.gamesList,
+    compareGamesList,
+    selectedDayData.dateKey,
+    detailCompareDayKey
+  )
 }
 
 function getDetailGroupLabel(mode, key) {
@@ -197,6 +277,15 @@ function backToSummary() {
 
   
   selectedDayData = null
+  detailCompareDayKey = ""
+
+  const compareSection = document.getElementById("detailCompareSection")
+  const compareLegend = document.getElementById("detailCompareLegend")
+  if (compareSection) compareSection.style.display = "none"
+  if (compareLegend) {
+    compareLegend.style.display = "none"
+    compareLegend.innerHTML = ""
+  }
 
   if (groupedPageMode && groupedPageMode !== 'game' && groupedPageData.length > 0) {
     displayGroupedPage(groupedPageMode, groupedPageData)

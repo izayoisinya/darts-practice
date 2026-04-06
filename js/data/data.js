@@ -386,10 +386,15 @@ function drawGameScoresChart() {
   drawSelectedRangeChart()
 }
 
-function drawDetailGroupChart(gamesList) {
+function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = "", compareLabel = "") {
   const canvas = document.getElementById("scoreChart")
+  const detailLegend = document.getElementById("detailCompareLegend")
   if (!canvas || !gamesList || gamesList.length === 0) {
     hideDetailBullRate()
+    if (detailLegend) {
+      detailLegend.style.display = "none"
+      detailLegend.innerHTML = ""
+    }
     return
   }
   setRangeChartSectionVisible(false)
@@ -397,11 +402,23 @@ function drawDetailGroupChart(gamesList) {
   
   // Canvas のサイズを取得
   if (!canvas.offsetWidth || !canvas.offsetHeight) {
-    setTimeout(() => drawDetailGroupChart(gamesList), 100)
+    setTimeout(() => {
+      drawDetailGroupChart(gamesList, compareGamesList, baseLabel, compareLabel)
+    }, 100)
     return
   }
   
-  const scores = gamesList.map(s => s.score)
+  const baseScores = gamesList.map(s => s.score)
+  const hasCompare = Array.isArray(compareGamesList) && compareGamesList.length > 0
+  const compareScoresRaw = hasCompare ? compareGamesList.map(s => s.score) : []
+  const length = Math.max(baseScores.length, compareScoresRaw.length, 1)
+
+  const scores = Array.from({ length }, (_, i) =>
+    i < baseScores.length ? baseScores[i] : null
+  )
+  const compareScores = Array.from({ length }, (_, i) =>
+    i < compareScoresRaw.length ? compareScoresRaw[i] : null
+  )
   
   const width = canvas.width = canvas.offsetWidth
   const height = canvas.height = canvas.offsetHeight || 220
@@ -416,8 +433,9 @@ function drawDetailGroupChart(gamesList) {
   ctx.clearRect(0, 0, width, height)
   
   // スコアの最小値と最大値
-  const minScore = Math.min(...scores)
-  const maxScore = Math.max(...scores)
+  const validScores = [...scores, ...compareScores].filter(v => v !== null)
+  const minScore = Math.min(...validScores)
+  const maxScore = Math.max(...validScores)
   const scoreRange = maxScore - minScore || 1
   
   // 横グリッド
@@ -441,35 +459,24 @@ function drawDetailGroupChart(gamesList) {
   }
   
   // 折れ線
-  const stepX = graphWidth / (scores.length - 1 || 1)
-  
-  ctx.beginPath()
-  ctx.lineWidth = 2
-  ctx.strokeStyle = "#4CAF50"
-  
-  scores.forEach((score, i) => {
-    const x = padding + stepX * i
-    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
-    
-    if (i === 0) {
-      ctx.moveTo(x, y)
+  const stepX = graphWidth / (length - 1 || 1)
+  drawLineSeries(ctx, scores, "#4CAF50", padding, height, graphHeight, minScore, scoreRange, stepX)
+  if (hasCompare) {
+    drawLineSeries(ctx, compareScores, "#4da3ff", padding, height, graphHeight, minScore, scoreRange, stepX)
+  }
+
+  if (detailLegend) {
+    if (hasCompare) {
+      detailLegend.innerHTML = `
+        <span class="range-chart-legend-item"><span class="range-chart-legend-swatch a"></span>A: ${baseLabel || "Selected Day"}</span>
+        <span class="range-chart-legend-item"><span class="range-chart-legend-swatch b"></span>B: ${compareLabel || "Compare Day"}</span>
+      `
+      detailLegend.style.display = "flex"
     } else {
-      ctx.lineTo(x, y)
+      detailLegend.style.display = "none"
+      detailLegend.innerHTML = ""
     }
-  })
-  
-  ctx.stroke()
-  
-  // ポイント
-  scores.forEach((score, i) => {
-    const x = padding + stepX * i
-    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
-    
-    ctx.beginPath()
-    ctx.arc(x, y, 3, 0, Math.PI * 2)
-    ctx.fillStyle = "#4CAF50"
-    ctx.fill()
-  })
+  }
 }
 
 function hideDetailBullRate() {

@@ -182,6 +182,34 @@ main {
   background: #4da3ff;
 }
 
+.detail-compare-section {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid #2a2f3a;
+  border-radius: 10px;
+  background: #11151c;
+}
+
+.detail-compare-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-compare-controls label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.detail-compare-controls select {
+  background: #1a1f29;
+  border: 1px solid #3a3f4b;
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 6px 8px;
+  min-width: 180px;
+}
+
 .range-chart-section {
   margin-top: 12px;
   padding-top: 8px;

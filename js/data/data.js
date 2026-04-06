@@ -272,8 +272,8 @@ function generateTestData(days = 60) {
         innerBulls,
         
         bullRate: Number(((bulls / darts) * 100).toFixed(1)),
-        innerRate: bulls ?
-          Number(((innerBulls / bulls) * 100).toFixed(1)) :
+        innerRate: darts ?
+          Number(((innerBulls / darts) * 100).toFixed(1)) :
           0,
         
         roundAvg: Number((score / 8).toFixed(1)),

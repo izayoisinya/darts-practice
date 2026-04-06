@@ -902,6 +902,46 @@ main {
   }
 }
 
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  body.data-detail-view #leftPanel {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    grid-template-areas:
+      "stats stats"
+      "bull chart"
+      "awards awards";
+    align-content: start;
+    gap: 10px 12px;
+  }
+
+  body.data-detail-view #statsSection {
+    grid-area: stats;
+  }
+
+  body.data-detail-view #detailBullRateWrapper {
+    grid-area: bull;
+    margin: 0;
+  }
+
+  body.data-detail-view #chartContainer {
+    grid-area: chart;
+    margin: 0;
+  }
+
+  body.data-detail-view #awardsSection {
+    grid-area: awards;
+  }
+
+  body.data-detail-view #scoreChart,
+  body.data-detail-view #rangeScoreChart {
+    height: 170px;
+  }
+
+  body.data-detail-view .detail-bull-rate-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) {
   .session-kpi-grid {
     gap: 8px;

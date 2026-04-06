@@ -903,7 +903,7 @@ main {
 }
 
 @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-  body.data-detail-view .session-card-body {
+  .session-card-body {
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
     grid-template-areas:
       "kpi kpi"
@@ -913,38 +913,38 @@ main {
     align-items: start;
   }
 
-  body.data-detail-view .session-main-block {
+  .session-main-block {
     display: contents;
   }
 
-  body.data-detail-view .session-kpi-grid {
+  .session-kpi-grid {
     grid-area: kpi;
   }
 
-  body.data-detail-view .session-rate-group {
+  .session-rate-group {
     grid-area: rates;
     min-width: 0;
   }
 
-  body.data-detail-view .session-triple-block {
+  .session-triple-block {
     grid-area: triple;
     min-width: 0;
   }
 
-  body.data-detail-view .session-side-block {
+  .session-side-block {
     grid-area: chart;
     min-width: 0;
   }
 
-  body.data-detail-view .session-side-block .session-meta-block {
+  .session-side-block .session-meta-block {
     padding: 8px 10px;
   }
 
-  body.data-detail-view .session-round-block .round-chart {
+  .session-round-block .round-chart {
     min-height: 140px;
   }
 
-  body.data-detail-view .session-round-block .round-line-chart {
+  .session-round-block .round-line-chart {
     height: 140px;
     flex: 0 0 140px;
   }

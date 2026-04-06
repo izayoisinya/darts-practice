@@ -941,12 +941,20 @@ main {
   }
 
   .session-round-block .round-chart {
-    min-height: 140px;
+    min-height: 170px;
   }
 
   .session-round-block .round-line-chart {
-    height: 140px;
-    flex: 0 0 140px;
+    height: auto;
+    min-height: 170px;
+    flex: 1 1 auto;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1366px) {
+  .session-stat-row {
+    grid-template-columns: 24px 24px minmax(0, 1fr) 42px;
+    gap: 8px;
   }
 }
 

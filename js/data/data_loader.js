@@ -217,14 +217,14 @@ function createSessionCardHtml(session, gameNumber) {
           </div>
         </div>
 
-        <div class="session-meta-block">
+        <div class="session-meta-block session-triple-block">
           <div class="session-meta-title">Triple</div>
           ${tripleHtml}
         </div>
       </div>
 
       <div class="session-side-block">
-        <div class="session-meta-block">
+        <div class="session-meta-block session-round-block">
           <div class="session-meta-title">Round Scores</div>
           <div class="round-chart">${roundChartHtml}</div>
         </div>

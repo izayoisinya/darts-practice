@@ -903,16 +903,24 @@ main {
 }
 
 @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-  .session-card-body {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+  .session-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
     grid-template-areas:
+      "header header"
       "kpi kpi"
-      "rates rates"
-      "triple chart";
-    gap: 12px;
-    align-items: stretch;
+      "rates triple"
+      "chart triple"
+      "awards triple";
+    gap: 10px 12px;
   }
 
+  .session-card-header {
+    grid-area: header;
+    margin-bottom: 0;
+  }
+
+  .session-card-body,
   .session-main-block {
     display: contents;
   }
@@ -926,34 +934,40 @@ main {
     min-width: 0;
   }
 
-  .session-triple-block {
-    grid-area: triple;
+  .session-side-block {
+    grid-area: chart;
     min-width: 0;
   }
 
-  .session-side-block {
-    grid-area: chart;
+  .session-triple-block {
+    grid-area: triple;
     min-width: 0;
     height: 100%;
   }
 
+  .session-awards-block {
+    grid-area: awards;
+    margin-top: 0;
+  }
+
+  .session-side-block .session-meta-block,
   .session-triple-block,
+  .session-awards-block {
+    padding: 8px 10px;
+  }
+
   .session-round-block {
     height: 100%;
   }
 
-  .session-side-block .session-meta-block {
-    padding: 8px 10px;
-  }
-
   .session-round-block .round-chart {
-    min-height: 0;
+    min-height: 220px;
     height: 100%;
   }
 
   .session-round-block .round-line-chart {
     height: 100%;
-    min-height: 0;
+    min-height: 220px;
     flex: 1 1 auto;
   }
 }

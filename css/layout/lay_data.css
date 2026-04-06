@@ -962,18 +962,18 @@ main {
   }
 
   .session-round-block {
-    height: 100%;
+    height: auto;
   }
 
   .session-round-block .round-chart {
     min-height: 220px;
-    height: 100%;
+    height: auto;
   }
 
   .session-round-block .round-line-chart {
-    height: 100%;
+    height: 220px;
     min-height: 220px;
-    flex: 1 1 auto;
+    flex: 0 0 220px;
   }
 }
 

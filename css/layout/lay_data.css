@@ -6,7 +6,7 @@ main {
   height: calc(100dvh - 80px); /* header分引く */
   overflow: hidden;
   max-width: auto;
-  padding: 10px 20px 0 20px;
+  padding: 10px 40px 0 20px;
 }
 
 .header {

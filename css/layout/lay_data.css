@@ -907,7 +907,7 @@ main {
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
     grid-template-areas:
       "kpi kpi"
-      "rates chart"
+      "rates rates"
       "triple chart";
     gap: 12px;
     align-items: start;

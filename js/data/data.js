@@ -145,7 +145,7 @@ function buildReferenceRows(items, labelPrefix) {
   return items.map(item => `
     <div class="rating-reference-row">
       <span class="rating-reference-rank">${labelPrefix} ${item.rating}</span>
-      <span class="rating-reference-threshold">PPD ${item.ppd.toFixed(1)}+</span>
+      <span class="rating-reference-threshold">PPD ${item.ppd.toFixed(2)}+</span>
     </div>
   `).join("")
 }
@@ -180,16 +180,19 @@ function renderRatingReference(ratings) {
   section.innerHTML = `
     <h3>レーティング参考値</h3>
     ${current}
-    <div class="rating-reference-grid">
-      <div class="rating-reference-col">
-        <div class="rating-reference-col-title">ダーツライブ</div>
-        ${buildReferenceRows(dlTable, "RT")}
+    <details class="rating-reference-details">
+      <summary>実数値テーブルを表示</summary>
+      <div class="rating-reference-grid">
+        <div class="rating-reference-col">
+          <div class="rating-reference-col-title">ダーツライブ</div>
+          ${buildReferenceRows(dlTable, "RT")}
+        </div>
+        <div class="rating-reference-col">
+          <div class="rating-reference-col-title">フェニックス</div>
+          ${buildReferenceRows(phxTable, "RATING")}
+        </div>
       </div>
-      <div class="rating-reference-col">
-        <div class="rating-reference-col-title">フェニックス</div>
-        ${buildReferenceRows(phxTable, "RATING")}
-      </div>
-    </div>
+    </details>
   `
   section.style.display = "block"
 }

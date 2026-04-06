@@ -895,6 +895,24 @@ main {
   line-height: 1;
 }
 
+@media (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) {
+  .session-kpi-grid {
+    gap: 8px;
+  }
+
+  .session-kpi-item {
+    padding: 8px;
+  }
+
+  .session-kpi-label {
+    font-size: 10px;
+  }
+
+  .session-kpi-value {
+    font-size: 24px;
+  }
+}
+
 .session-rate-group {
   display: flex;
   flex-direction: column;

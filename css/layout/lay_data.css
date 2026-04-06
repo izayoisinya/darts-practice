@@ -949,11 +949,6 @@ main {
     height: 100%;
   }
 
-  .session-triple-grid {
-    grid-template-columns: 1fr;
-    grid-template-areas: none;
-  }
-
   .session-awards-block {
     grid-area: awards;
     margin-top: 0;
@@ -1024,24 +1019,14 @@ main {
 }
 
 /* ===================================================== */
-/* TABLET KPI landscape size down (iPad landscape)       */
+/* TABLET PORTRAIT — Triple 1 column (must come after    */
+/* landscape to win specificity by source order)         */
 /* ===================================================== */
 
-@media (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) {
-  .session-kpi-grid {
-    gap: 8px;
-  }
-
-  .session-kpi-item {
-    padding: 8px;
-  }
-
-  .session-kpi-label {
-    font-size: 10px;
-  }
-
-  .session-kpi-value {
-    font-size: 24px;
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .session-triple-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: none;
   }
 }
 
@@ -1165,6 +1150,12 @@ main {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .session-triple-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .session-triple-item {

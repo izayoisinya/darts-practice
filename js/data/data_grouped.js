@@ -3,6 +3,24 @@
 // ============================================
 const GROUP_NOTE_KEY = "dartsDayNotesV2"
 let groupNoteEditingImage = null
+let selectedDayTagFilter = ""
+
+function getFilteredGroupedEntries(mode, entries) {
+  if (mode !== "day" || !selectedDayTagFilter) return entries
+
+  return (entries || []).filter(([dayKey]) => {
+    const tags = getDayNote(dayKey).tags || []
+    return tags.includes(selectedDayTagFilter)
+  })
+}
+
+function toggleDayTagFilter(tag) {
+  if (groupedPageMode !== "day") return
+  const normalized = String(tag || "").trim().replace(/^#/, "")
+  selectedDayTagFilter = selectedDayTagFilter === normalized ? "" : normalized
+  groupedPageNumber = 1
+  displayGroupedPage(groupedPageMode, groupedPageData)
+}
 
 function renderGroupedPaginated(mode) {
   
@@ -26,17 +44,26 @@ function renderGroupedPaginated(mode) {
 
 function displayGroupedPage(mode, sortedEntries) {
   ensureGroupNoteModalWired()
+  const filteredEntries = getFilteredGroupedEntries(mode, sortedEntries)
   
   const container = document.getElementById("sessionsContainer")
   container.innerHTML = ""
   
   const PAGE_SIZE = 10
+  const totalPages = Math.max(1, Math.ceil(filteredEntries.length / PAGE_SIZE))
+  if (groupedPageNumber > totalPages) groupedPageNumber = totalPages
   const start = (groupedPageNumber - 1) * PAGE_SIZE
   const end = start + PAGE_SIZE
   
-  const pageData = sortedEntries.slice(start, end)
+  const pageData = filteredEntries.slice(start, end)
 
-  updateGroupedLeftCalendar(mode, pageData)
+  updateGroupedLeftCalendar(mode, sortedEntries, pageData)
+
+  if (filteredEntries.length === 0) {
+    container.innerHTML = `<p>タグ「#${escapeHtml(selectedDayTagFilter)}」に一致するデータはありません</p>`
+    renderGroupedPagination(filteredEntries.length)
+    return
+  }
   
   // グループカードを表示
   pageData.forEach(([key, list]) => {
@@ -107,12 +134,12 @@ function displayGroupedPage(mode, sortedEntries) {
   })
   
   // ページネーション表示
-  renderGroupedPagination(sortedEntries.length)
+  renderGroupedPagination(filteredEntries.length)
 }
 
 function renderGroupedPagination(total) {
   const PAGE_SIZE = 10
-  const totalPages = Math.ceil(total / PAGE_SIZE)
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   
   document.getElementById('pageInfo').textContent = 
     `${groupedPageNumber} / ${totalPages}`
@@ -123,8 +150,9 @@ function renderGroupedPagination(total) {
 
 
 function changeGroupedPage(page) {
+  const filteredEntries = getFilteredGroupedEntries(groupedPageMode, groupedPageData)
   const PAGE_SIZE = 10
-  const totalPages = Math.ceil(groupedPageData.length / PAGE_SIZE)
+  const totalPages = Math.max(1, Math.ceil(filteredEntries.length / PAGE_SIZE))
   
   if (page < 1 || page > totalPages) return
   
@@ -136,6 +164,7 @@ function changeGroupedPage(page) {
 function displayGroupView(mode) {
   groupedPageMode = mode
   groupedPageNumber = 1
+  if (mode !== "day") selectedDayTagFilter = ""
   
   const sessions = JSON.parse(
     localStorage.getItem("dartsSessions")
@@ -161,18 +190,18 @@ function displayGroupView(mode) {
   }
 }
 
-function updateGroupedLeftCalendar(mode, pageData) {
+function updateGroupedLeftCalendar(mode, allEntries, pageData) {
   const calendarContainer = document.getElementById("calendarContainer")
   if (!calendarContainer) return
 
-  if (!pageData || pageData.length === 0) {
+  if (!allEntries || allEntries.length === 0 || !pageData || pageData.length === 0) {
     calendarContainer.style.display = "none"
     calendarContainer.innerHTML = ""
     return
   }
 
   const gameDates = {}
-  pageData.forEach(([, list]) => {
+  allEntries.forEach(([, list]) => {
     ;(list || []).forEach(g => {
       if (!g || !g.date) return
       const d = new Date(g.date)
@@ -185,35 +214,31 @@ function updateGroupedLeftCalendar(mode, pageData) {
   calendarContainer.style.display = "block"
 
   if (mode === "year") {
-    const firstYear = parseInt(pageData[0][0], 10)
-    if (typeof renderYearCalendar === "function" && !Number.isNaN(firstYear)) {
-      const cal = renderYearCalendar(firstYear, gameDates)
+    const years = [...new Set(
+      allEntries
+        .map(([key]) => parseInt(key, 10))
+        .filter(year => !Number.isNaN(year))
+    )].sort((a, b) => a - b)
+    const currentYears = new Set(
+      pageData
+        .map(([key]) => parseInt(key, 10))
+        .filter(year => !Number.isNaN(year))
+    )
+
+    if (typeof renderYearCalendar === "function" && years.length) {
+      const cal = years
+        .map(year => `
+          <div class="group-cal-block${currentYears.has(year) ? " is-current-page" : ""}">
+            ${renderYearCalendar(year, gameDates)}
+          </div>
+        `)
+        .join("")
       const stats = renderTagStats(mode, pageData)
-      calendarContainer.innerHTML = `${cal}${stats}`
+      calendarContainer.innerHTML = `<div class="group-cal-scroll">${cal}</div>${stats}`
+      scrollGroupedCalendarToCurrent(calendarContainer)
     } else {
       calendarContainer.innerHTML = ""
     }
-    return
-  }
-
-  let year = null
-  let month = null
-  const firstKey = pageData[0][0]
-
-  if (mode === "month") {
-    const parts = firstKey.split("-")
-    year = parseInt(parts[0], 10)
-    month = parseInt(parts[1], 10)
-  } else {
-    const d = new Date(firstKey)
-    if (!Number.isNaN(d.getTime())) {
-      year = d.getFullYear()
-      month = d.getMonth() + 1
-    }
-  }
-
-  if (Number.isNaN(year) || Number.isNaN(month) || !year || !month) {
-    calendarContainer.innerHTML = ""
     return
   }
 
@@ -244,9 +269,50 @@ function updateGroupedLeftCalendar(mode, pageData) {
     })
   }
 
-  const cal = renderGroupedMonthCalendar(year, month, highlightSet, gameDates)
+  const monthKeys = [...new Set(Object.keys(gameDates).map(key => key.slice(0, 7)))]
+    .sort((a, b) => a.localeCompare(b))
+
+  const cal = monthKeys
+    .map(monthKey => {
+      const parts = monthKey.split("-")
+      const year = parseInt(parts[0], 10)
+      const month = parseInt(parts[1], 10)
+      if (Number.isNaN(year) || Number.isNaN(month)) return ""
+
+      const lastDay = new Date(year, month, 0).getDate()
+      let hasCurrentPageRange = false
+      for (let d = 1; d <= lastDay; d++) {
+        const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`
+        if (highlightSet.has(dateKey)) {
+          hasCurrentPageRange = true
+          break
+        }
+      }
+
+      return `
+        <div class="group-cal-block${hasCurrentPageRange ? " is-current-page" : ""}">
+          ${renderGroupedMonthCalendar(year, month, highlightSet, gameDates)}
+        </div>
+      `
+    })
+    .join("")
+
   const stats = renderTagStats(mode, pageData)
-  calendarContainer.innerHTML = `${cal}${stats}`
+  calendarContainer.innerHTML = `<div class="group-cal-scroll">${cal}</div>${stats}`
+  scrollGroupedCalendarToCurrent(calendarContainer)
+}
+
+function scrollGroupedCalendarToCurrent(calendarContainer) {
+  const scrollEl = calendarContainer?.querySelector(".group-cal-scroll")
+  if (!scrollEl) return
+
+  requestAnimationFrame(() => {
+    const target = scrollEl.querySelector(".group-cal-block.is-current-page")
+    if (!target) return
+
+    const targetTop = target.offsetTop - scrollEl.offsetTop
+    scrollEl.scrollTop = Math.max(0, targetTop - 8)
+  })
 }
 
 function renderGroupedMonthCalendar(year, month, highlightSet, gameDates) {
@@ -356,6 +422,73 @@ function parseTags(raw) {
     .filter(Boolean))]
 }
 
+function getUsedTagsForSuggestions() {
+  const notes = getAllDayNotes()
+  const counts = {}
+
+  Object.values(notes || {}).forEach(note => {
+    ;(note?.tags || []).forEach(tag => {
+      const normalized = String(tag || "").trim().replace(/^#/, "")
+      if (!normalized) return
+      counts[normalized] = (counts[normalized] || 0) + 1
+    })
+  })
+
+  return Object.entries(counts)
+    .sort((a, b) => {
+      if (b[1] !== a[1]) return b[1] - a[1]
+      return a[0].localeCompare(b[0], "ja")
+    })
+    .map(([tag]) => tag)
+}
+
+function renderGroupNoteTagSuggestions() {
+  const wrap = document.getElementById("groupNoteTagSuggestions")
+  const input = document.getElementById("groupNoteTags")
+  if (!wrap || !input) return
+
+  const usedTags = getUsedTagsForSuggestions()
+  if (!usedTags.length) {
+    wrap.style.display = "none"
+    wrap.innerHTML = ""
+    return
+  }
+
+  const selected = new Set(parseTags(input.value))
+  const chips = usedTags
+    .map(tag => `
+      <button
+        type="button"
+        class="group-note-suggest-chip${selected.has(tag) ? " is-selected" : ""}"
+        data-tag="${escapeHtml(tag)}"
+      >#${escapeHtml(tag)}</button>
+    `)
+    .join("")
+
+  wrap.innerHTML = `
+    <div class="group-note-suggest-title">Used Tags</div>
+    <div class="group-note-suggest-row">${chips}</div>
+  `
+  wrap.style.display = "block"
+
+  wrap.querySelectorAll(".group-note-suggest-chip").forEach(btn => {
+    btn.onclick = () => {
+      const tag = btn.dataset.tag || ""
+      if (!tag) return
+
+      const next = new Set(parseTags(input.value))
+      if (next.has(tag)) next.delete(tag)
+      else next.add(tag)
+
+      input.value = [...next].join(", ")
+      renderGroupNoteTagSuggestions()
+      input.focus()
+    }
+  })
+
+  input.oninput = () => renderGroupNoteTagSuggestions()
+}
+
 function extractHashTags(comment) {
   const matches = String(comment || "").match(/#([^\s#.,、，]+)/g) || []
   return [...new Set(matches.map(m => m.replace(/^#/, "").trim()).filter(Boolean))]
@@ -380,10 +513,18 @@ function renderTagStats(mode, pageData) {
     return '<div class="tag-stats-card"><div class="tag-stats-title">Tag Stats</div><div class="tag-stats-empty">タグはまだありません</div></div>'
   }
 
+  const selectedLabel = selectedDayTagFilter
+    ? `<button type="button" class="tag-stats-clear-btn" onclick="toggleDayTagFilter('')">Clear: #${escapeHtml(selectedDayTagFilter)}</button>`
+    : ""
+
   const items = rows
-    .map(([tag, count]) => `<div class="tag-stats-row"><span>#${escapeHtml(tag)}</span><strong>${count}</strong></div>`)
+    .map(([tag, count]) => {
+      const encoded = encodeURIComponent(tag)
+      const active = mode === "day" && selectedDayTagFilter === tag ? " is-active" : ""
+      return `<button type="button" class="tag-stats-row tag-stats-filter-btn${active}" onclick="toggleDayTagFilter(decodeURIComponent('${encoded}'))"><span>#${escapeHtml(tag)}</span><strong>${count}</strong></button>`
+    })
     .join("")
-  return `<div class="tag-stats-card"><div class="tag-stats-title">Tag Stats</div>${items}</div>`
+  return `<div class="tag-stats-card"><div class="tag-stats-title">Tag Stats</div>${selectedLabel}${items}</div>`
 }
 
 function ensureGroupNoteModalWired() {
@@ -453,6 +594,7 @@ function openDayNoteEditor(dayKey, label) {
   title.textContent = `${label} Memo`
   comment.value = note.comment || ""
   tags.value = (note.tags || []).join(", ")
+  renderGroupNoteTagSuggestions()
   groupNoteEditingImage = note.imageData || ""
   imageInput.value = ""
 

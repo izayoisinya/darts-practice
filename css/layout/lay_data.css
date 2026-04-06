@@ -1114,6 +1114,23 @@ main {
   line-height: 1;
 }
 
+@media (min-width: 768px) and (max-width: 1366px) {
+  .session-triple-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "n20 n17"
+      "n19 n16"
+      "n18 n15";
+  }
+
+  .session-triple-grid .session-triple-item:nth-child(1) { grid-area: n20; }
+  .session-triple-grid .session-triple-item:nth-child(2) { grid-area: n19; }
+  .session-triple-grid .session-triple-item:nth-child(3) { grid-area: n18; }
+  .session-triple-grid .session-triple-item:nth-child(4) { grid-area: n17; }
+  .session-triple-grid .session-triple-item:nth-child(5) { grid-area: n16; }
+  .session-triple-grid .session-triple-item:nth-child(6) { grid-area: n15; }
+}
+
 .round-chart {
   flex: 1;
   display: flex;

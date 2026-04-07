@@ -22,14 +22,23 @@ main {
   border-bottom: 1px solid var(--border-main); 
 }
 
+.header h1 {
+  margin: 0;
+  line-height: 1;
+}
+
 @media (min-width: 768px) and (max-width: 1366px) {
   .tablet .header {
-    height: calc(var(--header-height) + env(safe-area-inset-top) + 10px);
-    padding: env(safe-area-inset-top) 16px 0 14px;
+    height: calc(env(safe-area-inset-top) + 52px);
+    padding: env(safe-area-inset-top) 12px 0 10px;
+  }
+
+  .tablet .header h1 {
+    font-size: 30px;
   }
 
   .tablet main {
-    height: calc(100dvh - 70px);
+    height: calc(100dvh - 62px);
   }
 }
 

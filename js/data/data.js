@@ -505,7 +505,12 @@ function drawGameScoresChart() {
 function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = "", compareLabel = "") {
   const canvas = document.getElementById("scoreChart")
   const detailLegend = document.getElementById("detailCompareLegend")
-  if (!canvas || !gamesList || gamesList.length === 0) {
+  const safeGamesList = Array.isArray(gamesList) ? gamesList.filter(Boolean) : []
+  const safeCompareGamesList = Array.isArray(compareGamesList)
+    ? compareGamesList.filter(Boolean)
+    : []
+
+  if (!canvas || safeGamesList.length === 0) {
     hideDetailBullRate()
     if (detailLegend) {
       detailLegend.style.display = "none"
@@ -514,7 +519,7 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
     return
   }
   setRangeChartSectionVisible(false)
-  renderDetailBullRate(gamesList)
+  renderDetailBullRate(safeGamesList)
 
   const canvasState = setupHiDPICanvas(canvas, 220)
   if (!canvasState) {
@@ -525,9 +530,11 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
   }
   const { ctx, width, height } = canvasState
   
-  const baseScores = gamesList.map(s => s.score)
-  const hasCompare = Array.isArray(compareGamesList) && compareGamesList.length > 0
-  const compareScoresRaw = hasCompare ? compareGamesList.map(s => s.score) : []
+  const baseScores = safeGamesList.map(s => Number(s?.score) || 0)
+  const hasCompare = safeCompareGamesList.length > 0
+  const compareScoresRaw = hasCompare
+    ? safeCompareGamesList.map(s => Number(s?.score) || 0)
+    : []
   const length = Math.max(baseScores.length, compareScoresRaw.length, 1)
 
   const scores = Array.from({ length }, (_, i) =>

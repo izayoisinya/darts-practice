@@ -272,7 +272,9 @@ function displayDetailPage() {
   let compareGamesList = null
   if (groupedPageMode === "day" && detailCompareDayKey) {
     const grouped = getSessionsGroupedByDay()
-    compareGamesList = grouped[detailCompareDayKey] || null
+    compareGamesList = Array.isArray(grouped[detailCompareDayKey])
+      ? grouped[detailCompareDayKey].filter(Boolean)
+      : null
   }
 
   drawDetailGroupChart(

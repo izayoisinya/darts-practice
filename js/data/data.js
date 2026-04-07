@@ -12,26 +12,24 @@ function isPhonePortraitDataView() {
 function setupHiDPICanvas(canvas, fallbackHeight = 220) {
   if (!canvas) return null
 
-  const cssWidth = canvas.clientWidth || canvas.offsetWidth || 0
-  const cssHeight = canvas.clientHeight || canvas.offsetHeight || fallbackHeight
+  // inline style を先にリセットして CSS (width:100%) が有効な状態で計測する
+  canvas.style.width = ''
+  canvas.style.height = ''
+
+  const cssWidth = canvas.offsetWidth || 0
+  const cssHeight = canvas.offsetHeight || fallbackHeight
   if (!cssWidth || !cssHeight) return null
 
   const dpr = Math.min(window.devicePixelRatio || 1, 3)
   canvas.width = Math.round(cssWidth * dpr)
   canvas.height = Math.round(cssHeight * dpr)
-  canvas.style.width = `${cssWidth}px`
-  canvas.style.height = `${cssHeight}px`
+  // style は設定しない → CSS の width:100% がそのまま表示サイズを管理する
 
   const ctx = canvas.getContext("2d")
   if (!ctx) return null
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
-  return {
-    ctx,
-    width: cssWidth,
-    height: cssHeight,
-    dpr
-  }
+  return { ctx, width: cssWidth, height: cssHeight, dpr }
 }
 
 function setDataPanel(mode) {

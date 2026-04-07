@@ -19,8 +19,9 @@ body {
 
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+  /* left/right は各ページの CSS で per-element 管理するため body では除外 */
+  padding-left: 0;
+  padding-right: 0;
 }
 
 button,

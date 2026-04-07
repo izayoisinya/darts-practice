@@ -1663,11 +1663,12 @@ main {
 
 .phone.landscape {
   --data-footer-spacer: calc(98px + env(safe-area-inset-bottom));
+  --phone-menu-edge-space: 30px;
 }
 
 .phone.landscape .header {
   height: calc(env(safe-area-inset-top) + 42px);
-  padding: env(safe-area-inset-top) 4px 0 4px;
+  padding: env(safe-area-inset-top) calc(6px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 4px;
 }
 
 .phone.landscape .header h1 {
@@ -1677,12 +1678,12 @@ main {
 }
 
 .phone.landscape main.data-container {
-  padding: 2px 4px 0 4px;
+  padding: 2px calc(6px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 4px;
 }
 
 .phone.landscape .footer-bar {
   height: 48px;
-  padding: 4px 4px calc(4px + env(safe-area-inset-bottom)) 4px;
+  padding: 4px calc(6px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) 4px;
   gap: 8px;
 }
 
@@ -1796,7 +1797,7 @@ body.phone.landscape.data-detail-view .session-card-body {
 
 .phone.portrait {
   --data-footer-spacer: calc(150px + env(safe-area-inset-bottom));
-  --phone-menu-edge-space: 24px;
+  --phone-menu-edge-space: 30px;
 }
 
 .phone.portrait .header {

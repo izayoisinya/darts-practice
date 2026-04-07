@@ -1514,3 +1514,92 @@ main {
   padding: 0.55rem 0.3rem;
   font-size: 0.78rem;
 }
+
+/* セッションカード: tablet portrait と同じ構成 */
+.phone.portrait .session-card {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+  grid-template-areas:
+    "header header"
+    "kpi kpi"
+    "rates triple"
+    "chart triple"
+    "awards triple";
+  gap: 10px 12px;
+}
+
+.phone.portrait .session-card-header {
+  grid-area: header;
+  margin-bottom: 0;
+}
+
+.phone.portrait .session-card-body,
+.phone.portrait .session-main-block {
+  display: contents;
+}
+
+.phone.portrait .session-kpi-grid {
+  grid-area: kpi;
+}
+
+.phone.portrait .session-rate-group {
+  grid-area: rates;
+  min-width: 0;
+}
+
+.phone.portrait .session-side-block {
+  grid-area: chart;
+  min-width: 0;
+}
+
+.phone.portrait .session-triple-block {
+  grid-area: triple;
+  min-width: 0;
+  height: 100%;
+}
+
+.phone.portrait .session-awards-block {
+  grid-area: awards;
+  margin-top: 0;
+}
+
+.phone.portrait .session-side-block .session-meta-block,
+.phone.portrait .session-triple-block,
+.phone.portrait .session-awards-block {
+  padding: 8px 10px;
+}
+
+.phone.portrait .session-round-block {
+  height: auto;
+}
+
+.phone.portrait .session-round-block .round-chart {
+  min-height: 220px;
+  height: auto;
+}
+
+.phone.portrait .session-round-block .round-line-chart {
+  height: 220px;
+  min-height: 220px;
+  flex: 0 0 220px;
+}
+
+.phone.portrait .session-stat-row {
+  grid-template-columns: 24px 24px minmax(0, 1fr) 42px;
+  gap: 8px;
+}
+
+.phone.portrait .session-triple-grid {
+  grid-template-columns: 1fr;
+  grid-template-areas: none;
+}
+
+body.phone.portrait.data-detail-view .session-card-body {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+  grid-template-areas:
+    "kpi kpi"
+    "rates rates"
+    "triple chart";
+  gap: 12px;
+  align-items: start;
+}

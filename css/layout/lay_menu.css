@@ -21,6 +21,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  pointer-events: none;
   
   
   
@@ -38,7 +39,7 @@
   top: 0;
   right: 0;
   
-  width: 40px;
+  width: 20px;
   height: 100dvh;
   
   background: transparent;
@@ -73,6 +74,7 @@ body.menu-open .menu-edge {
 
 .side-menu.open {
   right: 0;
+  pointer-events: auto;
 }
 
 

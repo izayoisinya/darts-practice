@@ -423,7 +423,7 @@ function drawGameScoresChart() {
   const last30 = sessions.slice(-30)
   const scores = last30.map(s => s.score)
   
-  const padding = 45
+    const padding = 38
   const graphWidth = width - padding * 2
   const graphHeight = height - padding * 2
   
@@ -449,14 +449,14 @@ function drawGameScoresChart() {
     ctx.fillStyle = "rgba(255,255,255,0.4)"
     ctx.font = "12px sans-serif"
     ctx.textAlign = "right"
-    ctx.fillText(Math.round(value), padding - 5, y + 4)
+      ctx.fillText(Math.round(value), padding - 3, y + 4)
   }
   
   // 折れ線
   const stepX = graphWidth / (scores.length - 1 || 1)
   
   ctx.beginPath()
-  ctx.lineWidth = 2
+    ctx.lineWidth = 1.5
   ctx.strokeStyle = "#4CAF50"
   
   scores.forEach((score, i) => {
@@ -478,7 +478,7 @@ function drawGameScoresChart() {
     const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
     
     ctx.beginPath()
-    ctx.arc(x, y, 3, 0, Math.PI * 2)
+      ctx.arc(x, y, 2, 0, Math.PI * 2)
     ctx.fillStyle = "#4CAF50"
     ctx.fill()
   })
@@ -521,7 +521,7 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
     i < compareScoresRaw.length ? compareScoresRaw[i] : null
   )
   
-  const padding = 45
+    const padding = 38
   const graphWidth = width - padding * 2
   const graphHeight = height - padding * 2
   
@@ -549,9 +549,9 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
     ctx.stroke()
     
     ctx.fillStyle = "rgba(255,255,255,0.4)"
-    ctx.font = "12px sans-serif"
+      ctx.font = "10px sans-serif"
     ctx.textAlign = "right"
-    ctx.fillText(Math.round(value), padding - 5, y + 4)
+      ctx.fillText(Math.round(value), padding - 3, y + 4)
   }
   
   // 折れ線
@@ -767,7 +767,7 @@ function buildDateLabels(startDate, length) {
 function drawLineSeries(ctx, values, color, padding, height, graphHeight, minScore, scoreRange, stepX) {
   let started = false
   ctx.beginPath()
-  ctx.lineWidth = 2
+    ctx.lineWidth = 1.5
   ctx.strokeStyle = color
 
   values.forEach((score, i) => {
@@ -792,7 +792,7 @@ function drawLineSeries(ctx, values, color, padding, height, graphHeight, minSco
     const x = padding + stepX * i
     const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
     ctx.beginPath()
-    ctx.arc(x, y, 3, 0, Math.PI * 2)
+      ctx.arc(x, y, 2, 0, Math.PI * 2)
     ctx.fillStyle = color
     ctx.fill()
   })
@@ -858,7 +858,7 @@ function drawSelectedRangeChart() {
     return
   }
 
-  const padding = 45
+    const padding = 38
   const graphWidth = width - padding * 2
   const graphHeight = height - padding * 2
   const minScore = Math.min(...allScores)
@@ -877,16 +877,16 @@ function drawSelectedRangeChart() {
     ctx.stroke()
 
     ctx.fillStyle = "rgba(255,255,255,0.4)"
-    ctx.font = "12px sans-serif"
+      ctx.font = "10px sans-serif"
     ctx.textAlign = "right"
-    ctx.fillText(Math.round(value), padding - 5, y + 4)
+      ctx.fillText(Math.round(value), padding - 3, y + 4)
   }
 
   const stepX = graphWidth / (length - 1 || 1)
   const labels = buildDateLabels(startDate || compareStartDate, length)
   const labelStep = Math.max(1, Math.ceil(length / 6))
   ctx.fillStyle = "rgba(255,255,255,0.45)"
-  ctx.font = "11px sans-serif"
+    ctx.font = "10px sans-serif"
   ctx.textAlign = "center"
   labels.forEach((label, i) => {
     if (i % labelStep !== 0 && i !== labels.length - 1) return

@@ -294,6 +294,11 @@ main {
   padding: 6px 8px;
 }
 
+.range-chart-controls input {
+  width: 100%;
+  min-width: 0;
+}
+
 .range-chart-controls button {
   cursor: pointer;
 }
@@ -1633,6 +1638,26 @@ main {
   min-width: 80px;
   padding: 0.55rem 0.3rem;
   font-size: 0.78rem;
+}
+
+.phone.portrait .range-chart-row {
+  grid-template-columns: 14px minmax(0, 1fr) 10px minmax(0, 1fr);
+  gap: 4px;
+}
+
+.phone.portrait .range-prefix,
+.phone.portrait .range-sep {
+  font-size: 11px;
+}
+
+.phone.portrait .range-chart-controls input {
+  min-width: 0;
+  padding: 5px 6px;
+  font-size: 12px;
+}
+
+.phone.portrait .range-apply-row {
+  margin-top: 2px;
 }
 
 /* セッションカード: tablet portrait と同じ構成 */

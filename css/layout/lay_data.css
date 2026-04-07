@@ -22,6 +22,17 @@ main {
   border-bottom: 1px solid var(--border-main); 
 }
 
+@media (min-width: 768px) and (max-width: 1366px) {
+  .tablet .header {
+    height: calc(var(--header-height) + env(safe-area-inset-top) + 10px);
+    padding: env(safe-area-inset-top) 16px 0 14px;
+  }
+
+  .tablet main {
+    height: calc(100dvh - 70px);
+  }
+}
+
 .data-container {
   display: grid;
   grid-template-columns: 1fr 1fr;

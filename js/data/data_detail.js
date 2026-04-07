@@ -6,6 +6,38 @@ let detailViewMode = false
 let selectedDayData = null
 let detailPageNumber = 1
 let detailCompareDayKey = ""
+let detailHistoryArmed = false
+let detailPopstateBound = false
+
+function ensureDetailPopstateHandler() {
+  if (detailPopstateBound) return
+  window.addEventListener("popstate", () => {
+    // 詳細表示中の戻る操作(端スワイプ含む)は画面遷移ではなく詳細クローズを優先
+    if (detailViewMode) {
+      backToSummary({ fromPopState: true })
+    }
+  })
+  detailPopstateBound = true
+}
+
+function armDetailHistoryState(dateKey) {
+  if (!window.history || typeof window.history.pushState !== "function") return
+  const state = window.history.state || {}
+  if (state && state.dataDetailOpen) {
+    detailHistoryArmed = true
+    return
+  }
+  window.history.pushState(
+    {
+      ...(state || {}),
+      dataDetailOpen: true,
+      dataDetailKey: String(dateKey || ""),
+      dataDetailAt: Date.now()
+    },
+    ""
+  )
+  detailHistoryArmed = true
+}
 
 function setDataDetailViewClass(enabled) {
   if (!document.body) return
@@ -13,6 +45,9 @@ function setDataDetailViewClass(enabled) {
 }
 
 function showGameDetails(dateKey, gamesList) {
+  ensureDetailPopstateHandler()
+  armDetailHistoryState(dateKey)
+
   detailViewMode = true
   setDataDetailViewClass(true)
   selectedDayData = { dateKey, gamesList }
@@ -315,9 +350,18 @@ function changeDetailPage(page) {
   displayDetailPage()
 }
 
-function backToSummary() {
+function backToSummary(options = {}) {
+  const fromPopState = Boolean(options && options.fromPopState)
+
+  // 通常の戻るボタン押下時は履歴を戻して、popstate経由で同じクローズ処理を通す
+  if (!fromPopState && detailHistoryArmed && window.history && window.history.length > 1) {
+    window.history.back()
+    return
+  }
+
   detailViewMode = false
   setDataDetailViewClass(false)
+  detailHistoryArmed = false
 
   if (typeof hideDetailBullRate === "function") {
     hideDetailBullRate()

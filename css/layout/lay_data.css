@@ -62,6 +62,18 @@ main {
   padding-bottom: 0;
 }
 
+.tablet.landscape #rightPanel {
+  overflow-x: hidden;
+}
+
+.tablet.landscape #sessionsContainer {
+  overflow-x: hidden;
+}
+
+.tablet.landscape #sessionsContainer .session-card {
+  min-width: 0;
+}
+
 #sessionsContainer::after {
   content: "";
   display: block;

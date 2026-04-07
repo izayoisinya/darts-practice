@@ -5,6 +5,7 @@ let dataPanelSwipeBound = false
 let panelTouchStartX = 0
 let panelTouchStartY = 0
 let panelSwipeBlockedByTabs = false
+const chartAxisFontFamily = "'Segoe UI', 'Noto Sans JP', sans-serif"
 
 function isPhonePortraitDataView() {
   return body.classList.contains("phone") && body.classList.contains("portrait")
@@ -22,15 +23,28 @@ function setupHiDPICanvas(canvas, fallbackHeight = 220) {
   if (!cssWidth || !cssHeight) return null
 
   const dpr = Math.min(window.devicePixelRatio || 1, 3)
-  canvas.width = Math.round(cssWidth * dpr)
-  canvas.height = Math.round(cssHeight * dpr)
+  const backingWidth = Math.max(1, Math.round(cssWidth * dpr))
+  const backingHeight = Math.max(1, Math.round(cssHeight * dpr))
+  canvas.width = backingWidth
+  canvas.height = backingHeight
   // style は設定しない → CSS の width:100% がそのまま表示サイズを管理する
 
   const ctx = canvas.getContext("2d")
   if (!ctx) return null
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  const scaleX = backingWidth / cssWidth
+  const scaleY = backingHeight / cssHeight
+  ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0)
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = "high"
 
   return { ctx, width: cssWidth, height: cssHeight, dpr }
+}
+
+function setChartAxisTextStyle(ctx) {
+  ctx.fillStyle = "rgba(255,255,255,0.62)"
+  ctx.font = `600 10px ${chartAxisFontFamily}`
+  ctx.textAlign = "right"
+  ctx.textBaseline = "middle"
 }
 
 function setDataPanel(mode) {
@@ -462,10 +476,8 @@ function drawGameScoresChart() {
     ctx.lineTo(width - rightPadding, y)
     ctx.stroke()
     
-    ctx.fillStyle = "rgba(255,255,255,0.4)"
-    ctx.font = "9px sans-serif"
-    ctx.textAlign = "right"
-    ctx.fillText(Math.round(value), padding - 2, y + 3)
+    setChartAxisTextStyle(ctx)
+    ctx.fillText(Math.round(value), Math.round(padding - 2), Math.round(y))
   }
   
   // 折れ線
@@ -572,10 +584,8 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
     ctx.lineTo(width - rightPadding, y)
     ctx.stroke()
     
-    ctx.fillStyle = "rgba(255,255,255,0.4)"
-    ctx.font = "9px sans-serif"
-    ctx.textAlign = "right"
-    ctx.fillText(Math.round(value), padding - 2, y + 3)
+    setChartAxisTextStyle(ctx)
+    ctx.fillText(Math.round(value), Math.round(padding - 2), Math.round(y))
   }
   
   // 折れ線
@@ -901,18 +911,17 @@ function drawSelectedRangeChart() {
     ctx.lineTo(width - rightPadding, y)
     ctx.stroke()
 
-    ctx.fillStyle = "rgba(255,255,255,0.4)"
-    ctx.font = "9px sans-serif"
-    ctx.textAlign = "right"
-    ctx.fillText(Math.round(value), padding - 2, y + 3)
+    setChartAxisTextStyle(ctx)
+    ctx.fillText(Math.round(value), Math.round(padding - 2), Math.round(y))
   }
 
   const stepX = graphWidth / (length - 1 || 1)
   const labels = buildDateLabels(startDate || compareStartDate, length)
   const labelStep = Math.max(1, Math.ceil(length / 6))
-  ctx.fillStyle = "rgba(255,255,255,0.45)"
-    ctx.font = "10px sans-serif"
+  ctx.fillStyle = "rgba(255,255,255,0.56)"
+  ctx.font = `600 10px ${chartAxisFontFamily}`
   ctx.textAlign = "center"
+  ctx.textBaseline = "alphabetic"
   labels.forEach((label, i) => {
     if (i % labelStep !== 0 && i !== labels.length - 1) return
     const x = padding + stepX * i

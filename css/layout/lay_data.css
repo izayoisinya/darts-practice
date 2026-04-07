@@ -1555,7 +1555,7 @@ main {
 
 .phone.landscape .header {
   height: calc(env(safe-area-inset-top) + 42px);
-  padding: env(safe-area-inset-top) calc(8px + env(safe-area-inset-right)) 0 calc(8px + env(safe-area-inset-left));
+  padding: env(safe-area-inset-top) 6px 0 6px;
 }
 
 .phone.landscape .header h1 {
@@ -1565,12 +1565,12 @@ main {
 }
 
 .phone.landscape main.data-container {
-  padding: 6px calc(8px + env(safe-area-inset-right)) 0 calc(8px + env(safe-area-inset-left));
+  padding: 4px 6px 0 6px;
 }
 
 .phone.landscape .footer-bar {
   height: 48px;
-  padding: 8px calc(10px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left));
+  padding: 6px 6px calc(6px + env(safe-area-inset-bottom)) 6px;
   gap: 10px;
 }
 

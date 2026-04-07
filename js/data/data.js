@@ -42,7 +42,7 @@ function setupHiDPICanvas(canvas, fallbackHeight = 220) {
 
 function setChartAxisTextStyle(ctx) {
   ctx.fillStyle = "rgba(255,255,255,0.62)"
-  ctx.font = `600 10px ${chartAxisFontFamily}`
+  ctx.font = `600 9px ${chartAxisFontFamily}`
   ctx.textAlign = "right"
   ctx.textBaseline = "middle"
 }
@@ -919,7 +919,7 @@ function drawSelectedRangeChart() {
   const labels = buildDateLabels(startDate || compareStartDate, length)
   const labelStep = Math.max(1, Math.ceil(length / 6))
   ctx.fillStyle = "rgba(255,255,255,0.56)"
-  ctx.font = `600 10px ${chartAxisFontFamily}`
+  ctx.font = `600 9px ${chartAxisFontFamily}`
   ctx.textAlign = "center"
   ctx.textBaseline = "alphabetic"
   labels.forEach((label, i) => {

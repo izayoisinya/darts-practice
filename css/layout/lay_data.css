@@ -1858,6 +1858,11 @@ body.phone.landscape.data-detail-view .session-card-body {
   align-items: stretch;
 }
 
+.phone.portrait .data-card {
+  flex: 1 1 calc(50% - 0.3rem);
+  min-width: 0;
+}
+
 .phone.portrait .panel-switcher {
   display: flex;
   gap: 0.5rem;

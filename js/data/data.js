@@ -51,14 +51,14 @@ function setupDataPanelSwipe() {
   if (!container) return
 
   container.addEventListener("touchstart", e => {
-    if (!isPhonePortraitDataView() || detailViewMode) return
+    if (!isPhonePortraitDataView()) return
     if (!e.touches || !e.touches[0]) return
     panelTouchStartX = e.touches[0].clientX
     panelTouchStartY = e.touches[0].clientY
   }, { passive: true })
 
   container.addEventListener("touchend", e => {
-    if (!isPhonePortraitDataView() || detailViewMode) return
+    if (!isPhonePortraitDataView()) return
     if (!e.changedTouches || !e.changedTouches[0]) return
 
     const dx = e.changedTouches[0].clientX - panelTouchStartX

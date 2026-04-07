@@ -9,6 +9,31 @@ function isPhonePortraitDataView() {
   return body.classList.contains("phone") && body.classList.contains("portrait")
 }
 
+function setupHiDPICanvas(canvas, fallbackHeight = 220) {
+  if (!canvas) return null
+
+  const cssWidth = canvas.clientWidth || canvas.offsetWidth || 0
+  const cssHeight = canvas.clientHeight || canvas.offsetHeight || fallbackHeight
+  if (!cssWidth || !cssHeight) return null
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 3)
+  canvas.width = Math.round(cssWidth * dpr)
+  canvas.height = Math.round(cssHeight * dpr)
+  canvas.style.width = `${cssWidth}px`
+  canvas.style.height = `${cssHeight}px`
+
+  const ctx = canvas.getContext("2d")
+  if (!ctx) return null
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+  return {
+    ctx,
+    width: cssWidth,
+    height: cssHeight,
+    dpr
+  }
+}
+
 function setDataPanel(mode) {
   if (mode !== "history" && mode !== "stats") return
   dataPanelMode = mode
@@ -375,14 +400,23 @@ function drawGameScoresChart() {
   const canvas = document.getElementById("scoreChart")
   if (!canvas) return
   hideDetailBullRate()
+
+  const canvasState = setupHiDPICanvas(canvas, 220)
+  if (!canvasState) {
+    setTimeout(() => drawGameScoresChart(), 100)
+    return
+  }
+  const { ctx, width, height } = canvasState
+
+  ctx.clearRect(0, 0, width, height)
   
   const sessions = JSON.parse(
     localStorage.getItem("dartsSessions")
   ) || []
   
   if (sessions.length === 0) {
-    const ctx = canvas.getContext("2d")
     ctx.fillStyle = "rgba(255,255,255,0.3)"
+    ctx.font = "12px sans-serif"
     ctx.fillText("No data", 10, 20)
     return
   }
@@ -391,23 +425,9 @@ function drawGameScoresChart() {
   const last30 = sessions.slice(-30)
   const scores = last30.map(s => s.score)
   
-  // Canvas のサイズを取得
-  if (!canvas.offsetWidth || !canvas.offsetHeight) {
-    setTimeout(() => drawGameScoresChart(), 100)
-    return
-  }
-  
-  const width = canvas.width = canvas.offsetWidth
-  const height = canvas.height = canvas.offsetHeight || 220
-  
   const padding = 45
   const graphWidth = width - padding * 2
   const graphHeight = height - padding * 2
-  
-  const ctx = canvas.getContext("2d")
-  
-  // 背景をクリア
-  ctx.clearRect(0, 0, width, height)
   
   // スコアの最小値と最大値
   const minScore = Math.min(...scores)
@@ -481,14 +501,15 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
   }
   setRangeChartSectionVisible(false)
   renderDetailBullRate(gamesList)
-  
-  // Canvas のサイズを取得
-  if (!canvas.offsetWidth || !canvas.offsetHeight) {
+
+  const canvasState = setupHiDPICanvas(canvas, 220)
+  if (!canvasState) {
     setTimeout(() => {
       drawDetailGroupChart(gamesList, compareGamesList, baseLabel, compareLabel)
     }, 100)
     return
   }
+  const { ctx, width, height } = canvasState
   
   const baseScores = gamesList.map(s => s.score)
   const hasCompare = Array.isArray(compareGamesList) && compareGamesList.length > 0
@@ -502,14 +523,9 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
     i < compareScoresRaw.length ? compareScoresRaw[i] : null
   )
   
-  const width = canvas.width = canvas.offsetWidth
-  const height = canvas.height = canvas.offsetHeight || 220
-  
   const padding = 45
   const graphWidth = width - padding * 2
   const graphHeight = height - padding * 2
-  
-  const ctx = canvas.getContext("2d")
   
   // 背景をクリア
   ctx.clearRect(0, 0, width, height)
@@ -800,14 +816,12 @@ function drawSelectedRangeChart() {
   const sessions = JSON.parse(localStorage.getItem("dartsSessions")) || []
   ensureRangeDefaults(sessions)
 
-  if (!canvas.offsetWidth || !canvas.offsetHeight) {
+  const canvasState = setupHiDPICanvas(canvas, 220)
+  if (!canvasState) {
     setTimeout(() => drawSelectedRangeChart(), 100)
     return
   }
-
-  const ctx = canvas.getContext("2d")
-  const width = canvas.width = canvas.offsetWidth
-  const height = canvas.height = canvas.offsetHeight || 220
+  const { ctx, width, height } = canvasState
   ctx.clearRect(0, 0, width, height)
 
   const startDate = parseDateStart(startInput.value)

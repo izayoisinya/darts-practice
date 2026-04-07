@@ -1,5 +1,15 @@
-let viewMode = "game" 
+let viewMode = "game"
 let rangeChartWired = false
+let dataPanelMode = "history"
+
+function setDataPanel(mode) {
+  dataPanelMode = mode
+  const main = document.querySelector("main.data-container")
+  if (main) main.classList.toggle("panel-stats", mode === "stats")
+  document.querySelectorAll(".panel-switcher button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.panel === mode)
+  })
+}
 
 function updateViewTabs(mode) {
   document.querySelectorAll(".tabs-container button").forEach(btn => {
@@ -19,7 +29,12 @@ function changeView(mode) {
     setDataDetailViewClass(false)
   }
   updateViewTabs(mode)
-  
+
+  // phone portrait: group表示時はHistoryパネルへ自動切り替え
+  if (mode !== "game" && body.classList.contains("phone") && body.classList.contains("portrait")) {
+    setDataPanel("history")
+  }
+
   const statsSection = document.getElementById("statsSection")
   const awardsSection = document.getElementById("awardsSection")
   const chartContainer = document.getElementById("chartContainer")

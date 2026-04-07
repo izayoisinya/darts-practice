@@ -1408,81 +1408,109 @@ main {
   background: rgb(var(--accent-rgb) / 0.35);
   color: #fff;
   font-weight: 700;
+}
+
+
+/* ===================================================== */
+/* PANEL SWITCHER                                        */
+/* ===================================================== */
+
+/* デスクトップタブレットでは非表示（両パネル並列表示） */
+.panel-switcher {
+  display: none;
+}
+
+.panel-switcher button {
+  position: relative;
+  padding: 0.65rem 1rem;
+  background: linear-gradient(180deg, rgba(24, 32, 46, 0.92), rgba(15, 23, 42, 0.86));
+  color: #94a3b8;
+  border: 1px solid rgba(71, 85, 105, 0.55);
+  border-radius: 0.75rem;
   cursor: pointer;
-}
-
-.cal-day-num {
-  font-size: 12px;
-  line-height: 1;
-}
-
-.cal-dot {
-  display: block;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--accent);
-  margin-top: 2px;
-}
-
-.cal-day.cal-highlight .cal-dot {
-  background: #fff;
-}
-
-/* Year カレンダー */
-
-.cal-year-title {
-  font-size: 15px;
+  font-size: 0.9rem;
   font-weight: 700;
-  text-align: center;
-  margin-bottom: 12px;
+  letter-spacing: 0.02em;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease,
+              color 0.18s ease, background 0.18s ease;
 }
 
-.cal-year-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.mini-cal-wrap {
-  padding: 8px 6px;
-  background: #11151c;
-  border: 1px solid #2a2f3a;
-  border-radius: 10px;
-}
-
-.mini-cal-title {
-  font-size: 10px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 4px;
-  opacity: 0.8;
-}
-
-.mini-cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
-}
-
-.mini-cal-hd {
-  font-size: 8px;
-  text-align: center;
-  opacity: 0.4;
-  padding: 1px 0;
-}
-
-.mini-cal-day {
-  font-size: 8px;
-  text-align: center;
-  padding: 2px 1px;
-  border-radius: 3px;
-  line-height: 1.2;
-  color: rgba(255,255,255,0.45);
-}
-
-.mini-cal-day.mini-has-games {
-  background: rgb(var(--accent-rgb) / 0.35);
+.panel-switcher button.active {
+  background: linear-gradient(180deg, rgb(var(--accent-rgb) / 0.35), rgb(var(--accent-rgb) / 0.18));
   color: #fff;
-  font-weight: 700;
+  border-color: rgb(var(--accent-rgb) / 0.75);
+  box-shadow: 0 10px 24px rgb(var(--accent-rgb) / 0.2), inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+
+/* ===================================================== */
+/* RESPONSIVE  PHONE PORTRAIT                          */
+/* ===================================================== */
+
+.phone.portrait {
+  --data-footer-spacer: calc(200px + env(safe-area-inset-bottom));
+}
+
+.phone.portrait main.data-container {
+  grid-template-columns: 1fr;
+  padding: 10px 12px 0 12px;
+}
+
+/* デフォルト: History (rightPanel) 表示, Stats (leftPanel) 非表示 */
+.phone.portrait #leftPanel {
+  display: none;
+}
+
+/* Stats パネルアクティブ時 */
+.phone.portrait main.data-container.panel-stats #leftPanel {
+  display: flex;
+}
+
+.phone.portrait main.data-container.panel-stats #rightPanel {
+  display: none;
+}
+
+/* Stats パネル時はページネーション不要 */
+.phone.portrait main.data-container.panel-stats .pagination {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* フッターバー: 3段縦積み */
+.phone.portrait .footer-bar {
+  flex-direction: column;
+  height: auto;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  gap: 5px;
+  align-items: stretch;
+}
+
+.phone.portrait .panel-switcher {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.phone.portrait .panel-switcher button {
+  flex: 1;
+  padding: 0.55rem 0.4rem;
+}
+
+.phone.portrait .pagination {
+  width: 100%;
+  justify-content: center;
+  padding: 0;
+}
+
+.phone.portrait .tabs-container {
+  width: 100%;
+  padding: 0;
+  justify-content: stretch;
+}
+
+.phone.portrait .tabs-container button {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.3rem;
+  font-size: 0.78rem;
 }

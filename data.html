@@ -93,8 +93,12 @@
     </section>
   </div>
   <!-- タブボタンを右下に配置 -->
-  <!-- フッター：ページネーションとタブを同じ行に配置 -->
+  <!-- フッター：パネル切替 / ページネーション / ビュータブ -->
 <div class="footer-bar">
+  <div class="panel-switcher" id="panelSwitcher">
+    <button class="active" data-panel="history" onclick="setDataPanel('history')">History</button>
+    <button data-panel="stats" onclick="setDataPanel('stats')">Stats</button>
+  </div>
   <div class="pagination" id="paginationContainer">
     <button id="prevBtn" onclick="changePage('Prev')">Prev</button>
     <span class="page-info" id="pageInfo"></span>

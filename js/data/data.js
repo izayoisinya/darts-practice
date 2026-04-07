@@ -1,14 +1,61 @@
 let viewMode = "game"
 let rangeChartWired = false
 let dataPanelMode = "history"
+let dataPanelSwipeBound = false
+let panelTouchStartX = 0
+let panelTouchStartY = 0
+
+function isPhonePortraitDataView() {
+  return body.classList.contains("phone") && body.classList.contains("portrait")
+}
 
 function setDataPanel(mode) {
+  if (mode !== "history" && mode !== "stats") return
   dataPanelMode = mode
   const main = document.querySelector("main.data-container")
   if (main) main.classList.toggle("panel-stats", mode === "stats")
   document.querySelectorAll(".panel-switcher button").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.panel === mode)
+    const isActive = btn.dataset.panel === mode
+    btn.classList.toggle("active", isActive)
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false")
   })
+}
+
+function setupDataPanelSwipe() {
+  if (dataPanelSwipeBound) return
+
+  const container = document.querySelector("main.data-container")
+  if (!container) return
+
+  container.addEventListener("touchstart", e => {
+    if (!isPhonePortraitDataView() || detailViewMode) return
+    if (!e.touches || !e.touches[0]) return
+    panelTouchStartX = e.touches[0].clientX
+    panelTouchStartY = e.touches[0].clientY
+  }, { passive: true })
+
+  container.addEventListener("touchend", e => {
+    if (!isPhonePortraitDataView() || detailViewMode) return
+    if (!e.changedTouches || !e.changedTouches[0]) return
+
+    const dx = e.changedTouches[0].clientX - panelTouchStartX
+    const dy = e.changedTouches[0].clientY - panelTouchStartY
+    const absDx = Math.abs(dx)
+    const absDy = Math.abs(dy)
+
+    if (absDx < 55 || absDx <= absDy * 1.2) return
+
+    if (dx < 0 && dataPanelMode !== "stats") {
+      setDataPanel("stats")
+      return
+    }
+
+    if (dx > 0 && dataPanelMode !== "history") {
+      setDataPanel("history")
+    }
+  }, { passive: true })
+
+  dataPanelSwipeBound = true
 }
 
 function updateViewTabs(mode) {
@@ -20,6 +67,7 @@ function updateViewTabs(mode) {
 }
 
 function changeView(mode) {
+  setupDataPanelSwipe()
   viewMode = mode
   detailViewMode = false
   selectedDayData = null
@@ -75,6 +123,7 @@ function changeView(mode) {
 }
 
 function renderView() {
+  setupDataPanelSwipe()
   hideDetailBullRate()
   if (typeof setDataDetailViewClass === "function") {
     setDataDetailViewClass(false)
@@ -844,3 +893,5 @@ function drawSelectedRangeChart() {
     legend.style.display = "flex"
   }
 }
+
+window.addEventListener("DOMContentLoaded", setupDataPanelSwipe)

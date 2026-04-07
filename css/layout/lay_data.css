@@ -1486,6 +1486,10 @@ main {
 /* ===================================================== */
 
 /* デスクトップタブレットでは非表示（両パネル並列表示） */
+.data-panel-top {
+  display: none;
+}
+
 .panel-switcher {
   display: none;
 }
@@ -1518,12 +1522,25 @@ main {
 /* ===================================================== */
 
 .phone.portrait {
-  --data-footer-spacer: calc(200px + env(safe-area-inset-bottom));
+  --data-footer-spacer: calc(150px + env(safe-area-inset-bottom));
 }
 
 .phone.portrait main.data-container {
   grid-template-columns: 1fr;
   padding: 10px 12px 0 12px;
+}
+
+.phone.portrait .data-panel-top {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 7;
+  margin-bottom: 6px;
+  padding: 2px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.78));
+  border: 1px solid rgba(71, 85, 105, 0.35);
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
 }
 
 /* デフォルト: History (rightPanel) 表示, Stats (leftPanel) 非表示 */
@@ -1551,7 +1568,7 @@ main {
   flex-direction: column;
   height: auto;
   padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-  gap: 5px;
+  gap: 6px;
   align-items: stretch;
 }
 

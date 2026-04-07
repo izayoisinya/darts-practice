@@ -423,8 +423,9 @@ function drawGameScoresChart() {
   const last30 = sessions.slice(-30)
   const scores = last30.map(s => s.score)
   
-    const padding = 38
-  const graphWidth = width - padding * 2
+  const padding = 34
+  const rightPadding = 8
+  const graphWidth = width - padding - rightPadding
   const graphHeight = height - padding * 2
   
   // スコアの最小値と最大値
@@ -443,13 +444,13 @@ function drawGameScoresChart() {
     
     ctx.beginPath()
     ctx.moveTo(padding, y)
-    ctx.lineTo(width - padding, y)
+    ctx.lineTo(width - rightPadding, y)
     ctx.stroke()
     
     ctx.fillStyle = "rgba(255,255,255,0.4)"
-    ctx.font = "12px sans-serif"
+    ctx.font = "9px sans-serif"
     ctx.textAlign = "right"
-      ctx.fillText(Math.round(value), padding - 3, y + 4)
+    ctx.fillText(Math.round(value), padding - 2, y + 3)
   }
   
   // 折れ線
@@ -521,8 +522,9 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
     i < compareScoresRaw.length ? compareScoresRaw[i] : null
   )
   
-    const padding = 38
-  const graphWidth = width - padding * 2
+  const padding = 34
+  const rightPadding = 8
+  const graphWidth = width - padding - rightPadding
   const graphHeight = height - padding * 2
   
   // 背景をクリア
@@ -545,13 +547,13 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
     
     ctx.beginPath()
     ctx.moveTo(padding, y)
-    ctx.lineTo(width - padding, y)
+    ctx.lineTo(width - rightPadding, y)
     ctx.stroke()
     
     ctx.fillStyle = "rgba(255,255,255,0.4)"
-      ctx.font = "10px sans-serif"
+    ctx.font = "9px sans-serif"
     ctx.textAlign = "right"
-      ctx.fillText(Math.round(value), padding - 3, y + 4)
+    ctx.fillText(Math.round(value), padding - 2, y + 3)
   }
   
   // 折れ線
@@ -858,8 +860,9 @@ function drawSelectedRangeChart() {
     return
   }
 
-    const padding = 38
-  const graphWidth = width - padding * 2
+  const padding = 34
+  const rightPadding = 8
+  const graphWidth = width - padding - rightPadding
   const graphHeight = height - padding * 2
   const minScore = Math.min(...allScores)
   const maxScore = Math.max(...allScores)
@@ -873,13 +876,13 @@ function drawSelectedRangeChart() {
     const y = height - padding - (value - minScore) / scoreRange * graphHeight
     ctx.beginPath()
     ctx.moveTo(padding, y)
-    ctx.lineTo(width - padding, y)
+    ctx.lineTo(width - rightPadding, y)
     ctx.stroke()
 
     ctx.fillStyle = "rgba(255,255,255,0.4)"
-      ctx.font = "10px sans-serif"
+    ctx.font = "9px sans-serif"
     ctx.textAlign = "right"
-      ctx.fillText(Math.round(value), padding - 3, y + 4)
+    ctx.fillText(Math.round(value), padding - 2, y + 3)
   }
 
   const stepX = graphWidth / (length - 1 || 1)

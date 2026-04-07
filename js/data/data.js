@@ -4,6 +4,7 @@ let dataPanelMode = "history"
 let dataPanelSwipeBound = false
 let panelTouchStartX = 0
 let panelTouchStartY = 0
+let panelSwipeBlockedByTabs = false
 
 function isPhonePortraitDataView() {
   return body.classList.contains("phone") && body.classList.contains("portrait")
@@ -52,6 +53,12 @@ function setupDataPanelSwipe() {
 
   container.addEventListener("touchstart", e => {
     if (!isPhonePortraitDataView()) return
+    const target = e.target instanceof Element ? e.target : null
+    if (target && target.closest(".tabs-container")) {
+      panelSwipeBlockedByTabs = true
+      return
+    }
+    panelSwipeBlockedByTabs = false
     if (!e.touches || !e.touches[0]) return
     panelTouchStartX = e.touches[0].clientX
     panelTouchStartY = e.touches[0].clientY
@@ -59,6 +66,10 @@ function setupDataPanelSwipe() {
 
   container.addEventListener("touchend", e => {
     if (!isPhonePortraitDataView()) return
+    if (panelSwipeBlockedByTabs) {
+      panelSwipeBlockedByTabs = false
+      return
+    }
     if (!e.changedTouches || !e.changedTouches[0]) return
 
     const dx = e.changedTouches[0].clientX - panelTouchStartX
@@ -76,6 +87,10 @@ function setupDataPanelSwipe() {
     if (dx > 0 && dataPanelMode !== "history") {
       setDataPanel("history")
     }
+  }, { passive: true })
+
+  container.addEventListener("touchcancel", () => {
+    panelSwipeBlockedByTabs = false
   }, { passive: true })
 
   dataPanelSwipeBound = true

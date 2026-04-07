@@ -1523,7 +1523,7 @@ main {
 
 .phone.portrait {
   --data-footer-spacer: calc(150px + env(safe-area-inset-bottom));
-  --phone-menu-edge-space: 42px;
+  --phone-menu-edge-space: 24px;
 }
 
 .phone.portrait .header {

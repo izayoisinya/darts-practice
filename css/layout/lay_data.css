@@ -922,6 +922,18 @@ main {
   }
 }
 
+@media (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) {
+  #statsContainer {
+    flex-wrap: wrap;
+    overflow-x: hidden;
+  }
+
+  #statsContainer .data-card {
+    min-width: 0;
+    flex: 1 1 calc(50% - 0.3rem);
+  }
+}
+
 @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
   .session-card {
     display: grid;

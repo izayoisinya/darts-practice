@@ -1523,11 +1523,23 @@ main {
 
 .phone.portrait {
   --data-footer-spacer: calc(150px + env(safe-area-inset-bottom));
+  --phone-menu-edge-space: 42px;
+}
+
+.phone.portrait .header {
+  height: calc(env(safe-area-inset-top) + 52px);
+  padding: env(safe-area-inset-top) calc(8px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 12px;
+}
+
+.phone.portrait .header h1 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.05;
 }
 
 .phone.portrait main.data-container {
   grid-template-columns: 1fr;
-  padding: 10px 12px 0 12px;
+  padding: 8px calc(10px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 10px;
 }
 
 .phone.portrait .data-panel-top {
@@ -1567,7 +1579,7 @@ main {
 .phone.portrait .footer-bar {
   flex-direction: column;
   height: auto;
-  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  padding: 8px calc(10px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) 10px;
   gap: 6px;
   align-items: stretch;
 }
@@ -1592,12 +1604,22 @@ main {
 .phone.portrait .tabs-container {
   width: 100%;
   padding: 0;
-  justify-content: stretch;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  justify-content: flex-start;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.phone.portrait .tabs-container::-webkit-scrollbar {
+  display: none;
 }
 
 .phone.portrait .tabs-container button {
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 auto;
+  min-width: 80px;
   padding: 0.55rem 0.3rem;
   font-size: 0.78rem;
 }

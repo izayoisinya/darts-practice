@@ -264,14 +264,25 @@ main {
 
 .range-chart-row {
   display: grid;
-  grid-template-columns: auto 1fr auto 1fr auto;
+  grid-template-columns: 18px minmax(0, 1fr) auto minmax(0, 1fr);
   gap: 8px;
   align-items: center;
 }
 
-.range-chart-controls label {
+.range-prefix,
+.range-sep {
   font-size: 12px;
   opacity: 0.8;
+  text-align: center;
+}
+
+.range-prefix {
+  font-weight: 700;
+}
+
+.range-apply-row {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .range-chart-controls input,

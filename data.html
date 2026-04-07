@@ -78,16 +78,18 @@
         <h3>Score Trend (Selected Period)</h3>
         <div class="range-chart-controls">
           <div class="range-chart-row">
-            <label for="rangeStartDate">A Start</label>
+            <span class="range-prefix">A</span>
             <input id="rangeStartDate" type="date" />
-            <label for="rangeEndDate">A End</label>
+            <span class="range-sep">~</span>
             <input id="rangeEndDate" type="date" />
           </div>
           <div class="range-chart-row">
-            <label for="compareStartDate">B Start</label>
+            <span class="range-prefix">B</span>
             <input id="compareStartDate" type="date" />
-            <label for="compareEndDate">B End</label>
+            <span class="range-sep">~</span>
             <input id="compareEndDate" type="date" />
+          </div>
+          <div class="range-apply-row">
             <button id="rangeApplyBtn" type="button">Apply</button>
           </div>
         </div>

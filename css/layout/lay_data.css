@@ -74,6 +74,32 @@ main {
   min-width: 0;
 }
 
+.tablet.landscape .detail-compare-controls {
+  flex-wrap: wrap;
+}
+
+.tablet.landscape .detail-compare-controls select {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.tablet.landscape .range-chart-row {
+  grid-template-columns: 14px minmax(0, 1fr) 10px minmax(0, 1fr);
+  gap: 6px;
+}
+
+.tablet.landscape .range-chart-controls input {
+  min-width: 0;
+  max-width: 100%;
+  font-size: 12px;
+  padding: 5px 6px;
+}
+
+.tablet.landscape .range-chart-legend {
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
 #sessionsContainer::after {
   content: "";
   display: block;

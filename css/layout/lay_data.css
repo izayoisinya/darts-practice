@@ -1550,12 +1550,12 @@ main {
 /* ===================================================== */
 
 .phone.landscape {
-  --data-footer-spacer: calc(112px + env(safe-area-inset-bottom));
+  --data-footer-spacer: calc(98px + env(safe-area-inset-bottom));
 }
 
 .phone.landscape .header {
   height: calc(env(safe-area-inset-top) + 42px);
-  padding: env(safe-area-inset-top) 6px 0 6px;
+  padding: env(safe-area-inset-top) 4px 0 4px;
 }
 
 .phone.landscape .header h1 {
@@ -1565,13 +1565,13 @@ main {
 }
 
 .phone.landscape main.data-container {
-  padding: 4px 6px 0 6px;
+  padding: 2px 4px 0 4px;
 }
 
 .phone.landscape .footer-bar {
   height: 48px;
-  padding: 6px 6px calc(6px + env(safe-area-inset-bottom)) 6px;
-  gap: 10px;
+  padding: 4px 4px calc(4px + env(safe-area-inset-bottom)) 4px;
+  gap: 8px;
 }
 
 .phone.landscape .tabs-container {
@@ -1591,6 +1591,95 @@ main {
 
 .phone.landscape .pagination button {
   padding: 0.35rem 0.75rem;
+}
+
+/* 横向きでもセッションカードを縦向きと同じ構成にする */
+.phone.landscape .session-card {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+  grid-template-areas:
+    "header header"
+    "kpi kpi"
+    "rates triple"
+    "chart triple"
+    "awards triple";
+  gap: 10px 12px;
+}
+
+.phone.landscape .session-card-header {
+  grid-area: header;
+  margin-bottom: 0;
+}
+
+.phone.landscape .session-card-body,
+.phone.landscape .session-main-block {
+  display: contents;
+}
+
+.phone.landscape .session-kpi-grid {
+  grid-area: kpi;
+}
+
+.phone.landscape .session-rate-group {
+  grid-area: rates;
+  min-width: 0;
+}
+
+.phone.landscape .session-side-block {
+  grid-area: chart;
+  min-width: 0;
+}
+
+.phone.landscape .session-triple-block {
+  grid-area: triple;
+  min-width: 0;
+  height: 100%;
+}
+
+.phone.landscape .session-awards-block {
+  grid-area: awards;
+  margin-top: 0;
+}
+
+.phone.landscape .session-side-block .session-meta-block,
+.phone.landscape .session-triple-block,
+.phone.landscape .session-awards-block {
+  padding: 8px 10px;
+}
+
+.phone.landscape .session-round-block {
+  height: auto;
+}
+
+.phone.landscape .session-round-block .round-chart {
+  min-height: 220px;
+  height: auto;
+}
+
+.phone.landscape .session-round-block .round-line-chart {
+  height: 220px;
+  min-height: 220px;
+  flex: 0 0 220px;
+}
+
+.phone.landscape .session-stat-row {
+  grid-template-columns: 24px 24px minmax(0, 1fr) 42px;
+  gap: 8px;
+}
+
+.phone.landscape .session-triple-grid {
+  grid-template-columns: 1fr;
+  grid-template-areas: none;
+}
+
+body.phone.landscape.data-detail-view .session-card-body {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+  grid-template-areas:
+    "kpi kpi"
+    "rates rates"
+    "triple chart";
+  gap: 12px;
+  align-items: start;
 }
 
 .phone.portrait {

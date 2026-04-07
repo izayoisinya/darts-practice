@@ -1549,6 +1549,50 @@ main {
 /* RESPONSIVE  PHONE PORTRAIT                          */
 /* ===================================================== */
 
+.phone.landscape {
+  --data-footer-spacer: calc(112px + env(safe-area-inset-bottom));
+}
+
+.phone.landscape .header {
+  height: calc(env(safe-area-inset-top) + 42px);
+  padding: env(safe-area-inset-top) calc(8px + env(safe-area-inset-right)) 0 calc(8px + env(safe-area-inset-left));
+}
+
+.phone.landscape .header h1 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.phone.landscape main.data-container {
+  padding: 6px calc(8px + env(safe-area-inset-right)) 0 calc(8px + env(safe-area-inset-left));
+}
+
+.phone.landscape .footer-bar {
+  height: 48px;
+  padding: 8px calc(10px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left));
+  gap: 10px;
+}
+
+.phone.landscape .tabs-container {
+  gap: 0.35rem;
+  padding: 0;
+}
+
+.phone.landscape .tabs-container button {
+  min-width: 66px;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+.phone.landscape .pagination {
+  padding: 0;
+}
+
+.phone.landscape .pagination button {
+  padding: 0.35rem 0.75rem;
+}
+
 .phone.portrait {
   --data-footer-spacer: calc(150px + env(safe-area-inset-bottom));
   --phone-menu-edge-space: 24px;

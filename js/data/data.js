@@ -47,6 +47,15 @@ function setChartAxisTextStyle(ctx) {
   ctx.textBaseline = "middle"
 }
 
+function getChartPadding() {
+  const isPhone = body.classList.contains("phone")
+  return {
+    left: isPhone ? 27 : 34,
+    right: isPhone ? 8 : 8,
+    vertical: 34
+  }
+}
+
 function setDataPanel(mode) {
   if (mode !== "history" && mode !== "stats") return
   dataPanelMode = mode
@@ -452,10 +461,12 @@ function drawGameScoresChart() {
   const last30 = sessions.slice(-30)
   const scores = last30.map(s => s.score)
   
-  const padding = 34
-  const rightPadding = 8
+  const chartPadding = getChartPadding()
+  const padding = chartPadding.left
+  const rightPadding = chartPadding.right
+  const verticalPadding = chartPadding.vertical
   const graphWidth = width - padding - rightPadding
-  const graphHeight = height - padding * 2
+  const graphHeight = height - verticalPadding * 2
   
   // スコアの最小値と最大値
   const minScore = Math.min(...scores)
@@ -469,7 +480,7 @@ function drawGameScoresChart() {
   const gridSteps = 4
   for (let i = 0; i <= gridSteps; i++) {
     const value = minScore + (scoreRange / gridSteps) * i
-    const y = height - padding - (value - minScore) / scoreRange * graphHeight
+    const y = height - verticalPadding - (value - minScore) / scoreRange * graphHeight
     
     ctx.beginPath()
     ctx.moveTo(padding, y)
@@ -489,7 +500,7 @@ function drawGameScoresChart() {
   
   scores.forEach((score, i) => {
     const x = padding + stepX * i
-    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
+    const y = height - verticalPadding - ((score - minScore) / scoreRange) * graphHeight
     
     if (i === 0) {
       ctx.moveTo(x, y)
@@ -503,7 +514,7 @@ function drawGameScoresChart() {
   // ポイント
   scores.forEach((score, i) => {
     const x = padding + stepX * i
-    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
+    const y = height - verticalPadding - ((score - minScore) / scoreRange) * graphHeight
     
     ctx.beginPath()
       ctx.arc(x, y, 2, 0, Math.PI * 2)
@@ -556,10 +567,12 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
     i < compareScoresRaw.length ? compareScoresRaw[i] : null
   )
   
-  const padding = 34
-  const rightPadding = 8
+  const chartPadding = getChartPadding()
+  const padding = chartPadding.left
+  const rightPadding = chartPadding.right
+  const verticalPadding = chartPadding.vertical
   const graphWidth = width - padding - rightPadding
-  const graphHeight = height - padding * 2
+  const graphHeight = height - verticalPadding * 2
   
   // 背景をクリア
   ctx.clearRect(0, 0, width, height)
@@ -577,7 +590,7 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
   const gridSteps = 4
   for (let i = 0; i <= gridSteps; i++) {
     const value = minScore + (scoreRange / gridSteps) * i
-    const y = height - padding - (value - minScore) / scoreRange * graphHeight
+    const y = height - verticalPadding - (value - minScore) / scoreRange * graphHeight
     
     ctx.beginPath()
     ctx.moveTo(padding, y)
@@ -590,9 +603,9 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
   
   // 折れ線
   const stepX = graphWidth / (length - 1 || 1)
-  drawLineSeries(ctx, scores, "#4CAF50", padding, height, graphHeight, minScore, scoreRange, stepX)
+  drawLineSeries(ctx, scores, "#4CAF50", padding, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
   if (hasCompare) {
-    drawLineSeries(ctx, compareScores, "#4da3ff", padding, height, graphHeight, minScore, scoreRange, stepX)
+    drawLineSeries(ctx, compareScores, "#4da3ff", padding, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
   }
 
   if (detailLegend) {
@@ -798,7 +811,7 @@ function buildDateLabels(startDate, length) {
   return labels
 }
 
-function drawLineSeries(ctx, values, color, padding, height, graphHeight, minScore, scoreRange, stepX) {
+function drawLineSeries(ctx, values, color, padding, verticalPadding, height, graphHeight, minScore, scoreRange, stepX) {
   let started = false
   ctx.beginPath()
     ctx.lineWidth = 1.5
@@ -811,7 +824,7 @@ function drawLineSeries(ctx, values, color, padding, height, graphHeight, minSco
     }
 
     const x = padding + stepX * i
-    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
+    const y = height - verticalPadding - ((score - minScore) / scoreRange) * graphHeight
     if (!started) {
       ctx.moveTo(x, y)
       started = true
@@ -824,7 +837,7 @@ function drawLineSeries(ctx, values, color, padding, height, graphHeight, minSco
   values.forEach((score, i) => {
     if (score === null) return
     const x = padding + stepX * i
-    const y = height - padding - ((score - minScore) / scoreRange) * graphHeight
+    const y = height - verticalPadding - ((score - minScore) / scoreRange) * graphHeight
     ctx.beginPath()
       ctx.arc(x, y, 2, 0, Math.PI * 2)
     ctx.fillStyle = color
@@ -892,10 +905,12 @@ function drawSelectedRangeChart() {
     return
   }
 
-  const padding = 34
-  const rightPadding = 8
+  const chartPadding = getChartPadding()
+  const padding = chartPadding.left
+  const rightPadding = chartPadding.right
+  const verticalPadding = chartPadding.vertical
   const graphWidth = width - padding - rightPadding
-  const graphHeight = height - padding * 2
+  const graphHeight = height - verticalPadding * 2
   const minScore = Math.min(...allScores)
   const maxScore = Math.max(...allScores)
   const scoreRange = maxScore - minScore || 1
@@ -905,7 +920,7 @@ function drawSelectedRangeChart() {
   const gridSteps = 4
   for (let i = 0; i <= gridSteps; i++) {
     const value = minScore + (scoreRange / gridSteps) * i
-    const y = height - padding - (value - minScore) / scoreRange * graphHeight
+    const y = height - verticalPadding - (value - minScore) / scoreRange * graphHeight
     ctx.beginPath()
     ctx.moveTo(padding, y)
     ctx.lineTo(width - rightPadding, y)
@@ -928,8 +943,8 @@ function drawSelectedRangeChart() {
     ctx.fillText(label, x, height - 8)
   })
 
-  drawLineSeries(ctx, seriesA, "#7bc96f", padding, height, graphHeight, minScore, scoreRange, stepX)
-  drawLineSeries(ctx, seriesB, "#4da3ff", padding, height, graphHeight, minScore, scoreRange, stepX)
+  drawLineSeries(ctx, seriesA, "#7bc96f", padding, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
+  drawLineSeries(ctx, seriesB, "#4da3ff", padding, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
 
   if (legend) {
     legend.innerHTML = `

@@ -1410,6 +1410,76 @@ main {
   font-weight: 700;
 }
 
+.cal-day-num {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.cal-dot {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 2px;
+}
+
+.cal-day.cal-highlight .cal-dot {
+  background: #fff;
+}
+
+/* Year カレンダー */
+
+.cal-year-title {
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.cal-year-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.mini-cal-wrap {
+  padding: 8px 6px;
+  background: #11151c;
+  border: 1px solid #2a2f3a;
+  border-radius: 10px;
+}
+
+.mini-cal-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.mini-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.mini-cal-hd {
+  font-size: 8px;
+  text-align: center;
+  opacity: 0.4;
+  padding: 1px 0;
+}
+
+.mini-cal-day {
+  font-size: 8px;
+  text-align: center;
+  padding: 2px 1px;
+  border-radius: 3px;
+  line-height: 1.2;
+  color: rgba(255,255,255,0.45);
+}
+
 
 /* ===================================================== */
 /* PANEL SWITCHER                                        */

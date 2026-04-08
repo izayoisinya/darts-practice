@@ -341,18 +341,22 @@ body::before {
 
 .tablet.landscape .future-panel {
   grid-column: 2;
+  grid-row: 1;
 }
 
 .tablet.landscape .utility-panel {
-  grid-column: 3;
+  grid-column: 2;
+  grid-row: 2;
 }
 
 .tablet.landscape .updates-panel {
-  grid-column: 2;
+  grid-column: 3;
+  grid-row: 1;
 }
 
 .tablet.landscape .news-panel {
   grid-column: 3;
+  grid-row: 2;
 }
 
 .tablet.portrait .menu-container {

@@ -42,17 +42,34 @@
     </header>
 
     <main class="menu-container">
-      <section class="game-list">
-        <h3>Game</h3>
-        <button onclick="location.href = 'countup.html'">CountUp</button>
-        <button disabled>01 (Coming Soon)</button>
-        <button disabled>Cricket (Coming Soon)</button>
+      <section class="hero-panel">
+        <p class="section-label">Main Game</p>
+        <button class="hero-btn" onclick="location.href = 'countup.html'">
+          <span class="btn-title">CountUp</span>
+          <span class="btn-sub">Classic score attack</span>
+        </button>
       </section>
 
-      <section class="opt-list">
-        <h3>Option</h3>
-        <button onclick="location.href = 'data.html'">Data</button>
-        <button onclick="location.href = 'settings.html'">Settings</button>
+      <section class="future-panel">
+        <p class="section-label">Next</p>
+        <div class="coming-grid">
+          <article class="coming-card" aria-disabled="true">
+            <span class="coming-title">01</span>
+            <span class="coming-tag">Coming Soon</span>
+          </article>
+          <article class="coming-card" aria-disabled="true">
+            <span class="coming-title">Cricket</span>
+            <span class="coming-tag">Coming Soon</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="utility-panel">
+        <p class="section-label">Utility</p>
+        <div class="utility-actions">
+          <button onclick="location.href = 'data.html'">Data</button>
+          <button onclick="location.href = 'settings.html'">Settings</button>
+        </div>
       </section>
     </main>
 

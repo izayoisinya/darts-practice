@@ -24,8 +24,12 @@ function enforceFreshClient() {
   }
 }
 
-function initApp() {
+async function initApp() {
   enforceFreshClient()
+
+  if (typeof initSessionsStorage === "function") {
+    await initSessionsStorage()
+  }
 
   detectDevice()
   applyOrientationPreference()

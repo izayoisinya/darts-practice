@@ -487,7 +487,11 @@ window.addEventListener('DOMContentLoaded', () => {
   initDataPage()
 })
 
-function initDataPage() {
+async function initDataPage() {
+  if (typeof initSessionsStorage === "function") {
+    await initSessionsStorage()
+  }
+
   const sessions = readSessions()
   
   const totalPages = Math.ceil(sessions.length / PAGE_SIZE)

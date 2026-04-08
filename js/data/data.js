@@ -378,7 +378,11 @@ function addStat(container, title, value) {
   container.appendChild(row)
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  if (typeof initSessionsStorage === "function") {
+    await initSessionsStorage()
+  }
+
   renderView()
   queueInitialGameChartRefresh()
 })

@@ -1,6 +1,10 @@
 const SAVE_KEY = "dartsPractice"
 const SESSIONS_KEY = "dartsSessionsV2"
 const LEGACY_SESSIONS_KEY = "dartsSessions"
+const SESSION_DB_NAME = "dartsPracticeDB"
+const SESSION_DB_VERSION = 1
+const SESSION_STORE_NAME = "app"
+const SESSION_RECORD_KEY = "sessions"
 const AWARD_KEYS = [
   "hatTrick",
   "lowTon",
@@ -10,6 +14,11 @@ const AWARD_KEYS = [
   "threeInTheBed",
   "whiteHorse"
 ]
+
+let sessionsCache = null
+let sessionsInitPromise = null
+let sessionsWriteQueue = Promise.resolve()
+let sessionsBackend = "localStorage"
 
 function toFiniteNumber(value, fallback = 0) {
   const n = Number(value)
@@ -130,17 +139,108 @@ function deserializeSessionFromStorage(session) {
   })
 }
 
-function writeSessions(sessions) {
-  const list = Array.isArray(sessions) ? sessions : []
-  const compact = list
-    .map(serializeSessionForStorage)
-    .filter(Boolean)
-
-  localStorage.setItem(SESSIONS_KEY, JSON.stringify(compact))
-  localStorage.removeItem(LEGACY_SESSIONS_KEY)
+function supportsIndexedDb() {
+  return typeof indexedDB !== "undefined"
 }
 
-function readSessions() {
+function openSessionDb() {
+  return new Promise((resolve, reject) => {
+    if (!supportsIndexedDb()) {
+      reject(new Error("IndexedDB is not supported"))
+      return
+    }
+
+    const request = indexedDB.open(SESSION_DB_NAME, SESSION_DB_VERSION)
+
+    request.onupgradeneeded = event => {
+      const db = event.target.result
+      if (!db.objectStoreNames.contains(SESSION_STORE_NAME)) {
+        db.createObjectStore(SESSION_STORE_NAME, { keyPath: "id" })
+      }
+    }
+
+    request.onsuccess = () => resolve(request.result)
+    request.onerror = () => reject(request.error || new Error("Failed to open IndexedDB"))
+  })
+}
+
+function readCompactSessionsFromDb() {
+  return openSessionDb().then(db =>
+    new Promise((resolve, reject) => {
+      const tx = db.transaction(SESSION_STORE_NAME, "readonly")
+      const store = tx.objectStore(SESSION_STORE_NAME)
+      const request = store.get(SESSION_RECORD_KEY)
+
+      request.onsuccess = () => {
+        const value = request.result?.data
+        resolve(Array.isArray(value) ? value : [])
+      }
+      request.onerror = () => reject(request.error || new Error("Failed to read sessions from IndexedDB"))
+
+      tx.oncomplete = () => db.close()
+      tx.onabort = () => db.close()
+      tx.onerror = () => db.close()
+    })
+  )
+}
+
+function writeCompactSessionsToDb(compactSessions) {
+  return openSessionDb().then(db =>
+    new Promise((resolve, reject) => {
+      const tx = db.transaction(SESSION_STORE_NAME, "readwrite")
+      const store = tx.objectStore(SESSION_STORE_NAME)
+      store.put({
+        id: SESSION_RECORD_KEY,
+        data: compactSessions,
+        updatedAt: Date.now()
+      })
+
+      tx.oncomplete = () => {
+        db.close()
+        resolve()
+      }
+      tx.onerror = () => {
+        const err = tx.error || new Error("Failed to write sessions to IndexedDB")
+        db.close()
+        reject(err)
+      }
+      tx.onabort = () => {
+        const err = tx.error || new Error("IndexedDB write transaction aborted")
+        db.close()
+        reject(err)
+      }
+    })
+  )
+}
+
+function clearSessionsFromDb() {
+  if (!supportsIndexedDb()) return Promise.resolve()
+
+  return openSessionDb().then(db =>
+    new Promise((resolve, reject) => {
+      const tx = db.transaction(SESSION_STORE_NAME, "readwrite")
+      const store = tx.objectStore(SESSION_STORE_NAME)
+      store.delete(SESSION_RECORD_KEY)
+
+      tx.oncomplete = () => {
+        db.close()
+        resolve()
+      }
+      tx.onerror = () => {
+        const err = tx.error || new Error("Failed to clear sessions from IndexedDB")
+        db.close()
+        reject(err)
+      }
+      tx.onabort = () => {
+        const err = tx.error || new Error("IndexedDB clear transaction aborted")
+        db.close()
+        reject(err)
+      }
+    })
+  )
+}
+
+function readSessionsFromLocalStorage() {
   try {
     const raw = localStorage.getItem(SESSIONS_KEY)
     if (raw) {
@@ -162,23 +262,120 @@ function readSessions() {
     const parsed = JSON.parse(legacyRaw)
     if (!Array.isArray(parsed)) return []
 
-    const normalized = parsed
+    return parsed
       .map(normalizeSessionForApp)
       .filter(Boolean)
-
-    if (normalized.length) {
-      writeSessions(normalized)
-    }
-
-    return normalized
   } catch {
     return []
   }
 }
 
-function clearSessionsStorage() {
+function clearLocalSessionKeys() {
   localStorage.removeItem(SESSIONS_KEY)
   localStorage.removeItem(LEGACY_SESSIONS_KEY)
+}
+
+function queuePersistSessions(compact) {
+  sessionsWriteQueue = sessionsWriteQueue
+    .then(() => {
+      if (supportsIndexedDb()) {
+        return writeCompactSessionsToDb(compact)
+          .then(() => {
+            sessionsBackend = "indexedDB"
+            clearLocalSessionKeys()
+          })
+      }
+
+      sessionsBackend = "localStorage"
+      localStorage.setItem(SESSIONS_KEY, JSON.stringify(compact))
+      localStorage.removeItem(LEGACY_SESSIONS_KEY)
+      return undefined
+    })
+    .catch(() => {
+      // IndexedDB write failure fallback.
+      sessionsBackend = "localStorage"
+      localStorage.setItem(SESSIONS_KEY, JSON.stringify(compact))
+      localStorage.removeItem(LEGACY_SESSIONS_KEY)
+    })
+
+  return sessionsWriteQueue
+}
+
+function initSessionsStorage() {
+  if (sessionsInitPromise) return sessionsInitPromise
+
+  sessionsInitPromise = (async () => {
+    const local = readSessionsFromLocalStorage()
+    sessionsCache = local
+
+    if (!supportsIndexedDb()) {
+      sessionsBackend = "localStorage"
+      return sessionsCache
+    }
+
+    sessionsBackend = "indexedDB"
+
+    try {
+      const compactFromDb = await readCompactSessionsFromDb()
+
+      if (Array.isArray(compactFromDb) && compactFromDb.length > 0) {
+        sessionsCache = compactFromDb
+          .map(deserializeSessionFromStorage)
+          .filter(Boolean)
+        sessionsBackend = "indexedDB"
+        clearLocalSessionKeys()
+        return sessionsCache
+      }
+
+      if (local.length > 0) {
+        const compactLocal = local
+          .map(serializeSessionForStorage)
+          .filter(Boolean)
+        await writeCompactSessionsToDb(compactLocal)
+        sessionsBackend = "indexedDB"
+        clearLocalSessionKeys()
+      }
+    } catch {
+      // Keep localStorage fallback when IndexedDB init fails.
+      sessionsBackend = "localStorage"
+    }
+
+    return sessionsCache
+  })()
+
+  return sessionsInitPromise
+}
+
+function writeSessions(sessions) {
+  const list = Array.isArray(sessions) ? sessions : []
+  const normalized = list
+    .map(normalizeSessionForApp)
+    .filter(Boolean)
+  const compact = normalized
+    .map(serializeSessionForStorage)
+    .filter(Boolean)
+
+  sessionsCache = normalized
+  queuePersistSessions(compact)
+}
+
+function readSessions() {
+  if (!Array.isArray(sessionsCache)) {
+    sessionsCache = readSessionsFromLocalStorage()
+  }
+
+  return sessionsCache
+}
+
+function clearSessionsStorage() {
+  sessionsCache = []
+  sessionsBackend = supportsIndexedDb() ? "indexedDB" : "localStorage"
+  clearLocalSessionKeys()
+  clearSessionsFromDb().catch(() => {})
+}
+
+function getSessionsStorageBackend() {
+  return sessionsBackend
 }
 
 function saveGame() {

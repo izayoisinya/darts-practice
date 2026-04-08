@@ -1,4 +1,185 @@
 const SAVE_KEY = "dartsPractice"
+const SESSIONS_KEY = "dartsSessionsV2"
+const LEGACY_SESSIONS_KEY = "dartsSessions"
+const AWARD_KEYS = [
+  "hatTrick",
+  "lowTon",
+  "highTon",
+  "ton80",
+  "threeInTheBlack",
+  "threeInTheBed",
+  "whiteHorse"
+]
+
+function toFiniteNumber(value, fallback = 0) {
+  const n = Number(value)
+  return Number.isFinite(n) ? n : fallback
+}
+
+function toRoundScores(rounds) {
+  if (!Array.isArray(rounds)) return []
+  return rounds.map(round =>
+    (round || []).reduce((sum, dart) => sum + (dart?.score || 0), 0)
+  )
+}
+
+function toTripleArray(tripleHits) {
+  const list = []
+  for (let i = 15; i <= 20; i++) {
+    list.push(toFiniteNumber(tripleHits?.[i], 0))
+  }
+  return list
+}
+
+function fromTripleArray(data) {
+  const tripleHits = {}
+  if (Array.isArray(data)) {
+    for (let i = 15; i <= 20; i++) {
+      tripleHits[i] = toFiniteNumber(data[i - 15], 0)
+    }
+    return tripleHits
+  }
+
+  for (let i = 15; i <= 20; i++) {
+    tripleHits[i] = toFiniteNumber(data?.[i], 0)
+  }
+  return tripleHits
+}
+
+function toAwardsArray(awards) {
+  return AWARD_KEYS.map(key => toFiniteNumber(awards?.[key], 0))
+}
+
+function fromAwardsArray(data) {
+  const awards = {}
+  AWARD_KEYS.forEach((key, idx) => {
+    awards[key] = Array.isArray(data)
+      ? toFiniteNumber(data[idx], 0)
+      : toFiniteNumber(data?.[key], 0)
+  })
+  return awards
+}
+
+function normalizeSessionForApp(session) {
+  if (!session || typeof session !== "object") return null
+
+  const roundScores = Array.isArray(session.roundScores)
+    ? session.roundScores.map(score => toFiniteNumber(score, 0))
+    : toRoundScores(session.rounds)
+
+  const awards = fromAwardsArray(session.awards)
+
+  return {
+    date: toFiniteNumber(session.date, Date.now()),
+    score: toFiniteNumber(session.score, 0),
+    ppd: toFiniteNumber(session.ppd, 0),
+    bulls: toFiniteNumber(session.bulls, 0),
+    innerBulls: toFiniteNumber(session.innerBulls, 0),
+    bullRate: toFiniteNumber(session.bullRate, 0),
+    innerRate: toFiniteNumber(session.innerRate, 0),
+    roundAvg: toFiniteNumber(session.roundAvg, 0),
+    tripleHits: fromTripleArray(session.tripleHits),
+    awards,
+    totalAwards: toFiniteNumber(
+      session.totalAwards,
+      Object.values(awards).reduce((sum, count) => sum + count, 0)
+    ),
+    roundScores,
+    gameType: String(session.gameType || "countup")
+  }
+}
+
+function serializeSessionForStorage(session) {
+  const normalized = normalizeSessionForApp(session)
+  if (!normalized) return null
+
+  return {
+    d: normalized.date,
+    s: normalized.score,
+    p: normalized.ppd,
+    b: normalized.bulls,
+    i: normalized.innerBulls,
+    br: normalized.bullRate,
+    ir: normalized.innerRate,
+    ra: normalized.roundAvg,
+    t: toTripleArray(normalized.tripleHits),
+    a: toAwardsArray(normalized.awards),
+    ta: normalized.totalAwards,
+    r: normalized.roundScores,
+    g: normalized.gameType
+  }
+}
+
+function deserializeSessionFromStorage(session) {
+  if (!session || typeof session !== "object") return null
+
+  return normalizeSessionForApp({
+    date: session.d,
+    score: session.s,
+    ppd: session.p,
+    bulls: session.b,
+    innerBulls: session.i,
+    bullRate: session.br,
+    innerRate: session.ir,
+    roundAvg: session.ra,
+    tripleHits: session.t,
+    awards: session.a,
+    totalAwards: session.ta,
+    roundScores: session.r,
+    gameType: session.g
+  })
+}
+
+function writeSessions(sessions) {
+  const list = Array.isArray(sessions) ? sessions : []
+  const compact = list
+    .map(serializeSessionForStorage)
+    .filter(Boolean)
+
+  localStorage.setItem(SESSIONS_KEY, JSON.stringify(compact))
+  localStorage.removeItem(LEGACY_SESSIONS_KEY)
+}
+
+function readSessions() {
+  try {
+    const raw = localStorage.getItem(SESSIONS_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map(deserializeSessionFromStorage)
+          .filter(Boolean)
+      }
+    }
+  } catch {
+    // ignore and fallback
+  }
+
+  try {
+    const legacyRaw = localStorage.getItem(LEGACY_SESSIONS_KEY)
+    if (!legacyRaw) return []
+
+    const parsed = JSON.parse(legacyRaw)
+    if (!Array.isArray(parsed)) return []
+
+    const normalized = parsed
+      .map(normalizeSessionForApp)
+      .filter(Boolean)
+
+    if (normalized.length) {
+      writeSessions(normalized)
+    }
+
+    return normalized
+  } catch {
+    return []
+  }
+}
+
+function clearSessionsStorage() {
+  localStorage.removeItem(SESSIONS_KEY)
+  localStorage.removeItem(LEGACY_SESSIONS_KEY)
+}
 
 function saveGame() {
   
@@ -33,9 +214,7 @@ function loadGame() {
 
 function saveSession() {
   
-  const sessions = JSON.parse(
-    localStorage.getItem("dartsSessions")
-  ) || []
+  const sessions = readSessions()
 
   const calculated = typeof calculateStats === "function" ?
     calculateStats() :
@@ -131,11 +310,8 @@ function saveSession() {
   awards,
   totalAwards,
 
-  rounds: JSON.parse(JSON.stringify(game.rounds))
+  roundScores
   })
   
-  localStorage.setItem(
-    "dartsSessions",
-    JSON.stringify(sessions)
-  )
+  writeSessions(sessions)
 }

@@ -1,7 +1,11 @@
-function createRoundChartHtml(rounds) {
-  const scores = (rounds || []).map(round =>
-    (round || []).reduce((sum, dart) => sum + (dart?.score || 0), 0)
-  )
+function createRoundChartHtml(roundSource) {
+  const scores = Array.isArray(roundSource)
+    ? (roundSource.length > 0 && typeof roundSource[0] === "number"
+      ? roundSource.map(score => Number(score) || 0)
+      : roundSource.map(round =>
+        (round || []).reduce((sum, dart) => sum + (dart?.score || 0), 0)
+      ))
+    : []
   const n = scores.length
   if (n === 0) return '<svg class="round-line-chart" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid meet"></svg>'
 
@@ -161,7 +165,10 @@ function createAwardsHtml(session) {
 
 function createSessionCardHtml(session, gameNumber) {
   const t = session.tripleHits || {}
-  const roundChartHtml = createRoundChartHtml(session.rounds)
+  const roundSource = Array.isArray(session.roundScores)
+    ? session.roundScores
+    : session.rounds
+  const roundChartHtml = createRoundChartHtml(roundSource)
   const awardsHtml = createAwardsHtml(session)
   const totalDarts = (session?.rounds || [])
     .flat()
@@ -252,9 +259,7 @@ function createSessionCardHtml(session, gameNumber) {
 
 function loadSessions() {
   
-  const sessions = JSON.parse(
-    localStorage.getItem("dartsSessions")
-  ) || []
+  const sessions = readSessions()
   
   const container = document.getElementById("sessionsContainer")
   container.innerHTML = ""
@@ -433,9 +438,7 @@ function changePage(direction) {
 
   if (groupedPageMode === 'game') {
     // Game ビュー
-    const sessions = JSON.parse(
-      localStorage.getItem("dartsSessions")
-    ) || []
+      const sessions = readSessions()
     const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
     
     if (direction === 'Prev' && currentPage > 1) currentPage--
@@ -485,9 +488,7 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 function initDataPage() {
-  const sessions = JSON.parse(
-    localStorage.getItem("dartsSessions")
-  ) || []
+  const sessions = readSessions()
   
   const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
   

@@ -188,9 +188,7 @@ function changeView(mode) {
     currentPage = 1
     groupedPageMode = 'game'
     
-    const sessions = JSON.parse(
-      localStorage.getItem("dartsSessions")
-    ) || []
+    const sessions = readSessions()
     
     const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
     
@@ -248,9 +246,7 @@ function renderView() {
 
 function loadStats() {
   
-  const sessions = JSON.parse(
-    localStorage.getItem("dartsSessions")
-  ) || []
+  const sessions = readSessions()
   
   const statsContainer = document.getElementById("statsContainer")
   const awardsContainer = document.getElementById("awardsContainer")
@@ -464,7 +460,7 @@ function generateTestData(days = 60) {
     }
   }
   
-  localStorage.setItem("dartsSessions", JSON.stringify(sessions))
+  writeSessions(sessions)
   
   console.log("テストデータ生成完了:", sessions.length)
 }
@@ -483,9 +479,7 @@ function drawGameScoresChart() {
 
   ctx.clearRect(0, 0, width, height)
   
-  const sessions = JSON.parse(
-    localStorage.getItem("dartsSessions")
-  ) || []
+  const sessions = readSessions()
   
   if (sessions.length === 0) {
     ctx.fillStyle = "rgba(255,255,255,0.3)"
@@ -895,7 +889,7 @@ function drawSelectedRangeChart() {
   const legend = document.getElementById("rangeChartLegend")
   if (!canvas || !startInput || !endInput || !compareStartInput || !compareEndInput) return
 
-  const sessions = JSON.parse(localStorage.getItem("dartsSessions")) || []
+  const sessions = readSessions()
   ensureRangeDefaults(sessions)
 
   const canvasState = setupHiDPICanvas(canvas, 220)

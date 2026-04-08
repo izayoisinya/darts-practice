@@ -97,7 +97,7 @@ function showGameDetails(dateKey, gamesList) {
 }
 
 function getSessionsGroupedByDay() {
-  const sessions = JSON.parse(localStorage.getItem("dartsSessions") || "[]")
+  const sessions = readSessions()
   const grouped = {}
   ;(sessions || []).forEach(s => {
     if (!s || !s.date) return

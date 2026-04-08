@@ -11,7 +11,7 @@ let calendarJumpOriginData = null
 let calendarJumpOriginPage = null
 
 function jumpToCalendarDay(dateStr) {
-  const sessions = JSON.parse(localStorage.getItem("dartsSessions") || "[]")
+  const sessions = readSessions()
   const groups = groupSessions(sessions, "day")
   const dayList = groups[dateStr] || []
   if (!dayList.length) return
@@ -46,9 +46,7 @@ function toggleDayTagFilter(tag) {
 
 function renderGroupedPaginated(mode) {
   
-  const sessions = JSON.parse(
-    localStorage.getItem("dartsSessions")
-  ) || []
+  const sessions = readSessions()
   
   const container = document.getElementById("sessionsContainer")
   container.innerHTML = ""
@@ -188,9 +186,7 @@ function displayGroupView(mode) {
   groupedPageNumber = 1
   if (mode !== "day") selectedDayTagFilter = ""
   
-  const sessions = JSON.parse(
-    localStorage.getItem("dartsSessions")
-  ) || []
+  const sessions = readSessions()
   
   // モードに応じたグループ化
   const groups = groupSessions(sessions, mode)

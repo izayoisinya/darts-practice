@@ -97,14 +97,7 @@ function initMenuSummary() {
 
   if (!avgScoreEl || !roundAvgEl || !gamesEl) return
 
-  let sessions = []
-
-  try {
-    const raw = localStorage.getItem("dartsSessions")
-    sessions = raw ? JSON.parse(raw) : []
-  } catch {
-    sessions = []
-  }
+  const sessions = readSessions()
 
   if (!Array.isArray(sessions) || sessions.length === 0) {
     avgScoreEl.textContent = "-"

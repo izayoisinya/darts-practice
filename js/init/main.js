@@ -29,6 +29,7 @@ function initApp() {
 
   detectDevice()
   refreshLayout()
+  initMenuSummary()
   
   // ダーツ入力ボタンのイベント登録
   if (document.getElementById("numberTable")) {
@@ -44,6 +45,63 @@ function initApp() {
   window.addEventListener("resize", refreshLayout)
   window.addEventListener("orientationchange", refreshLayout)
   
+}
+
+function initMenuSummary() {
+  const avgScoreEl = document.getElementById("menuAvgScore")
+  const roundAvgEl = document.getElementById("menuRoundAvg")
+  const gamesEl = document.getElementById("menuGamesPlayed")
+
+  if (!avgScoreEl || !roundAvgEl || !gamesEl) return
+
+  let sessions = []
+
+  try {
+    const raw = localStorage.getItem("dartsSessions")
+    sessions = raw ? JSON.parse(raw) : []
+  } catch {
+    sessions = []
+  }
+
+  if (!Array.isArray(sessions) || sessions.length === 0) {
+    avgScoreEl.textContent = "-"
+    roundAvgEl.textContent = "-"
+    gamesEl.textContent = "0"
+    return
+  }
+
+  const countupSessions = sessions.filter(s => {
+    return !s || typeof s !== "object"
+      ? false
+      : (s.gameType ?? "countup") === "countup"
+  })
+
+  const games = countupSessions.length
+
+  if (games === 0) {
+    avgScoreEl.textContent = "-"
+    roundAvgEl.textContent = "-"
+    gamesEl.textContent = "0"
+    return
+  }
+
+  const totalScore = countupSessions.reduce((sum, s) => {
+    const score = Number(s?.score)
+    return sum + (Number.isFinite(score) ? score : 0)
+  }, 0)
+
+  const roundAvgList = countupSessions
+    .map(s => Number(s?.roundAvg))
+    .filter(Number.isFinite)
+
+  const avgScore = totalScore / games
+  const roundAvg = roundAvgList.length
+    ? roundAvgList.reduce((sum, value) => sum + value, 0) / roundAvgList.length
+    : 0
+
+  avgScoreEl.textContent = avgScore.toFixed(1)
+  roundAvgEl.textContent = roundAvg.toFixed(1)
+  gamesEl.textContent = String(games)
 }
 
 

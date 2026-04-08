@@ -6,6 +6,7 @@ let panelTouchStartX = 0
 let panelTouchStartY = 0
 let panelSwipeBlockedByTabs = false
 const chartAxisFontFamily = "'Segoe UI', 'Noto Sans JP', sans-serif"
+let initialChartRefreshQueued = false
 
 function isPhonePortraitDataView() {
   return body.classList.contains("phone") && body.classList.contains("portrait")
@@ -119,6 +120,32 @@ function setupDataPanelSwipe() {
   dataPanelSwipeBound = true
 }
 
+function refreshGameChartsNow() {
+  if (viewMode !== "game") return
+  if (detailViewMode) return
+  drawGameScoresChart()
+  drawSelectedRangeChart()
+}
+
+function queueInitialGameChartRefresh() {
+  if (initialChartRefreshQueued) return
+  initialChartRefreshQueued = true
+
+  // 端末ごとのレイアウト確定タイミング差を吸収するため複数回再描画
+  requestAnimationFrame(() => {
+    refreshGameChartsNow()
+  })
+
+  setTimeout(() => {
+    refreshGameChartsNow()
+  }, 180)
+
+  setTimeout(() => {
+    refreshGameChartsNow()
+    initialChartRefreshQueued = false
+  }, 520)
+}
+
 function updateViewTabs(mode) {
   document.querySelectorAll(".tabs-container button").forEach(btn => {
     const isActive = btn.dataset.view === mode
@@ -208,6 +235,7 @@ function renderView() {
     loadStats(viewMode)
     loadSessions()
     drawGameScoresChart()
+    queueInitialGameChartRefresh()
   } else {
     statsSection.style.display = "none"
     awardsSection.style.display = "none"
@@ -356,6 +384,15 @@ function addStat(container, title, value) {
 
 document.addEventListener("DOMContentLoaded", () => {
   renderView()
+  queueInitialGameChartRefresh()
+})
+
+window.addEventListener("load", () => {
+  queueInitialGameChartRefresh()
+})
+
+window.addEventListener("pageshow", () => {
+  queueInitialGameChartRefresh()
 })
 
 function generateTestData(days = 60) {

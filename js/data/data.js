@@ -391,78 +391,60 @@ window.addEventListener("pageshow", () => {
   queueInitialGameChartRefresh()
 })
 
-function generateTestData(days = 60) {
-  
-  const sessions = []
-  
-  const now = new Date()
-  
-  for (let i = days - 1; i >= 0; i--) {
-    
-    const date = new Date(now)
-    date.setDate(now.getDate() - i)
-    
-    const gamesPerDay = Math.floor(Math.random() * 3) + 1
-    
-    for (let g = 0; g < gamesPerDay; g++) {
-      
-      const score = Math.floor(Math.random() * 600) + 600
-      const darts = 24
-      
-      const ppd = score / darts
-      
-      const bulls = Math.floor(Math.random() * 10)
-      const innerBulls = Math.floor(bulls * Math.random())
-      
-      const tripleHits = {}
-      
-      for (let n = 15; n <= 20; n++) {
-        tripleHits[n] = Math.floor(Math.random() * 5)
-      }
-      
-      sessions.push({
-        date: date.getTime(),
-        
-        score,
-        ppd: Number(ppd.toFixed(2)),
-        
-        bulls,
-        innerBulls,
-        
-        bullRate: Number(((bulls / darts) * 100).toFixed(1)),
-        innerRate: bulls ?
-          Number(((innerBulls / darts) * 100).toFixed(1)) :
-          0,
-        
-        roundAvg: Number((score / 8).toFixed(1)),
-        
-        tripleHits,
+function isLikelyGeneratedTestSession(session) {
+  const roundScores = Array.isArray(session?.roundScores)
+    ? session.roundScores
+    : Array.isArray(session?.rounds)
+      ? session.rounds.map(round =>
+        (round || []).reduce((sum, dart) => sum + (dart?.score || 0), 0)
+      )
+      : []
 
-        awards: {
-          hatTrick: 0,
-          lowTon: 0,
-          highTon: 0,
-          ton80: 0,
-          threeInTheBlack: 0,
-          threeInTheBed: 0,
-          whiteHorse: 0
-        },
+  if (roundScores.length !== 8) return false
+  if (!roundScores.every(score => Number(score) === 60)) return false
 
-        totalAwards: 0,
-        
-        rounds: Array.from({ length: 8 }, () => [
-          { score: 20 },
-          { score: 20 },
-          { score: 20 }
-        ])
-      })
-      
-    }
+  const roundTotal = roundScores.reduce((sum, score) => sum + Number(score || 0), 0)
+  const score = Number(session?.score || 0)
+
+  if (!Number.isFinite(score) || score < 600 || score > 1199) return false
+  if (Math.abs(score - roundTotal) < 100) return false
+
+  const awards = session?.awards || {}
+  const allAwardsZero = [
+    "hatTrick",
+    "lowTon",
+    "highTon",
+    "ton80",
+    "threeInTheBlack",
+    "threeInTheBed",
+    "whiteHorse"
+  ].every(key => Number(awards[key] || 0) === 0)
+
+  return allAwardsZero
+}
+
+function removeGeneratedTestData() {
+  const sessions = readSessions()
+  if (!Array.isArray(sessions) || sessions.length === 0) {
+    alert("削除対象データがありません")
+    return
   }
-  
-  writeSessions(sessions)
-  
-  console.log("テストデータ生成完了:", sessions.length)
+
+  const filtered = sessions.filter(session => !isLikelyGeneratedTestSession(session))
+  const removed = sessions.length - filtered.length
+
+  if (removed <= 0) {
+    alert("削除対象のテストデータは見つかりませんでした")
+    return
+  }
+
+  if (!confirm(`${removed}件のテストデータを削除します。よろしいですか？`)) {
+    return
+  }
+
+  writeSessions(filtered)
+  alert(`${removed}件のテストデータを削除しました`)
+  location.reload()
 }
 
 function drawGameScoresChart() {

@@ -34,27 +34,83 @@
     <link rel="stylesheet" href="css/layout/lay_menu.css" />
 
     <style>
+      body {
+        background:
+          radial-gradient(circle at 15% 12%, rgba(0, 255, 200, 0.12), transparent 34%),
+          radial-gradient(circle at 88% 0%, rgba(77, 171, 255, 0.12), transparent 30%),
+          var(--bg-main);
+      }
+
       .settings-container {
-        max-width: 420px;
+        width: min(520px, 100%);
         margin: auto;
-        padding: 20px;
+        padding: 20px 16px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 14px;
+      }
+
+      .settings-panel {
+        background: linear-gradient(165deg, #151922 0%, #10141d 100%);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow:
+          0 10px 24px rgba(0, 0, 0, 0.4),
+          0 0 0 1px rgba(0, 0, 0, 0.3) inset;
+        padding: 14px;
+      }
+
+      .panel-title {
+        margin: 0 0 12px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgb(var(--accent-rgb) / 0.92);
       }
 
       .setting-group {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 7px;
+      }
+
+      .setting-group + .setting-group {
+        margin-top: 12px;
+      }
+
+      .setting-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
       }
 
       .setting-group select {
-        padding: 10px;
+        height: 42px;
+        padding: 0 12px;
         border-radius: 10px;
-        background: #1c212c;
-        color: white;
-        border: none;
+        background: #1a202a;
+        color: var(--text-main);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .setting-group select:focus {
+        outline: none;
+        border-color: rgb(var(--accent-rgb) / 0.6);
+        box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.15);
+      }
+
+      .setting-help {
+        margin: 4px 0 0;
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--text-muted);
+      }
+
+      .orientation-status {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--text-muted);
       }
     </style>
   </head>
@@ -65,23 +121,47 @@
     </header>
 
     <main class="settings-container">
-      <div class="setting-group">
-        <label>Bull Mode</label>
+      <section class="settings-panel">
+        <h2 class="panel-title">Game</h2>
 
-        <select id="bullModeSetting">
-          <option value="fat">FAT (50/50)</option>
-          <option value="double">SEPARATE (50/25)</option>
-        </select>
-      </div>
+        <div class="setting-group">
+          <label for="bullModeSetting">Bull Mode</label>
 
-      <div class="setting-group">
-        <label>Rounds</label>
+          <select id="bullModeSetting">
+            <option value="fat">FAT (50/50)</option>
+            <option value="double">SEPARATE (50/25)</option>
+          </select>
+        </div>
 
-        <select id="roundSetting" disabled>
-          <option value="8">8</option>
-          <option value="10">10</option>
-          <option value="15">15</option>
-        </select>
+        <div class="setting-group">
+          <label for="roundSetting">Rounds</label>
+
+          <select id="roundSetting" disabled>
+            <option value="8">8</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="settings-panel">
+        <h2 class="panel-title">Display</h2>
+
+        <div class="setting-group">
+          <label for="orientationSetting">Screen Orientation</label>
+
+          <select id="orientationSetting">
+            <option value="auto">Free</option>
+            <option value="portrait">Portrait Lock</option>
+            <option value="landscape">Landscape Lock</option>
+          </select>
+
+          <p class="setting-help">
+            一部端末ではブラウザ仕様上、画面回転ロックが適用されない場合があります。
+          </p>
+          <p id="orientationStatus" class="orientation-status"></p>
+        </div>
+      </section>
       </div>
     </main>
 

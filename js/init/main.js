@@ -28,6 +28,7 @@ function initApp() {
   enforceFreshClient()
 
   detectDevice()
+  applyOrientationPreference()
   refreshLayout()
   initMenuSummary()
   
@@ -46,6 +47,48 @@ function initApp() {
   window.addEventListener("orientationchange", refreshLayout)
   
 }
+
+function getSavedSettings() {
+  try {
+    const raw = localStorage.getItem("dartsSettings")
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+
+function applyOrientationPreference(mode) {
+  const settings = getSavedSettings()
+  const targetMode = mode ?? settings.orientationMode ?? "auto"
+  const orientation = screen?.orientation
+
+  if (!orientation) return Promise.resolve(false)
+
+  if (targetMode === "auto") {
+    if (typeof orientation.unlock === "function") {
+      try {
+        orientation.unlock()
+        return Promise.resolve(true)
+      } catch {
+        return Promise.resolve(false)
+      }
+    }
+    return Promise.resolve(false)
+  }
+
+  if (typeof orientation.lock !== "function") {
+    return Promise.resolve(false)
+  }
+
+  const lockType = targetMode === "landscape" ? "landscape" : "portrait"
+
+  return orientation
+    .lock(lockType)
+    .then(() => true)
+    .catch(() => false)
+}
+
+window.applyOrientationPreference = applyOrientationPreference
 
 function initMenuSummary() {
   const avgScoreEl = document.getElementById("menuAvgScore")

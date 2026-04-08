@@ -6,6 +6,8 @@ html,
 body {
   margin: 0;
   padding: 0;
+  height: auto;
+  overflow-y: auto;
 }
 
 body {
@@ -306,6 +308,60 @@ body::before {
 
 .phone.landscape .hero-btn {
   min-height: calc(100% - 30px);
+}
+
+
+/* ============================== */
+/* TABLET */
+/* ============================== */
+
+.tablet .menu-container {
+  width: 100%;
+  max-width: 1180px;
+  padding: 20px 24px 18px;
+}
+
+.tablet .hero-panel,
+.tablet .future-panel,
+.tablet .utility-panel,
+.tablet .updates-panel,
+.tablet .news-panel {
+  width: 100%;
+}
+
+.tablet.landscape .menu-container {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.tablet.landscape .hero-panel {
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+
+.tablet.landscape .future-panel {
+  grid-column: 2;
+}
+
+.tablet.landscape .utility-panel {
+  grid-column: 3;
+}
+
+.tablet.landscape .updates-panel {
+  grid-column: 2;
+}
+
+.tablet.landscape .news-panel {
+  grid-column: 3;
+}
+
+.tablet.portrait .menu-container {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.tablet.portrait .hero-panel {
+  grid-column: 1 / 3;
 }
 
 

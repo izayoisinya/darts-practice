@@ -3,29 +3,16 @@
 // ===============================
 document.addEventListener("DOMContentLoaded", initApp)
 
-function enforceFreshClient() {
-  const params = new URLSearchParams(location.search)
-
-  if (params.has("keepCache")) return
-
-  // Remove stale PWA cache/service worker so device testing reflects latest files.
+function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .getRegistrations()
-      .then(registrations => Promise.all(registrations.map(reg => reg.unregister())))
-      .catch(() => {})
-  }
-
-  if ("caches" in window) {
-    caches
-      .keys()
-      .then(keys => Promise.all(keys.map(key => caches.delete(key))))
+      .register("./sw.js")
       .catch(() => {})
   }
 }
 
 async function initApp() {
-  enforceFreshClient()
+  registerServiceWorker()
 
   if (typeof initSessionsStorage === "function") {
     await initSessionsStorage()

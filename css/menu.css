@@ -237,7 +237,7 @@ body::before {
 
 .utility-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 10px;
 }
 
@@ -366,6 +366,55 @@ body::before {
 
 .tablet.portrait .hero-panel {
   grid-column: 1 / 3;
+}
+
+
+/* ============================== */
+/* DESKTOP */
+/* ============================== */
+
+.desktop .menu-container {
+  width: min(100%, 1460px);
+  max-width: 1460px;
+  padding: 24px 28px 20px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  row-gap: 0;
+  column-gap: 14px;
+  align-items: start;
+}
+
+.desktop .hero-panel,
+.desktop .future-panel,
+.desktop .utility-panel,
+.desktop .updates-panel,
+.desktop .news-panel {
+  width: 100%;
+}
+
+.desktop .hero-panel {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.desktop .future-panel {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.desktop .updates-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.desktop .utility-panel {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.desktop .news-panel {
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 14px;
 }
 
 

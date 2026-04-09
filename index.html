@@ -83,35 +83,18 @@
         <div class="utility-actions">
           <button onclick="location.href = 'data.html'">Data</button>
           <button onclick="location.href = 'settings.html'">Settings</button>
+          <button onclick="location.href = 'news.html'">Info</button>
         </div>
       </section>
 
       <section class="updates-panel">
         <p class="section-label">更新情報</p>
-        <ul class="info-list" aria-label="更新情報一覧">
-          <li class="info-item">
-            <span class="info-date">2026/04/09</span>
-            <p class="info-text">データ保存を IndexedDB 優先に変更し、保存容量を拡張しました。</p>
-          </li>
-          <li class="info-item">
-            <span class="info-date">2026/04/09</span>
-            <p class="info-text">設定画面にデータ保存状況（件数・保存先・容量概算）を追加しました。</p>
-          </li>
-        </ul>
+        <ul class="info-list" id="mainUpdatesList" aria-label="更新情報一覧"></ul>
       </section>
 
       <section class="news-panel">
         <p class="section-label">お知らせ</p>
-        <ul class="info-list" aria-label="お知らせ一覧">
-          <li class="info-item">
-            <span class="info-date">案内</span>
-            <p class="info-text">ベータ公開準備中です。画面表示や操作感のフィードバックを歓迎しています。</p>
-          </li>
-          <li class="info-item">
-            <span class="info-date">注意</span>
-            <p class="info-text">端末やブラウザの仕様により、保存容量や挙動が一部異なる場合があります。</p>
-          </li>
-        </ul>
+        <ul class="info-list" id="mainNoticesList" aria-label="お知らせ一覧"></ul>
       </section>
     </main>
 
@@ -123,6 +106,7 @@
     <script src="js/core/state.js" defer></script>
     <script src="js/core/core.js" defer></script>
     <script src="js/core/storage.js" defer></script>
+    <script src="js/ui/news.js" defer></script>
 
     <!-- 初期化（最後に読み込む） -->
     <script src="js/init/main.js" defer></script>

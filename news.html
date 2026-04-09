@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Info | Darts Practice</title>
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0,
+                maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <meta name="theme-color" content="#0f1115" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <meta name="apple-mobile-web-app-title" content="Darts Practice" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+
+    <link rel="manifest" href="manifest.json" />
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/layout/lay_core.css" />
+    <link rel="stylesheet" href="css/layout/lay_menu.css" />
+    <link rel="stylesheet" href="css/news.css" />
+  </head>
+
+  <body>
+    <header class="header">
+      <h1>Info</h1>
+    </header>
+
+    <main class="info-container">
+      <section class="info-panel">
+        <div class="info-tabs" role="tablist" aria-label="Information Tabs">
+          <button class="active" data-tab="all" role="tab" aria-selected="true" type="button">すべて</button>
+          <button data-tab="updates" role="tab" aria-selected="false" type="button">更新情報</button>
+          <button data-tab="notice" role="tab" aria-selected="false" type="button">お知らせ</button>
+          <button data-tab="plan" role="tab" aria-selected="false" type="button">更新予定</button>
+        </div>
+
+        <section class="tab-panel active" id="tab-all" data-panel="all" role="tabpanel">
+          <ul class="info-list" id="allList"></ul>
+        </section>
+
+        <section class="tab-panel" id="tab-updates" data-panel="updates" role="tabpanel" hidden>
+          <ul class="info-list" id="updatesList"></ul>
+        </section>
+
+        <section class="tab-panel" id="tab-notice" data-panel="notice" role="tabpanel" hidden>
+          <ul class="info-list" id="noticeList"></ul>
+        </section>
+
+        <section class="tab-panel" id="tab-plan" data-panel="plan" role="tabpanel" hidden>
+          <ul class="info-list" id="planList"></ul>
+        </section>
+      </section>
+    </main>
+
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <div id="menuEdge" class="menu-edge"></div>
+
+    <div id="sideMenu" class="side-menu" role="navigation">
+      <div class="menu-header">Menu</div>
+
+      <button data-link="index.html">Main Menu</button>
+      <button data-link="countup.html">CountUp</button>
+      <button disabled>01(Coming Soon)</button>
+      <button disabled>Cricket(Coming Soon)</button>
+      <button data-link="data.html">Data</button>
+      <button data-link="settings.html">Settings</button>
+      <button data-link="news.html">Info</button>
+    </div>
+
+    <script src="js/core/state.js" defer></script>
+    <script src="js/core/core.js" defer></script>
+    <script src="js/core/storage.js" defer></script>
+
+    <script src="js/ui/news.js" defer></script>
+    <script src="js/init/main.js" defer></script>
+  </body>
+</html>

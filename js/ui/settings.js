@@ -138,6 +138,71 @@ async function updateStorageStatus() {
   }
 }
 
+// ===============================
+// ===== バックアップ ============
+// ===============================
+
+function exportBackup() {
+  const sessions = typeof readSessions === "function" ? readSessions() : []
+  const settings = readSettings()
+
+  const backup = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    sessions,
+    settings
+  }
+
+  const json = JSON.stringify(backup, null, 2)
+  const blob = new Blob([json], { type: "application/json" })
+  const url = URL.createObjectURL(blob)
+
+  const date = new Date().toISOString().slice(0, 10)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = `darts-backup-${date}.json`
+  a.click()
+
+  URL.revokeObjectURL(url)
+}
+
+function importBackup(file) {
+  if (!file) return
+
+  const reader = new FileReader()
+  reader.onload = async e => {
+    let backup
+    try {
+      backup = JSON.parse(e.target.result)
+    } catch {
+      alert("ファイルの読み込みに失敗しました。\n正しいバックアップファイルを選択してください。")
+      return
+    }
+
+    if (!backup || !Array.isArray(backup.sessions)) {
+      alert("バックアップファイルの形式が正しくありません。")
+      return
+    }
+
+    const confirmed = confirm(
+      `${backup.sessions.length} 件のデータをインポートします。\n現在のデータは上書きされます。よろしいですか？`
+    )
+    if (!confirmed) return
+
+    if (typeof writeSessions === "function") {
+      writeSessions(backup.sessions)
+    }
+
+    if (backup.settings && typeof writeSettings === "function") {
+      writeSettings({ ...readSettings(), ...backup.settings })
+    }
+
+    alert("インポートが完了しました。")
+    await updateStorageStatus()
+  }
+  reader.readAsText(file)
+}
+
 async function initSettingsPage() {
   const bullSelect = document.getElementById("bullModeSetting")
   const roundSelect = document.getElementById("roundSetting")
@@ -156,6 +221,20 @@ async function initSettingsPage() {
   if (refreshStatusBtn) {
     refreshStatusBtn.addEventListener("click", () => {
       updateStorageStatus()
+    })
+  }
+
+  const exportBtn = document.getElementById("exportBackupBtn")
+  const importInput = document.getElementById("importBackupInput")
+
+  if (exportBtn) {
+    exportBtn.addEventListener("click", exportBackup)
+  }
+
+  if (importInput) {
+    importInput.addEventListener("change", e => {
+      importBackup(e.target.files[0])
+      importInput.value = ""
     })
   }
 

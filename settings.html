@@ -42,9 +42,20 @@
       }
 
       .settings-container {
-        width: min(520px, 100%);
+        width: min(1040px, 100%);
         margin: auto;
         padding: 20px 16px;
+        display: block;
+        overflow-y: auto;
+      }
+
+      .settings-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .settings-column {
         display: flex;
         flex-direction: column;
         gap: 14px;
@@ -164,6 +175,19 @@
           grid-template-columns: 1fr;
         }
       }
+
+      @media (min-width: 900px) {
+        .settings-layout {
+          display: grid;
+          grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+          align-items: start;
+          gap: 18px;
+        }
+
+        .settings-panel {
+          height: fit-content;
+        }
+      }
     </style>
   </head>
 
@@ -173,78 +197,102 @@
     </header>
 
     <main class="settings-container">
-      <section class="settings-panel">
-        <h2 class="panel-title">Game</h2>
+      <div class="settings-layout">
+        <div class="settings-column settings-column-game">
+          <section class="settings-panel">
+            <h2 class="panel-title">Game</h2>
 
-        <div class="setting-group">
-          <label for="bullModeSetting">Bull Mode</label>
+            <div class="setting-group">
+              <label for="bullModeSetting">Bull Mode</label>
 
-          <select id="bullModeSetting">
-            <option value="fat">FAT (50/50)</option>
-            <option value="double">SEPARATE (50/25)</option>
-          </select>
+              <select id="bullModeSetting">
+                <option value="fat">FAT (50/50)</option>
+                <option value="double">SEPARATE (50/25)</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label for="roundSetting">Rounds</label>
+
+              <select id="roundSetting" disabled>
+                <option value="8">8</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+              </select>
+            </div>
+          </section>
         </div>
 
-        <div class="setting-group">
-          <label for="roundSetting">Rounds</label>
+        <div class="settings-column settings-column-other">
+          <section class="settings-panel">
+            <h2 class="panel-title">Display</h2>
 
-          <select id="roundSetting" disabled>
-            <option value="8">8</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-          </select>
+            <div class="setting-group">
+              <label for="orientationSetting">Screen Orientation</label>
+
+              <select id="orientationSetting">
+                <option value="auto">Free</option>
+                <option value="portrait">Portrait Lock</option>
+                <option value="landscape">Landscape Lock</option>
+              </select>
+
+              <p class="setting-help">
+                一部端末ではブラウザ仕様上、画面回転ロックが適用されない場合があります。
+              </p>
+              <p id="orientationStatus" class="orientation-status"></p>
+            </div>
+          </section>
+
+          <section class="settings-panel">
+            <h2 class="panel-title">データ保存状況</h2>
+
+            <div class="storage-status-grid">
+              <div class="storage-status-item">
+                <span class="storage-status-label">保存ゲーム数</span>
+                <span class="storage-status-value" id="storageGameCount">-</span>
+              </div>
+              <div class="storage-status-item">
+                <span class="storage-status-label">保存先</span>
+                <span class="storage-status-value" id="storageBackend">-</span>
+              </div>
+              <div class="storage-status-item">
+                <span class="storage-status-label">使用容量（概算）</span>
+                <span class="storage-status-value" id="storageUsage">-</span>
+              </div>
+              <div class="storage-status-item">
+                <span class="storage-status-label">利用上限（概算）</span>
+                <span class="storage-status-value" id="storageQuota">-</span>
+              </div>
+            </div>
+
+            <div class="storage-status-actions">
+              <button id="refreshStorageStatusBtn" type="button">再計測</button>
+            </div>
+
+            <p id="storageStatusNote" class="storage-status-note">
+              容量はブラウザ全体の概算です。実データのみの正確な容量ではありません。
+            </p>
+          </section>
+
+          <section class="settings-panel">
+            <h2 class="panel-title">バックアップ</h2>
+
+            <div class="setting-group">
+              <label>エクスポート</label>
+              <p class="setting-help">全記録データをJSONファイルとして端末に保存します。端末の引き継ぎや万一のデータ消失に備えて定期的にバックアップしてください。</p>
+              <button id="exportBackupBtn" type="button" style="margin-top:8px; min-height:42px; padding:0 16px; font-size:14px;">データをエクスポート</button>
+            </div>
+
+            <div class="setting-group" style="margin-top:14px;">
+              <label>インポート</label>
+              <p class="setting-help">バックアップファイルから記録データを復元します。現在のデータは上書きされます。</p>
+              <label for="importBackupInput" style="display:inline-block; margin-top:8px; min-height:42px; padding:0 16px; font-size:14px; background:#1a202a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; line-height:42px; cursor:pointer; color:var(--text-main);">
+                ファイルを選択
+              </label>
+              <input id="importBackupInput" type="file" accept=".json,application/json" style="display:none;" />
+            </div>
+          </section>
         </div>
-      </section>
-
-      <section class="settings-panel">
-        <h2 class="panel-title">Display</h2>
-
-        <div class="setting-group">
-          <label for="orientationSetting">Screen Orientation</label>
-
-          <select id="orientationSetting">
-            <option value="auto">Free</option>
-            <option value="portrait">Portrait Lock</option>
-            <option value="landscape">Landscape Lock</option>
-          </select>
-
-          <p class="setting-help">
-            一部端末ではブラウザ仕様上、画面回転ロックが適用されない場合があります。
-          </p>
-          <p id="orientationStatus" class="orientation-status"></p>
-        </div>
-      </section>
-
-      <section class="settings-panel">
-        <h2 class="panel-title">データ保存状況</h2>
-
-        <div class="storage-status-grid">
-          <div class="storage-status-item">
-            <span class="storage-status-label">保存ゲーム数</span>
-            <span class="storage-status-value" id="storageGameCount">-</span>
-          </div>
-          <div class="storage-status-item">
-            <span class="storage-status-label">保存先</span>
-            <span class="storage-status-value" id="storageBackend">-</span>
-          </div>
-          <div class="storage-status-item">
-            <span class="storage-status-label">使用容量（概算）</span>
-            <span class="storage-status-value" id="storageUsage">-</span>
-          </div>
-          <div class="storage-status-item">
-            <span class="storage-status-label">利用上限（概算）</span>
-            <span class="storage-status-value" id="storageQuota">-</span>
-          </div>
-        </div>
-
-        <div class="storage-status-actions">
-          <button id="refreshStorageStatusBtn" type="button">再計測</button>
-        </div>
-
-        <p id="storageStatusNote" class="storage-status-note">
-          容量はブラウザ全体の概算です。実データのみの正確な容量ではありません。
-        </p>
-      </section>
       </div>
     </main>
 

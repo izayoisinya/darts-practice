@@ -423,7 +423,6 @@ function refreshGameChartsNow() {
   if (viewMode !== "game") return
   if (detailViewMode) return
   drawGameScoresChart()
-  drawSelectedRangeChart()
 }
 
 function queueInitialGameChartRefresh() {
@@ -503,7 +502,7 @@ function changeView(mode) {
     loadStats()
     loadSessions()
     updatePaginationUI(totalPages)
-    setRangeChartSectionVisible(true)
+    setRangeChartSectionVisible(false)
     drawGameScoresChart()
   } else if (safeMode === "analysis") {
     setAnalysisLayout(true)
@@ -512,10 +511,11 @@ function changeView(mode) {
     chartContainer.style.display = "block"
     if (gameChartSection) gameChartSection.style.display = "none"
     if (analysisContainer) analysisContainer.style.display = "flex"
-    setRangeChartSectionVisible(false)
+    setRangeChartSectionVisible(true)
     groupedPageMode = "analysis"
     updatePaginationUI(1)
     renderAnalysisScatter()
+    drawSelectedRangeChart()
     window.scrollTo(0, 0)
   } else {
     setAnalysisLayout(false)
@@ -559,7 +559,7 @@ function renderView() {
     chartContainer.style.display = "block"
     if (gameChartSection) gameChartSection.style.display = "flex"
     if (analysisContainer) analysisContainer.style.display = "none"
-    setRangeChartSectionVisible(true)
+    setRangeChartSectionVisible(false)
     loadStats(viewMode)
     loadSessions()
     drawGameScoresChart()
@@ -571,10 +571,11 @@ function renderView() {
     chartContainer.style.display = "block"
     if (gameChartSection) gameChartSection.style.display = "none"
     if (analysisContainer) analysisContainer.style.display = "flex"
-    setRangeChartSectionVisible(false)
+    setRangeChartSectionVisible(true)
     groupedPageMode = "analysis"
     updatePaginationUI(1)
     renderAnalysisScatter()
+    drawSelectedRangeChart()
   } else {
     setAnalysisLayout(false)
     statsSection.style.display = "none"
@@ -889,7 +890,6 @@ function drawGameScoresChart() {
     ctx.fill()
   })
 
-  drawSelectedRangeChart()
 }
 
 function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = "", compareLabel = "") {
@@ -1223,7 +1223,7 @@ function drawLineSeries(ctx, values, color, padding, verticalPadding, height, gr
 }
 
 function drawSelectedRangeChart() {
-  if (viewMode !== "game") return
+  if (viewMode !== "analysis") return
 
   wireRangeChartControls()
 

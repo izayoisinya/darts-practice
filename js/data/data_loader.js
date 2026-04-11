@@ -174,14 +174,23 @@ function createSessionCardHtml(session, gameNumber) {
     .flat()
     .filter(d => d)
     .length
-  const bullRateNum = totalDarts > 0
+  const bullRateRaw = totalDarts > 0
     ? ((session?.bulls || 0) / totalDarts) * 100
     : Number(session?.bullRate || 0)
-  const innerRateNum = totalDarts > 0
+  const innerRateRaw = totalDarts > 0
     ? ((session?.innerBulls || 0) / totalDarts) * 100
     : Number(session?.innerRate || 0)
-  const bullRate = Number.isFinite(bullRateNum) ? bullRateNum.toFixed(1) : "0.0"
-  const innerRate = Number.isFinite(innerRateNum) ? innerRateNum.toFixed(1) : "0.0"
+
+  const normalizePercent = value => {
+    if (!Number.isFinite(value)) return 0
+    const asPercent = value > 0 && value <= 1 ? value * 100 : value
+    return Math.max(0, Math.min(100, asPercent))
+  }
+
+  const bullRateNum = normalizePercent(bullRateRaw)
+  const innerRateNum = normalizePercent(innerRateRaw)
+  const bullRate = bullRateNum.toFixed(1)
+  const innerRate = innerRateNum.toFixed(1)
   const tripleHtml = `
     <div class="session-triple-grid">
       <div class="session-triple-item"><span class="session-triple-label">20:</span><span class="session-triple-value">${t[20] ?? 0}</span></div>
@@ -433,6 +442,11 @@ function changePage(direction) {
     if (newPage >= 1 && newPage <= totalPages) {
       changeDetailPage(newPage)
     }
+    return
+  }
+
+  if (groupedPageMode === "analysis") {
+    updatePaginationUI(1)
     return
   }
 

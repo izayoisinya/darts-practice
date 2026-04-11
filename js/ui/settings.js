@@ -2,7 +2,50 @@ const SETTINGS_KEY = "dartsSettings"
 
 const DEFAULT_SETTINGS = {
   bullMode: "fat",
-  orientationMode: "auto"
+  orientationMode: "auto",
+  dataTabs: {
+    analysis: true,
+    day: true,
+    week: true,
+    month: true,
+    year: true
+  }
+}
+
+function normalizeDataTabs(dataTabs) {
+  const source = dataTabs && typeof dataTabs === "object" ? dataTabs : {}
+  return {
+    analysis: source.analysis !== false,
+    day: source.day !== false,
+    week: source.week !== false,
+    month: source.month !== false,
+    year: source.year !== false
+  }
+}
+
+function readDataTabTogglesFromForm() {
+  return {
+    analysis: !!document.getElementById("tabToggleAnalysis")?.checked,
+    day: !!document.getElementById("tabToggleDay")?.checked,
+    week: !!document.getElementById("tabToggleWeek")?.checked,
+    month: !!document.getElementById("tabToggleMonth")?.checked,
+    year: !!document.getElementById("tabToggleYear")?.checked
+  }
+}
+
+function applyDataTabTogglesToForm(dataTabs) {
+  const normalized = normalizeDataTabs(dataTabs)
+  const analysis = document.getElementById("tabToggleAnalysis")
+  const day = document.getElementById("tabToggleDay")
+  const week = document.getElementById("tabToggleWeek")
+  const month = document.getElementById("tabToggleMonth")
+  const year = document.getElementById("tabToggleYear")
+
+  if (analysis) analysis.checked = normalized.analysis
+  if (day) day.checked = normalized.day
+  if (week) week.checked = normalized.week
+  if (month) month.checked = normalized.month
+  if (year) year.checked = normalized.year
 }
 
 function readSettings() {
@@ -21,20 +64,31 @@ function writeSettings(settings) {
 
 function loadSettings() {
   const settings = readSettings()
+  settings.dataTabs = normalizeDataTabs(settings.dataTabs)
 
   document.getElementById("bullModeSetting").value = settings.bullMode
   const orientationSelect = document.getElementById("orientationSetting")
   if (orientationSelect) {
     orientationSelect.value = settings.orientationMode
   }
+  applyDataTabTogglesToForm(settings.dataTabs)
 }
 
 function saveSettings() {
   const prevSettings = readSettings()
+  const dataTabs = normalizeDataTabs(readDataTabTogglesFromForm())
+
+  const enabledTabCount = Object.values(dataTabs).filter(Boolean).length
+  if (enabledTabCount < 1) {
+    alert("データ画面タブは最低1つONにしてください")
+    applyDataTabTogglesToForm(prevSettings.dataTabs)
+    return
+  }
 
   const settings = {
     bullMode: document.getElementById("bullModeSetting").value,
-    orientationMode: document.getElementById("orientationSetting")?.value || "auto"
+    orientationMode: document.getElementById("orientationSetting")?.value || "auto",
+    dataTabs
   }
 
   writeSettings(settings)
@@ -208,6 +262,13 @@ async function initSettingsPage() {
   const roundSelect = document.getElementById("roundSetting")
   const orientationSelect = document.getElementById("orientationSetting")
   const refreshStatusBtn = document.getElementById("refreshStorageStatusBtn")
+  const tabToggles = [
+    document.getElementById("tabToggleAnalysis"),
+    document.getElementById("tabToggleDay"),
+    document.getElementById("tabToggleWeek"),
+    document.getElementById("tabToggleMonth"),
+    document.getElementById("tabToggleYear")
+  ].filter(Boolean)
 
   if (!bullSelect) return
 
@@ -223,6 +284,7 @@ async function initSettingsPage() {
       updateStorageStatus()
     })
   }
+  tabToggles.forEach(el => el.addEventListener("change", saveSettings))
 
   const exportBtn = document.getElementById("exportBackupBtn")
   const importInput = document.getElementById("importBackupInput")

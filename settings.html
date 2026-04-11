@@ -119,6 +119,32 @@
         box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.15);
       }
 
+      .tab-toggle-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .tab-toggle-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #1a202a;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 8px 10px;
+      }
+
+      .tab-toggle-item input {
+        accent-color: var(--accent);
+      }
+
+      .tab-toggle-item label {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
       .setting-help {
         margin: 4px 0 0;
         font-size: 12px;
@@ -180,6 +206,10 @@
 
       @media (max-width: 480px) {
         .storage-status-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .tab-toggle-grid {
           grid-template-columns: 1fr;
         }
       }
@@ -248,6 +278,38 @@
                 一部端末ではブラウザ仕様上、画面回転ロックが適用されない場合があります。
               </p>
               <p id="orientationStatus" class="orientation-status"></p>
+            </div>
+          </section>
+
+          <section class="settings-panel">
+            <h2 class="panel-title">Data Tabs</h2>
+
+            <div class="setting-group">
+              <label>データ画面で表示するタブ</label>
+              <p class="setting-help">Gameは固定表示です。最低1つは表示タブをONにしてください。</p>
+
+              <div class="tab-toggle-grid">
+                <div class="tab-toggle-item">
+                  <input type="checkbox" id="tabToggleAnalysis" />
+                  <label for="tabToggleAnalysis">Analysis</label>
+                </div>
+                <div class="tab-toggle-item">
+                  <input type="checkbox" id="tabToggleDay" />
+                  <label for="tabToggleDay">Day</label>
+                </div>
+                <div class="tab-toggle-item">
+                  <input type="checkbox" id="tabToggleWeek" />
+                  <label for="tabToggleWeek">Week</label>
+                </div>
+                <div class="tab-toggle-item">
+                  <input type="checkbox" id="tabToggleMonth" />
+                  <label for="tabToggleMonth">Month</label>
+                </div>
+                <div class="tab-toggle-item">
+                  <input type="checkbox" id="tabToggleYear" />
+                  <label for="tabToggleYear">Year</label>
+                </div>
+              </div>
             </div>
           </section>
 

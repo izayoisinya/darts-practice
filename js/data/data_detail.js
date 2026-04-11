@@ -55,7 +55,11 @@ function showGameDetails(dateKey, gamesList) {
   detailCompareDayKey = ""
   
   const chartContainer = document.getElementById("chartContainer")
+  const gameChartSection = document.getElementById("gameChartSection")
+  const analysisContainer = document.getElementById("analysisContainer")
   chartContainer.style.display = "block"
+  if (gameChartSection) gameChartSection.style.display = "flex"
+  if (analysisContainer) analysisContainer.style.display = "none"
   
   const statsSection = document.getElementById("statsSection")
   statsSection.style.display = "flex"
@@ -110,6 +114,27 @@ function getSessionsGroupedByDay() {
   return grouped
 }
 
+function resetDetailCompareUI() {
+  const section = document.getElementById("detailCompareSection")
+  const select = document.getElementById("detailCompareSelect")
+  const legend = document.getElementById("detailCompareLegend")
+  const tagsBox = document.getElementById("detailCompareTags")
+
+  detailCompareDayKey = ""
+
+  if (section) section.style.display = "none"
+  if (select) {
+    select.onchange = null
+    select.innerHTML = ""
+    select.value = ""
+  }
+  if (tagsBox) tagsBox.innerHTML = ""
+  if (legend) {
+    legend.style.display = "none"
+    legend.innerHTML = ""
+  }
+}
+
 function setupDetailCompareControls(currentDayKey) {
   const section = document.getElementById("detailCompareSection")
   const select = document.getElementById("detailCompareSelect")
@@ -118,13 +143,7 @@ function setupDetailCompareControls(currentDayKey) {
   if (!section || !select) return
 
   if (groupedPageMode !== "day") {
-    section.style.display = "none"
-    select.innerHTML = ""
-    if (tagsBox) tagsBox.innerHTML = ""
-    if (legend) {
-      legend.style.display = "none"
-      legend.innerHTML = ""
-    }
+    resetDetailCompareUI()
     return
   }
 
@@ -204,6 +223,7 @@ function renderDetailCompareTagChips(tags) {
 }
 
 function displayDetailPage() {
+  if (!selectedDayData || !Array.isArray(selectedDayData.gamesList)) return
   
   const container = document.getElementById("sessionsContainer")
   container.innerHTML = ""
@@ -387,15 +407,7 @@ function backToSummary(options = {}) {
 
   
   selectedDayData = null
-  detailCompareDayKey = ""
-
-  const compareSection = document.getElementById("detailCompareSection")
-  const compareLegend = document.getElementById("detailCompareLegend")
-  if (compareSection) compareSection.style.display = "none"
-  if (compareLegend) {
-    compareLegend.style.display = "none"
-    compareLegend.innerHTML = ""
-  }
+  resetDetailCompareUI()
 
   // カレンダータップで来ていた場合は元のモードに戻す
   if (calendarJumpOriginMode !== null) {

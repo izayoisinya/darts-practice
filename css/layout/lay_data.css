@@ -49,6 +49,14 @@ main {
   height: 100%;
 }
 
+.data-container.analysis-mode {
+  grid-template-columns: 1fr;
+}
+
+.data-container.analysis-mode #rightPanel {
+  display: none;
+}
+
 #leftPanel {
   display: flex;
   flex-direction: column;
@@ -232,6 +240,12 @@ main {
   border: none;
   font-size: 18px;
   line-height: 1.3;
+}
+
+#gameChartSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 #scoreChart {
@@ -450,6 +464,68 @@ main {
   height: 220px;
   border: 1px solid #333;
   border-radius: 4px;
+}
+
+.analysis-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.scatter-tag-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.scatter-tag-btn,
+.scatter-clear-btn {
+  border: 1px solid #3a3f4b;
+  background: #1a1f29;
+  color: var(--text-main);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.scatter-tag-btn.is-active {
+  border-color: currentColor;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08) inset;
+}
+
+.scatter-clear-btn {
+  border-style: dashed;
+}
+
+#scatterChart {
+  display: block;
+  width: 100%;
+  height: 280px;
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+
+.scatter-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  min-height: 20px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.scatter-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scatter-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
 
 .rating-reference {

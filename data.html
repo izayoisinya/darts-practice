@@ -66,42 +66,51 @@
     </section>
     <section id="calendarContainer" style="display:none;"></section>
     <section id="chartContainer" style="display:none;">
-      <h3>Score Trend (Last 30 Games)</h3>
-      <canvas id="scoreChart"></canvas>
+      <div id="gameChartSection">
+        <h3>Score Trend (Last 30 Games)</h3>
+        <canvas id="scoreChart"></canvas>
 
-      <div id="detailCompareSection" class="detail-compare-section" style="display:none;">
-        <div class="detail-compare-controls">
-          <label for="detailCompareSelect">比較日</label>
-          <select id="detailCompareSelect"></select>
+        <div id="detailCompareSection" class="detail-compare-section" style="display:none;">
+          <div class="detail-compare-controls">
+            <label for="detailCompareSelect">比較日</label>
+            <select id="detailCompareSelect"></select>
+          </div>
+          <div id="detailCompareTags" class="detail-compare-tags"></div>
+          <div id="detailCompareLegend" class="range-chart-legend" style="display:none;"></div>
         </div>
-        <div id="detailCompareTags" class="detail-compare-tags"></div>
-        <div id="detailCompareLegend" class="range-chart-legend" style="display:none;"></div>
+
+        <div id="rangeChartSection" class="range-chart-section" style="display:none;">
+          <h3>Score Trend (Selected Period)</h3>
+          <div class="range-chart-controls">
+            <div class="range-chart-row">
+              <span class="range-prefix">A</span>
+              <input id="rangeStartDate" type="date" />
+              <span class="range-sep">~</span>
+              <input id="rangeEndDate" type="date" />
+            </div>
+            <div class="range-chart-row">
+              <span class="range-prefix">B</span>
+              <input id="compareStartDate" type="date" />
+              <span class="range-sep">~</span>
+              <input id="compareEndDate" type="date" />
+            </div>
+            <div class="range-apply-row">
+              <button id="rangeApplyBtn" type="button">Apply</button>
+            </div>
+          </div>
+          <div id="rangeChartLegend" class="range-chart-legend" style="display:none;"></div>
+          <canvas id="rangeScoreChart"></canvas>
+        </div>
+
+        <section id="ratingReferenceSection" class="rating-reference" style="display:none;"></section>
       </div>
 
-      <div id="rangeChartSection" class="range-chart-section" style="display:none;">
-        <h3>Score Trend (Selected Period)</h3>
-        <div class="range-chart-controls">
-          <div class="range-chart-row">
-            <span class="range-prefix">A</span>
-            <input id="rangeStartDate" type="date" />
-            <span class="range-sep">~</span>
-            <input id="rangeEndDate" type="date" />
-          </div>
-          <div class="range-chart-row">
-            <span class="range-prefix">B</span>
-            <input id="compareStartDate" type="date" />
-            <span class="range-sep">~</span>
-            <input id="compareEndDate" type="date" />
-          </div>
-          <div class="range-apply-row">
-            <button id="rangeApplyBtn" type="button">Apply</button>
-          </div>
-        </div>
-        <div id="rangeChartLegend" class="range-chart-legend" style="display:none;"></div>
-        <canvas id="rangeScoreChart"></canvas>
-      </div>
-
-      <section id="ratingReferenceSection" class="rating-reference" style="display:none;"></section>
+      <section id="analysisContainer" class="analysis-section" style="display:none;">
+        <h3>Tag Scatter</h3>
+        <div id="scatterTagControls" class="scatter-tag-controls"></div>
+        <canvas id="scatterChart"></canvas>
+        <div id="scatterLegend" class="scatter-legend"></div>
+      </section>
     </section>
   </div>
   <!-- タブボタンを右下に配置 -->
@@ -114,6 +123,7 @@
   </div>
 <div class="tabs-container">
   <button class="active" data-view="game" onclick="changeView('game')">Game</button>
+  <button data-view="analysis" onclick="changeView('analysis')">Analysis</button>
   <button data-view="day" onclick="changeView('day')">Day</button>
   <button data-view="week" onclick="changeView('week')">Week</button>
   <button data-view="month" onclick="changeView('month')">Month</button>

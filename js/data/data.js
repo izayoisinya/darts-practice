@@ -7,6 +7,28 @@ let panelTouchStartY = 0
 let panelSwipeBlockedByTabs = false
 const chartAxisFontFamily = "'Segoe UI', 'Noto Sans JP', sans-serif"
 let initialChartRefreshQueued = false
+let scatterSelectedTags = []
+let detailChartRenderSeq = 0
+const DATA_SETTINGS_KEY = "dartsSettings"
+
+const DEFAULT_DATA_TABS = {
+  analysis: true,
+  day: true,
+  week: true,
+  month: true,
+  year: true
+}
+
+const scatterColorPalette = [
+  "#ff6b6b",
+  "#4da3ff",
+  "#7bc96f",
+  "#ffd166",
+  "#06d6a0",
+  "#f78c6b",
+  "#a78bfa",
+  "#ff9ff3"
+]
 
 function isPhonePortraitDataView() {
   return body.classList.contains("phone") && body.classList.contains("portrait")
@@ -48,12 +70,289 @@ function setChartAxisTextStyle(ctx) {
   ctx.textBaseline = "middle"
 }
 
+function readDataTabSettings() {
+  try {
+    const raw = localStorage.getItem(DATA_SETTINGS_KEY)
+    const parsed = raw ? JSON.parse(raw) : {}
+    const source = parsed?.dataTabs && typeof parsed.dataTabs === "object"
+      ? parsed.dataTabs
+      : {}
+
+    return {
+      analysis: source.analysis !== false,
+      day: source.day !== false,
+      week: source.week !== false,
+      month: source.month !== false,
+      year: source.year !== false
+    }
+  } catch {
+    return { ...DEFAULT_DATA_TABS }
+  }
+}
+
+function getVisibleViews() {
+  const tabs = readDataTabSettings()
+  const dynamicViews = ["analysis", "day", "week", "month", "year"]
+  const visible = dynamicViews.filter(view => tabs[view] !== false)
+  return ["game", ...visible]
+}
+
+function ensureViewIsVisible(mode) {
+  const visibleViews = getVisibleViews()
+  return visibleViews.includes(mode) ? mode : "game"
+}
+
+function applyDataViewTabVisibility() {
+  const tabs = readDataTabSettings()
+  const viewButtons = document.querySelectorAll(".tabs-container button[data-view]")
+  viewButtons.forEach(btn => {
+    const view = btn.dataset.view || ""
+    if (view === "game") {
+      btn.style.display = ""
+      return
+    }
+
+    btn.style.display = tabs[view] === false ? "none" : ""
+  })
+}
+
 function getChartPadding() {
   const isPhone = body.classList.contains("phone")
   return {
     left: isPhone ? 27 : 34,
     right: isPhone ? 8 : 8,
     vertical: 34
+  }
+}
+
+function normalizeTag(tag) {
+  return String(tag || "").trim().replace(/^#/, "")
+}
+
+function getTagColor(tag) {
+  const normalized = normalizeTag(tag)
+  if (!normalized) return "#9aa4b2"
+  let hash = 0
+  for (let i = 0; i < normalized.length; i++) {
+    hash = (hash * 31 + normalized.charCodeAt(i)) >>> 0
+  }
+  return scatterColorPalette[hash % scatterColorPalette.length]
+}
+
+function getSessionTagsForScatter(session) {
+  const date = new Date(session?.date)
+  if (Number.isNaN(date.getTime())) return []
+  if (typeof getDayNote !== "function" || typeof getLocalDateKey !== "function") return []
+
+  const note = getDayNote(getLocalDateKey(date))
+  if (!Array.isArray(note?.tags)) return []
+  return note.tags.map(normalizeTag).filter(Boolean)
+}
+
+function getScatterAvailableTags(sessions) {
+  const counts = {}
+  sessions.forEach(session => {
+    getSessionTagsForScatter(session).forEach(tag => {
+      counts[tag] = (counts[tag] || 0) + 1
+    })
+  })
+
+  return Object.entries(counts)
+    .sort((a, b) => {
+      if (b[1] !== a[1]) return b[1] - a[1]
+      return a[0].localeCompare(b[0], "ja")
+    })
+    .map(([tag]) => tag)
+}
+
+function renderScatterLegend(tags, selectedTags) {
+  const legend = document.getElementById("scatterLegend")
+  if (!legend) return
+
+  const effectiveTags = (selectedTags.length ? selectedTags : tags).slice(0, 8)
+  if (!effectiveTags.length) {
+    legend.innerHTML = '<span class="scatter-legend-item">タグ未設定データはグレーで表示されます</span>'
+    return
+  }
+
+  const rows = effectiveTags
+    .map(tag => `
+      <span class="scatter-legend-item">
+        <span class="scatter-legend-swatch" style="background:${getTagColor(tag)}"></span>
+        #${tag}
+      </span>
+    `)
+    .join("")
+
+  legend.innerHTML = `${rows}<span class="scatter-legend-item"><span class="scatter-legend-swatch" style="background:rgba(154,164,178,0.35)"></span>タグなし/非選択</span>`
+}
+
+function renderScatterTagControls(sessions) {
+  const controls = document.getElementById("scatterTagControls")
+  if (!controls) return []
+
+  const tags = getScatterAvailableTags(sessions)
+  scatterSelectedTags = scatterSelectedTags.filter(tag => tags.includes(tag))
+
+  if (!tags.length) {
+    controls.innerHTML = '<span class="scatter-legend-item">タグ付きメモを追加すると色分けできます</span>'
+    renderScatterLegend([], [])
+    return []
+  }
+
+  const clearActive = scatterSelectedTags.length === 0 ? " is-active" : ""
+  const clearBtn = `<button type="button" class="scatter-clear-btn${clearActive}" id="scatterClearFilterBtn">All Tags</button>`
+  const tagButtons = tags
+    .map(tag => {
+      const isActive = scatterSelectedTags.includes(tag) ? " is-active" : ""
+      return `<button type="button" class="scatter-tag-btn${isActive}" data-tag="${escapeHtml(tag)}" style="color:${getTagColor(tag)}">#${escapeHtml(tag)}</button>`
+    })
+    .join("")
+
+  controls.innerHTML = `${clearBtn}${tagButtons}`
+
+  const clearBtnEl = document.getElementById("scatterClearFilterBtn")
+  if (clearBtnEl) {
+    clearBtnEl.onclick = () => {
+      scatterSelectedTags = []
+      renderAnalysisScatter()
+    }
+  }
+
+  controls.querySelectorAll(".scatter-tag-btn").forEach(btn => {
+    btn.onclick = () => {
+      const tag = normalizeTag(btn.getAttribute("data-tag"))
+      if (!tag) return
+      if (scatterSelectedTags.includes(tag)) {
+        scatterSelectedTags = scatterSelectedTags.filter(t => t !== tag)
+      } else {
+        scatterSelectedTags = [...scatterSelectedTags, tag]
+      }
+      renderAnalysisScatter()
+    }
+  })
+
+  renderScatterLegend(tags, scatterSelectedTags)
+  return tags
+}
+
+function drawScatterChart(tags) {
+  const canvas = document.getElementById("scatterChart")
+  if (!canvas) return
+
+  const sessions = readSessions()
+    .slice()
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+
+  const canvasState = setupHiDPICanvas(canvas, 280)
+  if (!canvasState) {
+    setTimeout(() => drawScatterChart(tags), 100)
+    return
+  }
+
+  const { ctx, width, height } = canvasState
+  ctx.clearRect(0, 0, width, height)
+
+  if (!sessions.length) {
+    ctx.fillStyle = "rgba(255,255,255,0.4)"
+    ctx.font = "12px sans-serif"
+    ctx.fillText("No data", 12, 20)
+    return
+  }
+
+  const points = sessions.map(session => {
+    const date = new Date(session.date)
+    const x = date.getTime()
+    const score = Number(session.score) || 0
+    const sessionTags = getSessionTagsForScatter(session)
+    return { x, score, tags: sessionTags }
+  }).filter(point => Number.isFinite(point.x))
+
+  if (!points.length) {
+    ctx.fillStyle = "rgba(255,255,255,0.4)"
+    ctx.font = "12px sans-serif"
+    ctx.fillText("No valid date data", 12, 20)
+    return
+  }
+
+  const chartPadding = getChartPadding()
+  const left = chartPadding.left
+  const right = chartPadding.right
+  const top = 22
+  const bottom = 28
+  const graphWidth = width - left - right
+  const graphHeight = height - top - bottom
+
+  const xMin = Math.min(...points.map(p => p.x))
+  const xMax = Math.max(...points.map(p => p.x))
+  const xRange = xMax - xMin || 1
+
+  const yMin = Math.min(...points.map(p => p.score))
+  const yMax = Math.max(...points.map(p => p.score))
+  const yRange = yMax - yMin || 1
+
+  ctx.strokeStyle = "rgba(255,255,255,0.08)"
+  ctx.lineWidth = 1
+  const gridSteps = 4
+  for (let i = 0; i <= gridSteps; i++) {
+    const value = yMin + (yRange / gridSteps) * i
+    const y = height - bottom - ((value - yMin) / yRange) * graphHeight
+    ctx.beginPath()
+    ctx.moveTo(left, y)
+    ctx.lineTo(width - right, y)
+    ctx.stroke()
+
+    setChartAxisTextStyle(ctx)
+    ctx.fillText(Math.round(value), Math.round(left - 2), Math.round(y))
+  }
+
+  const tickCount = 5
+  ctx.fillStyle = "rgba(255,255,255,0.56)"
+  ctx.font = `600 9px ${chartAxisFontFamily}`
+  ctx.textAlign = "center"
+  ctx.textBaseline = "alphabetic"
+  for (let i = 0; i < tickCount; i++) {
+    const ratio = tickCount === 1 ? 0 : i / (tickCount - 1)
+    const t = xMin + xRange * ratio
+    const xPos = left + graphWidth * ratio
+    const d = new Date(t)
+    const label = `${d.getMonth() + 1}/${d.getDate()}`
+    ctx.fillText(label, xPos, height - 8)
+  }
+
+  points.forEach(point => {
+    const xPos = left + ((point.x - xMin) / xRange) * graphWidth
+    const yPos = height - bottom - ((point.score - yMin) / yRange) * graphHeight
+
+    const matchedTag = scatterSelectedTags.find(tag => point.tags.includes(tag))
+    let color = "rgba(154,164,178,0.35)"
+
+    if (scatterSelectedTags.length === 0) {
+      const firstTag = point.tags[0]
+      color = firstTag ? getTagColor(firstTag) : "rgba(154,164,178,0.35)"
+    } else if (matchedTag) {
+      color = getTagColor(matchedTag)
+    }
+
+    ctx.beginPath()
+    ctx.arc(xPos, yPos, 3.4, 0, Math.PI * 2)
+    ctx.fillStyle = color
+    ctx.fill()
+  })
+
+  renderScatterLegend(tags, scatterSelectedTags)
+}
+
+function renderAnalysisScatter() {
+  const sessions = readSessions()
+  const tags = renderScatterTagControls(sessions)
+  drawScatterChart(tags)
+}
+
+function setAnalysisLayout(active) {
+  const main = document.querySelector("main.data-container")
+  if (main) {
+    main.classList.toggle("analysis-mode", active)
   }
 }
 
@@ -147,16 +446,20 @@ function queueInitialGameChartRefresh() {
 }
 
 function updateViewTabs(mode) {
+  applyDataViewTabVisibility()
+  const safeMode = ensureViewIsVisible(mode)
   document.querySelectorAll(".tabs-container button").forEach(btn => {
-    const isActive = btn.dataset.view === mode
+    const isActive = btn.dataset.view === safeMode
     btn.classList.toggle("active", isActive)
     btn.setAttribute("aria-pressed", isActive ? "true" : "false")
   })
 }
 
 function changeView(mode) {
+  applyDataViewTabVisibility()
+  const safeMode = ensureViewIsVisible(mode)
   setupDataPanelSwipe()
-  viewMode = mode
+  viewMode = safeMode
   detailViewMode = false
   selectedDayData = null
   detailPageNumber = 1
@@ -164,27 +467,32 @@ function changeView(mode) {
   if (typeof setDataDetailViewClass === "function") {
     setDataDetailViewClass(false)
   }
-  updateViewTabs(mode)
+  updateViewTabs(safeMode)
 
   // phone portrait: group表示時はHistoryパネルへ自動切り替え
-  if (mode !== "game" && body.classList.contains("phone") && body.classList.contains("portrait")) {
+  if (safeMode !== "game" && body.classList.contains("phone") && body.classList.contains("portrait")) {
     setDataPanel("history")
   }
 
   const statsSection = document.getElementById("statsSection")
   const awardsSection = document.getElementById("awardsSection")
   const chartContainer = document.getElementById("chartContainer")
+  const gameChartSection = document.getElementById("gameChartSection")
+  const analysisContainer = document.getElementById("analysisContainer")
   const calendarContainer = document.getElementById("calendarContainer")
   if (calendarContainer) {
     calendarContainer.style.display = "none"
     calendarContainer.innerHTML = ""
   }
 
-  if (mode === 'game') {
+  if (safeMode === 'game') {
+    setAnalysisLayout(false)
     // Game ビューに戻す
     statsSection.style.display = "flex"
     awardsSection.style.display = "flex"
     chartContainer.style.display = "block"
+    if (gameChartSection) gameChartSection.style.display = "flex"
+    if (analysisContainer) analysisContainer.style.display = "none"
     currentPage = 1
     groupedPageMode = 'game'
     
@@ -197,18 +505,35 @@ function changeView(mode) {
     updatePaginationUI(totalPages)
     setRangeChartSectionVisible(true)
     drawGameScoresChart()
+  } else if (safeMode === "analysis") {
+    setAnalysisLayout(true)
+    statsSection.style.display = "none"
+    awardsSection.style.display = "none"
+    chartContainer.style.display = "block"
+    if (gameChartSection) gameChartSection.style.display = "none"
+    if (analysisContainer) analysisContainer.style.display = "flex"
+    setRangeChartSectionVisible(false)
+    groupedPageMode = "analysis"
+    updatePaginationUI(1)
+    renderAnalysisScatter()
+    window.scrollTo(0, 0)
   } else {
+    setAnalysisLayout(false)
     // Group ビュー（Day/Week/Month/Year）
     statsSection.style.display = "none"
     awardsSection.style.display = "none"
     chartContainer.style.display = "none"
+    if (gameChartSection) gameChartSection.style.display = "none"
+    if (analysisContainer) analysisContainer.style.display = "none"
     setRangeChartSectionVisible(false)
-    displayGroupView(mode)
+    displayGroupView(safeMode)
     window.scrollTo(0, 0)
   }
 }
 
 function renderView() {
+  applyDataViewTabVisibility()
+  viewMode = ensureViewIsVisible(viewMode)
   setupDataPanelSwipe()
   hideDetailBullRate()
   if (typeof setDataDetailViewClass === "function") {
@@ -219,6 +544,8 @@ function renderView() {
   const statsSection = document.getElementById("statsSection")
   const awardsSection = document.getElementById("awardsSection")
   const chartContainer = document.getElementById("chartContainer")
+  const gameChartSection = document.getElementById("gameChartSection")
+  const analysisContainer = document.getElementById("analysisContainer")
   const calendarContainer = document.getElementById("calendarContainer")
   if (calendarContainer) {
     calendarContainer.style.display = "none"
@@ -226,18 +553,35 @@ function renderView() {
   }
   
   if (viewMode === "game") {
+    setAnalysisLayout(false)
     statsSection.style.display = "flex"
     awardsSection.style.display = "flex"
     chartContainer.style.display = "block"
+    if (gameChartSection) gameChartSection.style.display = "flex"
+    if (analysisContainer) analysisContainer.style.display = "none"
     setRangeChartSectionVisible(true)
     loadStats(viewMode)
     loadSessions()
     drawGameScoresChart()
     queueInitialGameChartRefresh()
+  } else if (viewMode === "analysis") {
+    setAnalysisLayout(true)
+    statsSection.style.display = "none"
+    awardsSection.style.display = "none"
+    chartContainer.style.display = "block"
+    if (gameChartSection) gameChartSection.style.display = "none"
+    if (analysisContainer) analysisContainer.style.display = "flex"
+    setRangeChartSectionVisible(false)
+    groupedPageMode = "analysis"
+    updatePaginationUI(1)
+    renderAnalysisScatter()
   } else {
+    setAnalysisLayout(false)
     statsSection.style.display = "none"
     awardsSection.style.display = "none"
     chartContainer.style.display = "none"
+    if (gameChartSection) gameChartSection.style.display = "none"
+    if (analysisContainer) analysisContainer.style.display = "none"
     setRangeChartSectionVisible(false)
     renderGroupedPaginated(viewMode)
   }
@@ -395,6 +739,12 @@ window.addEventListener("pageshow", () => {
   queueInitialGameChartRefresh()
 })
 
+window.addEventListener("resize", () => {
+  if (viewMode === "analysis") {
+    renderAnalysisScatter()
+  }
+})
+
 function isLikelyGeneratedTestSession(session) {
   const roundScores = Array.isArray(session?.roundScores)
     ? session.roundScores
@@ -543,6 +893,7 @@ function drawGameScoresChart() {
 }
 
 function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = "", compareLabel = "") {
+  const renderSeq = ++detailChartRenderSeq
   const canvas = document.getElementById("scoreChart")
   const detailLegend = document.getElementById("detailCompareLegend")
   const safeGamesList = Array.isArray(gamesList) ? gamesList.filter(Boolean) : []
@@ -559,15 +910,19 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
     return
   }
   setRangeChartSectionVisible(false)
-  renderDetailBullRate(safeGamesList)
 
   const canvasState = setupHiDPICanvas(canvas, 220)
   if (!canvasState) {
     setTimeout(() => {
+      if (renderSeq !== detailChartRenderSeq) return
       drawDetailGroupChart(gamesList, compareGamesList, baseLabel, compareLabel)
     }, 100)
     return
   }
+  if (renderSeq !== detailChartRenderSeq) return
+
+  renderDetailBullRate(safeGamesList)
+
   const { ctx, width, height } = canvasState
   
   const baseScores = safeGamesList.map(s => Number(s?.score) || 0)
@@ -652,6 +1007,11 @@ function renderDetailBullRate(gamesList) {
   const section = document.getElementById("detailBullRateSection")
   if (!section) return
 
+  const clampPercent = value => {
+    if (!Number.isFinite(value)) return 0
+    return Math.max(0, Math.min(100, value))
+  }
+
   const totalBulls = gamesList.reduce((sum, game) => sum + (game?.bulls || 0), 0)
   const totalInnerBulls = gamesList.reduce((sum, game) => sum + (game?.innerBulls || 0), 0)
   const totalDarts = gamesList.reduce((sum, game) => {
@@ -660,8 +1020,8 @@ function renderDetailBullRate(gamesList) {
     return sum + 24
   }, 0)
 
-  const bullRateNum = totalDarts > 0 ? (totalBulls / totalDarts) * 100 : 0
-  const innerBullRateNum = totalDarts > 0 ? (totalInnerBulls / totalDarts) * 100 : 0
+  const bullRateNum = clampPercent(totalDarts > 0 ? (totalBulls / totalDarts) * 100 : 0)
+  const innerBullRateNum = clampPercent(totalDarts > 0 ? (totalInnerBulls / totalDarts) * 100 : 0)
   const bullRate = bullRateNum.toFixed(1)
   const innerBullRate = innerBullRateNum.toFixed(1)
 

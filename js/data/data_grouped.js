@@ -10,6 +10,10 @@ let calendarJumpOriginMode = null
 let calendarJumpOriginData = null
 let calendarJumpOriginPage = null
 
+function isTagFilterEnabledMode(mode) {
+  return mode === "day" || mode === "week" || mode === "month" || mode === "year"
+}
+
 function jumpToCalendarDay(dateStr) {
   const sessions = readSessions()
   const groups = groupSessions(sessions, "day")
@@ -28,16 +32,19 @@ function jumpToCalendarDay(dateStr) {
 }
 
 function getFilteredGroupedEntries(mode, entries) {
-  if (mode !== "day" || !selectedDayTagFilter) return entries
+  if (!isTagFilterEnabledMode(mode) || !selectedDayTagFilter) return entries
 
-  return (entries || []).filter(([dayKey]) => {
-    const tags = getDayNote(dayKey).tags || []
-    return tags.includes(selectedDayTagFilter)
+  return (entries || []).filter(([key, list]) => {
+    const dayKeys = mode === "day" ? [key] : getDayKeysFromSessions(list)
+    return dayKeys.some(dayKey => {
+      const tags = getDayNote(dayKey).tags || []
+      return tags.includes(selectedDayTagFilter)
+    })
   })
 }
 
 function toggleDayTagFilter(tag) {
-  if (groupedPageMode !== "day") return
+  if (!isTagFilterEnabledMode(groupedPageMode)) return
   const normalized = String(tag || "").trim().replace(/^#/, "")
   selectedDayTagFilter = selectedDayTagFilter === normalized ? "" : normalized
   groupedPageNumber = 1
@@ -184,7 +191,6 @@ function changeGroupedPage(page) {
 function displayGroupView(mode) {
   groupedPageMode = mode
   groupedPageNumber = 1
-  if (mode !== "day") selectedDayTagFilter = ""
   
   const sessions = readSessions()
   
@@ -539,7 +545,7 @@ function renderTagStats(mode, pageData) {
   const items = rows
     .map(([tag, count]) => {
       const encoded = encodeURIComponent(tag)
-      const active = mode === "day" && selectedDayTagFilter === tag ? " is-active" : ""
+      const active = isTagFilterEnabledMode(mode) && selectedDayTagFilter === tag ? " is-active" : ""
       return `<button type="button" class="tag-stats-row tag-stats-filter-btn${active}" onclick="toggleDayTagFilter(decodeURIComponent('${encoded}'))"><span>#${escapeHtml(tag)}</span><strong>${count}</strong></button>`
     })
     .join("")

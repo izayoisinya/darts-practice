@@ -3,6 +3,10 @@ const SETTINGS_KEY = "dartsSettings"
 const DEFAULT_SETTINGS = {
   bullMode: "fat",
   orientationMode: "auto",
+  gamePanels: {
+    round: true,
+    stats: true
+  },
   dataTabs: {
     analysis: true,
     day: true,
@@ -21,6 +25,30 @@ function normalizeDataTabs(dataTabs) {
     month: source.month !== false,
     year: source.year !== false
   }
+}
+
+function normalizeGamePanels(gamePanels) {
+  const source = gamePanels && typeof gamePanels === "object" ? gamePanels : {}
+  return {
+    round: source.round !== false,
+    stats: source.stats !== false
+  }
+}
+
+function readGamePanelTogglesFromForm() {
+  return {
+    round: !!document.getElementById("gamePanelRound")?.checked,
+    stats: !!document.getElementById("gamePanelStats")?.checked
+  }
+}
+
+function applyGamePanelTogglesToForm(gamePanels) {
+  const normalized = normalizeGamePanels(gamePanels)
+  const round = document.getElementById("gamePanelRound")
+  const stats = document.getElementById("gamePanelStats")
+
+  if (round) round.checked = normalized.round
+  if (stats) stats.checked = normalized.stats
 }
 
 function readDataTabTogglesFromForm() {
@@ -65,18 +93,21 @@ function writeSettings(settings) {
 function loadSettings() {
   const settings = readSettings()
   settings.dataTabs = normalizeDataTabs(settings.dataTabs)
+  settings.gamePanels = normalizeGamePanels(settings.gamePanels)
 
   document.getElementById("bullModeSetting").value = settings.bullMode
   const orientationSelect = document.getElementById("orientationSetting")
   if (orientationSelect) {
     orientationSelect.value = settings.orientationMode
   }
+  applyGamePanelTogglesToForm(settings.gamePanels)
   applyDataTabTogglesToForm(settings.dataTabs)
 }
 
 function saveSettings() {
   const prevSettings = readSettings()
   const dataTabs = normalizeDataTabs(readDataTabTogglesFromForm())
+  const gamePanels = normalizeGamePanels(readGamePanelTogglesFromForm())
 
   const enabledTabCount = Object.values(dataTabs).filter(Boolean).length
   if (enabledTabCount < 1) {
@@ -88,6 +119,7 @@ function saveSettings() {
   const settings = {
     bullMode: document.getElementById("bullModeSetting").value,
     orientationMode: document.getElementById("orientationSetting")?.value || "auto",
+    gamePanels,
     dataTabs
   }
 
@@ -269,6 +301,10 @@ async function initSettingsPage() {
     document.getElementById("tabToggleMonth"),
     document.getElementById("tabToggleYear")
   ].filter(Boolean)
+  const gamePanelToggles = [
+    document.getElementById("gamePanelRound"),
+    document.getElementById("gamePanelStats")
+  ].filter(Boolean)
 
   if (!bullSelect) return
 
@@ -285,6 +321,7 @@ async function initSettingsPage() {
     })
   }
   tabToggles.forEach(el => el.addEventListener("change", saveSettings))
+  gamePanelToggles.forEach(el => el.addEventListener("change", saveSettings))
 
   const exportBtn = document.getElementById("exportBackupBtn")
   const importInput = document.getElementById("importBackupInput")

@@ -91,3 +91,61 @@ body {
 .stats-area {
   overflow-y: auto;
 }
+
+body.hide-round-area .round-area {
+  display: none;
+}
+
+body.hide-stats-area .stats-area {
+  display: none;
+}
+
+body.hide-round-area .container {
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "input stats";
+}
+
+body.hide-stats-area .container {
+  grid-template-columns: 1.5fr 1fr;
+  grid-template-areas: "round input";
+}
+
+body.hide-round-area.hide-stats-area .container {
+  grid-template-columns: 1fr;
+  grid-template-areas: "input";
+}
+
+body.phone.portrait.hide-round-area .container {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 0.6fr;
+  grid-template-areas:
+    "input"
+    "stats";
+}
+
+body.phone.portrait.hide-stats-area .container {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "round input";
+}
+
+body.phone.portrait.hide-round-area.hide-stats-area .container {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "input";
+}
+
+body.phone.landscape.hide-round-area .container {
+  grid-template-columns: 45% 55%;
+  grid-template-areas: "input stats";
+}
+
+body.phone.landscape.hide-stats-area .container {
+  grid-template-columns: 45% 55%;
+  grid-template-areas: "round input";
+}
+
+body.phone.landscape.hide-round-area.hide-stats-area .container {
+  grid-template-columns: 1fr;
+  grid-template-areas: "input";
+}

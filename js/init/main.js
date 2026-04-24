@@ -19,6 +19,7 @@ async function initApp() {
   }
 
   detectDevice()
+    applyGamePanelVisibility()
   applyOrientationPreference()
   refreshLayout()
   initMenuSummary()
@@ -47,6 +48,35 @@ function getSavedSettings() {
     return {}
   }
 }
+
+  function normalizeGamePanels(gamePanels) {
+    const source = gamePanels && typeof gamePanels === "object" ? gamePanels : {}
+    return {
+      round: source.round !== false,
+      stats: source.stats !== false
+    }
+  }
+
+  function applyGamePanelVisibility() {
+    const roundArea = document.querySelector(".round-area")
+    const statsArea = document.querySelector(".stats-area")
+    if (!roundArea || !statsArea) return
+
+    const settings = getSavedSettings()
+    const gamePanels = normalizeGamePanels(settings.gamePanels)
+
+    body.classList.toggle("hide-round-area", !gamePanels.round)
+    body.classList.toggle("hide-stats-area", !gamePanels.stats)
+
+    if (!gamePanels.round) {
+      body.classList.remove("round-open")
+    }
+    if (!gamePanels.stats) {
+      body.classList.remove("iphone-stats-open")
+    }
+  }
+
+  window.applyGamePanelVisibility = applyGamePanelVisibility
 
 function applyOrientationPreference(mode) {
   const settings = getSavedSettings()

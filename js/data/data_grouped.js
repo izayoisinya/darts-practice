@@ -3,7 +3,8 @@
 // ============================================
 const GROUP_NOTE_KEY = "dartsDayNotesV2"
 let groupNoteEditingImage = null
-let selectedDayTagFilter = ""
+let selectedDayTagFilters = []
+let selectedDayTagFilterMode = "and"
 
 // カレンダータップで日付ジャンプしたときの元モード保存
 let calendarJumpOriginMode = null
@@ -32,21 +33,41 @@ function jumpToCalendarDay(dateStr) {
 }
 
 function getFilteredGroupedEntries(mode, entries) {
-  if (!isTagFilterEnabledMode(mode) || !selectedDayTagFilter) return entries
+  if (!isTagFilterEnabledMode(mode) || !selectedDayTagFilters.length) return entries
 
   return (entries || []).filter(([key, list]) => {
     const dayKeys = mode === "day" ? [key] : getDayKeysFromSessions(list)
-    return dayKeys.some(dayKey => {
+    const groupTags = new Set()
+    dayKeys.forEach(dayKey => {
       const tags = getDayNote(dayKey).tags || []
-      return tags.includes(selectedDayTagFilter)
+      tags.forEach(tag => groupTags.add(tag))
     })
+    if (selectedDayTagFilterMode === "or") {
+      return selectedDayTagFilters.some(tag => groupTags.has(tag))
+    }
+    return selectedDayTagFilters.every(tag => groupTags.has(tag))
   })
+}
+
+function setDayTagFilterMode(mode) {
+  if (!isTagFilterEnabledMode(groupedPageMode)) return
+  const normalized = mode === "or" ? "or" : "and"
+  if (selectedDayTagFilterMode === normalized) return
+  selectedDayTagFilterMode = normalized
+  groupedPageNumber = 1
+  displayGroupedPage(groupedPageMode, groupedPageData)
 }
 
 function toggleDayTagFilter(tag) {
   if (!isTagFilterEnabledMode(groupedPageMode)) return
   const normalized = String(tag || "").trim().replace(/^#/, "")
-  selectedDayTagFilter = selectedDayTagFilter === normalized ? "" : normalized
+  if (!normalized) {
+    selectedDayTagFilters = []
+  } else if (selectedDayTagFilters.includes(normalized)) {
+    selectedDayTagFilters = selectedDayTagFilters.filter(t => t !== normalized)
+  } else {
+    selectedDayTagFilters = [...selectedDayTagFilters, normalized]
+  }
   groupedPageNumber = 1
   displayGroupedPage(groupedPageMode, groupedPageData)
 }
@@ -87,7 +108,9 @@ function displayGroupedPage(mode, sortedEntries) {
   updateGroupedLeftCalendar(mode, sortedEntries, pageData)
 
   if (filteredEntries.length === 0) {
-    container.innerHTML = `<p>タグ「#${escapeHtml(selectedDayTagFilter)}」に一致するデータはありません</p>`
+    const selectedLabels = selectedDayTagFilters.map(tag => `#${escapeHtml(tag)}`).join(" / ")
+    const modeLabel = selectedDayTagFilterMode === "or" ? "AかB" : "AかつB"
+    container.innerHTML = `<p>タグ「${selectedLabels}」（${modeLabel}）に一致するデータはありません</p>`
     renderGroupedPagination(filteredEntries.length)
     return
   }
@@ -538,18 +561,22 @@ function renderTagStats(mode, pageData) {
     return '<div class="tag-stats-card"><div class="tag-stats-title">Tag Stats</div><div class="tag-stats-empty">タグはまだありません</div></div>'
   }
 
-  const selectedLabel = selectedDayTagFilter
-    ? `<button type="button" class="tag-stats-clear-btn" onclick="toggleDayTagFilter('')">Clear: #${escapeHtml(selectedDayTagFilter)}</button>`
+  const selectedLabel = selectedDayTagFilters.length
+    ? `<button type="button" class="tag-stats-clear-btn" onclick="toggleDayTagFilter('')">Clear: ${selectedDayTagFilters.map(tag => `#${escapeHtml(tag)}`).join(" / ")} (${selectedDayTagFilterMode === "or" ? "AかB" : "AかつB"})</button>`
+    : ""
+
+  const modeToggle = isTagFilterEnabledMode(mode) && selectedDayTagFilters.length >= 2
+    ? `<div class="tag-stats-mode-toggle"><button type="button" class="tag-stats-mode-btn${selectedDayTagFilterMode === "and" ? " is-active" : ""}" onclick="setDayTagFilterMode('and')">AかつB</button><button type="button" class="tag-stats-mode-btn${selectedDayTagFilterMode === "or" ? " is-active" : ""}" onclick="setDayTagFilterMode('or')">AかB</button></div>`
     : ""
 
   const items = rows
     .map(([tag, count]) => {
       const encoded = encodeURIComponent(tag)
-      const active = isTagFilterEnabledMode(mode) && selectedDayTagFilter === tag ? " is-active" : ""
+      const active = isTagFilterEnabledMode(mode) && selectedDayTagFilters.includes(tag) ? " is-active" : ""
       return `<button type="button" class="tag-stats-row tag-stats-filter-btn${active}" onclick="toggleDayTagFilter(decodeURIComponent('${encoded}'))"><span>#${escapeHtml(tag)}</span><strong>${count}</strong></button>`
     })
     .join("")
-  return `<div class="tag-stats-card"><div class="tag-stats-title">Tag Stats</div>${selectedLabel}${items}</div>`
+  return `<div class="tag-stats-card"><div class="tag-stats-title">Tag Stats</div>${selectedLabel}${modeToggle}${items}</div>`
 }
 
 function ensureGroupNoteModalWired() {

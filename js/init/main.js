@@ -37,6 +37,16 @@ async function initApp() {
   
   window.addEventListener("resize", refreshLayout)
   window.addEventListener("orientationchange", refreshLayout)
+  window.addEventListener("pageshow", () => {
+    applyGamePanelVisibility()
+    applyOrientationPreference()
+    refreshLayout()
+  })
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return
+    applyGamePanelVisibility()
+    refreshLayout()
+  })
   
 }
 

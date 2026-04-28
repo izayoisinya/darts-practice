@@ -18,6 +18,21 @@
   gap: 16px;
 }
 
+.tablet.landscape.hide-round-area .container {
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "input stats";
+}
+
+.tablet.landscape.hide-stats-area .container {
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "round input";
+}
+
+.tablet.landscape.hide-round-area.hide-stats-area .container {
+  grid-template-columns: 1fr;
+  grid-template-areas: "input";
+}
+
 .tablet.landscape .round-area { min-width: 320px; }
 .tablet.landscape .input-area { min-width: 280px; }
 .tablet.landscape .stats-area { min-width: 220px; }

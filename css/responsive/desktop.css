@@ -19,12 +19,12 @@
 }
 
 .desktop.hide-round-area .container {
-  grid-template-columns: 2.5fr 1fr;
+  grid-template-columns: 1fr 1fr;
   grid-template-areas: "input stats";
 }
 
 .desktop.hide-stats-area .container {
-  grid-template-columns: 1.5fr 2fr;
+  grid-template-columns: 1fr 1fr;
   grid-template-areas: "round input";
 }
 

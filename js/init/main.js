@@ -68,6 +68,8 @@ function getSavedSettings() {
   }
 
   function applyGamePanelVisibility() {
+    const pageBody = document.body
+    if (!pageBody) return
     const roundArea = document.querySelector(".round-area")
     const statsArea = document.querySelector(".stats-area")
     if (!roundArea || !statsArea) return
@@ -75,14 +77,16 @@ function getSavedSettings() {
     const settings = getSavedSettings()
     const gamePanels = normalizeGamePanels(settings.gamePanels)
 
-    body.classList.toggle("hide-round-area", !gamePanels.round)
-    body.classList.toggle("hide-stats-area", !gamePanels.stats)
+    pageBody.classList.toggle("hide-round-area", !gamePanels.round)
+    pageBody.classList.toggle("hide-stats-area", !gamePanels.stats)
+    roundArea.style.display = gamePanels.round ? "" : "none"
+    statsArea.style.display = gamePanels.stats ? "" : "none"
 
     if (!gamePanels.round) {
-      body.classList.remove("round-open")
+      pageBody.classList.remove("round-open")
     }
     if (!gamePanels.stats) {
-      body.classList.remove("iphone-stats-open")
+      pageBody.classList.remove("iphone-stats-open")
     }
   }
 

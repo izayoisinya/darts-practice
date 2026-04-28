@@ -18,6 +18,21 @@
   gap: 20px;
 }
 
+.desktop.hide-round-area .container {
+  grid-template-columns: 2.5fr 1fr;
+  grid-template-areas: "input stats";
+}
+
+.desktop.hide-stats-area .container {
+  grid-template-columns: 1.5fr 2fr;
+  grid-template-areas: "round input";
+}
+
+.desktop.hide-round-area.hide-stats-area .container {
+  grid-template-columns: 1fr;
+  grid-template-areas: "input";
+}
+
 
 /* ===================================================== */
 /* DESKTOP INPUT                                         */

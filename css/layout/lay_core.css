@@ -124,9 +124,11 @@ body.phone.portrait.hide-round-area .container {
 }
 
 body.phone.portrait.hide-stats-area .container {
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
-  grid-template-areas: "round input";
+  grid-template-columns: 1fr;
+  grid-template-rows: 0.7fr 1fr;
+  grid-template-areas:
+    "round"
+    "input";
 }
 
 body.phone.portrait.hide-round-area.hide-stats-area .container {

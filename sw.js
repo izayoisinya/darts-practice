@@ -1,5 +1,5 @@
-const APP_CACHE = "darts-app-v2"
-const RUNTIME_CACHE = "darts-runtime-v2"
+const APP_CACHE = "darts-app-v3"
+const RUNTIME_CACHE = "darts-runtime-v3"
 
 const PRECACHE_URLS = [
   "./",
@@ -84,16 +84,24 @@ self.addEventListener("fetch", event => {
     return
   }
 
-  // Static assets are cache-first for faster startup and offline use.
+  // Static assets use stale-while-revalidate so updates are picked up
+  // without waiting for users to clear cache manually.
   event.respondWith(
     caches.match(event.request).then(cached => {
-      if (cached) return cached
+      const networkFetch = fetch(event.request)
+        .then(response => {
+          const cloned = response.clone()
+          caches.open(RUNTIME_CACHE).then(cache => cache.put(event.request, cloned))
+          return response
+        })
+        .catch(() => null)
 
-      return fetch(event.request).then(response => {
-        const cloned = response.clone()
-        caches.open(RUNTIME_CACHE).then(cache => cache.put(event.request, cloned))
-        return response
-      })
+      if (cached) {
+        event.waitUntil(networkFetch)
+        return cached
+      }
+
+      return networkFetch.then(response => response || caches.match(event.request))
     })
   )
 })

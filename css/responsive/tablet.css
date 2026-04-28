@@ -57,7 +57,7 @@
 
 .tablet.portrait.hide-round-area .container {
   grid-template-columns: 1fr;
-  grid-template-rows: 1.5fr 1fr;
+  grid-template-rows: 1.7fr 1fr;
   grid-template-areas:
     "input"
     "stats";
@@ -65,7 +65,7 @@
 
 .tablet.portrait.hide-stats-area .container {
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 1.5fr;
+  grid-template-rows: 1fr 1.7fr;
   grid-template-areas:
     "round"
     "input";

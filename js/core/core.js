@@ -57,6 +57,10 @@ function refreshLayout() {
   if (typeof createNumberTable === "function") {
     createNumberTable()
   }
+
+  if (typeof renderRounds === "function") {
+    renderRounds()
+  }
   
   if (typeof drawScoreChart === "function") {
     drawScoreChart()

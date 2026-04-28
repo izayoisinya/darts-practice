@@ -15,6 +15,14 @@
   display: none;
 }
 
+#roundContainer.round-two-column {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: repeat(var(--round-grid-rows, 4), minmax(0, auto));
+  grid-auto-flow: column;
+  column-gap: 14px;
+}
+
 
 /* ================================= */
 /* ============== ROUND ROW ======== */

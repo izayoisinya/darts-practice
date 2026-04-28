@@ -37,6 +37,15 @@ function renderRounds() {
   
   const container = document.getElementById("roundContainer")
   if (!container) return
+
+  const useTwoColumn = !document.body.classList.contains("phone")
+  container.classList.toggle("round-two-column", useTwoColumn)
+  if (useTwoColumn) {
+    const rowCount = Math.max(1, Math.ceil(game.rounds.length / 2))
+    container.style.setProperty("--round-grid-rows", String(rowCount))
+  } else {
+    container.style.removeProperty("--round-grid-rows")
+  }
   
   container.innerHTML = ""
   

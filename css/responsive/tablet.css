@@ -55,6 +55,28 @@
   gap: 16px;
 }
 
+.tablet.portrait.hide-round-area .container {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1.5fr 1fr;
+  grid-template-areas:
+    "input"
+    "stats";
+}
+
+.tablet.portrait.hide-stats-area .container {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1.5fr;
+  grid-template-areas:
+    "round"
+    "input";
+}
+
+.tablet.portrait.hide-round-area.hide-stats-area .container {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "input";
+}
+
 
 /* ================================= */
 /* TABLET PORTRAIT STATS 2 COLUMN    */
@@ -130,4 +152,15 @@
   grid-template-columns: repeat(3,1fr);
 
   align-items: center;
+}
+
+.tablet .top-buttons button {
+  min-height: 56px;
+  font-size: 15px;
+}
+
+.tablet .number-row button {
+  min-height: 44px;
+  padding: 0;
+  font-size: 15px;
 }

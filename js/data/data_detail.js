@@ -212,7 +212,9 @@ function displayDetailPage() {
   const start = (detailPageNumber - 1) * PAGE_SIZE
   const end = start + PAGE_SIZE
   
-  const pageData = selectedDayData.gamesList.slice(start, end).reverse()
+  // Game ビューと同じく新しいゲームから表示する
+  const totalGames = selectedDayData.gamesList.length
+  const pageData = selectedDayData.gamesList.slice().reverse().slice(start, end)
   const dayNoteMap = getDayNoteMapForDetail()
 
   const label = getDetailGroupLabel(groupedPageMode, selectedDayData.dateKey)
@@ -252,8 +254,7 @@ function displayDetailPage() {
   // ゲーム一覧
   pageData.forEach((game, idx) => {
     const gameDiv = document.createElement("div")
-    const totalGames = selectedDayData.gamesList.length
-    const gameNumber = end - idx
+    const gameNumber = totalGames - (start + idx)
 
     const tags = getSessionTagsForDetail(game, dayNoteMap)
     const tagsHtml = tags.length

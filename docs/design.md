@@ -383,7 +383,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 
 | 関数 | 内容 |
 | --- | --- |
-| `showGameDetails()` / `displayDetailPage()` | 指定した日のゲーム一覧を表示する |
+| `showGameDetails()` / `displayDetailPage()` | 指定した日のゲーム一覧を新しい順に表示する（番号はその日の何ゲーム目か） |
 | `changeDetailPage()` / `updateDetailPaginationUI()` | 詳細ビューのページ送り |
 | `backToSummary()` | グループビューに戻る（ブラウザの戻るにも対応） |
 | `setupDetailCompareControls()` | 比較する日を選ぶ |
@@ -557,7 +557,6 @@ graph LR
 | `stats.js` の `updateStats()` / `showAward()` | 画面への表示（DOM 操作）を行っており、「stats は計算のみ」の原則から外れている |
 | `data.html` | `initDataPage()` が `<body onload>` と `DOMContentLoaded` の両方から呼ばれ、2 回実行されている |
 | 設定画面の Rounds | 8 / 10 / 15 の選択肢はあるが保存されず、ゲームにも反映されない（8 固定） |
-| `data_detail.js` の `displayDetailPage()` | 日別の詳細画面で、1 ページが 10 件に満たないとゲーム番号がずれる（例：4 ゲームの日が Game 10〜7 と表示される）。また 1 ページ目に古いゲームから表示される |
 | `countup.html` | データ表示画面用の JS（data_loader.js / data.js など）も読み込んでおり、その初期化処理が要素がないためエラーになっている（動作には影響なし） |
 | スマホ横向きのカウントアップ画面 | ラウンド合計の数字が右端で切れて見える場合がある（iPhone 13 相当の画面で確認） |
 
@@ -584,3 +583,4 @@ graph LR
 | 2026.3.23 | 初版（LaTeX） |
 | 2026.9.30 | 現行コードに合わせて全面改訂し、Markdown 化。画面画像を撮り直し、データ設計・PWA・現状の課題の章を追加 |
 | 2026.9.30 | アワード判定を `stats.js` に一本化。1 ラウンド 1 アワード（優先順位あり）に変更し、3 in the Bed / White Horse で T15 が判定されない不具合を修正 |
+| 2026.9.30 | 日別詳細画面のゲーム番号のずれを修正し、新しいゲームから表示するよう変更 |

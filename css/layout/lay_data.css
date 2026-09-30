@@ -42,6 +42,31 @@ main {
   }
 }
 
+/*
+  データ画面の縦方向の割り付け：ヘッダーは端末ごとの高さ、メインは残りの高さを全部使う。
+  安全領域の余白は、上はヘッダーの中、下は固定フッター（.footer-bar）の中で 1 回だけ取るため、
+  base.css で body に付けている上下の余白はここで打ち消す。
+  （main の height: calc(100dvh - …) は安全領域を考慮していないので使わない）
+*/
+body.page-data {
+  display: flex;
+  flex-direction: column;
+
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+body.page-data .header {
+  flex: none;
+}
+
+body.page-data main.data-container {
+  flex: 1;
+
+  height: auto;
+  min-height: 0;
+}
+
 .data-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1418,10 +1443,10 @@ main {
   justify-content: space-between;
   align-items: center;
   
-  /* 高さ調節 */
-  height: 60px;
+  /* 高さ調節（下の安全領域＝ホームバーの分だけ高くし、ボタンをその上に置く） */
+  height: calc(60px + env(safe-area-inset-bottom));
   
-  padding: 20px;
+  padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
   gap: 20px;
   
   /* 固定位置 */
@@ -1682,7 +1707,7 @@ main {
 }
 
 .phone.landscape .footer-bar {
-  height: 48px;
+  height: calc(48px + env(safe-area-inset-bottom));
   padding: 4px calc(6px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) 4px;
   gap: 8px;
 }

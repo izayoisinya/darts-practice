@@ -29,6 +29,55 @@ function resetChartRetry(key) {
   chartRetryCounts[key] = 0
 }
 
+// 縦軸の範囲を決める。点が 1 つだけ・同じスコアばかりのときも
+// 目盛りが重ならないよう、最低 40 点の幅を取って点を真ん中に置く
+const MIN_SCORE_AXIS_RANGE = 40
+
+function getScoreAxis(scores) {
+  let min = Math.min(...scores)
+  let max = Math.max(...scores)
+
+  if (max - min < MIN_SCORE_AXIS_RANGE) {
+    const mid = (min + max) / 2
+    min = Math.max(0, Math.round(mid - MIN_SCORE_AXIS_RANGE / 2))
+    max = min + MIN_SCORE_AXIS_RANGE
+  }
+
+  return { minScore: min, scoreRange: max - min }
+}
+
+// 点が 1 つだけのときは横方向の真ん中に置く
+function getChartStartX(padding, graphWidth, length) {
+  return length === 1 ? padding + graphWidth / 2 : padding
+}
+
+function setScoreChartTitle(text) {
+  const title = document.getElementById("scoreChartTitle")
+  if (title) title.textContent = text
+}
+
+// 今表示しているグラフを描き直す（パネル切り替え・画面の回転時）
+let lastDetailChartArgs = null
+
+function redrawVisibleCharts() {
+  if (detailViewMode) {
+    if (lastDetailChartArgs) drawDetailGroupChart(...lastDetailChartArgs)
+  } else {
+    refreshGameChartsNow()
+  }
+}
+
+let chartResizeTimer = null
+
+function queueChartRedrawForResize() {
+  if (!isDataPage()) return
+  clearTimeout(chartResizeTimer)
+  chartResizeTimer = setTimeout(redrawVisibleCharts, 150)
+}
+
+window.addEventListener("resize", queueChartRedrawForResize)
+window.addEventListener("orientationchange", queueChartRedrawForResize)
+
 function isPhonePortraitDataView() {
   return body.classList.contains("phone") && body.classList.contains("portrait")
 }
@@ -91,13 +140,7 @@ function setDataPanel(mode) {
 
   // Stats パネルを開いたら、隠れていて描けなかったグラフを描き直す
   if (mode === "stats") {
-    requestAnimationFrame(() => {
-      if (detailViewMode) {
-        if (selectedDayData && typeof displayDetailPage === "function") displayDetailPage()
-      } else {
-        refreshGameChartsNow()
-      }
-    })
+    requestAnimationFrame(redrawVisibleCharts)
   }
 }
 
@@ -501,6 +544,7 @@ function drawGameScoresChart() {
   const { ctx, width, height } = canvasState
 
   ctx.clearRect(0, 0, width, height)
+  setScoreChartTitle("Score Trend (Last 30 Games)")
   
   const sessions = readSessions()
   
@@ -522,10 +566,8 @@ function drawGameScoresChart() {
   const graphWidth = width - padding - rightPadding
   const graphHeight = height - verticalPadding * 2
   
-  // スコアの最小値と最大値
-  const minScore = Math.min(...scores)
-  const maxScore = Math.max(...scores)
-  const scoreRange = maxScore - minScore || 1
+  // 縦軸の範囲
+  const { minScore, scoreRange } = getScoreAxis(scores)
   
   // 横グリッド（スコアラベル）
   ctx.strokeStyle = "rgba(255,255,255,0.08)"
@@ -547,13 +589,14 @@ function drawGameScoresChart() {
   
   // 折れ線
   const stepX = graphWidth / (scores.length - 1 || 1)
+  const startX = getChartStartX(padding, graphWidth, scores.length)
   
   ctx.beginPath()
     ctx.lineWidth = 1.5
   ctx.strokeStyle = "#4CAF50"
   
   scores.forEach((score, i) => {
-    const x = padding + stepX * i
+    const x = startX + stepX * i
     const y = height - verticalPadding - ((score - minScore) / scoreRange) * graphHeight
     
     if (i === 0) {
@@ -567,7 +610,7 @@ function drawGameScoresChart() {
   
   // ポイント
   scores.forEach((score, i) => {
-    const x = padding + stepX * i
+    const x = startX + stepX * i
     const y = height - verticalPadding - ((score - minScore) / scoreRange) * graphHeight
     
     ctx.beginPath()
@@ -586,6 +629,8 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
   const safeCompareGamesList = Array.isArray(compareGamesList)
     ? compareGamesList.filter(Boolean)
     : []
+
+  lastDetailChartArgs = [gamesList, compareGamesList, baseLabel, compareLabel]
 
   if (!canvas || safeGamesList.length === 0) {
     hideDetailBullRate()
@@ -631,12 +676,16 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
   
   // 背景をクリア
   ctx.clearRect(0, 0, width, height)
+
+  // タイトル（その日・週・月・年のゲームのグラフ）
+  const groupLabel = baseLabel && typeof getDetailGroupLabel === "function"
+    ? getDetailGroupLabel(groupedPageMode, baseLabel)
+    : baseLabel
+  setScoreChartTitle(groupLabel ? `Score Trend (${groupLabel})` : "Score Trend")
   
-  // スコアの最小値と最大値
+  // 縦軸の範囲
   const validScores = [...scores, ...compareScores].filter(v => v !== null)
-  const minScore = Math.min(...validScores)
-  const maxScore = Math.max(...validScores)
-  const scoreRange = maxScore - minScore || 1
+  const { minScore, scoreRange } = getScoreAxis(validScores)
   
   // 横グリッド
   ctx.strokeStyle = "rgba(255,255,255,0.08)"
@@ -658,9 +707,10 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
   
   // 折れ線
   const stepX = graphWidth / (length - 1 || 1)
-  drawLineSeries(ctx, scores, "#4CAF50", padding, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
+  const startX = getChartStartX(padding, graphWidth, length)
+  drawLineSeries(ctx, scores, "#4CAF50", startX, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
   if (hasCompare) {
-    drawLineSeries(ctx, compareScores, "#4da3ff", padding, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
+    drawLineSeries(ctx, compareScores, "#4da3ff", startX, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
   }
 
   if (detailLegend) {
@@ -967,9 +1017,7 @@ function drawSelectedRangeChart() {
   const verticalPadding = chartPadding.vertical
   const graphWidth = width - padding - rightPadding
   const graphHeight = height - verticalPadding * 2
-  const minScore = Math.min(...allScores)
-  const maxScore = Math.max(...allScores)
-  const scoreRange = maxScore - minScore || 1
+  const { minScore, scoreRange } = getScoreAxis(allScores)
 
   ctx.strokeStyle = "rgba(255,255,255,0.08)"
   ctx.lineWidth = 1
@@ -987,6 +1035,7 @@ function drawSelectedRangeChart() {
   }
 
   const stepX = graphWidth / (length - 1 || 1)
+  const startX = getChartStartX(padding, graphWidth, length)
   const labels = buildDateLabels(startDate || compareStartDate, length)
   const labelStep = Math.max(1, Math.ceil(length / 6))
   ctx.fillStyle = "rgba(255,255,255,0.56)"
@@ -995,12 +1044,12 @@ function drawSelectedRangeChart() {
   ctx.textBaseline = "alphabetic"
   labels.forEach((label, i) => {
     if (i % labelStep !== 0 && i !== labels.length - 1) return
-    const x = padding + stepX * i
+    const x = startX + stepX * i
     ctx.fillText(label, x, height - 8)
   })
 
-  drawLineSeries(ctx, seriesA, "#7bc96f", padding, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
-  drawLineSeries(ctx, seriesB, "#4da3ff", padding, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
+  drawLineSeries(ctx, seriesA, "#7bc96f", startX, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
+  drawLineSeries(ctx, seriesB, "#4da3ff", startX, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
 
   if (legend) {
     legend.innerHTML = `

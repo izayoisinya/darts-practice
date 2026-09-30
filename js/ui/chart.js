@@ -10,8 +10,14 @@ function drawScoreChart() {
   
   const ctx = canvas.getContext("2d");
   
-const width = canvas.width = canvas.offsetWidth
-const height = canvas.height = canvas.offsetHeight || 220
+// 表示サイズは CSS で決まる。描画は画面の倍率（devicePixelRatio）に合わせて細かくし、ぼやけないようにする
+const width = canvas.offsetWidth
+const height = canvas.offsetHeight || 220
+const dpr = Math.min(window.devicePixelRatio || 1, 3)
+
+canvas.width = Math.round(width * dpr)
+canvas.height = Math.round(height * dpr)
+ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
 const padding = 45
 const paddingTop = 5

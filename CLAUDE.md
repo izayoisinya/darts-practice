@@ -4,7 +4,8 @@
 対戦ではなく練習分析に特化。個人用だが一般公開も視野に入れている。
 
 - 回答・コミットメッセージ・UI 上の説明文は日本語でよい（UI のラベルは英語が基本：History / Stats / Awards など）
-- 仕様の原典：`Darts Practice App 仕様書 v01.text`（機能仕様）。内部設計書（PDF, 2026.3 時点）の要点は本ファイルに反映済み
+- 仕様の原典：`Darts Practice App 仕様書 v01.text`（機能仕様）
+- 内部設計書：`docs/design.md`。構成・関数・データ形式を変えたら設計書も合わせて更新する（画面が大きく変わったら `docs/images/` の画像も撮り直す）
 
 ## 作業の流れ（Git）
 
@@ -32,7 +33,7 @@
 index.html      メインメニュー（ゲーム選択 / Data / Settings / Info）
 countup.html    COUNT-UP ゲーム画面（Rounds / Input / Stats の 3 エリア）
 data.html       スコア記録データの表示（Statistics）
-settings.html   設定（ブルモード: fat / sepa、画面向き、ストレージ状況）
+settings.html   設定（ブルモード: fat / double、画面向き、ストレージ状況）
 news.html       お知らせ
 sw.js           Service Worker（プリキャッシュ）
 manifest.json   PWA マニフェスト

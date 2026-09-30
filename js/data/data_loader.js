@@ -56,59 +56,6 @@ function createRoundChartHtml(roundSource) {
   </svg>`
 }
 
-function calculateAwardsFromRounds(rounds) {
-  const awards = {
-    hatTrick: 0,
-    lowTon: 0,
-    highTon: 0,
-    ton80: 0,
-    threeInTheBlack: 0,
-    threeInTheBed: 0,
-    whiteHorse: 0
-  }
-
-  ;(rounds || []).forEach(round => {
-    const valid = (round || []).filter(d => d)
-    if (valid.length !== 3) return
-
-    const roundScore = valid.reduce((sum, d) => sum + (d.score || 0), 0)
-    const allBull = valid.every(d =>
-      d.special === "outerBull" || d.special === "innerBull"
-    )
-    const allInner = valid.every(d => d.special === "innerBull")
-
-    if (allBull) awards.hatTrick++
-    if (allInner) awards.threeInTheBlack++
-
-    if (!allBull) {
-      if (roundScore === 180) awards.ton80++
-      else if (roundScore >= 151 && roundScore <= 177) awards.highTon++
-      else if (roundScore >= 100 && roundScore <= 150) awards.lowTon++
-    }
-
-    const bedTriples = valid.filter(d =>
-      d.multiplier === 3 && d.score >= 45 && d.score <= 60
-    )
-    if (
-      bedTriples.length === 3 &&
-      bedTriples[0].score === bedTriples[1].score &&
-      bedTriples[1].score === bedTriples[2].score
-    ) {
-      awards.threeInTheBed++
-    }
-
-    const horseTriples = valid.filter(d =>
-      d.multiplier === 3 && d.score >= 45 && d.score <= 60
-    )
-    const horseNumbers = new Set(horseTriples.map(d => d.score))
-    if (horseTriples.length === 3 && horseNumbers.size === 3) {
-      awards.whiteHorse++
-    }
-  })
-
-  return awards
-}
-
 function getSessionAwards(session) {
   const base = {
     hatTrick: 0,
@@ -124,7 +71,8 @@ function getSessionAwards(session) {
     return { ...base, ...session.awards }
   }
 
-  return { ...base, ...calculateAwardsFromRounds(session?.rounds || []) }
+  // 判定は stats.js の countRoundAwards() に一本化
+  return { ...base, ...countRoundAwards(session?.rounds || []) }
 }
 
 function getSessionTotalAwards(session) {

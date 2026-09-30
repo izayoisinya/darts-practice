@@ -1,4 +1,70 @@
 // ===============================
+// ===== Awards判定 ===============
+// ===============================
+const AWARD_KEYS_BY_PRIORITY = [
+  "ton80",
+  "threeInTheBlack",
+  "hatTrick",
+  "threeInTheBed",
+  "whiteHorse",
+  "highTon",
+  "lowTon"
+]
+
+// 1ラウンドのアワードを判定する（3投完了のみ）
+// 複数に当てはまる場合は上位（AWARD_KEYS_BY_PRIORITY の先頭側）の1つだけを返す
+function judgeRoundAward(round) {
+
+  if (!Array.isArray(round) || round.length !== 3 || round.some(d => !d)) {
+    return null
+  }
+
+  const roundScore = round.reduce((sum, d) => sum + (d.score || 0), 0)
+
+  const allBull = round.every(d =>
+    d.special === "outerBull" ||
+    d.special === "innerBull"
+  )
+
+  const allInner = round.every(d =>
+    d.special === "innerBull"
+  )
+
+  // T15〜T20（クリケットナンバー）のトリプル
+  const cricketTriples = round.filter(d =>
+    d.multiplier === 3 && d.value >= 15 && d.value <= 20
+  )
+  const tripleNumbers = new Set(cricketTriples.map(d => d.value))
+
+  if (roundScore === 180) return "ton80"
+  if (allInner) return "threeInTheBlack"
+  if (allBull) return "hatTrick"
+  if (cricketTriples.length === 3 && tripleNumbers.size === 1) return "threeInTheBed"
+  if (cricketTriples.length === 3 && tripleNumbers.size === 3) return "whiteHorse"
+  if (roundScore >= 151) return "highTon"
+  if (roundScore >= 100) return "lowTon"
+
+  return null
+}
+
+// 全ラウンドのアワード数を数える
+function countRoundAwards(rounds) {
+
+  const awards = {}
+  AWARD_KEYS_BY_PRIORITY.forEach(key => {
+    awards[key] = 0
+  })
+
+  ;(rounds || []).forEach(round => {
+    const award = judgeRoundAward(round)
+    if (award) awards[award]++
+  })
+
+  return awards
+}
+
+
+// ===============================
 // ===== Stats計算（拡張版） =====
 // ===============================
 function calculateStats() {
@@ -12,15 +78,6 @@ function calculateStats() {
   let innerBullCount = 0;
   let maxRound = 0;
   let completedRounds = 0;
-
-  // ★ Awards用
-  let hatTrick = 0;
-  let lowTon = 0;
-  let highTon = 0;
-  let ton80 = 0;
-  let threeInTheBlack = 0;
-  let threeInTheBed = 0;
-  let whiteHorse = 0;
 
   
   // ------------------------------------------
@@ -63,64 +120,12 @@ function calculateStats() {
       completedRounds++;
       maxRound = Math.max(maxRound, roundScore);
     }
-
-
-    // --------------------------------------
-    // ⑤ Awards判定（3投完了のみ）
-    // --------------------------------------
-    if (dartCount === 3) {
-
-      const allBull = round.every(d =>
-        d.special === "outerBull" ||
-        d.special === "innerBull"
-      );
-
-      const allInner = round.every(d =>
-        d.special === "innerBull"
-      );
-
-      if (allBull) hatTrick++;
-      if (allInner) threeInTheBlack++;
-
-      if (!allBull) {
-        if (roundScore === 180) ton80++;
-        else if (roundScore >= 151 && roundScore <= 177) highTon++;
-        else if (roundScore >= 100 && roundScore <= 150) lowTon++;
-      }
-      
-      // 3 in the Bed
-const bedTriples = round.filter(d =>
-  d && d.multiplier === 3 && d.score >= 48 && d.score <= 60
-)
-
-if (
-  bedTriples.length === 3 &&
-  bedTriples[0].score === bedTriples[1].score &&
-  bedTriples[1].score === bedTriples[2].score
-) {
-  threeInTheBed++
-}
-
-// White Horse
-const horseTriples = round.filter(d =>
-  d && d.multiplier === 3 && d.score >= 48 && d.score <= 60
-)
-
-const horseNumbers = new Set(
-  horseTriples.map(d => d.score)
-)
-
-if (horseTriples.length === 3 && horseNumbers.size === 3) {
-  whiteHorse++
-}
-
-    }
     
   });
 
 
   // ------------------------------------------
-  // ⑥ 平均計算
+  // ⑤ 平均計算
   // ------------------------------------------
   const ppd = totalDarts ?
     totalScore / totalDarts :
@@ -128,7 +133,7 @@ if (horseTriples.length === 3 && horseNumbers.size === 3) {
     
 
   // ------------------------------------------
-  // ⑦ 結果返却
+  // ⑥ 結果返却
   // ------------------------------------------
   return {
     totalScore,
@@ -152,14 +157,8 @@ if (horseTriples.length === 3 && horseNumbers.size === 3) {
 
     maxRound,
 
-    // ★ Awards追加
-    hatTrick,
-    lowTon,
-    highTon,
-    ton80,
-    threeInTheBlack,
-    threeInTheBed,
-whiteHorse
+    // ★ Awards（1ラウンド1つ、上位のみ）
+    ...countRoundAwards(game.rounds)
   };
 }
 

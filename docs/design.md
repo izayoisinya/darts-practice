@@ -174,6 +174,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 | GAME | Rounds | 8 / 10 / 15 を選べるが保存されず、ゲームは 8 ラウンド固定。01・クリケット実装時に調整予定 |
 | DISPLAY | Screen Orientation | 画面の向きの固定（Free / Portrait Lock / Landscape Lock）。ブラウザによっては効かない |
 | データ保存状況 | — | 保存ゲーム数、保存先（IndexedDB / LocalStorage）、使用容量・上限の概算 |
+| データのバックアップ | 書き出し / 読み込み | ゲームの記録と日別メモを JSON ファイルに書き出す・読み込む（詳細は 6.6） |
 
 ### 4.5 news.html（お知らせ画面）
 
@@ -237,7 +238,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | index.html | ui/news.js |
 | countup.html | game/*（stats → game_core → game_countup → cu_ui）、data/*（rating 以外）、ui/chart.js、ui/settings.js |
 | data.html | game/stats.js（アワード判定）、data/*（data_loader → data_grouped → data_detail → rating → data） |
-| settings.html | game/*、ui/settings.js |
+| settings.html | core/backup.js、game/*、ui/settings.js |
 | news.html | ui/news.js |
 
 #### core/state.js
@@ -276,6 +277,18 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `saveSession()` | 終了したゲームを履歴に追加する |
 | `normalizeSessionForApp()` | 履歴 1 件をアプリ内の形式に整える（欠損値の補完） |
 | `serializeSessionForStorage()` / `deserializeSessionFromStorage()` | 保存用の短縮形式との相互変換 |
+
+#### core/backup.js
+
+バックアップの書き出し・読み込み。画面操作は含まない（UI は `ui/settings.js`）。
+
+| 関数 | 内容 |
+| --- | --- |
+| `createBackupData()` | ゲームの記録と日別メモからバックアップ用のデータを作る |
+| `getBackupFileName()` | ファイル名（`darts-practice-backup-YYYYMMDD-HHMM.json`）を作る |
+| `parseBackupText(text)` | ファイルの中身を読み、このアプリのバックアップか確認する |
+| `planBackupImport(data)` | 追加するゲーム・更新する日別メモを見積もる（まだ保存しない） |
+| `applyBackupImport(plan)` | 見積もりどおりに保存する |
 
 #### init/main.js
 
@@ -430,6 +443,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `loadSettings()` / `saveSettings()` | 画面と設定を同期する |
 | `applyOrientationMode()` | 画面の向きの設定を反映する |
 | `updateStorageStatus()` | データ保存状況を表示する |
+| `initBackupControls()` / `exportBackup()` / `importBackupFile()` | バックアップの書き出し・読み込みボタンの処理 |
 
 #### ui/news.js
 
@@ -502,6 +516,25 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
   "2026-09-29": { comment, tags: [ … ], imageData /* 画像の Data URL */, updatedAt }
 }
 ```
+
+### 6.6 バックアップ（書き出し・読み込み）
+
+設定画面の「データのバックアップ」から、ゲームの記録と日別メモを 1 つの JSON ファイルに書き出し、別の端末で読み込める。進行中のゲームと設定は含めない。
+
+```js
+{
+  app: "darts-practice",       // このアプリのファイルかの確認用
+  version: 1,                  // ファイル形式のバージョン
+  exportedAt: "2026-09-30T…",  // 書き出した日時
+  sessions: [ … ],             // ゲーム履歴（アプリ内の形式。6.2 の左列）
+  dayNotes: { "2026-09-29": { … } }  // 日別メモ（6.5 と同じ形）
+}
+```
+
+- **書き出し**：タブレット・スマホでは共有シート（「ファイルに保存」や AirDrop）を開き、PC ではダウンロードする
+- **読み込み**：今の記録は消さずに、まだない記録だけを追加する。同じゲームかどうかは「種類・終了日時・スコア」で判定する。日別メモは、その日のメモがないか、読み込む方が新しい（`updatedAt` が大きい）場合だけ入れ替える
+- 読み込む前に、追加する件数を確認ダイアログで表示する
+- 形式を変えるときは `BACKUP_VERSION` を上げる。アプリより新しいバージョンのファイルは読み込まない
 
 ## 7. データフロー
 
@@ -605,3 +638,4 @@ graph LR
 | 2026.9.30 | カウントアップ画面の Rounds / Stats の開閉モーションを、端末・向きに関係なく同じ伸び縮みの動きにそろえた |
 | 2026.9.30 | カウントアップ画面で安全領域の余白が重複し、ヘッダーとカラムの間が空く・下端が切れる不具合を修正 |
 | 2026.9.30 | データ表示画面で安全領域の余白が重複し、画面下端がはみ出す・フッターのボタンがホームバーに重なる不具合を修正 |
+| 2026.9.30 | 設定画面にデータの書き出し・読み込み（バックアップ）を追加 |

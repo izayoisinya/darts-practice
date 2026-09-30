@@ -138,6 +138,135 @@ async function updateStorageStatus() {
   }
 }
 
+// ===============================
+// ===== バックアップ（書き出し・読み込み） =====
+// ===============================
+function setBackupStatus(message) {
+  const el = document.getElementById("backupStatus")
+  if (el) el.textContent = message
+}
+
+function downloadBackupFile(blob, fileName) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+async function exportBackup() {
+  if (typeof initSessionsStorage === "function") {
+    await initSessionsStorage()
+  }
+
+  const data = createBackupData()
+  const fileName = getBackupFileName()
+  const blob = new Blob([JSON.stringify(data)], { type: "application/json" })
+  const doneMessage = `ゲーム ${data.sessions.length.toLocaleString()} 件と日別メモ ${Object.keys(data.dayNotes).length} 件を書き出しました`
+
+  // タブレット・スマホは共有シート（「ファイルに保存」や AirDrop）を優先する
+  const canShareFile =
+    !document.body.classList.contains("desktop") &&
+    typeof File === "function" &&
+    navigator.canShare &&
+    navigator.canShare({ files: [new File([blob], fileName, { type: "application/json" })] })
+
+  if (canShareFile) {
+    try {
+      await navigator.share({
+        files: [new File([blob], fileName, { type: "application/json" })],
+        title: fileName
+      })
+      setBackupStatus(doneMessage)
+      return
+    } catch (error) {
+      if (error && error.name === "AbortError") {
+        setBackupStatus("書き出しをキャンセルしました")
+        return
+      }
+      // 共有できなかった場合はダウンロードに切り替える
+    }
+  }
+
+  downloadBackupFile(blob, fileName)
+  setBackupStatus(doneMessage)
+}
+
+function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result || ""))
+    reader.onerror = () => reject(new Error("ファイルを読み込めませんでした"))
+    reader.readAsText(file)
+  })
+}
+
+async function importBackupFile(file) {
+  if (!file) return
+
+  try {
+    if (typeof initSessionsStorage === "function") {
+      await initSessionsStorage()
+    }
+
+    const data = parseBackupText(await readFileAsText(file))
+    const plan = planBackupImport(data)
+    const newCount = plan.newSessions.length
+
+    if (newCount === 0 && plan.updatedNoteCount === 0) {
+      setBackupStatus("追加するデータはありませんでした（すべて取り込み済みです）")
+      alert("追加するデータはありませんでした（すべて取り込み済みです）")
+      return
+    }
+
+    const ok = confirm(
+      `ファイル内のゲーム ${plan.totalSessions.toLocaleString()} 件のうち、` +
+      `まだない ${newCount.toLocaleString()} 件を追加します。\n` +
+      `日別メモは ${plan.updatedNoteCount} 件を追加・更新します。\n\n` +
+      "今の記録は消えません。読み込みますか？"
+    )
+    if (!ok) {
+      setBackupStatus("読み込みをキャンセルしました")
+      return
+    }
+
+    await applyBackupImport(plan)
+
+    setBackupStatus(`ゲーム ${newCount.toLocaleString()} 件と日別メモ ${plan.updatedNoteCount} 件を読み込みました`)
+    await updateStorageStatus()
+  } catch (error) {
+    const message = error && error.message ? error.message : "読み込みに失敗しました"
+    setBackupStatus(message)
+    alert(message)
+  }
+}
+
+function initBackupControls() {
+  const exportBtn = document.getElementById("exportBackupBtn")
+  const importBtn = document.getElementById("importBackupBtn")
+  const importInput = document.getElementById("importBackupInput")
+
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+      exportBackup().catch(() => setBackupStatus("書き出しに失敗しました"))
+    })
+  }
+
+  if (importBtn && importInput) {
+    importBtn.addEventListener("click", () => importInput.click())
+
+    importInput.addEventListener("change", async () => {
+      const file = importInput.files && importInput.files[0]
+      await importBackupFile(file)
+      // 同じファイルをもう一度選べるようにする
+      importInput.value = ""
+    })
+  }
+}
+
 async function initSettingsPage() {
   const bullSelect = document.getElementById("bullModeSetting")
   const roundSelect = document.getElementById("roundSetting")
@@ -158,6 +287,8 @@ async function initSettingsPage() {
       updateStorageStatus()
     })
   }
+
+  initBackupControls()
 
   loadSettings()
   applyOrientationMode(readSettings().orientationMode)

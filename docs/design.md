@@ -120,13 +120,25 @@ GitHub 上のリポジトリ（`izayoisinya/darts-practice`）を iPad 及びタ
 
 <img src="images/countup_phone.jpg" alt="カウントアップ画面（スマホ縦）" width="240">
 
-Rounds エリアと Input エリアが横並びになり、その下に Stats エリアが表示される。Rounds エリアをタップするとエリアが開き、各ダーツのスコアが表示される（`body.round-open`）。
+Rounds エリアと Input エリアが横並びになり、その下に Stats エリアが表示される。Rounds エリアをタップするとエリアが開き、各ダーツのスコアが表示される（`body.round-open`）。Input エリアは消さずに幅 0 まで畳む。
 
 **スマートフォン横向き**
 
 ![カウントアップ画面（スマホ横）](images/countup_phone_landscape.jpg)
 
 各エリアが全て横並びになり、Stats エリアがコンパクト表示になる。コンパクト Stats エリアをタップすると Stats エリアが開き、詳細情報が表示される（`body.iphone-stats-open`）。
+
+**開閉のモーション**
+
+縦・横どちらも `cu_ui.js` の `toggleAreaLayout()` で開閉し、同じ動きにそろえている。
+
+1. 切り替え前に各エリアの位置と大きさを測る
+2. `body` のクラスを切り替え、切り替え後の位置と大きさを測る
+3. Web Animations（`element.animate()`）で、前の位置・大きさから新しい位置・大きさへ 0.3 秒かけて動かす（畳まれるエリアはフェードアウト）
+4. 切り替え中は `body.area-animating` が付き、新しく出る中身（各投のスコア・Stats の詳細／コンパクト表示）が少し遅れてふわっと表示される（`phone.css` の `areaContentIn`）
+5. 動き終わってから Stats のグラフを描き直す
+
+`element.animate()` が使えないブラウザや、端末で「視差効果を減らす」が有効な場合はアニメーションせずに切り替える。CSS 側でエリアの幅に transition を付けると測定がずれるため付けないこと。
 
 ### 4.3 data.html（データ表示画面）
 
@@ -305,6 +317,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `createNumberTable()` / `createNumberRow()` | 1〜20 と D / T の入力ボタンを生成する |
 | `setupTopButtons()` | Bull / In / Miss / 戻る ボタンをセットアップする |
 | `updateBullModeUI()` | ブルモードの表示を更新する |
+| `toggleAreaLayout(className, onDone)` | Rounds / Stats の開閉（`body` のクラス切り替え）を、各エリアが伸び縮みするアニメーション付きで行う |
 
 #### game/stats.js
 
@@ -584,3 +597,4 @@ graph LR
 | 2026.9.30 | 現行コードに合わせて全面改訂し、Markdown 化。画面画像を撮り直し、データ設計・PWA・現状の課題の章を追加 |
 | 2026.9.30 | アワード判定を `stats.js` に一本化。1 ラウンド 1 アワード（優先順位あり）に変更し、3 in the Bed / White Horse で T15 が判定されない不具合を修正 |
 | 2026.9.30 | 日別詳細画面のゲーム番号のずれを修正し、新しいゲームから表示するよう変更 |
+| 2026.9.30 | カウントアップ画面の Rounds / Stats の開閉モーションを、端末・向きに関係なく同じ伸び縮みの動きにそろえた |

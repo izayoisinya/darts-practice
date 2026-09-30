@@ -20,8 +20,6 @@
   gap: 8px;
   
   padding: 5px 40px 0 5px;
-  
-  transition: grid-template-columns .3s ease;
 }
 
 
@@ -100,8 +98,6 @@
   grid-template-columns: 1fr 1fr;
 
   gap: 8px;
-
-  transition: opacity .2s ease;
 }
 
 .phone.landscape .stats-compact .kpi-value {
@@ -120,7 +116,6 @@
 
 .phone.landscape .stats-detail {
   display: none;
-  transform: translateX(20px);
 }
 
 .phone.landscape #scoreChart {
@@ -144,6 +139,7 @@
 
   overflow: hidden;
   opacity: 0;
+  pointer-events: none;
 }
 
 .phone.landscape.iphone-stats-open .stats-area {
@@ -152,16 +148,12 @@
 
 .phone.landscape.iphone-stats-open .stats-compact {
   display: none;
-  opacity: 0;
 }
 
 .phone.landscape.iphone-stats-open .stats-detail {
   display: grid;
   
   grid-template-columns: 1fr 1fr;
-
-  opacity: 1;
-  transform: translateX(0);
 }
 
 .phone.landscape.iphone-stats-open .stats-left {
@@ -333,17 +325,19 @@
 /* PHONE PORTRAIT - ROUNDS OPEN                          */
 /* ===================================================== */
 
+/* 入力エリアは消さずに幅 0 へ畳む（開閉アニメーションで伸び縮みさせるため） */
 .phone.portrait.round-open .container {
-  
-  grid-template-columns: 1fr;
-  
-  grid-template-areas:
-    "round"
-    "stats";
+  grid-template-columns: 1fr 0;
+  column-gap: 0;
 }
 
 .phone.portrait.round-open .input-area {
-  display: none;
+  width: 0;
+  padding: 0;
+
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .phone.portrait.round-open .round-area {
@@ -356,4 +350,29 @@
 
 .phone.portrait.round-open .round {
   grid-template-columns: 50px max-content auto;
+}
+
+
+/* ===================================================== */
+/* AREA TOGGLE MOTION                                    */
+/* ===================================================== */
+
+/* エリアの伸び縮みは cu_ui.js の toggleAreaLayout() が行う。 */
+/* ここでは、切り替え中（.area-animating）に新しく出てくる中身をふわっと表示する */
+
+@keyframes areaContentIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.phone.portrait.area-animating.round-open .round-darts,
+.phone.landscape.area-animating.iphone-stats-open .stats-detail,
+.phone.landscape.area-animating:not(.iphone-stats-open) .stats-compact {
+  animation: areaContentIn .24s ease .08s both;
 }

@@ -219,7 +219,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | --- | --- |
 | index.html | ui/news.js |
 | countup.html | game/*（stats → game_core → game_countup → cu_ui）、data/*（rating 以外）、ui/chart.js、ui/settings.js |
-| data.html | data/*（data_loader → data_grouped → data_detail → rating → data） |
+| data.html | game/stats.js（アワード判定）、data/*（data_loader → data_grouped → data_detail → rating → data） |
 | settings.html | game/*、ui/settings.js |
 | news.html | ui/news.js |
 
@@ -312,21 +312,25 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 
 | 関数 | 内容 |
 | --- | --- |
+| `judgeRoundAward(round)` | 1 ラウンドのアワードを判定する（1 ラウンド 1 つ、上位のみ） |
+| `countRoundAwards(rounds)` | 全ラウンドのアワード数を数える。データ表示画面の再計算もこれを使う |
 | `calculateStats()` | 現在のゲームから合計・PPD・ブル率・最高ラウンド・アワード数などを計算する |
 | `updateStats()` | 計算結果を Stats エリアに表示する |
 | `showAward()` | アワードの表示・非表示を切り替える |
 
-アワードの判定条件（3 投完了したラウンドのみ）：
+アワードの判定条件（3 投完了したラウンドのみ）。**1 ラウンドにつき 1 つだけ**とし、複数に当てはまる場合は上の行（優先順位が高いもの）を採用する。
 
-| アワード | 条件 |
-| --- | --- |
-| Hat Trick | 3 投すべてブル |
-| 3 in the Black | 3 投すべてインナーブル |
-| Ton 80 | 180 点（Hat Trick を除く） |
-| High Ton | 151〜177 点（Hat Trick を除く） |
-| Low Ton | 100〜150 点（Hat Trick を除く） |
-| 3 in the Bed | 同じ数字のトリプル（T16〜T20）に 3 本 |
-| White Horse | 異なる数字のトリプル（T16〜T20）に 3 本 |
+| 優先 | アワード | 条件 |
+| --- | --- | --- |
+| 1 | Ton 80 | 180 点 |
+| 2 | 3 in the Black | 3 投すべてインナーブル |
+| 3 | Hat Trick | 3 投すべてブル |
+| 4 | 3 in the Bed | 同じ数字のトリプル（T15〜T20）に 3 本 |
+| 5 | White Horse | 異なる数字のトリプル（T15〜T20）に 3 本 |
+| 6 | High Ton | 151 点以上 |
+| 7 | Low Ton | 100 点以上 |
+
+例：インナーブル × 3 は 3 in the Black のみ（Hat Trick には数えない）、T20 × 3 は Ton 80 のみ、T20・T19・T18 は White Horse のみ。
 
 #### data/data_loader.js
 
@@ -338,7 +342,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `loadSessions()` | Game ビューの履歴カードを表示する |
 | `createSessionCardHtml()` | 1 ゲーム分のカードを生成する |
 | `createRoundChartHtml()` | カード内のラウンドスコアのグラフを生成する |
-| `calculateAwardsFromRounds()` / `getSessionAwards()` | 履歴からアワード数を求める |
+| `getSessionAwards()` | 履歴のアワード数を返す（保存値がなければ `countRoundAwards()` で再計算） |
 | `groupSessions(sessions, mode)` | 履歴を日・週（月曜始まり）・月・年ごとにまとめる |
 | `calcSummary()` | まとめた履歴の集計値を計算する |
 | `getLocalDateKey()` / `getWeekRange()` / `formatShort()` | 日付の変換・整形 |
@@ -526,6 +530,7 @@ graph LR
   gcore --> storage
   storage -. 計算を借りている .-> stats
   dl[data/data_loader.js] --> storage
+  dl --> stats
   data[data/data.js] --> dl
   data --> rating[data/rating.js]
   dg[data/data_grouped.js] --> dl
@@ -552,6 +557,8 @@ graph LR
 | `stats.js` の `updateStats()` / `showAward()` | 画面への表示（DOM 操作）を行っており、「stats は計算のみ」の原則から外れている |
 | `data.html` | `initDataPage()` が `<body onload>` と `DOMContentLoaded` の両方から呼ばれ、2 回実行されている |
 | 設定画面の Rounds | 8 / 10 / 15 の選択肢はあるが保存されず、ゲームにも反映されない（8 固定） |
+| `data_detail.js` の `displayDetailPage()` | 日別の詳細画面で、1 ページが 10 件に満たないとゲーム番号がずれる（例：4 ゲームの日が Game 10〜7 と表示される）。また 1 ページ目に古いゲームから表示される |
+| `countup.html` | データ表示画面用の JS（data_loader.js / data.js など）も読み込んでおり、その初期化処理が要素がないためエラーになっている（動作には影響なし） |
 | スマホ横向きのカウントアップ画面 | ラウンド合計の数字が右端で切れて見える場合がある（iPhone 13 相当の画面で確認） |
 
 ## 11. 今後の拡張予定
@@ -576,3 +583,4 @@ graph LR
 | --- | --- |
 | 2026.3.23 | 初版（LaTeX） |
 | 2026.9.30 | 現行コードに合わせて全面改訂し、Markdown 化。画面画像を撮り直し、データ設計・PWA・現状の課題の章を追加 |
+| 2026.9.30 | アワード判定を `stats.js` に一本化。1 ラウンド 1 アワード（優先順位あり）に変更し、3 in the Bed / White Horse で T15 が判定されない不具合を修正 |

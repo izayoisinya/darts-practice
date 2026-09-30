@@ -66,4 +66,4 @@ Service Worker（`sw.js`）を利用するため、`file://` ではなく HTTP(S
 - 01 / Cricket / Half-it / Shoot-out などのゲームモード追加
 - ブル練習分析・スタッツ分析などの練習分析機能
 
-詳細な仕様は `Darts Practice App 仕様書 v01.text` を参照してください。
+機能の仕様は `Darts Practice App 仕様書 v01.text`、内部設計（ファイルの責務・データ形式など）は [`docs/design.md`](docs/design.md) を参照してください。

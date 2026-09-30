@@ -46,6 +46,7 @@ manifest.json   PWA マニフェスト
 | core/ | state.js | グローバル変数・定数のみ（`TOTAL_ROUNDS`, `game`, `sessions`, `bullMode` など）。**関数は書かない** |
 | core/ | core.js | 全画面共通：`detectDevice()`, `refreshLayout()`, `setupLinks()` |
 | core/ | storage.js | 永続化のみ。**ビジネスロジックを入れない・他モジュールに依存しない** |
+| core/ | backup.js | バックアップの書き出し・読み込み（ゲーム記録と日別メモの JSON 化・取り込み）。DOM 操作なし（UI は settings.js） |
 | init/ | main.js | 初期化（`initApp()`）、イベント登録（`registerEvents()`）、SW 登録、メニュー画面のサマリー |
 | game/ | game_core.js | ゲーム共通ロジック（次ゲーム、Undo、終了判定、リセット）。UI 生成は含まない |
 | game/ | game_countup.js | COUNT-UP 固有ロジック（`initGame()`, `addDart()`）。UI 生成は含まない |
@@ -81,6 +82,7 @@ manifest.json   PWA マニフェスト
 - セッションは保存時に短縮キーへシリアライズされる（`serializeSessionForStorage()`：`d` date, `s` score, `p` ppd, `r` roundScores, `a` awards 配列 など）。アプリ内では `normalizeSessionForApp()` の形で扱う
 - フィールドを追加するときは serialize / deserialize / normalize の 3 箇所を揃え、**既存ユーザーの保存データを壊さない**（欠損時のデフォルト値を用意する）
 - `gameType` は現在 `"countup"` のみ。新しいゲームはこれで区別する
+- 保存するデータを増やしたら、バックアップ（`backup.js` の書き出し・読み込み）にも含めるか検討する。ファイル形式を変えるときは `BACKUP_VERSION` を上げ、古い形式も読めるようにする
 
 ## Service Worker の注意
 

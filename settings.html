@@ -159,6 +159,24 @@
         line-height: 1.45;
       }
 
+      .backup-actions {
+        margin: 12px 0 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .backup-actions button {
+        min-height: 44px;
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      #exportBackupBtn {
+        color: var(--accent);
+        border-color: rgb(var(--accent-rgb) / 0.45);
+      }
+
       @media (max-width: 480px) {
         .storage-status-grid {
           grid-template-columns: 1fr;
@@ -245,6 +263,25 @@
           容量はブラウザ全体の概算です。実データのみの正確な容量ではありません。
         </p>
       </section>
+
+      <section class="settings-panel">
+        <h2 class="panel-title">データのバックアップ</h2>
+
+        <p class="setting-help">
+          ゲームの記録と日別メモをファイルに書き出します。別の端末で読み込むと、記録を移したりまとめたりできます。
+        </p>
+
+        <div class="backup-actions">
+          <button id="exportBackupBtn" type="button">書き出し</button>
+          <button id="importBackupBtn" type="button">読み込み</button>
+          <input id="importBackupInput" type="file" accept="application/json,.json" hidden />
+        </div>
+
+        <p class="setting-help">
+          読み込んでも今の記録は消えず、まだない記録だけが追加されます。
+        </p>
+        <p id="backupStatus" class="storage-status-note" role="status"></p>
+      </section>
       </div>
     </main>
 
@@ -278,6 +315,7 @@
     <script src="js/core/state.js" defer></script>
     <script src="js/core/core.js" defer></script>
     <script src="js/core/storage.js" defer></script>
+    <script src="js/core/backup.js" defer></script>
 
     <!-- ゲーム関連 -->
     <script src="js/game/stats.js" defer></script>

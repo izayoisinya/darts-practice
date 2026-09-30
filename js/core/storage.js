@@ -356,7 +356,7 @@ function writeSessions(sessions) {
     .filter(Boolean)
 
   sessionsCache = normalized
-  queuePersistSessions(compact)
+  return queuePersistSessions(compact)
 }
 
 function readSessions() {

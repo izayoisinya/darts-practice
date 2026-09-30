@@ -45,6 +45,7 @@
 .round-label {
   font-size: 24px;
   font-weight: 600;
+  white-space: nowrap;
   
   letter-spacing: 1px;
   

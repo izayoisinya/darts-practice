@@ -236,7 +236,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | 画面 | 読み込む JS（core / main 以外） |
 | --- | --- |
 | index.html | ui/news.js |
-| countup.html | game/*（stats → game_core → game_countup → cu_ui）、data/*（rating 以外）、ui/chart.js、ui/settings.js |
+| countup.html | game/*（stats → game_core → game_countup → cu_ui）、ui/chart.js、ui/settings.js |
 | data.html | game/stats.js（アワード判定）、data/*（data_loader → data_grouped → data_detail → rating → data） |
 | settings.html | core/backup.js、game/*、ui/settings.js |
 | news.html | ui/news.js |
@@ -394,6 +394,8 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `drawDetailGroupChart()` | 詳細ビューのグラフ（比較日との重ね表示）を描く |
 | `renderDetailBullRate()` | 詳細ビューのブル率を表示する |
 | `renderRatingReference()` | レーティング目安を表示する |
+| `isDataPage()` | データ表示画面（`body.page-data`）かどうか。ほかの画面で読み込まれても初期化しないためのガード |
+| `scheduleChartRetry()` / `resetChartRetry()` | グラフが隠れていて描けないときの再試行（最大 10 回で打ち切り）。隠れていたグラフは Stats パネルに切り替えたときに描き直す |
 
 #### data/data_grouped.js
 
@@ -608,7 +610,6 @@ graph LR
 | `stats.js` の `updateStats()` / `showAward()` | 画面への表示（DOM 操作）を行っており、「stats は計算のみ」の原則から外れている |
 | `data.html` | `initDataPage()` が `<body onload>` と `DOMContentLoaded` の両方から呼ばれ、2 回実行されている |
 | 設定画面の Rounds | 8 / 10 / 15 の選択肢はあるが保存されず、ゲームにも反映されない（8 固定） |
-| `countup.html` | データ表示画面用の JS（data_loader.js / data.js など）も読み込んでおり、その初期化処理が要素がないためエラーになっている（動作には影響なし） |
 | スマホ横向きのカウントアップ画面 | ラウンド合計の数字が右端で切れて見える場合がある（iPhone 13 相当の画面で確認） |
 
 ## 11. 今後の拡張予定
@@ -639,3 +640,4 @@ graph LR
 | 2026.9.30 | カウントアップ画面で安全領域の余白が重複し、ヘッダーとカラムの間が空く・下端が切れる不具合を修正 |
 | 2026.9.30 | データ表示画面で安全領域の余白が重複し、画面下端がはみ出す・フッターのボタンがホームバーに重なる不具合を修正 |
 | 2026.9.30 | 設定画面にデータの書き出し・読み込み（バックアップ）を追加 |
+| 2026.9.30 | カウントアップ画面のスコアグラフがデータ画面のスコア推移で上書きされる不具合を修正（カウントアップ画面からデータ画面用 JS の読み込みを削除）。データ画面のグラフ描画の再試行が止まらない不具合を修正 |

@@ -8,6 +8,27 @@ let panelSwipeBlockedByTabs = false
 const chartAxisFontFamily = "'Segoe UI', 'Noto Sans JP', sans-serif"
 let initialChartRefreshQueued = false
 
+// データ画面（data.html）以外で読み込まれても初期化しない
+function isDataPage() {
+  return body.classList.contains("page-data")
+}
+
+// グラフが隠れていて描けないときの再試行（最大 10 回 ≒ 1 秒で打ち切る）
+// 隠れているグラフは、表示されたとき（パネル切り替えなど）に描き直す
+const CHART_RETRY_LIMIT = 10
+const chartRetryCounts = {}
+
+function scheduleChartRetry(key, draw) {
+  const count = chartRetryCounts[key] || 0
+  if (count >= CHART_RETRY_LIMIT) return
+  chartRetryCounts[key] = count + 1
+  setTimeout(draw, 100)
+}
+
+function resetChartRetry(key) {
+  chartRetryCounts[key] = 0
+}
+
 function isPhonePortraitDataView() {
   return body.classList.contains("phone") && body.classList.contains("portrait")
 }
@@ -67,6 +88,17 @@ function setDataPanel(mode) {
     btn.classList.toggle("active", isActive)
     btn.setAttribute("aria-pressed", isActive ? "true" : "false")
   })
+
+  // Stats パネルを開いたら、隠れていて描けなかったグラフを描き直す
+  if (mode === "stats") {
+    requestAnimationFrame(() => {
+      if (detailViewMode) {
+        if (selectedDayData && typeof displayDetailPage === "function") displayDetailPage()
+      } else {
+        refreshGameChartsNow()
+      }
+    })
+  }
 }
 
 function setupDataPanelSwipe() {
@@ -379,6 +411,8 @@ function addStat(container, title, value) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  if (!isDataPage()) return
+
   if (typeof initSessionsStorage === "function") {
     await initSessionsStorage()
   }
@@ -388,10 +422,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 })
 
 window.addEventListener("load", () => {
+  if (!isDataPage()) return
   queueInitialGameChartRefresh()
 })
 
 window.addEventListener("pageshow", () => {
+  if (!isDataPage()) return
   queueInitialGameChartRefresh()
 })
 
@@ -458,9 +494,10 @@ function drawGameScoresChart() {
 
   const canvasState = setupHiDPICanvas(canvas, 220)
   if (!canvasState) {
-    setTimeout(() => drawGameScoresChart(), 100)
+    scheduleChartRetry("gameScores", () => drawGameScoresChart())
     return
   }
+  resetChartRetry("gameScores")
   const { ctx, width, height } = canvasState
 
   ctx.clearRect(0, 0, width, height)
@@ -563,11 +600,12 @@ function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = ""
 
   const canvasState = setupHiDPICanvas(canvas, 220)
   if (!canvasState) {
-    setTimeout(() => {
+    scheduleChartRetry("detailGroup", () => {
       drawDetailGroupChart(gamesList, compareGamesList, baseLabel, compareLabel)
-    }, 100)
+    })
     return
   }
+  resetChartRetry("detailGroup")
   const { ctx, width, height } = canvasState
   
   const baseScores = safeGamesList.map(s => Number(s?.score) || 0)
@@ -880,9 +918,10 @@ function drawSelectedRangeChart() {
 
   const canvasState = setupHiDPICanvas(canvas, 220)
   if (!canvasState) {
-    setTimeout(() => drawSelectedRangeChart(), 100)
+    scheduleChartRetry("selectedRange", () => drawSelectedRangeChart())
     return
   }
+  resetChartRetry("selectedRange")
   const { ctx, width, height } = canvasState
   ctx.clearRect(0, 0, width, height)
 

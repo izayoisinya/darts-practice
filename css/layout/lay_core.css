@@ -84,10 +84,6 @@ body {
 /* ============== AREA MODIFIERS === */
 /* ================================= */
 
-.input-area {
-  transition: width .35s ease, opacity .25s ease;
-}
-
 .stats-area {
   overflow-y: auto;
 }

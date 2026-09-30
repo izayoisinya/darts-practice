@@ -167,7 +167,7 @@ function registerEvents() {
         body.classList.contains("phone") &&
         body.classList.contains("portrait")
       ) {
-        body.classList.toggle("round-open")
+        toggleAreaLayout("round-open")
       }
     })
   }
@@ -182,13 +182,12 @@ function registerEvents() {
         body.classList.contains("landscape")
       ) {
       
-        body.classList.toggle("iphone-stats-open")
-      
-        setTimeout(() => {
+        // 開き終わってからグラフを描き直す（途中の大きさで描かないため）
+        toggleAreaLayout("iphone-stats-open", () => {
           if (typeof drawScoreChart === "function") {
             drawScoreChart()
           }
-        }, 50)
+        })
       }
     })
   }

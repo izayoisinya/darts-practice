@@ -223,3 +223,97 @@ function updateBullModeUI() {
 }
 
 
+// ===============================
+// ===== エリア開閉アニメーション ==
+// ===============================
+// body のクラス（round-open / iphone-stats-open）を切り替え、
+// 各エリアが切り替え前の位置・大きさから新しい位置・大きさへ
+// なめらかに伸び縮みするように動かす（端末・向きに関係なく同じ動き）
+const AREA_ANIMATION_MS = 300
+const AREA_ANIMATION_EASING = "cubic-bezier(.2, .8, .2, 1)"
+
+let areaAnimations = []
+let areaAnimationTimer = null
+
+function canAnimateAreas() {
+
+  if (typeof Element === "undefined" || typeof Element.prototype.animate !== "function") {
+    return false
+  }
+
+  const reduceMotion = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+  return !reduceMotion
+}
+
+function measureArea(el) {
+
+  const rect = el.getBoundingClientRect()
+
+  return {
+    left: rect.left,
+    top: rect.top,
+    width: rect.width,
+    height: rect.height,
+    opacity: getComputedStyle(el).opacity
+  }
+}
+
+function toggleAreaLayout(className, onDone) {
+
+  const body = document.body
+
+  const areas = [".round-area", ".input-area", ".stats-area"]
+    .map(selector => document.querySelector(selector))
+    .filter(Boolean)
+
+  // 連続タップ時は前のアニメーションを止めてから測る
+  areaAnimations.forEach(animation => animation.cancel())
+  areaAnimations = []
+  clearTimeout(areaAnimationTimer)
+  body.classList.remove("area-animating")
+
+  if (!canAnimateAreas()) {
+    body.classList.toggle(className)
+    if (onDone) onDone()
+    return
+  }
+
+  const before = areas.map(measureArea)
+
+  body.classList.toggle(className)
+  body.classList.add("area-animating")
+
+  const after = areas.map(measureArea)
+
+  areaAnimations = areas.map((el, i) => {
+
+    const from = before[i]
+    const to = after[i]
+
+    return el.animate([
+      {
+        transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)`,
+        width: `${from.width}px`,
+        height: `${from.height}px`,
+        opacity: from.opacity
+      },
+      {
+        transform: "translate(0, 0)",
+        width: `${to.width}px`,
+        height: `${to.height}px`,
+        opacity: to.opacity
+      }
+    ], {
+      duration: AREA_ANIMATION_MS,
+      easing: AREA_ANIMATION_EASING
+    })
+  })
+
+  areaAnimationTimer = setTimeout(() => {
+    areaAnimations = []
+    body.classList.remove("area-animating")
+    if (onDone) onDone()
+  }, AREA_ANIMATION_MS)
+}

@@ -67,6 +67,20 @@ body.page-data main.data-container {
   min-height: 0;
 }
 
+/*
+  ホーム画面から起動したとき、iOS 26 では画面に固定（position: fixed）した要素の下端が
+  画面の本当の下端より上になる（base.css 参照）。フッターはページ（body）の下端に置く。
+*/
+@media (display-mode: standalone) {
+  body.page-data {
+    position: relative;
+  }
+
+  body.page-data .footer-bar {
+    position: absolute;
+  }
+}
+
 .data-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1443,10 +1457,10 @@ body.page-data main.data-container {
   justify-content: space-between;
   align-items: center;
   
-  /* 高さ調節（下の安全領域＝ホームバーの分だけ高くし、ボタンをその上に置く） */
-  height: calc(60px + env(safe-area-inset-bottom));
+  /* 高さはボタンに合わせる。下の余白は通常の余白（10px）とホームバーの分の大きい方だけ */
+  height: auto;
   
-  padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+  padding: 10px 20px max(10px, env(safe-area-inset-bottom));
   gap: 20px;
   
   /* 固定位置 */

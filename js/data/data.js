@@ -78,8 +78,10 @@ function queueChartRedrawForResize() {
 window.addEventListener("resize", queueChartRedrawForResize)
 window.addEventListener("orientationchange", queueChartRedrawForResize)
 
+// 縦向き（スマホ・タブレット）は History / Stats を切り替えて 1 パネルずつ表示する
 function isPhonePortraitDataView() {
-  return body.classList.contains("phone") && body.classList.contains("portrait")
+  return body.classList.contains("portrait") &&
+    (body.classList.contains("phone") || body.classList.contains("tablet"))
 }
 
 function setupHiDPICanvas(canvas, fallbackHeight = 220) {
@@ -241,8 +243,8 @@ function changeView(mode) {
   }
   updateViewTabs(mode)
 
-  // phone portrait: group表示時はHistoryパネルへ自動切り替え
-  if (mode !== "game" && body.classList.contains("phone") && body.classList.contains("portrait")) {
+  // 縦向き（1 パネル表示）: group表示時はHistoryパネルへ自動切り替え
+  if (mode !== "game" && isPhonePortraitDataView()) {
     setDataPanel("history")
   }
 

@@ -35,3 +35,21 @@ h2 {
   font-weight: 600;
   letter-spacing: 0.5px;
 }
+
+
+/* ================================= */
+/* == HOME SCREEN APP (STANDALONE) = */
+/* ================================= */
+
+/*
+  iOS 26 のホーム画面アプリ（viewport-fit=cover ＋ black-translucent）では、
+  height: 100% / 100dvh / 100svh が上の安全領域の分だけ短く報告され、
+  画面の下に隙間ができる（WebKit Bug 301108）。
+  ホーム画面から起動したときは、正しい高さを返す 100lvh を使う。
+  （lvh に対応していない古いブラウザでは無視され、これまでどおり 100% になる）
+*/
+@media (display-mode: standalone) {
+  html {
+    height: 100lvh;
+  }
+}

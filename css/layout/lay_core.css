@@ -54,6 +54,7 @@ body {
 /*
   安全領域の余白は、上（ステータスバー）はヘッダーの中、下（ホームバー）は body で
   それぞれ 1 回だけ取る（ヘッダーの色がステータスバーの裏まで伸びるようにするため）。
+  下は「カラムの通常の余白」と「ホームバーの分」の大きい方だけを空ける。
   ヘッダーは中身の高さ、カラム（.container）は残りの高さを全部使うことで、
   端末や向きに関係なくヘッダーとカラムの間が空いたり、下が切れたりしないようにする。
 */
@@ -61,7 +62,8 @@ body.page-countup {
   display: flex;
   flex-direction: column;
 
-  padding-bottom: env(safe-area-inset-bottom);
+  /* .container の下の余白（10px）と合わせて、ホームバーの分（env）を超えて二重に空けない */
+  padding-bottom: max(0px, calc(env(safe-area-inset-bottom) - 10px));
 }
 
 body.page-countup .header {

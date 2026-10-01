@@ -41,13 +41,72 @@
           var(--bg-main);
       }
 
+      /* ===== 画面の割り付け =====
+         ヘッダーの下を全部スクロール領域にする（body は base.css でスクロール禁止のため）。
+         左右の余白に指を置いてもスクロールできるよう、スクロール領域は画面幅いっぱいにし、
+         中身は左右の padding で中央に寄せる。 */
+      body.page-settings {
+        display: flex;
+        flex-direction: column;
+      }
+
+      body.page-settings .header {
+        flex: none;
+
+        display: flex;
+        align-items: center;
+
+        padding: calc(env(safe-area-inset-top) + 12px) 24px 12px 20px;
+
+        background: var(--bg-panel);
+        border-bottom: 1px solid var(--border-main);
+      }
+
+      body.page-settings .header h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.1;
+      }
+
       .settings-container {
-        width: min(520px, 100%);
-        margin: auto;
-        padding: 20px 16px;
+        --settings-max-width: 560px;
+
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+
         display: flex;
         flex-direction: column;
         gap: 14px;
+
+        padding:
+          20px
+          max(36px, calc((100% - var(--settings-max-width)) / 2))
+          calc(24px + env(safe-area-inset-bottom))
+          max(16px, calc((100% - var(--settings-max-width)) / 2));
+      }
+
+      /* タブレット縦：1 列を少し広く */
+      .tablet.portrait .settings-container {
+        --settings-max-width: 640px;
+      }
+
+      /* 横向き：2 列 × 2 段に並べる（iPad 横ならスクロールなしで全部見える） */
+      .landscape .settings-container,
+      .desktop .settings-container {
+        --settings-max-width: 1040px;
+
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+        align-content: start;
+        gap: 16px;
+      }
+
+      /* スマホ：タイトルを小さめに */
+      .phone.page-settings .header h1 {
+        font-size: 22px;
       }
 
       .settings-panel {
@@ -185,7 +244,7 @@
     </style>
   </head>
 
-  <body>
+  <body class="page-settings">
     <header class="header">
       <h1>Settings</h1>
     </header>
@@ -282,7 +341,6 @@
         </p>
         <p id="backupStatus" class="storage-status-note" role="status"></p>
       </section>
-      </div>
     </main>
 
     <div id="menuOverlay" class="menu-overlay"></div>

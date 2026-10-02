@@ -88,6 +88,16 @@ body.page-info .header h1 {
   gap: 10px;
 }
 
+/* 箇条書きの「•」と既定の余白を消す */
+.info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: grid;
+  gap: 10px;
+}
+
 .tab-panel[hidden] {
   display: none;
 }

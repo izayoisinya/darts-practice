@@ -84,17 +84,20 @@ function getSessionTotalAwards(session) {
     .reduce((sum, count) => sum + count, 0)
 }
 
+// アワードの表示名（表示順）
+const AWARD_LABELS = [
+  ["hatTrick", "Hat Trick"],
+  ["threeInTheBlack", "3 in the Black"],
+  ["ton80", "Ton 80"],
+  ["highTon", "High Ton"],
+  ["lowTon", "Low Ton"],
+  ["threeInTheBed", "3 in the Bed"],
+  ["whiteHorse", "White Horse"]
+]
+
 function createAwardsHtml(session) {
   const awards = getSessionAwards(session)
-  const awardDefs = [
-    ["Hat Trick", awards.hatTrick],
-    ["3 in the Black", awards.threeInTheBlack],
-    ["Ton 80", awards.ton80],
-    ["High Ton", awards.highTon],
-    ["Low Ton", awards.lowTon],
-    ["3 in the Bed", awards.threeInTheBed],
-    ["White Horse", awards.whiteHorse]
-  ]
+  const awardDefs = AWARD_LABELS.map(([key, label]) => [label, awards[key]])
 
   const activeAwards = awardDefs.filter(([, count]) => count > 0)
   if (!activeAwards.length) {
@@ -130,6 +133,17 @@ function createSessionCardHtml(session, gameNumber) {
     : Number(session?.innerRate || 0)
   const bullRate = Number.isFinite(bullRateNum) ? bullRateNum.toFixed(1) : "0.0"
   const innerRate = Number.isFinite(innerRateNum) ? innerRateNum.toFixed(1) : "0.0"
+
+  // 縮小表示用の要約（ブル数とアワード）
+  const sessionAwards = getSessionAwards(session)
+  const awardSummary = AWARD_LABELS
+    .filter(([key]) => (sessionAwards[key] || 0) > 0)
+    .map(([key, label]) => `${label} ${sessionAwards[key]}`)
+  const compactSummary = [
+    `Bull ${session.bulls ?? 0}（${bullRate}%）`,
+    `In ${session.innerBulls ?? 0}`,
+    ...awardSummary
+  ].join(" · ")
   const tripleHtml = `
     <div class="session-triple-grid">
       <div class="session-triple-item"><span class="session-triple-label">20:</span><span class="session-triple-value">${t[20] ?? 0}</span></div>
@@ -144,7 +158,10 @@ function createSessionCardHtml(session, gameNumber) {
   return `
     <div class="session-card-header">
       <strong>Game ${gameNumber}</strong>
-      <span class="session-date">${new Date(session.date).toLocaleString()}</span>
+      <span class="session-card-header-right">
+        <span class="session-date">${new Date(session.date).toLocaleString()}</span>
+        <span class="session-toggle-icon" aria-hidden="true"></span>
+      </span>
     </div>
 
     <div class="session-card-body">
@@ -163,6 +180,8 @@ function createSessionCardHtml(session, gameNumber) {
             <span class="session-kpi-value">${session.roundAvg ?? "-"}</span>
           </div>
         </div>
+
+        <div class="session-compact-summary">${compactSummary}</div>
 
         <div class="session-rate-group">
           <div class="stat-row session-stat-row">
@@ -225,14 +244,9 @@ function loadSessions() {
   const pageData = reversed.slice(start, end)
   
   pageData.forEach((s, index) => {
-    const div = document.createElement("div")
-    div.className = "session-card"
-    
     const globalIndex = start + index
     const gameNumber = sessions.length - globalIndex
-    div.innerHTML = createSessionCardHtml(s, gameNumber)
-    
-    container.appendChild(div)
+    container.appendChild(createSessionCardElement(createSessionCardHtml(s, gameNumber)))
   })
 }
 
@@ -435,7 +449,50 @@ window.addEventListener('DOMContentLoaded', () => {
   initDataPage()
 })
 
+// 履歴カード：普段は縮小表示。タップ（クリック・Enter）で全項目の表示と切り替える
+let sessionCardToggleBound = false
+
+function toggleSessionCard(card) {
+  const expanded = card.classList.toggle("is-expanded")
+  card.setAttribute("aria-expanded", expanded ? "true" : "false")
+}
+
+function setupSessionCardToggle() {
+  if (sessionCardToggleBound) return
+
+  const container = document.getElementById("sessionsContainer")
+  if (!container) return
+
+  container.addEventListener("click", e => {
+    const card = e.target instanceof Element ? e.target.closest(".session-card") : null
+    if (card && container.contains(card)) toggleSessionCard(card)
+  })
+
+  container.addEventListener("keydown", e => {
+    if (e.key !== "Enter" && e.key !== " ") return
+    const card = e.target instanceof Element ? e.target.closest(".session-card") : null
+    if (!card || e.target !== card) return
+    e.preventDefault()
+    toggleSessionCard(card)
+  })
+
+  sessionCardToggleBound = true
+}
+
+// 履歴カードの外枠（縮小表示で作る）
+function createSessionCardElement(innerHtml) {
+  const div = document.createElement("div")
+  div.className = "session-card"
+  div.setAttribute("role", "button")
+  div.setAttribute("tabindex", "0")
+  div.setAttribute("aria-expanded", "false")
+  div.innerHTML = innerHtml
+  return div
+}
+
 async function initDataPage() {
+  setupSessionCardToggle()
+
   if (typeof initSessionsStorage === "function") {
     await initSessionsStorage()
   }

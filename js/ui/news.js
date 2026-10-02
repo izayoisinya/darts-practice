@@ -84,20 +84,30 @@ function switchInfoTab(target) {
   })
 }
 
+// 更新情報を日付の新しい順に並べる（同じ日付なら、あとに書いた方を上に）
+function getUpdatesNewestFirst() {
+  return INFO_CONTENT.updates
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => b.item.date.localeCompare(a.item.date) || b.index - a.index)
+    .map(({ item }) => item)
+}
+
 function initMainInfoSections() {
-  renderInfoList("mainUpdatesList", INFO_CONTENT.updates)
+  renderInfoList("mainUpdatesList", getUpdatesNewestFirst())
   renderInfoList("mainNoticesList", INFO_CONTENT.notice)
 }
 
 function initNewsPage() {
+  const updates = getUpdatesNewestFirst()
+
   const allItems = [
-    ...INFO_CONTENT.updates.map(item => ({ ...item, badge: `更新情報 / ${item.badge}` })),
+    ...updates.map(item => ({ ...item, badge: `更新情報 / ${item.badge}` })),
     ...INFO_CONTENT.notice.map(item => ({ ...item, badge: `お知らせ / ${item.badge}` })),
     ...INFO_CONTENT.plan.map(item => ({ ...item, badge: `更新予定 / ${item.badge}` }))
   ]
 
   renderInfoList("allList", allItems)
-  renderInfoList("updatesList", INFO_CONTENT.updates)
+  renderInfoList("updatesList", updates)
   renderInfoList("noticeList", INFO_CONTENT.notice)
   renderInfoList("planList", INFO_CONTENT.plan)
 

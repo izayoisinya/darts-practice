@@ -2,15 +2,13 @@
 /* MENU PAGE */
 /* ============================== */
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: auto;
-  overflow-y: auto;
-}
-
-body {
+/*
+  メイン画面の割り付け：ページの高さは画面に固定し（base.css）、ヘッダーとフッターの間を
+  スクロール領域（.menu-container）にする。
+  中身は左列（ゲームと操作）と右列（更新情報・お知らせ）の 2 列で、タブレットでは
+  各列が画面の高さいっぱいに伸び、余った高さは CountUp と更新情報が使う（空白を作らない）。
+*/
+body.page-menu {
   position: relative;
   background:
     radial-gradient(circle at 14% 20%, rgba(0, 255, 200, 0.14), transparent 34%),
@@ -19,11 +17,9 @@ body {
   color: var(--text-main);
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
-  overflow-x: hidden;
 }
 
-body::before {
+body.page-menu::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -39,15 +35,25 @@ body::before {
 /* HEADER */
 /* ============================== */
 
-.header {
-  height: 48px;
+.page-menu .header {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: calc(env(safe-area-inset-top) + 10px) 20px 10px;
   backdrop-filter: blur(8px);
-  font-size: 20px;
-  font-weight: 600;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.page-menu .header h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+
+.phone.page-menu .header h1 {
+  font-size: 22px;
 }
 
 
@@ -56,16 +62,40 @@ body::before {
 /* ============================== */
 
 .menu-container {
+  --menu-max-width: 1180px;
+
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  /* スクロール領域は画面幅いっぱい。中身は左右同じ余白で中央に寄せる */
+  --menu-side-space: max(28px, calc((100% - var(--menu-max-width)) / 2));
+  padding: 18px var(--menu-side-space);
+}
+
+.phone .menu-container {
+  --menu-side-space: 16px;
+}
+
+/* スマホでは列を縮めず、ページ（.menu-container）をスクロールさせる */
+.menu-col {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* NEXT と UTILITY（スマホ縦では縦に並べる） */
+.menu-sub {
   display: grid;
-  gap: 14px;
-  align-content: start;
-  justify-content: center;
-  justify-items: center;
-  padding: 18px 18px 14px;
-  max-width: 660px;
-  margin: 0 auto;
-  width: min(100%, 660px);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
 }
 
 
@@ -78,7 +108,7 @@ body::before {
 .utility-panel,
 .updates-panel,
 .news-panel {
-  width: min(500px, 100%);
+  width: 100%;
   background: linear-gradient(165deg, #151922 0%, #10141d 100%);
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -114,6 +144,8 @@ body::before {
 /* ============================== */
 
 .hero-btn {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   min-height: 118px;
   padding: 18px 16px;
@@ -130,6 +162,28 @@ body::before {
     0 0 0 1px rgb(var(--accent-rgb) / 0.15) inset,
     0 14px 28px rgba(0, 0, 0, 0.45),
     0 0 24px rgb(var(--accent-rgb) / 0.22);
+}
+
+/* ダーツボード風の同心円（飾り） */
+.hero-btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -60px;
+  width: 300px;
+  height: 300px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgb(var(--accent-rgb) / 0.55) 0 6%, transparent 6.5%),
+    repeating-radial-gradient(circle, transparent 0 9%, rgb(var(--accent-rgb) / 0.16) 9.5% 10.5%, transparent 11% 20%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.hero-btn > * {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-btn:hover {
@@ -158,7 +212,9 @@ body::before {
 }
 
 .hero-metrics {
-  margin-top: 10px;
+  /* 欄が縦に伸びたときは数字を一番下に置く */
+  margin-top: auto;
+  padding-top: 14px;
   width: 100%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -237,7 +293,7 @@ body::before {
 
 .utility-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -285,136 +341,172 @@ body::before {
 
 
 /* ============================== */
-/* LANDSCAPE */
+/* LANDSCAPE（スマホ横・タブレット横・PC）*/
 /* ============================== */
 
-.phone.landscape .menu-container {
-  max-width: 860px;
-  grid-template-columns: minmax(280px, 1.15fr) minmax(280px, 1fr);
+/* 左右 2 列 */
+.landscape .menu-container,
+.desktop .menu-container {
+  flex-direction: row;
   align-items: stretch;
 }
 
-.phone.landscape .hero-panel {
-  grid-row: 1 / 3;
-  width: 100%;
+.landscape .menu-col-main,
+.desktop .menu-col-main {
+  flex: 1.25 1 0;
 }
 
-.phone.landscape .future-panel,
-.phone.landscape .utility-panel,
-.phone.landscape .updates-panel,
-.phone.landscape .news-panel {
-  width: 100%;
+.landscape .menu-col-side,
+.desktop .menu-col-side {
+  flex: 1 1 0;
 }
 
-.phone.landscape .hero-btn {
-  min-height: calc(100% - 30px);
+/* タブレット横・PC：列を画面の高さに収める（余った高さは CountUp と更新情報が使う） */
+.tablet.landscape .menu-col,
+.desktop .menu-col {
+  min-height: 0;
 }
 
-
-/* ============================== */
-/* TABLET */
-/* ============================== */
-
-.tablet .menu-container {
-  width: 100%;
-  max-width: 1180px;
-  padding: 20px 24px 18px;
+/* NEXT と UTILITY を横並び */
+.landscape .menu-sub,
+.desktop .menu-sub {
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
 }
 
-.tablet .hero-panel,
-.tablet .future-panel,
-.tablet .utility-panel,
-.tablet .updates-panel,
-.tablet .news-panel {
-  width: 100%;
+.landscape .utility-actions,
+.desktop .utility-actions {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
 }
 
-.tablet.landscape .menu-container {
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
+.landscape .utility-actions button,
+.desktop .utility-actions button {
+  height: 42px;
 }
 
-.tablet.landscape .hero-panel {
-  grid-column: 1;
-  grid-row: 1 / 3;
-}
-
-.tablet.landscape .future-panel {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.tablet.landscape .utility-panel {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-.tablet.landscape .updates-panel {
-  grid-column: 3;
-  grid-row: 1;
-}
-
-.tablet.landscape .news-panel {
-  grid-column: 3;
-  grid-row: 2;
-}
-
-.tablet.portrait .menu-container {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
-}
-
-.tablet.portrait .hero-panel {
-  grid-column: 1 / 3;
+.landscape .coming-grid,
+.desktop .coming-grid {
+  height: calc(100% - 26px);
 }
 
 
 /* ============================== */
-/* DESKTOP */
+/* TABLET / DESKTOP：画面の高さいっぱいに伸ばす */
 /* ============================== */
 
-.desktop .menu-container {
-  width: min(100%, 1460px);
-  max-width: 1460px;
-  padding: 24px 28px 20px;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  row-gap: 0;
-  column-gap: 14px;
-  align-items: start;
-}
-
-.desktop .hero-panel,
-.desktop .future-panel,
-.desktop .utility-panel,
-.desktop .updates-panel,
-.desktop .news-panel {
-  width: 100%;
-}
-
+.tablet.landscape .hero-panel,
 .desktop .hero-panel {
-  grid-column: 1;
-  grid-row: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-.desktop .future-panel {
-  grid-column: 1;
-  grid-row: 2;
+.tablet.landscape .hero-btn,
+.desktop .hero-btn {
+  flex: 1;
+  justify-content: flex-start;
+  padding: 26px 24px 22px;
 }
 
+.tablet.landscape .hero-btn::after,
+.desktop .hero-btn::after {
+  width: 420px;
+  height: 420px;
+  right: -90px;
+}
+
+.tablet .btn-title,
+.desktop .btn-title {
+  font-size: 44px;
+}
+
+.tablet .btn-sub,
+.desktop .btn-sub {
+  font-size: 15px;
+}
+
+.tablet .hero-metrics,
+.desktop .hero-metrics {
+  gap: 12px;
+}
+
+.tablet .hero-metric,
+.desktop .hero-metric {
+  min-height: 78px;
+  padding: 12px;
+  align-items: center;
+}
+
+.tablet .metric-label,
+.desktop .metric-label {
+  font-size: 12px;
+}
+
+.tablet .metric-value,
+.desktop .metric-value {
+  font-size: 30px;
+}
+
+/* 更新情報は残りの高さを使い、多い分は欄の中でスクロール */
+.tablet .updates-panel,
 .desktop .updates-panel {
-  grid-column: 2;
-  grid-row: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.desktop .utility-panel {
-  grid-column: 1;
-  grid-row: 3;
+.tablet .updates-panel .info-list,
+.desktop .updates-panel .info-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  align-content: start;
 }
 
+.tablet .news-panel,
 .desktop .news-panel {
-  grid-column: 2;
-  grid-row: 2;
-  margin-top: 14px;
+  flex: none;
+}
+
+/* タブレット縦：上に CountUp と NEXT / UTILITY、下の残りの高さに更新情報とお知らせを左右に並べる */
+.tablet.portrait .menu-container {
+  --menu-max-width: 900px;
+}
+
+.tablet.portrait .menu-sub {
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+}
+
+.tablet.portrait .hero-btn {
+  min-height: 240px;
+  justify-content: flex-start;
+  padding: 26px 24px 22px;
+}
+
+.tablet.portrait .menu-col-side {
+  flex: 1 1 auto;
+  min-height: 320px;
+  flex-direction: row;
+}
+
+.tablet.portrait .updates-panel,
+.tablet.portrait .news-panel {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tablet.portrait .news-panel .info-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  align-content: start;
 }
 
 
@@ -423,7 +515,10 @@ body::before {
 /* ============================== */
 
 .footer {
-  height: 44px;
+  flex: none;
+  height: calc(40px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,5 +1,5 @@
-const APP_CACHE = "darts-app-v19"
-const RUNTIME_CACHE = "darts-runtime-v19"
+const APP_CACHE = "darts-app-v20"
+const RUNTIME_CACHE = "darts-runtime-v20"
 
 const PRECACHE_URLS = [
   "./",
@@ -11,6 +11,7 @@ const PRECACHE_URLS = [
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
+  "./apple-touch-icon.png",
   "./css/base.css",
   "./css/theme.css",
   "./css/menu.css",

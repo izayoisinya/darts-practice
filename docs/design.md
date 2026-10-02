@@ -618,6 +618,7 @@ graph LR
 - `sw.js` は、HTML はネットワーク優先、それ以外（JS・CSS・画像）はキャッシュ優先で配信する
 - **JS / CSS を変更したら `sw.js` のキャッシュ名（`darts-app-vN` / `darts-runtime-vN`）の番号を上げる。** 上げないと、利用者の端末に古いファイルが残り続ける
 - 新しいファイルを追加したら `PRECACHE_URLS` にも追加する
+- アイコン：Android などは `manifest.json` の `icon-192.png`（192px）/ `icon-512.png`（512px）、iPad・iPhone は各 HTML の `apple-touch-icon.png`（180px）を使う。iOS は画像をそのまま角丸で切り抜くため、Android 用より D を小さく（高さ約 50%）している
 - **iOS 26 のホーム画面アプリの高さの不具合（WebKit Bug 301108）**：`viewport-fit=cover` ＋ `black-translucent` で起動すると、`height: 100%` / `100dvh` / `100svh` / `innerHeight` が上の安全領域の分（iPad で約 32px）だけ短くなり、画面の下に隙間ができる。画面に固定（`position: fixed`）した要素の下端もその分上にずれる。対策として、`@media (display-mode: standalone)` のときだけ以下を指定している
   - `html { height: 100lvh }`（`base.css`。`100lvh` だけが正しい高さを返す）
   - サイドメニュー・右端の帯・オーバーレイも `height: 100lvh`（`lay_menu.css`）
@@ -677,3 +678,4 @@ graph LR
 | 2026.10.3 | メイン画面のレイアウトを組み直した（左右 2 列を画面の高さに合わせて伸ばし、空白をなくした。ヘッダーをステータスバーと重ならないようにした）。設計書の画面画像を撮り直した |
 | 2026.10.3 | サイドメニューの「Reset Game」をカウントアップ画面以外から外した |
 | 2026.10.3 | 「Reset Game」を進行中のゲームだけのリセットに変更（これまでは全ゲーム履歴も削除していた） |
+| 2026.10.3 | iPad・iPhone 用のアイコン（apple-touch-icon.png）を追加し D を小さく。Android 用アイコンをファイル名どおりのサイズに |

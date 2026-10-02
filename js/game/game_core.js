@@ -52,12 +52,12 @@ function isGameComplete() {
 }
 
 
+// 進行中のゲームだけをリセットする（保存済みのゲーム履歴は消さない）
 function forceResetGame() {
   
-  if (!confirm("ゲームデータをリセットしますか？")) return
+  if (!confirm("進行中のゲームをリセットしますか？\n（保存済みのゲーム記録は消えません）")) return
   
   localStorage.removeItem("dartsPractice")
-  clearSessionsStorage()
   
   location.reload()
   

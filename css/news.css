@@ -1,12 +1,12 @@
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: auto;
-  overflow-y: auto;
-}
+/*
+  お知らせ画面の割り付け：ページの高さは画面に固定し（base.css）、タイトルの下だけをスクロールさせる。
+  ページの高さを中身に合わせると、背景のグラデーションが中身の下端で切れて繰り返し表示され、
+  タブを切り替えるたびに背景が変わって見えるため。
+*/
+body.page-info {
+  display: flex;
+  flex-direction: column;
 
-body {
   background:
     radial-gradient(circle at 15% 12%, rgba(0, 255, 200, 0.12), transparent 34%),
     radial-gradient(circle at 88% 0%, rgba(77, 171, 255, 0.12), transparent 30%),
@@ -14,10 +14,42 @@ body {
   color: var(--text-main);
 }
 
+body.page-info .header {
+  flex: none;
+
+  display: flex;
+  align-items: center;
+
+  padding: calc(env(safe-area-inset-top) + 12px) 24px 12px 20px;
+
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-main);
+}
+
+body.page-info .header h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.phone.page-info .header h1 {
+  font-size: 22px;
+}
+
+/* スクロール領域は画面幅いっぱい（左右の余白に指を置いてもスクロールできる）。中身は中央に寄せる */
 .info-container {
-  width: min(980px, 100%);
-  margin: 0 auto;
-  padding: 18px 16px 20px;
+  --info-max-width: 980px;
+
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  padding:
+    18px
+    max(36px, calc((100% - var(--info-max-width)) / 2))
+    calc(20px + env(safe-area-inset-bottom))
+    max(16px, calc((100% - var(--info-max-width)) / 2));
 }
 
 .info-panel {

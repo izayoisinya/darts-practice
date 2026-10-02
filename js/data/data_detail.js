@@ -253,7 +253,6 @@ function displayDetailPage() {
   
   // ゲーム一覧
   pageData.forEach((game, idx) => {
-    const gameDiv = document.createElement("div")
     const gameNumber = totalGames - (start + idx)
 
     const tags = getSessionTagsForDetail(game, dayNoteMap)
@@ -263,9 +262,7 @@ function displayDetailPage() {
           .join("")}</div>`
       : ""
 
-    gameDiv.className = "session-card"
-    gameDiv.innerHTML = `${tagsHtml}${createSessionCardHtml(game, gameNumber)}`
-    container.appendChild(gameDiv)
+    container.appendChild(createSessionCardElement(`${tagsHtml}${createSessionCardHtml(game, gameNumber)}`))
   })
 
   updateDetailPaginationUI()

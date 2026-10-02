@@ -2129,3 +2129,103 @@ body.page-data.phone.portrait main.data-container {
   opacity: 0.25;
   pointer-events: none;
 }
+
+
+/* ===================================================== */
+/* HISTORY CARD：縮小表示 ⇔ 全項目表示                     */
+/* ===================================================== */
+
+/*
+  履歴カードは普段は縮小表示（Game 番号・日時、Score / PPD / Round Avg、要約 1 行）。
+  タップで .is-expanded が付き、ブル率・トリプル・ラウンドスコア・アワードをすべて表示する。
+  端末別の指定より優先させるため #sessionsContainer から指定する。
+*/
+#sessionsContainer .session-card {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+#sessionsContainer .session-card:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb) / 0.7);
+  outline-offset: 2px;
+}
+
+#sessionsContainer .session-card.is-expanded {
+  border-color: rgb(var(--accent-rgb) / 0.45);
+}
+
+.session-card-header-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 開閉を示す矢印（縮小時は下向き、開いたら上向き） */
+.session-toggle-icon {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+#sessionsContainer .session-card.is-expanded .session-toggle-icon {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.session-compact-summary {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* 縮小表示：KPI と要約だけ
+   （縦向きではカード全体をグリッドで割り付けているため、縮小時は通常の縦並びに戻す） */
+#sessionsContainer .session-card:not(.is-expanded) {
+  display: block;
+}
+
+#sessionsContainer .session-card:not(.is-expanded) .session-card-header {
+  margin-bottom: 10px;
+}
+
+#sessionsContainer .session-card:not(.is-expanded) .session-card-body {
+  display: block;
+}
+
+#sessionsContainer .session-card:not(.is-expanded) .session-main-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#sessionsContainer .session-card:not(.is-expanded) .session-rate-group,
+#sessionsContainer .session-card:not(.is-expanded) .session-triple-block,
+#sessionsContainer .session-card:not(.is-expanded) .session-side-block,
+#sessionsContainer .session-card:not(.is-expanded) .session-awards-block {
+  display: none;
+}
+
+/* 全項目表示：要約は不要 */
+#sessionsContainer .session-card.is-expanded .session-compact-summary {
+  display: none;
+}
+
+/* 開いたときに中身をふわっと表示 */
+@keyframes sessionCardExpand {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+#sessionsContainer .session-card.is-expanded .session-card-body,
+#sessionsContainer .session-card.is-expanded .session-awards-block {
+  animation: sessionCardExpand 0.2s ease both;
+}

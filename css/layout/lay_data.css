@@ -97,8 +97,10 @@ body.page-data main.data-container {
   画面の本当の下端より上になる（base.css 参照）。フッターはページ（body）の下端に置く。
 */
 @media (display-mode: standalone) {
-  body.page-data .footer-bar {
-    position: absolute;
+  @supports (-webkit-touch-callout: none) {
+    body.page-data .footer-bar {
+      position: absolute;
+    }
   }
 }
 

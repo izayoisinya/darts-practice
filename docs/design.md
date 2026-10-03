@@ -619,7 +619,7 @@ graph LR
 - **JS / CSS を変更したら `sw.js` のキャッシュ名（`darts-app-vN` / `darts-runtime-vN`）の番号を上げる。** 上げないと、利用者の端末に古いファイルが残り続ける
 - 新しいファイルを追加したら `PRECACHE_URLS` にも追加する
 - アイコン：Android などは `manifest.json` の `icon-192.png`（192px）/ `icon-512.png`（512px）、iPad・iPhone は各 HTML の `apple-touch-icon.png`（180px）を使う。iOS は画像をそのまま角丸で切り抜くため、Android 用より D を小さく（高さ約 50%）している
-- **iOS 26 のホーム画面アプリの高さの不具合（WebKit Bug 301108）**：`viewport-fit=cover` ＋ `black-translucent` で起動すると、`height: 100%` / `100dvh` / `100svh` / `innerHeight` が上の安全領域の分（iPad で約 32px）だけ短くなり、画面の下に隙間ができる。画面に固定（`position: fixed`）した要素の下端もその分上にずれる。対策として、`@media (display-mode: standalone)` のときだけ以下を指定している
+- **iOS 26 のホーム画面アプリの高さの不具合（WebKit Bug 301108）**：`viewport-fit=cover` ＋ `black-translucent` で起動すると、`height: 100%` / `100dvh` / `100svh` / `innerHeight` が上の安全領域の分（iPad で約 32px）だけ短くなり、画面の下に隙間ができる。画面に固定（`position: fixed`）した要素の下端もその分上にずれる。対策として、`@media (display-mode: standalone)` かつ iOS（`@supports (-webkit-touch-callout: none)`。iOS の Safari だけが対応）のときだけ以下を指定している。Android のホーム画面アプリでは起動直後の `100lvh` が実際の画面より高くなり、画面を回転するまで下が見切れるため、Android には適用しない
   - `html { height: 100lvh }`（`base.css`。`100lvh` だけが正しい高さを返す）
   - サイドメニュー・右端の帯・オーバーレイも `height: 100lvh`（`lay_menu.css`）
   - データ表示画面のフッターは `position: absolute` にして `body` の下端に置く（`lay_data.css`）
@@ -707,3 +707,4 @@ graph LR
 | 2026.10.3 | 今後の拡張予定に「ダーツボード形式の入力」と、最終目標（刺さった位置の分析）を追記 |
 | 2026.10.3 | 今後の拡張予定に「カメラからの自動入力」（カメラ主体＋手修正、位置の分割の考え方、座標での保存）と電子ボード接続の検討メモを追記 |
 | 2026.10.3 | カメラ自動入力に、4 点（20・6・3・11）のキャリブレーション、撮影ボタンなしの自動判定と、だめなときの撮影ボタン・手修正、カメラの置き方、進め方を追記 |
+| 2026.10.3 | Android のホーム画面アプリで、起動直後に全画面の下が見切れる（回転すると直る）不具合を修正。iOS 26 向けの高さ対策（`100lvh` など）を iOS だけに適用するようにした |

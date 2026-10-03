@@ -147,11 +147,13 @@ body.menu-open .menu-edge {
 /* HOME SCREEN APP (STANDALONE)    */
 /* =============================== */
 
-/* iOS 26 では 100dvh / 100% が短く報告されるため、画面の下端まで届くよう 100lvh にする（base.css 参照） */
+/* iOS 26 では 100dvh / 100% が短く報告されるため、画面の下端まで届くよう 100lvh にする（iOS のみ。base.css 参照） */
 @media (display-mode: standalone) {
-  .side-menu,
-  .menu-edge,
-  .menu-overlay {
-    height: 100lvh;
+  @supports (-webkit-touch-callout: none) {
+    .side-menu,
+    .menu-edge,
+    .menu-overlay {
+      height: 100lvh;
+    }
   }
 }

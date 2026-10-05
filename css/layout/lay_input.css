@@ -153,3 +153,131 @@
   box-shadow:
     inset 0 2px 4px rgba(0, 0, 0, .6);
 }
+
+/* ================================= */
+/* ============== BOARD INPUT ====== */
+/* ================================= */
+
+/* ボード形式の入力（board_input.js）。端末別の .number-table の指定より優先させる */
+body .number-table.board-mode {
+  display: block;
+  position: relative;
+
+  flex: 1;
+  height: auto;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+.board-wrap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+/* 縦横の短い方に合わせて描く（左右は中央・上下は上詰め。board_input.js の preserveAspectRatio） */
+.board-svg {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+
+  cursor: pointer;
+}
+
+.board-back {
+  fill: #0b0e13;
+}
+
+.board-svg .seg {
+  stroke: rgba(255, 255, 255, .14);
+  stroke-width: .006;
+}
+
+.seg-single.seg-a { fill: #1c212b; }
+.seg-single.seg-b { fill: #2d3440; }
+
+.seg-triple.seg-a,
+.seg-double.seg-a { fill: #b8404c; }
+
+.seg-triple.seg-b,
+.seg-double.seg-b { fill: #2f6fb3; }
+
+.board-svg .seg-outer-bull { fill: #b8404c; }
+.board-svg .seg-inner-bull { fill: #12161d; stroke: var(--accent); stroke-width: .012; }
+
+/* 押したところが分かるよう、触れている間だけ明るくする */
+.board-svg .seg:active {
+  filter: brightness(1.35);
+}
+
+.board-number {
+  fill: var(--text-muted);
+
+  font-size: .1px;
+  font-weight: 600;
+
+  text-anchor: middle;
+  dominant-baseline: central;
+
+  pointer-events: none;
+}
+
+.board-markers {
+  pointer-events: none;
+}
+
+.board-marker circle {
+  fill: var(--accent);
+  stroke: #0b0e13;
+  stroke-width: .012;
+}
+
+.board-marker text {
+  fill: #0b0e13;
+
+  font-size: .06px;
+  font-weight: 700;
+
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* 直前に入れた 1 投（左上に少しのあいだ表示） */
+.board-last {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  padding: 2px 8px;
+
+  border-radius: 8px;
+  background: rgba(17, 21, 28, .85);
+
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: pre;
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+.board-last.show {
+  animation: boardLastHit 1.2s ease forwards;
+}
+
+@keyframes boardLastHit {
+  0% { opacity: 0; transform: translateY(4px); }
+  12% { opacity: 1; transform: none; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}

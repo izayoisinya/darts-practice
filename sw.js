@@ -1,5 +1,5 @@
-const APP_CACHE = "darts-app-v21"
-const RUNTIME_CACHE = "darts-runtime-v21"
+const APP_CACHE = "darts-app-v22"
+const RUNTIME_CACHE = "darts-runtime-v22"
 
 const PRECACHE_URLS = [
   "./",
@@ -35,6 +35,7 @@ const PRECACHE_URLS = [
   "./js/data/data_detail.js",
   "./js/data/rating.js",
   "./js/data/data.js",
+  "./js/game/board_input.js",
   "./js/game/cu_ui.js",
   "./js/game/game_core.js",
   "./js/game/game_countup.js",

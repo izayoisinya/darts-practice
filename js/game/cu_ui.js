@@ -3,6 +3,9 @@ function updateUI() {
   updateStats()
   drawScoreChart()
   updateNextGameButton()
+  if (typeof renderBoardMarkers === "function") {
+    renderBoardMarkers()
+  }
   saveGame()
 }
 
@@ -78,6 +81,16 @@ function createNumberTable() {
   if (!table) return;
   
   table.innerHTML = "";
+  
+  // ボード形式の入力（設定画面で切り替え）
+  const useBoard = inputMode === "board" && typeof renderBoardInput === "function";
+  document.body.classList.toggle("input-board", useBoard);
+  table.classList.toggle("board-mode", useBoard);
+  
+  if (useBoard) {
+    renderBoardInput(table);
+    return;
+  }
   
   const isPhoneLandscape =
     document.body.classList.contains("phone") &&

@@ -376,3 +376,56 @@
 .phone.landscape.area-animating:not(.iphone-stats-open) .stats-compact {
   animation: areaContentIn .24s ease .08s both;
 }
+
+
+/* ===================================================== */
+/* PHONE PORTRAIT - BOARD INPUT                          */
+/* ===================================================== */
+
+/* ボード形式の入力のときは、ボードを横幅いっぱいに大きく出し、 */
+/* Rounds と Stats をその下に左右に並べる */
+.phone.portrait.input-board .container {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1.5fr 1fr;
+
+  grid-template-areas:
+    "input input"
+    "round stats";
+}
+
+.phone.portrait.input-board .round-area h2,
+.phone.portrait.input-board .stats-area h2 {
+  font-size: 18px;
+}
+
+.phone.portrait.input-board .round {
+  min-height: 30px;
+}
+
+.phone.portrait.input-board .round-label,
+.phone.portrait.input-board .round-score {
+  font-size: 16px;
+}
+
+/* Rounds を開いたときは、ボードと Stats を畳んで Rounds を画面いっぱいにする */
+.phone.portrait.input-board.round-open .container {
+  grid-template-columns: 1fr 0;
+  grid-template-rows: 0 1fr;
+  gap: 0;
+}
+
+.phone.portrait.input-board.round-open .input-area {
+  width: auto;
+  height: 0;
+  border-width: 0;
+}
+
+.phone.portrait.input-board.round-open .stats-area {
+  width: 0;
+  padding: 0;
+  border-width: 0;
+
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}

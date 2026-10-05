@@ -9,6 +9,8 @@ function initGame(load = true) {
     bullMode = settings.bullMode
   }
 
+  inputMode = settings.inputMode === "board" ? "board" : "buttons"
+
   if (load && loadGame()) {
     // セーブデータ読み込み成功
   } else {
@@ -38,7 +40,9 @@ function initGame(load = true) {
 // ===============================
 // ===== ダーツ追加 ==============
 // ===============================
-function addDart(value, multiplier, special = null) {
+// boardTap：ボード形式で入力したときのタップ位置（{ x, y }。ボードの中心が原点、ダブルの外側 = 1。
+// 本物より太く描いた輪の上での位置）。進行中のゲームの印の表示にだけ使い、ゲーム履歴には保存しない
+function addDart(value, multiplier, special = null, boardTap = null) {
   
   if (game.currentRound >= TOTAL_ROUNDS) return
   
@@ -48,12 +52,18 @@ function addDart(value, multiplier, special = null) {
   
   const score = value * multiplier
   
-  game.rounds[game.currentRound][game.currentDart] = {
+  const dart = {
     value,
     multiplier,
     score,
     special
   }
+
+  if (boardTap) {
+    dart.boardTap = boardTap
+  }
+
+  game.rounds[game.currentRound][game.currentDart] = dart
   
   game.currentDart++
   

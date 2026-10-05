@@ -122,7 +122,7 @@ GitHub 上のリポジトリ（`izayoisinya/darts-practice`）を iPad 及びタ
 | --- | --- |
 | ヘッダー | 合計スコア、NEXT GAME ボタン（8 ラウンド終了で押せる） |
 | Rounds | 各ラウンド（R1〜R8）の 1 投ごとの得点とラウンド合計 |
-| Input | ブルモード表示、Bull / In（インナーブル）/ Miss / 戻る、1〜20 と D（ダブル）・T（トリプル）の入力ボタン |
+| Input | ブルモード表示、Bull / In（インナーブル）/ Miss / 戻る、1〜20 と D（ダブル）・T（トリプル）の入力ボタン。設定で Board にすると、入力ボタンの代わりにダーツボードを表示する（下記） |
 | Stats | PPD・投げた本数・平均ラウンドスコア・最高ラウンドスコア、ブル数とブル率、インナーブル数と率、獲得アワード、ラウンドスコアのグラフ |
 
 **画面の縦方向の割り付け**
@@ -140,6 +140,16 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 ![カウントアップ画面（スマホ横）](images/countup_phone_landscape.jpg)
 
 各エリアが全て横並びになり、Stats エリアがコンパクト表示になる。コンパクト Stats エリアをタップすると Stats エリアが開き、詳細情報が表示される（`body.iphone-stats-open`）。
+
+**ボード形式の入力**
+
+設定画面の Input Style を Board にすると、1〜20 と D / T のボタンの代わりにダーツボード（SVG）を表示し、刺さった場所をタップして入力する（`board_input.js`）。Bull / In / Miss / 戻る のボタンはそのまま残す。
+
+- タップした位置から点数・S/D/T・ブルを求め、ボタン形式と同じ `addDart()` に渡す（点数計算・アワード判定・保存は共通）。ダブルの外（数字の輪や四隅）は Miss。アウターブルは Bull ボタンと同じくブルモードに従う（FAT 50 / SEPARATE 25）
+- 指で押せるよう、ブル・トリプル・ダブルの輪は本物の比率より太く描く（ダブルの外側を 1 として、インブル 0〜0.08、アウターブル〜0.17、内側シングル〜0.5、トリプル〜0.64、外側シングル〜0.84、ダブル〜1）
+- ボードは入力エリアの縦横の短い方に合わせ、左右は中央・上下は上詰めで描く（`preserveAspectRatio="xMidYMin meet"`。タップ位置の計算もこれに合わせる）
+- 今のラウンドのタップ位置に何投目かの番号付きの印を付ける（3 投目のあとは次の 1 投目まで直前のラウンドを表示）。直前の 1 投（例 `T20  60`）を左上に少しのあいだ表示する
+- スマートフォン縦向きのときは、ボードを横幅いっぱいに出し、その下に Rounds と Stats を左右に並べる（`body.input-board`。`phone.css`）。Rounds をタップすると、ボードと Stats を畳んで Rounds を画面いっぱいに開く
 
 **開閉のモーション**
 
@@ -180,6 +190,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 | 区分 | 項目 | 内容 |
 | --- | --- | --- |
+| GAME | Input Style | カウントアップの入力形式。Buttons（1〜20 と D / T のボタン、値 `buttons`）と Board（ダーツボード、値 `board`）の切り替え。進行中のゲームはそのまま |
 | GAME | Bull Mode | FAT（アウター 50 / インナー 50、値 `fat`）と SEPARATE（アウター 25 / インナー 50、値 `double`）の切り替え。変更すると進行中のゲームはリセットされる |
 | GAME | Rounds | 8 / 10 / 15 を選べるが保存されず、ゲームは 8 ラウンド固定。01・クリケット実装時に調整予定 |
 | DISPLAY | Screen Orientation | 画面の向きの固定（Free / Portrait Lock / Landscape Lock）。ブラウザによっては効かない |
@@ -207,7 +218,7 @@ darts-practice/
 ├── js/
 │   ├── core/            state.js / core.js / storage.js
 │   ├── init/            main.js
-│   ├── game/            game_core.js / game_countup.js / cu_ui.js / stats.js
+│   ├── game/            game_core.js / game_countup.js / cu_ui.js / board_input.js / stats.js
 │   ├── data/            data_loader.js / data.js / data_grouped.js / data_detail.js / rating.js
 │   └── ui/              chart.js / settings.js / news.js
 └── docs/                本設計書と画面画像
@@ -262,6 +273,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `TOTAL_ROUNDS` | ラウンド数（8） |
 | `MAX_SCORE` | 1 ラウンドの最大スコア（180） |
 | `bullMode` | ブルモード（`"fat"` / `"double"`） |
+| `inputMode` | 入力形式（`"buttons"` / `"board"`） |
 | `lockedRound` | Undo で戻れない確定済みラウンド |
 | `game` | ゲーム状態 `{ rounds, currentRound, currentDart }` |
 
@@ -333,7 +345,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | 関数 | 内容 |
 | --- | --- |
 | `initGame(load)` | 設定を読み込み、ゲームを初期化する（`load` が true なら途中のゲームを復元） |
-| `addDart(value, multiplier, special)` | 1 投を記録し、3 投で次のラウンドへ進める |
+| `addDart(value, multiplier, special, boardTap)` | 1 投を記録し、3 投で次のラウンドへ進める。`boardTap` はボード形式で入力したときのタップ位置（6.3 参照） |
 
 #### game/cu_ui.js
 
@@ -347,7 +359,21 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `createNumberTable()` / `createNumberRow()` | 1〜20 と D / T の入力ボタンを生成する |
 | `setupTopButtons()` | Bull / In / Miss / 戻る ボタンをセットアップする |
 | `updateBullModeUI()` | ブルモードの表示を更新する |
+| `createNumberTable()` の切り替え | 設定が Board のときは `renderBoardInput()` でボードを表示し、`body.input-board` を付ける |
 | `toggleAreaLayout(className, onDone)` | Rounds / Stats の開閉（`body` のクラス切り替え）を、各エリアが伸び縮みするアニメーション付きで行う |
+
+#### game/board_input.js
+
+ボード形式の入力（SVG の生成とタップ位置の判定）。
+
+| 名前 | 内容 |
+| --- | --- |
+| `BOARD_NUMBERS` / `BOARD_RADIUS` | 数字の並び（真上が 20、時計回り）と、各輪の外側の半径（ダブルの外側 = 1、本物より太い） |
+| `getBoardHit(x, y)` | ボード上の位置から `{ value, multiplier, special, label }` を求める（DOM を使わない） |
+| `createBoardSvgHtml()` | ボードの SVG を作る |
+| `renderBoardInput(container)` | 入力エリアにボードを表示し、タップを受け付ける |
+| `handleBoardTap(event)` | タップ位置を判定して `addDart()` に渡す |
+| `renderBoardMarkers()` | 今のラウンドのタップ位置に印を付ける（`updateUI()` から呼ぶ） |
 
 #### game/stats.js
 
@@ -515,7 +541,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 {
   gameType: "countup",
   rounds: [                 // 8 ラウンド × 3 投。未入力は null
-    [{ value, multiplier, score, special }, …],
+    [{ value, multiplier, score, special, boardTap? }, …],
     …
   ],
   currentRound, currentDart, lockedRound
@@ -524,10 +550,12 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 
 `special` はブルの場合に `"outerBull"` / `"innerBull"` が入る。
 
+`boardTap` はボード形式で入力したときだけ付くタップ位置 `{ x, y }`（ボードの中心が原点、ダブルの外側 = 1、y は下向きが正）。本物より太く描いた輪の上での位置なので、そのままでは本物のボードの座標ではない。いまは進行中のゲームの印の表示にだけ使い、ゲーム履歴（`saveSession()`）には保存しない。刺さった位置の分析（11 章）を作るときに、本物の比率への変換と履歴への保存を追加する。
+
 ### 6.4 設定
 
 ```js
-{ bullMode: "fat" | "double", orientationMode: "auto" | "portrait" | "landscape" }
+{ bullMode: "fat" | "double", inputMode: "buttons" | "board", orientationMode: "auto" | "portrait" | "landscape" }
 ```
 
 ### 6.5 日別メモ
@@ -562,9 +590,9 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 ### 7.1 ゲーム画面の処理フロー
 
 1. `main.js` の `initApp()` が実行され、保存領域を準備し、端末を判定する
-2. `cu_ui.js` の `setupTopButtons()` と、`game_countup.js` の `initGame()` から呼ばれる `createNumberTable()` で入力ボタンを生成する
+2. `cu_ui.js` の `setupTopButtons()` と、`game_countup.js` の `initGame()` から呼ばれる `createNumberTable()` で入力ボタン（設定が Board なら `board_input.js` のボード）を生成する
 3. `main.js` の `registerEvents()` でイベントを登録する
-4. ユーザーが入力ボタンを押す
+4. ユーザーが入力ボタンを押す（ボード形式ならボードをタップし、`handleBoardTap()` が位置を判定する）
 5. `game_countup.js` の `addDart()` で 1 投を記録する
 6. `cu_ui.js` の `updateUI()` が画面を更新する（`stats.js` で計算 → 表示、`chart.js` でグラフ描画）
 7. `storage.js` の `saveGame()` で進行中のゲームを保存する
@@ -593,6 +621,8 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 graph LR
   main[init/main.js] --> gc[game/game_countup.js]
   main --> cui[game/cu_ui.js]
+  cui --> board[game/board_input.js]
+  board --> gc
   cui --> gc
   gc --> cui
   gcore[game/game_core.js] --> gc
@@ -653,6 +683,7 @@ graph LR
 
 - 高度な分析機能（ブル練習分析・スタッツ分析など）
 - **ダーツボード形式の入力**（最終目標は刺さった位置の分析）
+  - 1〜3 は 2026.10.5 に実装済み（`board_input.js`）。残りは 4
   1. 入力パネルをダーツボード（SVG）で表示し、タップした場所から点数・S/D/T・ブルを求めて `addDart()` に渡す。点数計算・アワード判定・保存の処理は変えない。ボードの外は Miss
   2. 指で押せるよう、トリプル・ダブルの輪は本物の比率より太く描く（iPad の入力エリアに本物の比率で描くと輪の幅が 7px 前後になり押せない）
   3. 設定画面で「ボタン形式 / ボード形式」を切り替えられるようにする（今のボタン形式も残す）
@@ -710,3 +741,4 @@ graph LR
 | 2026.10.3 | カメラ自動入力に、4 点（20・6・3・11）のキャリブレーション、撮影ボタンなしの自動判定と、だめなときの撮影ボタン・手修正、カメラの置き方、進め方を追記 |
 | 2026.10.3 | Android のホーム画面アプリで、起動直後に全画面の下が見切れる（回転すると直る）不具合を修正。iOS 26 向けの高さ対策（`100lvh` など）を iOS だけに適用するようにした |
 | 2026.10.5 | 今後の拡張予定（ゲーム追加）に「プロテストモード」を追記 |
+| 2026.10.5 | カウントアップにボード形式の入力を追加（`board_input.js`）。設定画面の Input Style で Buttons / Board を切り替え。スマホ縦はボードを横幅いっぱいに表示 |

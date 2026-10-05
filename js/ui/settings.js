@@ -2,6 +2,7 @@ const SETTINGS_KEY = "dartsSettings"
 
 const DEFAULT_SETTINGS = {
   bullMode: "fat",
+  inputMode: "buttons",
   orientationMode: "auto"
 }
 
@@ -23,6 +24,10 @@ function loadSettings() {
   const settings = readSettings()
 
   document.getElementById("bullModeSetting").value = settings.bullMode
+  const inputModeSelect = document.getElementById("inputModeSetting")
+  if (inputModeSelect) {
+    inputModeSelect.value = settings.inputMode === "board" ? "board" : "buttons"
+  }
   const orientationSelect = document.getElementById("orientationSetting")
   if (orientationSelect) {
     orientationSelect.value = settings.orientationMode
@@ -34,6 +39,7 @@ function saveSettings() {
 
   const settings = {
     bullMode: document.getElementById("bullModeSetting").value,
+    inputMode: document.getElementById("inputModeSetting")?.value || "buttons",
     orientationMode: document.getElementById("orientationSetting")?.value || "auto"
   }
 
@@ -270,6 +276,7 @@ function initBackupControls() {
 async function initSettingsPage() {
   const bullSelect = document.getElementById("bullModeSetting")
   const roundSelect = document.getElementById("roundSetting")
+  const inputModeSelect = document.getElementById("inputModeSetting")
   const orientationSelect = document.getElementById("orientationSetting")
   const refreshStatusBtn = document.getElementById("refreshStorageStatusBtn")
 
@@ -278,6 +285,9 @@ async function initSettingsPage() {
   bullSelect.addEventListener("change", saveSettings)
   if (roundSelect) {
     roundSelect.addEventListener("change", saveSettings)
+  }
+  if (inputModeSelect) {
+    inputModeSelect.addEventListener("change", saveSettings)
   }
   if (orientationSelect) {
     orientationSelect.addEventListener("change", saveSettings)

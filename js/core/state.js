@@ -16,6 +16,9 @@ const accent = getComputedStyle(document.documentElement)
 // Bullモード
 let bullMode = "fat"
 
+// 入力形式（"buttons" ボタン / "board" ダーツボード）
+let inputMode = "buttons"
+
 // Undoロック
 let lockedRound = -1
 

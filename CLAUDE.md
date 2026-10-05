@@ -33,7 +33,7 @@
 index.html      メインメニュー（ゲーム選択 / Data / Settings / Info）
 countup.html    COUNT-UP ゲーム画面（Rounds / Input / Stats の 3 エリア）
 data.html       スコア記録データの表示（Statistics）
-settings.html   設定（ブルモード: fat / double、画面向き、ストレージ状況）
+settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、画面向き、ストレージ状況）
 news.html       お知らせ
 sw.js           Service Worker（プリキャッシュ）
 manifest.json   PWA マニフェスト
@@ -51,6 +51,7 @@ manifest.json   PWA マニフェスト
 | game/ | game_core.js | ゲーム共通ロジック（次ゲーム、Undo、終了判定、リセット）。UI 生成は含まない |
 | game/ | game_countup.js | COUNT-UP 固有ロジック（`initGame()`, `addDart()`）。UI 生成は含まない |
 | game/ | cu_ui.js | COUNT-UP の UI 生成・DOM 操作 |
+| game/ | board_input.js | ボード形式の入力（ダーツボードの SVG 生成・タップ位置の判定）。設定 `inputMode` が `"board"` のとき `createNumberTable()` から使う |
 | game/ | stats.js | スタッツ・アワード計算。**UI 表示・DOM 操作は含まない**（再利用できる形にする） |
 | data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()` |
 | data/ | data.js | データ画面の統括（ビュー切替、Stats/Awards 表示、グラフ、期間比較） |
@@ -94,5 +95,5 @@ manifest.json   PWA マニフェスト
 
 - ゲーム追加：01、Cricket、Half-it、Shoot-out（メニュー・サイドメニューに `Coming Soon` のボタンあり）、プロテストモード（内容は未定）
 - 機能追加：高度な分析機能、将来的にはユーザーアカウント・オンライン対戦・AI 対戦
-- ダーツボード形式の入力：入力パネルをボード（SVG）にし、設定画面でボタン形式と切り替え。最終目標は刺さった位置（座標）を保存して分析すること。詳細は `docs/design.md` の「11. 今後の拡張予定」
+- ダーツボード形式の入力：入力パネルをボード（SVG）にし、設定画面でボタン形式と切り替え（実装済み。`board_input.js`）。最終目標は刺さった位置（座標）を保存して分析すること。詳細は `docs/design.md` の「11. 今後の拡張予定」
 - カメラからの自動入力（入力の最終形）：カメラ映像を表示し 20・6・3・11 の 4 点でキャリブレーション。映像を見張って撮影ボタンなしで 3 投を自動判定し、だめなときは撮影ボタン、外れたときはボード形式の入力で修正。位置はセグメント内 6 分割程度の粗さで十分、保存は座標で行い区画分けは分析時に決める。詳細は `docs/design.md` の「11. 今後の拡張予定」

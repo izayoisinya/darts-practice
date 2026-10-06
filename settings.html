@@ -319,6 +319,34 @@
         </div>
 
         <div class="setting-group">
+          <label>Board Undo Button</label>
+
+          <div class="tab-toggle-grid">
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="boardUndoButtonSetting" />
+              <label for="boardUndoButtonSetting">戻るボタンを表示</label>
+            </div>
+          </div>
+
+          <p class="setting-help">
+            ボード入力のときに「戻る」ボタンを出すかどうか。出さないときは 3 本指スワイプで戻ります。
+          </p>
+        </div>
+
+        <div class="setting-group">
+          <label for="undoSwipeSetting">Undo Swipe</label>
+
+          <select id="undoSwipeSetting">
+            <option value="left">Left（3 本指で左へ）</option>
+            <option value="right">Right（3 本指で右へ）</option>
+          </select>
+
+          <p class="setting-help">
+            カウントアップ画面で 3 本指をこの向きにスワイプすると、最後の 1 投を取り消します。
+          </p>
+        </div>
+
+        <div class="setting-group">
           <label for="roundSetting">Rounds</label>
 
           <select id="roundSetting" disabled>
@@ -326,25 +354,6 @@
             <option value="10">10</option>
             <option value="15">15</option>
           </select>
-        </div>
-
-        <div class="setting-group">
-          <label>Game Panels</label>
-
-          <div class="tab-toggle-grid">
-            <div class="tab-toggle-item">
-              <input type="checkbox" id="gamePanelRound" checked />
-              <label for="gamePanelRound">Rounds</label>
-            </div>
-            <div class="tab-toggle-item">
-              <input type="checkbox" id="gamePanelStats" checked />
-              <label for="gamePanelStats">Stats</label>
-            </div>
-          </div>
-
-          <p class="setting-help">
-            カウントアップ画面に表示するエリアを選べます。Input は常に表示します。
-          </p>
         </div>
       </section>
 
@@ -364,6 +373,25 @@
             一部端末ではブラウザ仕様上、画面回転ロックが適用されない場合があります。
           </p>
           <p id="orientationStatus" class="orientation-status"></p>
+        </div>
+
+        <div class="setting-group">
+          <label>Game Panels</label>
+
+          <div class="tab-toggle-grid">
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="gamePanelRound" checked />
+              <label for="gamePanelRound">Rounds</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="gamePanelStats" checked />
+              <label for="gamePanelStats">Stats</label>
+            </div>
+          </div>
+
+          <p class="setting-help">
+            カウントアップ画面に表示するエリアを選べます。Input は常に表示します。
+          </p>
         </div>
 
         <div class="setting-group">

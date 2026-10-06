@@ -11,6 +11,7 @@ function initGame(load = true) {
 
   inputMode = settings.inputMode === "board" ? "board" : "buttons"
   boardZoomReset = settings.boardZoomReset === "round" ? "round" : "manual"
+  undoSwipeDirection = settings.undoSwipeDirection === "right" ? "right" : "left"
 
   if (load && loadGame()) {
     // セーブデータ読み込み成功

@@ -72,6 +72,9 @@ function applyGamePanelVisibility() {
   // 隠したエリアを開いた状態のまま残さない
   if (!showRound) document.body.classList.remove("round-open")
   if (!showStats) document.body.classList.remove("iphone-stats-open")
+
+  // ボード入力のときの戻るボタン（設定画面の Board Undo Button。初期値は隠す）
+  document.body.classList.toggle("hide-undo-button", getSavedSettings().boardUndoButton !== true)
 }
 
 function applyOrientationPreference(mode) {

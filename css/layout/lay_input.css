@@ -393,3 +393,18 @@ body.input-board .top-buttons button[data-display="Miss"] {
 body.input-board .top-buttons {
   grid-template-columns: 1fr;
 }
+
+/* ボード入力のときは Bull Mode の表示も隠す。戻るボタンは設定で出したときだけ（main.js の hide-undo-button） */
+body.input-board .bull-setting,
+body.input-board.hide-undo-button .top-buttons {
+  display: none;
+}
+
+/* 横向きで Input だけのとき、右の列に何も出さないならボードを横幅いっぱいに出す */
+body.landscape.input-board.hide-round-area.hide-stats-area.hide-undo-button .input-area {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "title"
+    "board"
+    "board";
+}

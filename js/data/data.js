@@ -167,6 +167,7 @@ function setupDataPanelSwipe() {
 
   container.addEventListener("touchend", e => {
     if (!isPhonePortraitDataView()) return
+    if (viewMode === "analysis") return
     if (panelSwipeBlockedByTabs) {
       panelSwipeBlockedByTabs = false
       return
@@ -198,10 +199,9 @@ function setupDataPanelSwipe() {
 }
 
 function refreshGameChartsNow() {
-  if (viewMode !== "game") return
   if (detailViewMode) return
-  drawGameScoresChart()
-  drawSelectedRangeChart()
+  if (viewMode === "game") drawGameScoresChart()
+  if (viewMode === "analysis") drawAnalysisCharts()
 }
 
 function queueInitialGameChartRefresh() {
@@ -223,7 +223,42 @@ function queueInitialGameChartRefresh() {
   }, 520)
 }
 
+// ===============================
+// ===== タブの表示・非表示 =======
+// ===============================
+// 設定画面の Data Tabs（dartsSettings.dataTabs）で選んだタブだけを出す。Game は常に表示
+const DATA_VIEW_TABS = ["analysis", "day", "week", "month", "year"]
+
+function readDataTabSettings() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("dartsSettings") || "{}")
+    return parsed && parsed.dataTabs && typeof parsed.dataTabs === "object"
+      ? parsed.dataTabs
+      : {}
+  } catch {
+    return {}
+  }
+}
+
+function getVisibleViews() {
+  const tabs = readDataTabSettings()
+  return ["game"].concat(DATA_VIEW_TABS.filter(view => tabs[view] !== false))
+}
+
+// 隠したタブが選ばれていたら Game に戻す
+function ensureViewIsVisible(mode) {
+  return getVisibleViews().includes(mode) ? mode : "game"
+}
+
+function applyDataViewTabVisibility() {
+  const visible = getVisibleViews()
+  document.querySelectorAll(".tabs-container button[data-view]").forEach(btn => {
+    btn.style.display = visible.includes(btn.dataset.view) ? "" : "none"
+  })
+}
+
 function updateViewTabs(mode) {
+  applyDataViewTabVisibility()
   document.querySelectorAll(".tabs-container button").forEach(btn => {
     const isActive = btn.dataset.view === mode
     btn.classList.toggle("active", isActive)
@@ -231,7 +266,38 @@ function updateViewTabs(mode) {
   })
 }
 
+// ビューごとに、Stats パネルに出す部品を切り替える
+//   game     : Stats・Awards・スコア推移・レーティング目安
+//   analysis : タグ別の散布図・期間 A/B の比較グラフ（History パネルは使わず 1 列で表示）
+//   それ以外 : Day / Week / Month / Year のまとめ（data_grouped.js）
+function showViewSections(mode) {
+  const show = (id, display) => {
+    const el = document.getElementById(id)
+    if (el) el.style.display = display
+  }
+
+  const isGame = mode === "game"
+  const isAnalysis = mode === "analysis"
+
+  show("statsSection", isGame ? "flex" : "none")
+  show("awardsSection", isGame ? "flex" : "none")
+  show("chartContainer", isGame || isAnalysis ? "block" : "none")
+  show("gameChartSection", isGame ? "flex" : "none")
+  show("analysisContainer", isAnalysis ? "flex" : "none")
+  setRangeChartSectionVisible(isAnalysis)
+
+  const main = document.querySelector("main.data-container")
+  if (main) main.classList.toggle("analysis-mode", isAnalysis)
+
+  const calendarContainer = document.getElementById("calendarContainer")
+  if (calendarContainer) {
+    calendarContainer.style.display = "none"
+    calendarContainer.innerHTML = ""
+  }
+}
+
 function changeView(mode) {
+  mode = ensureViewIsVisible(mode)
   setupDataPanelSwipe()
   viewMode = mode
   detailViewMode = false
@@ -244,24 +310,13 @@ function changeView(mode) {
   updateViewTabs(mode)
 
   // 縦向き（1 パネル表示）: group表示時はHistoryパネルへ自動切り替え
-  if (mode !== "game" && isPhonePortraitDataView()) {
+  if (mode !== "game" && mode !== "analysis" && isPhonePortraitDataView()) {
     setDataPanel("history")
   }
 
-  const statsSection = document.getElementById("statsSection")
-  const awardsSection = document.getElementById("awardsSection")
-  const chartContainer = document.getElementById("chartContainer")
-  const calendarContainer = document.getElementById("calendarContainer")
-  if (calendarContainer) {
-    calendarContainer.style.display = "none"
-    calendarContainer.innerHTML = ""
-  }
+  showViewSections(mode)
 
   if (mode === 'game') {
-    // Game ビューに戻す
-    statsSection.style.display = "flex"
-    awardsSection.style.display = "flex"
-    chartContainer.style.display = "block"
     currentPage = 1
     groupedPageMode = 'game'
     
@@ -272,50 +327,38 @@ function changeView(mode) {
     loadStats()
     loadSessions()
     updatePaginationUI(totalPages)
-    setRangeChartSectionVisible(true)
     drawGameScoresChart()
+  } else if (mode === "analysis") {
+    groupedPageMode = "analysis"
+    updatePaginationUI(1)
+    drawAnalysisCharts()
   } else {
     // Group ビュー（Day/Week/Month/Year）
-    statsSection.style.display = "none"
-    awardsSection.style.display = "none"
-    chartContainer.style.display = "none"
-    setRangeChartSectionVisible(false)
     displayGroupView(mode)
     window.scrollTo(0, 0)
   }
 }
 
 function renderView() {
+  viewMode = ensureViewIsVisible(viewMode)
   setupDataPanelSwipe()
   hideDetailBullRate()
   if (typeof setDataDetailViewClass === "function") {
     setDataDetailViewClass(false)
   }
   updateViewTabs(viewMode)
-  
-  const statsSection = document.getElementById("statsSection")
-  const awardsSection = document.getElementById("awardsSection")
-  const chartContainer = document.getElementById("chartContainer")
-  const calendarContainer = document.getElementById("calendarContainer")
-  if (calendarContainer) {
-    calendarContainer.style.display = "none"
-    calendarContainer.innerHTML = ""
-  }
+  showViewSections(viewMode)
   
   if (viewMode === "game") {
-    statsSection.style.display = "flex"
-    awardsSection.style.display = "flex"
-    chartContainer.style.display = "block"
-    setRangeChartSectionVisible(true)
     loadStats(viewMode)
     loadSessions()
     drawGameScoresChart()
     queueInitialGameChartRefresh()
+  } else if (viewMode === "analysis") {
+    groupedPageMode = "analysis"
+    updatePaginationUI(1)
+    drawAnalysisCharts()
   } else {
-    statsSection.style.display = "none"
-    awardsSection.style.display = "none"
-    chartContainer.style.display = "none"
-    setRangeChartSectionVisible(false)
     renderGroupedPaginated(viewMode)
   }
   
@@ -620,8 +663,6 @@ function drawGameScoresChart() {
     ctx.fillStyle = "#4CAF50"
     ctx.fill()
   })
-
-  drawSelectedRangeChart()
 }
 
 function drawDetailGroupChart(gamesList, compareGamesList = null, baseLabel = "", compareLabel = "") {
@@ -953,7 +994,7 @@ function drawLineSeries(ctx, values, color, padding, verticalPadding, height, gr
 }
 
 function drawSelectedRangeChart() {
-  if (viewMode !== "game") return
+  if (viewMode !== "analysis") return
 
   wireRangeChartControls()
 
@@ -1063,3 +1104,236 @@ function drawSelectedRangeChart() {
 }
 
 window.addEventListener("DOMContentLoaded", setupDataPanelSwipe)
+
+
+// ===============================
+// ===== Analysis（タグ別の散布図） =====
+// ===============================
+// 全ゲームのスコアを日付順に点で描き、その日のメモのタグで色分けする。
+// タグのボタンで、選んだタグの日だけを色付きにできる（選ばないときは全タグを色分け）
+
+let scatterSelectedTags = []
+
+const SCATTER_TAG_COLORS = [
+  "#ff6b6b",
+  "#4da3ff",
+  "#7bc96f",
+  "#ffd166",
+  "#06d6a0",
+  "#f78c6b",
+  "#a78bfa",
+  "#ff9ff3"
+]
+const SCATTER_NO_TAG_COLOR = "rgba(154,164,178,0.35)"
+
+function drawAnalysisCharts() {
+  if (viewMode !== "analysis") return
+  renderAnalysisScatter()
+  drawSelectedRangeChart()
+}
+
+function normalizeScatterTag(tag) {
+  return String(tag || "").trim().replace(/^#/, "")
+}
+
+// 使われているタグの一覧（多い順）。色はこの順番で割り当て、上位 8 個までは色が重ならない
+let scatterTagOrder = []
+
+function getScatterTagColor(tag) {
+  const index = scatterTagOrder.indexOf(normalizeScatterTag(tag))
+  if (index < 0) return SCATTER_NO_TAG_COLOR
+  return SCATTER_TAG_COLORS[index % SCATTER_TAG_COLORS.length]
+}
+
+function getSessionTagsForScatter(session) {
+  const date = new Date(session?.date)
+  if (Number.isNaN(date.getTime())) return []
+  if (typeof getDayNote !== "function" || typeof getLocalDateKey !== "function") return []
+
+  const note = getDayNote(getLocalDateKey(date))
+  if (!Array.isArray(note?.tags)) return []
+  return note.tags.map(normalizeScatterTag).filter(Boolean)
+}
+
+// 使われているタグを、多い順に並べる
+function getScatterAvailableTags(sessions) {
+  const counts = {}
+  sessions.forEach(session => {
+    getSessionTagsForScatter(session).forEach(tag => {
+      counts[tag] = (counts[tag] || 0) + 1
+    })
+  })
+
+  return Object.keys(counts).sort((a, b) => {
+    if (counts[b] !== counts[a]) return counts[b] - counts[a]
+    return a.localeCompare(b, "ja")
+  })
+}
+
+function renderScatterLegend(tags) {
+  const legend = document.getElementById("scatterLegend")
+  if (!legend) return
+
+  const shownTags = (scatterSelectedTags.length ? scatterSelectedTags : tags).slice(0, 8)
+  if (!shownTags.length) {
+    legend.innerHTML = '<span class="scatter-legend-item">タグ未設定のゲームはグレーで表示されます</span>'
+    return
+  }
+
+  const rows = shownTags
+    .map(tag => `
+      <span class="scatter-legend-item">
+        <span class="scatter-legend-swatch" style="background:${getScatterTagColor(tag)}"></span>
+        #${escapeHtml(tag)}
+      </span>
+    `)
+    .join("")
+
+  legend.innerHTML = rows +
+    `<span class="scatter-legend-item"><span class="scatter-legend-swatch" style="background:${SCATTER_NO_TAG_COLOR}"></span>タグなし/非選択</span>`
+}
+
+function renderScatterTagControls(sessions) {
+  const controls = document.getElementById("scatterTagControls")
+  if (!controls) return []
+
+  const tags = getScatterAvailableTags(sessions)
+  scatterTagOrder = tags
+  scatterSelectedTags = scatterSelectedTags.filter(tag => tags.includes(tag))
+
+  if (!tags.length) {
+    controls.innerHTML = '<span class="scatter-legend-item">日別メモにタグを付けると色分けできます</span>'
+    renderScatterLegend([])
+    return []
+  }
+
+  const allActive = scatterSelectedTags.length === 0 ? " is-active" : ""
+  const tagButtons = tags
+    .map(tag => {
+      const active = scatterSelectedTags.includes(tag) ? " is-active" : ""
+      return `<button type="button" class="scatter-tag-btn${active}" data-tag="${escapeHtml(tag)}" style="color:${getScatterTagColor(tag)}">#${escapeHtml(tag)}</button>`
+    })
+    .join("")
+
+  controls.innerHTML = `<button type="button" class="scatter-clear-btn${allActive}" data-tag="">All Tags</button>${tagButtons}`
+
+  controls.querySelectorAll("button").forEach(btn => {
+    btn.onclick = () => {
+      const tag = normalizeScatterTag(btn.getAttribute("data-tag"))
+      if (!tag) {
+        scatterSelectedTags = []
+      } else if (scatterSelectedTags.includes(tag)) {
+        scatterSelectedTags = scatterSelectedTags.filter(t => t !== tag)
+      } else {
+        scatterSelectedTags = scatterSelectedTags.concat(tag)
+      }
+      renderAnalysisScatter()
+    }
+  })
+
+  renderScatterLegend(tags)
+  return tags
+}
+
+function renderAnalysisScatter() {
+  const sessions = readSessions()
+  const tags = renderScatterTagControls(sessions)
+  drawScatterChart(sessions, tags)
+}
+
+function drawScatterChart(sessions, tags) {
+  const canvas = document.getElementById("scatterChart")
+  if (!canvas) return
+
+  const canvasState = setupHiDPICanvas(canvas, 280)
+  if (!canvasState) {
+    scheduleChartRetry("scatter", () => drawScatterChart(sessions, tags))
+    return
+  }
+  resetChartRetry("scatter")
+
+  const { ctx, width, height } = canvasState
+  ctx.clearRect(0, 0, width, height)
+
+  const points = sessions
+    .map(session => ({
+      x: new Date(session.date).getTime(),
+      score: Number(session.score) || 0,
+      tags: getSessionTagsForScatter(session)
+    }))
+    .filter(point => Number.isFinite(point.x))
+    .sort((a, b) => a.x - b.x)
+
+  if (!points.length) {
+    ctx.fillStyle = "rgba(255,255,255,0.4)"
+    ctx.font = "12px sans-serif"
+    ctx.fillText("No data", 12, 20)
+    return
+  }
+
+  const chartPadding = getChartPadding()
+  const left = chartPadding.left
+  const right = chartPadding.right
+  const top = 22
+  const bottom = 28
+  // 両端の点が枠や目盛りの文字に重ならないよう、点を置く範囲を少し内側にする
+  const inset = 8
+  const graphWidth = width - left - right
+  const graphHeight = height - top - bottom
+
+  const xMin = points[0].x
+  const xMax = points[points.length - 1].x
+  const xRange = xMax - xMin
+
+  const { minScore, scoreRange } = getScoreAxis(points.map(p => p.score))
+  const toY = score => height - bottom - ((score - minScore) / scoreRange) * graphHeight
+  // 1 日分しかないときは横方向の真ん中に置く
+  const toX = x => xRange
+    ? left + inset + ((x - xMin) / xRange) * (graphWidth - inset * 2)
+    : left + graphWidth / 2
+
+  // 横線と縦軸の目盛り
+  ctx.strokeStyle = "rgba(255,255,255,0.08)"
+  ctx.lineWidth = 1
+  const gridSteps = 4
+  for (let i = 0; i <= gridSteps; i++) {
+    const value = minScore + (scoreRange / gridSteps) * i
+    const y = toY(value)
+    ctx.beginPath()
+    ctx.moveTo(left, y)
+    ctx.lineTo(width - right, y)
+    ctx.stroke()
+
+    setChartAxisTextStyle(ctx)
+    ctx.fillText(Math.round(value), Math.round(left - 2), Math.round(y))
+  }
+
+  // 横軸の日付
+  ctx.fillStyle = "rgba(255,255,255,0.56)"
+  ctx.font = `600 9px ${chartAxisFontFamily}`
+  ctx.textAlign = "center"
+  ctx.textBaseline = "alphabetic"
+  const tickCount = xRange ? 5 : 1
+  for (let i = 0; i < tickCount; i++) {
+    const ratio = tickCount === 1 ? 0.5 : i / (tickCount - 1)
+    const d = new Date(xMin + xRange * ratio)
+    const tickX = tickCount === 1 ? toX(xMin) : left + inset + (graphWidth - inset * 2) * ratio
+    ctx.fillText(`${d.getMonth() + 1}/${d.getDate()}`, tickX, height - 8)
+  }
+
+  // 点（タグで色分け。タグを選んでいるときは、選んだタグの日だけ色を付ける）
+  points.forEach(point => {
+    let color = SCATTER_NO_TAG_COLOR
+    if (scatterSelectedTags.length === 0) {
+      if (point.tags[0]) color = getScatterTagColor(point.tags[0])
+    } else {
+      const matched = scatterSelectedTags.find(tag => point.tags.includes(tag))
+      if (matched) color = getScatterTagColor(matched)
+    }
+
+    ctx.beginPath()
+    ctx.arc(toX(point.x), toY(point.score), 3.4, 0, Math.PI * 2)
+    ctx.fillStyle = color
+    ctx.fill()
+  })
+}

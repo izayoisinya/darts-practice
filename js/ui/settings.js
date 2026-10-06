@@ -3,7 +3,45 @@ const SETTINGS_KEY = "dartsSettings"
 const DEFAULT_SETTINGS = {
   bullMode: "fat",
   inputMode: "buttons",
-  orientationMode: "auto"
+  orientationMode: "auto",
+  gamePanels: { round: true, stats: true },
+  dataTabs: { analysis: true, day: true, week: true, month: true, year: true }
+}
+
+// 設定画面のチェックボックスと、保存する設定のキーの対応
+const GAME_PANEL_TOGGLES = { round: "gamePanelRound", stats: "gamePanelStats" }
+const DATA_TAB_TOGGLES = {
+  analysis: "tabToggleAnalysis",
+  day: "tabToggleDay",
+  week: "tabToggleWeek",
+  month: "tabToggleMonth",
+  year: "tabToggleYear"
+}
+
+// 保存されていない項目は表示（true）として扱う
+function normalizeToggleSettings(source, keys) {
+  const values = source && typeof source === "object" ? source : {}
+  const result = {}
+  keys.forEach(key => {
+    result[key] = values[key] !== false
+  })
+  return result
+}
+
+function readTogglesFromForm(toggleIds) {
+  const result = {}
+  Object.keys(toggleIds).forEach(key => {
+    const input = document.getElementById(toggleIds[key])
+    result[key] = input ? input.checked : true
+  })
+  return result
+}
+
+function applyTogglesToForm(toggleIds, values) {
+  Object.keys(toggleIds).forEach(key => {
+    const input = document.getElementById(toggleIds[key])
+    if (input) input.checked = values[key] !== false
+  })
 }
 
 function readSettings() {
@@ -32,6 +70,14 @@ function loadSettings() {
   if (orientationSelect) {
     orientationSelect.value = settings.orientationMode
   }
+  applyTogglesToForm(
+    GAME_PANEL_TOGGLES,
+    normalizeToggleSettings(settings.gamePanels, Object.keys(GAME_PANEL_TOGGLES))
+  )
+  applyTogglesToForm(
+    DATA_TAB_TOGGLES,
+    normalizeToggleSettings(settings.dataTabs, Object.keys(DATA_TAB_TOGGLES))
+  )
 }
 
 function saveSettings() {
@@ -40,7 +86,9 @@ function saveSettings() {
   const settings = {
     bullMode: document.getElementById("bullModeSetting").value,
     inputMode: document.getElementById("inputModeSetting")?.value || "buttons",
-    orientationMode: document.getElementById("orientationSetting")?.value || "auto"
+    orientationMode: document.getElementById("orientationSetting")?.value || "auto",
+    gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES),
+    dataTabs: readTogglesFromForm(DATA_TAB_TOGGLES)
   }
 
   writeSettings(settings)
@@ -289,6 +337,12 @@ async function initSettingsPage() {
   if (inputModeSelect) {
     inputModeSelect.addEventListener("change", saveSettings)
   }
+  Object.values(GAME_PANEL_TOGGLES)
+    .concat(Object.values(DATA_TAB_TOGGLES))
+    .forEach(id => {
+      const input = document.getElementById(id)
+      if (input) input.addEventListener("change", saveSettings)
+    })
   if (orientationSelect) {
     orientationSelect.addEventListener("change", saveSettings)
   }

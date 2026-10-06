@@ -398,6 +398,9 @@ function changePage(direction) {
     return
   }
 
+  // Analysis はページ送りなし
+  if (groupedPageMode === "analysis") return
+
   if (groupedPageMode === 'game') {
     // Game ビュー
       const sessions = readSessions()

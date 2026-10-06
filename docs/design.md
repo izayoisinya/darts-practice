@@ -151,6 +151,10 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 - 今のラウンドのタップ位置に何投目かの番号付きの印を付ける（3 投目のあとは次の 1 投目まで直前のラウンドを表示）。直前の 1 投（例 `T20  60`）を左上に少しのあいだ表示する
 - スマートフォン縦向きのときは、ボードを横幅いっぱいに出し、その下に Rounds と Stats を左右に並べる（`body.input-board`。`phone.css`）。Rounds をタップすると、ボードと Stats を畳んで Rounds を画面いっぱいに開く
 
+**表示するエリアの選択**
+
+設定画面の Game Panels で Rounds / Stats をそれぞれ隠せる（Input は常に表示）。`main.js` の `applyGamePanelVisibility()` が `body` に `hide-round-area` / `hide-stats-area` を付け、残ったエリアで画面を分け直す（横 3 列の画面は `lay_core.css`、タブレット縦は `tablet.css`、スマホは縦横・ボード入力ごとに `phone.css`）。隠したエリアは開閉（`round-open` / `iphone-stats-open`）も外す。設定画面から戻ったときも反映されるよう、`refreshLayout()`（回転・`pageshow`・画面が再表示されたとき）でも呼ぶ。2026.4 に develop ブランチで作った機能を、2026.10.6 に今の main へ移植した
+
 **開閉のモーション**
 
 縦・横どちらも `cu_ui.js` の `toggleAreaLayout()` で開閉し、同じ動きにそろえている。
@@ -171,11 +175,14 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 | ビュー | 左（History） | 右（Stats） |
 | --- | --- | --- |
-| Game | 1 ゲームずつのカード（スコア・PPD・ラウンド平均・ブル・トリプル数・ラウンドスコアのグラフ・アワード） | 全体の Stats・Awards、直近 30 ゲームのスコア推移、期間 A/B の比較グラフ、レーティング目安 |
+| Game | 1 ゲームずつのカード（スコア・PPD・ラウンド平均・ブル・トリプル数・ラウンドスコアのグラフ・アワード） | 全体の Stats・Awards、直近 30 ゲームのスコア推移、レーティング目安 |
+| Analysis | （使わない。Stats パネルを 1 列で画面幅いっぱいに表示） | タグ別の散布図（全ゲームのスコアを日付順に点で描き、その日のメモのタグで色分け。タグのボタンで選んだタグの日だけ色付き）、期間 A/B の比較グラフ |
 | Day / Week / Month / Year | 期間ごとのまとめ（平均スコア・平均 PPD・ブル数）、メモボタン | カレンダー（練習した日に印）、タグ集計 |
 
 ![データ表示画面 Day ビュー（タブレット横）](images/data_day_tablet.jpg)
 
+- 下部のタブは設定画面の Data Tabs で Analysis / Day / Week / Month / Year を表示・非表示にできる（Game は常に表示）。隠したタブが選ばれていたら Game に戻す
+- Analysis タブと Data Tabs の設定は、2026.4 に develop ブランチで作った機能を 2026.10.6 に今の main へ移植した。期間 A/B の比較グラフは Game から Analysis へ移した（develop での配置に合わせた）
 - Day のカードを選ぶと、その日のゲーム一覧（詳細ビュー）を表示する。詳細ビューではその日のブル率や、他の日との比較グラフを表示できる
 - **Memo**：日ごとにコメント・タグ・セッティング画像を保存できる。タグは絞り込みや比較に使う
 - **履歴カード**は普段は縮小表示（Game 番号・日時、Score / PPD / Round Avg、ブル数とアワードの要約 1 行）。タップすると全項目（ブル率・トリプル・ラウンドスコアのグラフ・アワード）を表示し、もう一度タップで縮小に戻る。Game ビューと詳細ビューで共通
@@ -193,7 +200,9 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 | GAME | Input Style | カウントアップの入力形式。Buttons（1〜20 と D / T のボタン、値 `buttons`）と Board（ダーツボード、値 `board`）の切り替え。進行中のゲームはそのまま |
 | GAME | Bull Mode | FAT（アウター 50 / インナー 50、値 `fat`）と SEPARATE（アウター 25 / インナー 50、値 `double`）の切り替え。変更すると進行中のゲームはリセットされる |
 | GAME | Rounds | 8 / 10 / 15 を選べるが保存されず、ゲームは 8 ラウンド固定。01・クリケット実装時に調整予定 |
+| GAME | Game Panels | カウントアップ画面に表示するエリア（Rounds / Stats）。Input は常に表示 |
 | DISPLAY | Screen Orientation | 画面の向きの固定（Free / Portrait Lock / Landscape Lock）。ブラウザによっては効かない |
+| DISPLAY | Data Tabs | データ画面の下に表示するタブ（Analysis / Day / Week / Month / Year）。Game は常に表示 |
 | データ保存状況 | — | 保存ゲーム数、保存先（IndexedDB / LocalStorage）、使用容量・上限の概算 |
 | データのバックアップ | 書き出し / 読み込み | ゲームの記録と日別メモを JSON ファイルに書き出す・読み込む（詳細は 6.6） |
 
@@ -324,6 +333,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `registerEvents()` | サイドメニュー、NEXT GAME、スマホでのエリア開閉などのイベントを登録する |
 | `registerServiceWorker()` | Service Worker を登録する |
 | `applyOrientationPreference()` | 設定に従って画面の向きを固定・解除する |
+| `applyGamePanelVisibility()` | 設定の Game Panels に従って、カウントアップ画面の Rounds / Stats を隠す（`body.hide-round-area` / `hide-stats-area`） |
 | `initMenuSummary()` | メイン画面のサマリー（平均スコアなど）を表示する |
 
 #### game/game_core.js
@@ -425,12 +435,15 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 
 | 関数 | 内容 |
 | --- | --- |
-| `changeView(mode)` | Game / Day / Week / Month / Year を切り替える |
+| `changeView(mode)` | Game / Analysis / Day / Week / Month / Year を切り替える |
+| `showViewSections(mode)` | ビューに合わせて Stats パネルの部品（Stats・Awards・スコア推移・Analysis）を出し分ける |
+| `getVisibleViews()` / `ensureViewIsVisible()` / `applyDataViewTabVisibility()` | 設定の Data Tabs に従ってタブを隠す。隠したタブが選ばれていたら Game にする |
+| `drawAnalysisCharts()` / `renderAnalysisScatter()` / `drawScatterChart()` | Analysis タブのタグ別散布図と期間比較グラフを描く。タグの色は使われている数の多い順に割り当てる |
 | `renderView()` | 現在のビューを描画する |
 | `setDataPanel()` / `setupDataPanelSwipe()` | スマホ縦での History / Stats パネル切り替え |
 | `loadStats()` / `addStat()` | 全体の Stats・Awards を表示する |
 | `drawGameScoresChart()` | 直近 30 ゲームのスコア推移グラフを描く |
-| `drawSelectedRangeChart()` | 期間 A / B の比較グラフを描く |
+| `drawSelectedRangeChart()` | 期間 A / B の比較グラフを描く（Analysis タブ） |
 | `drawDetailGroupChart()` | 詳細ビューのグラフ（比較日との重ね表示）を描く |
 | `renderDetailBullRate()` | 詳細ビューのブル率を表示する |
 | `renderRatingReference()` | レーティング目安を表示する |
@@ -555,7 +568,13 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 ### 6.4 設定
 
 ```js
-{ bullMode: "fat" | "double", inputMode: "buttons" | "board", orientationMode: "auto" | "portrait" | "landscape" }
+{
+  bullMode: "fat" | "double",
+  inputMode: "buttons" | "board",
+  orientationMode: "auto" | "portrait" | "landscape",
+  gamePanels: { round: boolean, stats: boolean },                     // false で隠す。ない項目は表示
+  dataTabs: { analysis, day, week, month, year: boolean }             // 同上
+}
 ```
 
 ### 6.5 日別メモ
@@ -668,6 +687,7 @@ graph LR
 | 設定画面の Rounds | 8 / 10 / 15 の選択肢はあるが保存されず、ゲームにも反映されない（8 固定） |
 | スマホ横向きのカウントアップ画面 | ラウンド合計の数字が右端で切れて見える場合がある（iPhone 13 相当の画面で確認） |
 | スマホ横向きのカウントアップ画面の Score Graph | Stats を開いたとき、画面の高さが足りないと横軸ラベル（R1〜R8）が下端で切れる（750×342px の画面で確認。実機では未確認） |
+| develop ブランチの未移植分 | 2026.4.11〜4.29 に develop ブランチで作り、main に入っていない機能のうち、次は未移植：タグ絞り込みを Week / Month / Year でも使えるようにする・複数タグの AND / OR 絞り込み、Input エリアの拡張、タブレット縦・横 2 カラムのレイアウト調整（ボード入力で変わる見込みのため保留）。バックアップとカウントアップのグラフ修正は main で別に作り直し済み |
 | `core.js` の `detectDevice()`（端末判定） | Android は幅 1500px 未満だとスマホ判定になり、iPad と同じ大きさの 10〜11 インチ Android タブレット（例：Galaxy Tab S4 横 1138px）もスマホ用レイアウトになる。iPad は幅に関係なくタブレット判定で、基準がそろっていない。RedMagic Astra（約 9 インチ）は現状のスマホ用レイアウトで不自由なし。**一般公開前に**「画面の短い辺が一定以上ならタブレット」など iPad / Android 共通の基準に見直し、Astra をどちらに寄せるかは実機で見比べて決める |
 
 ## 11. 今後の拡張予定
@@ -744,3 +764,4 @@ graph LR
 | 2026.10.5 | 今後の拡張予定（ゲーム追加）に「プロテストモード」を追記 |
 | 2026.10.5 | カウントアップにボード形式の入力を追加（`board_input.js`）。設定画面の Input Style で Buttons / Board を切り替え。スマホ縦はボードを横幅いっぱいに表示 |
 | 2026.10.6 | PWA の章に GitHub Pages での公開の流れと、公開処理が止まったときの対処を追記 |
+| 2026.10.6 | develop ブランチから移植：カウントアップ画面の Rounds / Stats の表示・非表示（Game Panels）、データ画面のタブの表示・非表示（Data Tabs）、Analysis タブ（タグ別散布図・期間比較グラフ） |

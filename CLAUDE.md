@@ -33,7 +33,7 @@
 index.html      メインメニュー（ゲーム選択 / Data / Settings / Info）
 countup.html    COUNT-UP ゲーム画面（Rounds / Input / Stats の 3 エリア）
 data.html       スコア記録データの表示（Statistics）
-settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、画面向き、ストレージ状況）
+settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、表示エリア・データタブの表示/非表示、画面向き、ストレージ状況）
 news.html       お知らせ
 sw.js           Service Worker（プリキャッシュ）
 manifest.json   PWA マニフェスト
@@ -54,7 +54,7 @@ manifest.json   PWA マニフェスト
 | game/ | board_input.js | ボード形式の入力（ダーツボードの SVG 生成・タップ位置の判定）。設定 `inputMode` が `"board"` のとき `createNumberTable()` から使う |
 | game/ | stats.js | スタッツ・アワード計算。**UI 表示・DOM 操作は含まない**（再利用できる形にする） |
 | data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()` |
-| data/ | data.js | データ画面の統括（ビュー切替、Stats/Awards 表示、グラフ、期間比較） |
+| data/ | data.js | データ画面の統括（ビュー切替、タブの表示/非表示、Stats/Awards 表示、グラフ、Analysis：タグ別散布図・期間比較） |
 | data/ | data_grouped.js | Day/Week/Month/Year のグループビュー、日別メモ・タグ |
 | data/ | data_detail.js | グループ内のゲーム一覧（詳細ビュー）、カレンダー、比較 |
 | data/ | rating.js | PPD から DARTSLIVE / PHOENIX のレーティング目安を算出 |

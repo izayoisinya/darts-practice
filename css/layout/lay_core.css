@@ -124,3 +124,31 @@ body.page-countup .container {
 .stats-area {
   overflow-y: auto;
 }
+
+/* ================================= */
+/* ====== HIDDEN AREAS (SETTING) === */
+/* ================================= */
+
+/*
+  設定画面の Game Panels で Rounds / Stats を隠したときのレイアウト（main.js の applyGamePanelVisibility()）。
+  ここは横 3 列の画面（タブレット横・PC）。タブレット縦は tablet.css、スマホは phone.css で指定する。
+*/
+body.hide-round-area .round-area,
+body.hide-stats-area .stats-area {
+  display: none;
+}
+
+body.page-countup.hide-round-area .container {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas: "input stats";
+}
+
+body.page-countup.hide-stats-area .container {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas: "round input";
+}
+
+body.page-countup.hide-round-area.hide-stats-area .container {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "input";
+}

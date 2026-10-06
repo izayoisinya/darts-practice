@@ -50,6 +50,10 @@ function refreshLayout() {
   
   detectDevice()
   
+  if (typeof applyGamePanelVisibility === "function") {
+    applyGamePanelVisibility()
+  }
+  
   if (typeof createNumberTable === "function") {
     createNumberTable()
   }

@@ -281,3 +281,75 @@ body .number-table.board-mode {
   75% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+
+/* ================================= */
+/* ====== INPUT ONLY (LANDSCAPE) === */
+/* ================================= */
+
+/*
+  横向きで Rounds / Stats を両方隠し、ボード入力にしたとき（設定画面の Game Panels）。
+  入力エリアが横に長くなるので、ボードを左に高さいっぱいで大きく出し、
+  Bull Mode と Bull / In / Miss / 戻る は右の列に縦に並べる。
+*/
+body.landscape.input-board.hide-round-area.hide-stats-area .input-area {
+  display: grid;
+
+  grid-template-columns: minmax(0, 1fr) 240px;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-areas:
+    "title title"
+    "board bull"
+    "board buttons";
+
+  column-gap: 24px;
+  row-gap: 12px;
+}
+
+body.landscape.input-board.hide-round-area.hide-stats-area .bull-setting {
+  margin-bottom: 0;
+}
+
+body.landscape.input-board.hide-round-area.hide-stats-area .input-area h2 {
+  grid-area: title;
+}
+
+body.landscape.input-board.hide-round-area.hide-stats-area .bull-setting {
+  grid-area: bull;
+  align-self: start;
+}
+
+body.landscape.input-board.hide-round-area.hide-stats-area .top-buttons {
+  grid-area: buttons;
+
+  grid-template-columns: 1fr;
+  grid-auto-rows: 64px;
+  align-content: start;
+  gap: 12px;
+}
+
+body.landscape.input-board.hide-round-area.hide-stats-area .top-buttons button {
+  height: auto;
+  font-size: 18px;
+}
+
+body.landscape.input-board.hide-round-area.hide-stats-area .number-table.board-mode {
+  grid-area: board;
+  height: 100%;
+}
+
+/* スマホ横は高さが低いので、右の列とボタンを小さめにする */
+body.phone.landscape.input-board.hide-round-area.hide-stats-area .input-area {
+  grid-template-columns: minmax(0, 1fr) 150px;
+  column-gap: 12px;
+  row-gap: 8px;
+}
+
+body.phone.landscape.input-board.hide-round-area.hide-stats-area .top-buttons {
+  grid-auto-rows: 40px;
+  gap: 8px;
+}
+
+body.phone.landscape.input-board.hide-round-area.hide-stats-area .top-buttons button {
+  font-size: 15px;
+}

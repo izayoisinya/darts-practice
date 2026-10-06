@@ -31,6 +31,7 @@ function initGame(load = true) {
   createNumberTable()
 
   renderRounds()
+  renderHeaderRound()
   updateStats()
   drawScoreChart()
   updateNextGameButton()

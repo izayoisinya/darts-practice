@@ -1,5 +1,6 @@
 function updateUI() {
   renderRounds()
+  renderHeaderRound()
   updateStats()
   drawScoreChart()
   updateNextGameButton()
@@ -69,6 +70,33 @@ ${ renderDart(round[2]) }
     
   })
   
+}
+
+
+// ===============================
+// ===== ヘッダーの今のラウンド ===
+// ===============================
+// 合計スコアの右に、今のラウンドの各ダーツの得点を出す。
+// 3 投目のあとは、次の 1 投目を入れるまで入れ終わったラウンドを表示する
+function getDisplayRoundIndex() {
+
+  if (game.currentDart > 0) return game.currentRound
+  if (game.currentRound > 0) return game.currentRound - 1
+  return 0
+}
+
+function renderHeaderRound() {
+
+  const el = document.getElementById("headerRound")
+  if (!el) return
+
+  const index = Math.min(getDisplayRoundIndex(), TOTAL_ROUNDS - 1)
+  const round = game.rounds[index] || [null, null, null]
+
+  el.innerHTML = `
+    <span class="header-round-label">R${index + 1}</span>
+    ${renderDart(round[0])}${renderDart(round[1])}${renderDart(round[2])}
+  `
 }
 
 

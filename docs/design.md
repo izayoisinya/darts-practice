@@ -143,7 +143,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 **ボード形式の入力**
 
-設定画面の Input Style を Board にすると、1〜20 と D / T のボタンの代わりにダーツボード（SVG）を表示し、刺さった場所をタップして入力する（`board_input.js`）。戻るボタンだけを残し、ボードで入れられる Bull・In（ブル）と Miss のボタンは隠す（`lay_input.css`）。
+設定画面の Input Style を Board にすると、1〜20 と D / T のボタンの代わりにダーツボード（SVG）を表示し、刺さった場所をタップして入力する（`board_input.js`）。ボードで入れられる Bull・In（ブル）と Miss のボタン、Bull Mode の表示は隠す。戻るボタンは設定画面の Board Undo Button で出したときだけ表示する（初期値は隠す。`main.js` が `body.hide-undo-button` を付ける。`lay_input.css`）。
 
 - タップした位置から点数・S/D/T・ブルを求め、ボタン形式と同じ `addDart()` に渡す（点数計算・アワード判定・保存は共通）。ダブルの外（数字の輪や四隅）は Miss。アウターブルは Bull ボタンと同じくブルモードに従う（FAT 50 / SEPARATE 25）
 - 指で押せるよう、ブル・トリプル・ダブルの輪は本物の比率より太く描く（ダブルの外側を 1 として、インブル 0〜0.08、アウターブル〜0.17、内側シングル〜0.52、トリプル〜0.63、外側シングル〜0.89、ダブル〜1。トリプルとダブルは同じ太さ 0.11）
@@ -151,12 +151,12 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 - 今のラウンドのタップ位置に何投目かの番号付きの印を付ける（3 投目のあとは次の 1 投目まで直前のラウンドを表示）。直前の 1 投（例 `T20  60`）を左上に少しのあいだ表示する
 - **2 本指で拡大・移動**：ボードの上で 2 本指を広げる・つまむと、指の間の位置を中心に最大 4 倍まで拡大・縮小し、2 本指を動かすと表示範囲が移動する。SVG の `viewBox`（表示する範囲）を変えて行うので、拡大したまま 1 本指でタップしても、その範囲に合わせて正しい位置を判定する。2 本指の操作の直後（0.35 秒）のタップは入力にしない。拡大中は右上に「全体表示」ボタンを出す。ボードの上では、ブラウザ自体の拡大・スクロールは止めている（`touch-action: none`、iOS の `gesturestart`）。印と線は拡大しても画面上の大きさが変わらないようにしている
 - 拡大を元に戻すタイミングは設定画面の Board Zoom で選ぶ：Keep（全体表示ボタンを押すまで拡大したまま。初期値）/ Reset Each Round（ラウンドが変わったら自動で全体表示に戻す）
-- 横向きで Rounds / Stats を両方隠したとき（Input だけのとき）は、ボードを左に高さいっぱいで大きく出し、Bull Mode と 戻る を右の列に縦に並べる（`lay_input.css`）
+- 横向きで Rounds / Stats を両方隠したとき（Input だけのとき）は、ボードを左に高さいっぱいで大きく出し、戻るボタンを出す設定なら右の列に置く（出さないときはボードを横幅いっぱいに出す）（`lay_input.css`）
 - スマートフォン縦向きのときは、ボードを横幅いっぱいに出し、その下に Rounds と Stats を左右に並べる（`body.input-board`。`phone.css`）。Rounds をタップすると、ボードと Stats を畳んで Rounds を画面いっぱいに開く
 
 **3 本指スワイプで戻る**
 
-入力方式（ボタン / ボード）に関係なく、カウントアップ画面のエリアの上で 3 本指を左にスワイプすると、戻るボタンと同じく最後の 1 投を取り消す（`cu_ui.js` の `setupThreeFingerUndo()`。`main.js` の `registerEvents()` で `.container` に登録）。指は少しずつずれて置かれるので、3 本そろってから全部離すまでの動き（3 本の中心）が左へ 60px 以上・横の動きが縦の 1.5 倍より大きいときだけ戻る。戻ったときは画面中央に「戻る」を少し表示する（確定済みのラウンドで戻れなかったときは出さない）。ボードの上で 2 本指から 3 本指になったときは、拡大の操作をやめて指を置く前の表示に戻す。iPadOS の 3 本指の取り消し操作とぶつかる心配があったが、iPad のホーム画面アプリで 3 本指スワイプをしても OS 側では何も起きないことを確認済み（2026.10.7）
+入力方式（ボタン / ボード）に関係なく、カウントアップ画面のエリアの上で 3 本指を左（設定画面の Undo Swipe で右にもできる）にスワイプすると、戻るボタンと同じく最後の 1 投を取り消す（`cu_ui.js` の `setupThreeFingerUndo()`。`main.js` の `registerEvents()` で `.container` に登録）。指は少しずつずれて置かれるので、3 本そろってから全部離すまでの動き（3 本の中心）が設定した向きへ 60px 以上・横の動きが縦の 1.5 倍より大きいときだけ戻る。戻ったときは画面中央に「戻る」を少し表示する（確定済みのラウンドで戻れなかったときは出さない）。ボードの上で 2 本指から 3 本指になったときは、拡大の操作をやめて指を置く前の表示に戻す。iPadOS の 3 本指の取り消し操作とぶつかる心配があったが、iPad のホーム画面アプリで 3 本指スワイプをしても OS 側では何も起きないことを確認済み（2026.10.7）
 
 **表示するエリアの選択**
 
@@ -207,9 +207,11 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 | GAME | Input Style | カウントアップの入力形式。Buttons（1〜20 と D / T のボタン、値 `buttons`）と Board（ダーツボード、値 `board`）の切り替え。進行中のゲームはそのまま |
 | GAME | Bull Mode | FAT（アウター 50 / インナー 50、値 `fat`）と SEPARATE（アウター 25 / インナー 50、値 `double`）の切り替え。変更すると進行中のゲームはリセットされる |
 | GAME | Board Zoom | ボード入力で 2 本指で拡大したとき、いつ全体表示に戻すか。Keep（値 `manual`。全体表示ボタンで戻す）/ Reset Each Round（値 `round`。ラウンドが変わったら戻す） |
+| GAME | Board Undo Button | ボード入力のときに戻るボタンを表示するか（`boardUndoButton`。初期値は表示しない） |
+| GAME | Undo Swipe | 3 本指スワイプで戻るときの向き。Left（値 `left`。初期値）/ Right（値 `right`） |
 | GAME | Rounds | 8 / 10 / 15 を選べるが保存されず、ゲームは 8 ラウンド固定。01・クリケット実装時に調整予定 |
-| GAME | Game Panels | カウントアップ画面に表示するエリア（Rounds / Stats）。Input は常に表示 |
 | DISPLAY | Screen Orientation | 画面の向きの固定（Free / Portrait Lock / Landscape Lock）。ブラウザによっては効かない |
+| DISPLAY | Game Panels | カウントアップ画面に表示するエリア（Rounds / Stats）。Input は常に表示 |
 | DISPLAY | Data Tabs | データ画面の下に表示するタブ（Analysis / Day / Week / Month / Year）。Game は常に表示 |
 | データ保存状況 | — | 保存ゲーム数、保存先（IndexedDB / LocalStorage）、使用容量・上限の概算 |
 | データのバックアップ | 書き出し / 読み込み | ゲームの記録と日別メモを JSON ファイルに書き出す・読み込む（詳細は 6.6） |
@@ -292,6 +294,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `bullMode` | ブルモード（`"fat"` / `"double"`） |
 | `inputMode` | 入力形式（`"buttons"` / `"board"`） |
 | `boardZoomReset` | ボードの拡大を戻すタイミング（`"manual"` / `"round"`） |
+| `undoSwipeDirection` | 3 本指スワイプで戻る向き（`"left"` / `"right"`） |
 | `lockedRound` | Undo で戻れない確定済みラウンド |
 | `game` | ゲーム状態 `{ rounds, currentRound, currentDart }` |
 
@@ -342,7 +345,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `registerEvents()` | サイドメニュー、NEXT GAME、スマホでのエリア開閉などのイベントを登録する |
 | `registerServiceWorker()` | Service Worker を登録する |
 | `applyOrientationPreference()` | 設定に従って画面の向きを固定・解除する |
-| `applyGamePanelVisibility()` | 設定の Game Panels に従って、カウントアップ画面の Rounds / Stats を隠す（`body.hide-round-area` / `hide-stats-area`） |
+| `applyGamePanelVisibility()` | 設定の Game Panels に従って、カウントアップ画面の Rounds / Stats を隠す（`body.hide-round-area` / `hide-stats-area`）。ボード入力の戻るボタンの表示（`body.hide-undo-button`）もここで切り替える |
 | `initMenuSummary()` | メイン画面のサマリー（平均スコアなど）を表示する |
 
 #### game/game_core.js
@@ -585,6 +588,8 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
   bullMode: "fat" | "double",
   inputMode: "buttons" | "board",
   boardZoomReset: "manual" | "round",                                 // ボードの拡大を戻すタイミング
+  boardUndoButton: boolean,                                           // ボード入力で戻るボタンを出すか（ないときは出さない）
+  undoSwipeDirection: "left" | "right",                               // 3 本指スワイプで戻る向き
   orientationMode: "auto" | "portrait" | "landscape",
   gamePanels: { round: boolean, stats: boolean },                     // false で隠す。ない項目は表示
   dataTabs: { analysis, day, week, month, year: boolean }             // 同上
@@ -783,3 +788,4 @@ graph LR
 | 2026.10.7 | ボード入力を 2 本指で拡大（最大 4 倍）・移動できるようにした。拡大を戻すタイミングを設定画面の Board Zoom で選べる |
 | 2026.10.7 | ボード入力：ダブルの輪をトリプルと同じ太さに細くし、Bull / Miss ボタンを隠した |
 | 2026.10.7 | カウントアップ画面で 3 本指を左にスワイプすると戻る（最後の 1 投を取り消す）ようにした。ボード入力では In ボタンも隠し、戻るだけにした |
+| 2026.10.7 | 3 本指スワイプで戻る向きを設定（Undo Swipe）で選べるようにした。ボード入力では Bull Mode と戻るボタンを隠し、戻るボタンは設定（Board Undo Button）で出せるようにした。設定画面の Game Panels を Display 欄へ移した |

@@ -19,6 +19,7 @@ async function initApp() {
   }
 
   detectDevice()
+  applyGamePanelVisibility()
   applyOrientationPreference()
   refreshLayout()
   initMenuSummary()
@@ -36,6 +37,12 @@ async function initApp() {
   
   window.addEventListener("resize", refreshLayout)
   window.addEventListener("orientationchange", refreshLayout)
+
+  // 設定画面から戻ったとき（ページがキャッシュから表示されたとき）も表示エリアの設定を反映する
+  window.addEventListener("pageshow", refreshLayout)
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") refreshLayout()
+  })
   
 }
 
@@ -46,6 +53,25 @@ function getSavedSettings() {
   } catch {
     return {}
   }
+}
+
+// カウントアップ画面の Rounds / Stats の表示・非表示（設定画面の Game Panels）
+// body に hide-round-area / hide-stats-area を付け、CSS でレイアウトを切り替える
+function applyGamePanelVisibility() {
+  const roundArea = document.querySelector(".round-area")
+  const statsArea = document.querySelector(".stats-area")
+  if (!roundArea || !statsArea) return
+
+  const panels = getSavedSettings().gamePanels || {}
+  const showRound = panels.round !== false
+  const showStats = panels.stats !== false
+
+  document.body.classList.toggle("hide-round-area", !showRound)
+  document.body.classList.toggle("hide-stats-area", !showStats)
+
+  // 隠したエリアを開いた状態のまま残さない
+  if (!showRound) document.body.classList.remove("round-open")
+  if (!showStats) document.body.classList.remove("iphone-stats-open")
 }
 
 function applyOrientationPreference(mode) {

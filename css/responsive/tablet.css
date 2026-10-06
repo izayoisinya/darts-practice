@@ -116,3 +116,28 @@
 
   align-items: center;
 }
+
+/* ===================================================== */
+/* TABLET PORTRAIT - HIDDEN AREAS                        */
+/* ===================================================== */
+
+/* 設定画面の Game Panels で Rounds / Stats を隠したとき（lay_core.css 参照） */
+body.page-countup.tablet.portrait.hide-round-area .container {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 1fr 0.6fr;
+  grid-template-areas:
+    "input"
+    "stats";
+}
+
+body.page-countup.tablet.portrait.hide-stats-area .container {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "round input";
+}
+
+body.page-countup.tablet.portrait.hide-round-area.hide-stats-area .container {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "input";
+}

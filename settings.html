@@ -166,6 +166,36 @@
         color: var(--text-muted);
       }
 
+      .tab-toggle-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .tab-toggle-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #1a202a;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 8px 10px;
+      }
+
+      .tab-toggle-item input {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        accent-color: var(--accent);
+      }
+
+      .setting-group .tab-toggle-item label {
+        flex: 1;
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
       .orientation-status {
         margin-top: 8px;
         font-size: 12px;
@@ -284,6 +314,25 @@
             <option value="15">15</option>
           </select>
         </div>
+
+        <div class="setting-group">
+          <label>Game Panels</label>
+
+          <div class="tab-toggle-grid">
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="gamePanelRound" checked />
+              <label for="gamePanelRound">Rounds</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="gamePanelStats" checked />
+              <label for="gamePanelStats">Stats</label>
+            </div>
+          </div>
+
+          <p class="setting-help">
+            カウントアップ画面に表示するエリアを選べます。Input は常に表示します。
+          </p>
+        </div>
       </section>
 
       <section class="settings-panel">
@@ -302,6 +351,37 @@
             一部端末ではブラウザ仕様上、画面回転ロックが適用されない場合があります。
           </p>
           <p id="orientationStatus" class="orientation-status"></p>
+        </div>
+
+        <div class="setting-group">
+          <label>Data Tabs</label>
+
+          <div class="tab-toggle-grid">
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="tabToggleAnalysis" checked />
+              <label for="tabToggleAnalysis">Analysis</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="tabToggleDay" checked />
+              <label for="tabToggleDay">Day</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="tabToggleWeek" checked />
+              <label for="tabToggleWeek">Week</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="tabToggleMonth" checked />
+              <label for="tabToggleMonth">Month</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="tabToggleYear" checked />
+              <label for="tabToggleYear">Year</label>
+            </div>
+          </div>
+
+          <p class="setting-help">
+            データ画面の下に表示するタブを選べます。Game タブは常に表示します。
+          </p>
         </div>
       </section>
 

@@ -56,6 +56,10 @@ function showGameDetails(dateKey, gamesList) {
   
   const chartContainer = document.getElementById("chartContainer")
   chartContainer.style.display = "block"
+  const gameChartSection = document.getElementById("gameChartSection")
+  const analysisContainer = document.getElementById("analysisContainer")
+  if (gameChartSection) gameChartSection.style.display = "flex"
+  if (analysisContainer) analysisContainer.style.display = "none"
   
   const statsSection = document.getElementById("statsSection")
   statsSection.style.display = "flex"

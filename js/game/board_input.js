@@ -251,6 +251,18 @@ function getTouchDistance(touches) {
 function setupBoardZoomGestures(svg) {
 
   svg.addEventListener("touchstart", event => {
+    // 3 本指（戻る操作。cu_ui.js）になったら拡大はやめ、指を置く前の表示に戻す
+    if (event.touches.length >= 3) {
+      if (boardGesture && boardGesture.start) {
+        boardZoom.scale = boardGesture.start.scale
+        boardZoom.cx = boardGesture.start.cx
+        boardZoom.cy = boardGesture.start.cy
+        updateBoardZoomView()
+      }
+      boardGesture = { start: null, anchor: null }
+      return
+    }
+
     if (event.touches.length !== 2) return
 
     event.preventDefault()
@@ -295,7 +307,7 @@ function setupBoardZoomGestures(svg) {
     if (!boardGesture) return
     if (event.touches.length >= 2) return
 
-    // 2 本指の操作のあと、残った指を離したときのタップは入力にしない
+    // 2 本指・3 本指の操作のあと、残った指を離したときのタップは入力にしない
     boardGesture = null
     boardIgnoreClickUntil = Date.now() + 350
   }

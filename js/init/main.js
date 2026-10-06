@@ -171,6 +171,12 @@ function registerEvents() {
   const roundArea = document.querySelector(".round-area")
   
   const nextBtn = document.getElementById("nextGameBtn")
+
+  // カウントアップ画面：3 本指で左にスワイプして戻る（cu_ui.js）
+  const gameContainer = document.querySelector(".container")
+  if (gameContainer && document.getElementById("roundContainer")) {
+    setupThreeFingerUndo(gameContainer)
+  }
   
   if (nextBtn) {
     nextBtn.addEventListener("click", nextGame)

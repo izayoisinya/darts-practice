@@ -383,12 +383,13 @@ body.phone.landscape.input-board.hide-round-area.hide-stats-area .top-buttons bu
 }
 
 
-/* ボード入力のときは、ボードで入れられる Bull（アウターブル）と Miss のボタンを隠す */
+/* ボード入力のときは、ボードで入れられる Bull・In（ブル）と Miss のボタンを隠し、戻るだけ残す */
 body.input-board .top-buttons button[data-display="Bull"],
+body.input-board .top-buttons button[data-display="InBull"],
 body.input-board .top-buttons button[data-display="Miss"] {
   display: none;
 }
 
 body.input-board .top-buttons {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
 }

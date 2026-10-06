@@ -330,3 +330,81 @@ function toggleAreaLayout(className, onDone) {
     if (onDone) onDone()
   }, AREA_ANIMATION_MS)
 }
+
+
+// ===============================
+// ===== 3 本指スワイプで戻る =====
+// ===============================
+// 3 本指で左にスワイプすると、最後の 1 投を取り消す（戻るボタンと同じ）。
+// 指は少しずつずれて置かれるので、3 本そろったところから離すまでの動きで判定する
+const THREE_FINGER_SWIPE_MIN = 60
+
+let threeFingerSwipe = null
+
+function getTouchesCentroid(touches) {
+
+  let x = 0
+  let y = 0
+
+  for (let i = 0; i < touches.length; i++) {
+    x += touches[i].clientX
+    y += touches[i].clientY
+  }
+
+  return { x: x / touches.length, y: y / touches.length }
+}
+
+function setupThreeFingerUndo(target) {
+
+  target.addEventListener("touchstart", event => {
+    if (event.touches.length !== 3) return
+
+    const point = getTouchesCentroid(event.touches)
+    threeFingerSwipe = { start: point, last: point }
+  }, { passive: true })
+
+  target.addEventListener("touchmove", event => {
+    if (!threeFingerSwipe || event.touches.length < 3) return
+
+    // 3 本指のあいだは、画面のスクロールなどを止める
+    event.preventDefault()
+    threeFingerSwipe.last = getTouchesCentroid(event.touches)
+  }, { passive: false })
+
+  const finish = event => {
+    if (!threeFingerSwipe || event.touches.length > 0) return
+
+    const dx = threeFingerSwipe.last.x - threeFingerSwipe.start.x
+    const dy = threeFingerSwipe.last.y - threeFingerSwipe.start.y
+    threeFingerSwipe = null
+
+    if (dx <= -THREE_FINGER_SWIPE_MIN && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      const before = `${game.currentRound}-${game.currentDart}`
+      undoDart()
+      // 確定済みのラウンドなどで戻れなかったときは表示しない
+      if (`${game.currentRound}-${game.currentDart}` !== before) showUndoToast()
+    }
+  }
+
+  target.addEventListener("touchend", finish)
+  target.addEventListener("touchcancel", () => {
+    threeFingerSwipe = null
+  })
+}
+
+// 戻ったことが分かるよう、画面の中央に「戻る」を少しのあいだ出す
+function showUndoToast() {
+
+  let toast = document.querySelector(".undo-toast")
+
+  if (!toast) {
+    toast = document.createElement("div")
+    toast.className = "undo-toast"
+    toast.textContent = "戻る"
+    document.body.appendChild(toast)
+  }
+
+  toast.classList.remove("show")
+  void toast.offsetWidth
+  toast.classList.add("show")
+}

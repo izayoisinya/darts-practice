@@ -16,7 +16,7 @@ const BOARD_RADIUS = {
   outerBull: 0.17,
   innerSingle: 0.52,
   triple: 0.63,
-  outerSingle: 0.84,
+  outerSingle: 0.89,
   double: 1
 }
 

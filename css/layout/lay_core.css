@@ -152,3 +152,41 @@ body.page-countup.hide-round-area.hide-stats-area .container {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas: "input";
 }
+
+
+/* ================================= */
+/* ====== UNDO TOAST =============== */
+/* ================================= */
+
+/* 3 本指スワイプで戻ったとき、画面の中央に少しのあいだ出す（cu_ui.js の showUndoToast()） */
+.undo-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 50;
+
+  padding: 10px 22px;
+
+  border: 1px solid rgb(var(--accent-rgb) / 0.5);
+  border-radius: 999px;
+  background: rgba(17, 21, 28, .92);
+
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 700;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.undo-toast.show {
+  animation: undoToast 0.9s ease forwards;
+}
+
+@keyframes undoToast {
+  0% { opacity: 0; transform: translate(-50%, -40%); }
+  15% { opacity: 1; transform: translate(-50%, -50%); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%); }
+}

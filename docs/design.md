@@ -648,6 +648,7 @@ graph LR
 - `sw.js` は、HTML はネットワーク優先、それ以外（JS・CSS・画像）はキャッシュ優先で配信する
 - **JS / CSS を変更したら `sw.js` のキャッシュ名（`darts-app-vN` / `darts-runtime-vN`）の番号を上げる。** 上げないと、利用者の端末に古いファイルが残り続ける
 - 新しいファイルを追加したら `PRECACHE_URLS` にも追加する
+- 公開：GitHub Pages（main ブランチの / root）で `https://izayoisinya.github.io/darts-practice/` に公開している。main が更新されるたびに GitHub Actions の「pages build and deployment」が走って反映される（通常 1〜2 分）。GitHub Actions の障害で公開処理が順番待ちのまま止まり、取り消しもできなくなることがある。そのときは main に新しいコミットを入れると、公開処理が新しく走り直す
 - アイコン：Android などは `manifest.json` の `icon-192.png`（192px）/ `icon-512.png`（512px）、iPad・iPhone は各 HTML の `apple-touch-icon.png`（180px）を使う。iOS は画像をそのまま角丸で切り抜くため、Android 用より D を小さく（高さ約 50%）している
 - **iOS 26 のホーム画面アプリの高さの不具合（WebKit Bug 301108）**：`viewport-fit=cover` ＋ `black-translucent` で起動すると、`height: 100%` / `100dvh` / `100svh` / `innerHeight` が上の安全領域の分（iPad で約 32px）だけ短くなり、画面の下に隙間ができる。画面に固定（`position: fixed`）した要素の下端もその分上にずれる。対策として、`@media (display-mode: standalone)` かつ iOS（`@supports (-webkit-touch-callout: none)`。iOS の Safari だけが対応）のときだけ以下を指定している。Android のホーム画面アプリでは起動直後の `100lvh` が実際の画面より高くなり、画面を回転するまで下が見切れるため、Android には適用しない
   - `html { height: 100lvh }`（`base.css`。`100lvh` だけが正しい高さを返す）
@@ -742,3 +743,4 @@ graph LR
 | 2026.10.3 | Android のホーム画面アプリで、起動直後に全画面の下が見切れる（回転すると直る）不具合を修正。iOS 26 向けの高さ対策（`100lvh` など）を iOS だけに適用するようにした |
 | 2026.10.5 | 今後の拡張予定（ゲーム追加）に「プロテストモード」を追記 |
 | 2026.10.5 | カウントアップにボード形式の入力を追加（`board_input.js`）。設定画面の Input Style で Buttons / Board を切り替え。スマホ縦はボードを横幅いっぱいに表示 |
+| 2026.10.6 | PWA の章に GitHub Pages での公開の流れと、公開処理が止まったときの対処を追記 |

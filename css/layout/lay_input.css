@@ -381,3 +381,14 @@ body.phone.landscape.input-board.hide-round-area.hide-stats-area .top-buttons bu
 .board-zoom-reset[hidden] {
   display: none;
 }
+
+
+/* ボード入力のときは、ボードで入れられる Bull（アウターブル）と Miss のボタンを隠す */
+body.input-board .top-buttons button[data-display="Bull"],
+body.input-board .top-buttons button[data-display="Miss"] {
+  display: none;
+}
+
+body.input-board .top-buttons {
+  grid-template-columns: repeat(2, 1fr);
+}

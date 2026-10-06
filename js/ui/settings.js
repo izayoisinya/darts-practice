@@ -3,6 +3,7 @@ const SETTINGS_KEY = "dartsSettings"
 const DEFAULT_SETTINGS = {
   bullMode: "fat",
   inputMode: "buttons",
+  boardZoomReset: "manual",
   orientationMode: "auto",
   gamePanels: { round: true, stats: true },
   dataTabs: { analysis: true, day: true, week: true, month: true, year: true }
@@ -66,6 +67,10 @@ function loadSettings() {
   if (inputModeSelect) {
     inputModeSelect.value = settings.inputMode === "board" ? "board" : "buttons"
   }
+  const boardZoomSelect = document.getElementById("boardZoomResetSetting")
+  if (boardZoomSelect) {
+    boardZoomSelect.value = settings.boardZoomReset === "round" ? "round" : "manual"
+  }
   const orientationSelect = document.getElementById("orientationSetting")
   if (orientationSelect) {
     orientationSelect.value = settings.orientationMode
@@ -86,6 +91,7 @@ function saveSettings() {
   const settings = {
     bullMode: document.getElementById("bullModeSetting").value,
     inputMode: document.getElementById("inputModeSetting")?.value || "buttons",
+    boardZoomReset: document.getElementById("boardZoomResetSetting")?.value || "manual",
     orientationMode: document.getElementById("orientationSetting")?.value || "auto",
     gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES),
     dataTabs: readTogglesFromForm(DATA_TAB_TOGGLES)
@@ -336,6 +342,10 @@ async function initSettingsPage() {
   }
   if (inputModeSelect) {
     inputModeSelect.addEventListener("change", saveSettings)
+  }
+  const boardZoomSelect = document.getElementById("boardZoomResetSetting")
+  if (boardZoomSelect) {
+    boardZoomSelect.addEventListener("change", saveSettings)
   }
   Object.values(GAME_PANEL_TOGGLES)
     .concat(Object.values(DATA_TAB_TOGGLES))

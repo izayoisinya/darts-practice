@@ -149,6 +149,8 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 - 指で押せるよう、ブル・トリプル・ダブルの輪は本物の比率より太く描く（ダブルの外側を 1 として、インブル 0〜0.08、アウターブル〜0.17、内側シングル〜0.52、トリプル〜0.63、外側シングル〜0.84、ダブル〜1）
 - ボードは入力エリアの縦横の短い方に合わせ、左右は中央・上下は上詰めで描く（`preserveAspectRatio="xMidYMin meet"`。タップ位置の計算もこれに合わせる）
 - 今のラウンドのタップ位置に何投目かの番号付きの印を付ける（3 投目のあとは次の 1 投目まで直前のラウンドを表示）。直前の 1 投（例 `T20  60`）を左上に少しのあいだ表示する
+- **2 本指で拡大・移動**：ボードの上で 2 本指を広げる・つまむと、指の間の位置を中心に最大 4 倍まで拡大・縮小し、2 本指を動かすと表示範囲が移動する。SVG の `viewBox`（表示する範囲）を変えて行うので、拡大したまま 1 本指でタップしても、その範囲に合わせて正しい位置を判定する。2 本指の操作の直後（0.35 秒）のタップは入力にしない。拡大中は右上に「全体表示」ボタンを出す。ボードの上では、ブラウザ自体の拡大・スクロールは止めている（`touch-action: none`、iOS の `gesturestart`）。印と線は拡大しても画面上の大きさが変わらないようにしている
+- 拡大を元に戻すタイミングは設定画面の Board Zoom で選ぶ：Keep（全体表示ボタンを押すまで拡大したまま。初期値）/ Reset Each Round（ラウンドが変わったら自動で全体表示に戻す）
 - 横向きで Rounds / Stats を両方隠したとき（Input だけのとき）は、ボードを左に高さいっぱいで大きく出し、Bull Mode と Bull / In / Miss / 戻る を右の列に縦に並べる（`lay_input.css`）
 - スマートフォン縦向きのときは、ボードを横幅いっぱいに出し、その下に Rounds と Stats を左右に並べる（`body.input-board`。`phone.css`）。Rounds をタップすると、ボードと Stats を畳んで Rounds を画面いっぱいに開く
 
@@ -200,6 +202,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 | --- | --- | --- |
 | GAME | Input Style | カウントアップの入力形式。Buttons（1〜20 と D / T のボタン、値 `buttons`）と Board（ダーツボード、値 `board`）の切り替え。進行中のゲームはそのまま |
 | GAME | Bull Mode | FAT（アウター 50 / インナー 50、値 `fat`）と SEPARATE（アウター 25 / インナー 50、値 `double`）の切り替え。変更すると進行中のゲームはリセットされる |
+| GAME | Board Zoom | ボード入力で 2 本指で拡大したとき、いつ全体表示に戻すか。Keep（値 `manual`。全体表示ボタンで戻す）/ Reset Each Round（値 `round`。ラウンドが変わったら戻す） |
 | GAME | Rounds | 8 / 10 / 15 を選べるが保存されず、ゲームは 8 ラウンド固定。01・クリケット実装時に調整予定 |
 | GAME | Game Panels | カウントアップ画面に表示するエリア（Rounds / Stats）。Input は常に表示 |
 | DISPLAY | Screen Orientation | 画面の向きの固定（Free / Portrait Lock / Landscape Lock）。ブラウザによっては効かない |
@@ -284,6 +287,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `MAX_SCORE` | 1 ラウンドの最大スコア（180） |
 | `bullMode` | ブルモード（`"fat"` / `"double"`） |
 | `inputMode` | 入力形式（`"buttons"` / `"board"`） |
+| `boardZoomReset` | ボードの拡大を戻すタイミング（`"manual"` / `"round"`） |
 | `lockedRound` | Undo で戻れない確定済みラウンド |
 | `game` | ゲーム状態 `{ rounds, currentRound, currentDart }` |
 
@@ -384,7 +388,10 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `createBoardSvgHtml()` | ボードの SVG を作る |
 | `renderBoardInput(container)` | 入力エリアにボードを表示し、タップを受け付ける |
 | `handleBoardTap(event)` | タップ位置を判定して `addDart()` に渡す |
-| `renderBoardMarkers()` | 今のラウンドのタップ位置に印を付ける（`updateUI()` から呼ぶ） |
+| `renderBoardMarkers()` | 今のラウンドのタップ位置に印を付ける（`updateUI()` から呼ぶ）。拡大の倍率に合わせて印の大きさを変え、設定が Reset Each Round ならラウンドが変わったときに全体表示に戻す |
+| `boardZoom` / `setupBoardZoomGestures()` | 拡大の状態（倍率・表示の中心）と、2 本指の拡大・移動の操作 |
+| `toBoardPosition()` | 画面上の位置を、今表示している範囲に合わせてボード上の位置に変換する |
+| `resetBoardZoom()` | 全体表示に戻す |
 
 #### game/stats.js
 
@@ -572,6 +579,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 {
   bullMode: "fat" | "double",
   inputMode: "buttons" | "board",
+  boardZoomReset: "manual" | "round",                                 // ボードの拡大を戻すタイミング
   orientationMode: "auto" | "portrait" | "landscape",
   gamePanels: { round: boolean, stats: boolean },                     // false で隠す。ない項目は表示
   dataTabs: { analysis, day, week, month, year: boolean }             // 同上
@@ -767,3 +775,4 @@ graph LR
 | 2026.10.6 | PWA の章に GitHub Pages での公開の流れと、公開処理が止まったときの対処を追記 |
 | 2026.10.6 | develop ブランチから移植：カウントアップ画面の Rounds / Stats の表示・非表示（Game Panels）、データ画面のタブの表示・非表示（Data Tabs）、Analysis タブ（タグ別散布図・期間比較グラフ） |
 | 2026.10.7 | ボード入力：横向きで Input だけを表示するときのレイアウトを整え（ボードを大きく、ボタンを右の列に）、トリプルの輪を少し細くした |
+| 2026.10.7 | ボード入力を 2 本指で拡大（最大 4 倍）・移動できるようにした。拡大を戻すタイミングを設定画面の Board Zoom で選べる |

@@ -14,8 +14,8 @@ const BOARD_NUMBERS = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 
 const BOARD_RADIUS = {
   innerBull: 0.08,
   outerBull: 0.17,
-  innerSingle: 0.5,
-  triple: 0.64,
+  innerSingle: 0.52,
+  triple: 0.63,
   outerSingle: 0.84,
   double: 1
 }

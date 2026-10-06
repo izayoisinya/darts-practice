@@ -137,3 +137,32 @@
   color: #666;
   cursor: not-allowed;
 }
+
+/* ================================= */
+/* ====== CURRENT ROUND DARTS ====== */
+/* ================================= */
+
+/* 合計スコアの右に出す、今のラウンドの各ダーツの得点（cu_ui.js の renderHeaderRound()） */
+.header-round {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-left: 24px;
+}
+
+.header-round-label {
+  min-width: 40px;
+
+  color: var(--text-muted);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.header-round .dart {
+  width: 76px;
+  height: 52px;
+
+  font-size: 26px;
+  font-weight: 700;
+}

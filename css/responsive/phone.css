@@ -512,3 +512,73 @@ body.page-countup.phone.portrait.input-board.hide-round-area.hide-stats-area .co
   grid-template-rows: minmax(0, 1fr);
   grid-template-areas: "input";
 }
+
+
+/* ===================================================== */
+/* PHONE - HEADER ROUND                                  */
+/* ===================================================== */
+
+/* ヘッダーの今のラウンドの得点（lay_header.css）をスマホでは小さくする */
+.phone .header-round {
+  gap: 4px;
+  margin-left: 0;
+}
+
+.phone .header-round-label {
+  min-width: 0;
+  font-size: 13px;
+}
+
+.phone .header-round .dart {
+  width: 36px;
+  height: 30px;
+
+  font-size: 15px;
+}
+
+.phone.landscape .header-round {
+  margin-left: 12px;
+  gap: 6px;
+}
+
+.phone.landscape .header-round .dart {
+  width: 48px;
+  height: 32px;
+}
+
+/* スマホ縦は幅が狭いので、ラウンド番号は出さず、得点・NEXT GAME も少し詰める */
+.phone.portrait .score-block {
+  flex: none;
+}
+
+.phone.portrait .score-panel {
+  gap: 8px;
+}
+
+.phone.portrait .header-round-label {
+  display: none;
+}
+
+.phone.portrait .score-value {
+  font-size: 36px;
+}
+
+.phone.portrait .header-round .dart {
+  width: 30px;
+  font-size: 14px;
+}
+
+.phone.portrait .next-button {
+  flex: none;
+  width: 92px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* もっと狭い画面（幅 360px 未満）では、ヘッダーのラウンドの得点は出さない */
+@media (max-width: 359px) {
+  .phone.portrait .header-round {
+    display: none;
+  }
+}

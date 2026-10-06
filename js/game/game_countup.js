@@ -10,6 +10,7 @@ function initGame(load = true) {
   }
 
   inputMode = settings.inputMode === "board" ? "board" : "buttons"
+  boardZoomReset = settings.boardZoomReset === "round" ? "round" : "manual"
 
   if (load && loadGame()) {
     // セーブデータ読み込み成功

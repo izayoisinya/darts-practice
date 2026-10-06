@@ -26,6 +26,18 @@ const BOARD_VIEW = 1.2
 
 const SVG_NS = "http://www.w3.org/2000/svg"
 
+// 2 本指で拡大できる最大の倍率
+const BOARD_MAX_ZOOM = 4
+
+// 拡大の状態（scale 倍率、cx・cy 表示の中心。ボードの位置で表す）。
+// 画面の回転などでボードを作り直しても拡大したままにするため、ここに持つ
+const boardZoom = { scale: 1, cx: 0, cy: 0 }
+let boardZoomRound = 0
+
+// 2 本指の操作の途中経過と、操作の直後のタップを入力にしないための時刻
+let boardGesture = null
+let boardIgnoreClickUntil = 0
+
 
 // ===============================
 // ===== 当たり判定 ===============
@@ -124,13 +136,11 @@ function createBoardSvgHtml() {
     numbers += `<text class="board-number" x="${p.x}" y="${p.y}">${num}</text>`
   })
 
-  const v = BOARD_VIEW
-
   return `
-    <svg class="board-svg" viewBox="${-v} ${-v} ${v * 2} ${v * 2}"
+    <svg class="board-svg" viewBox="${getBoardViewBox()}"
       preserveAspectRatio="xMidYMin meet"
       xmlns="${SVG_NS}" role="img" aria-label="ダーツボード">
-      <circle class="board-back" r="${v}"/>
+      <circle class="board-back" r="${BOARD_VIEW}"/>
       ${segments}
       <circle class="seg seg-outer-bull" r="${BOARD_RADIUS.outerBull}"/>
       <circle class="seg seg-inner-bull" r="${BOARD_RADIUS.innerBull}"/>
@@ -150,32 +160,167 @@ function renderBoardInput(container) {
     <div class="board-wrap">
       ${createBoardSvgHtml()}
       <span class="board-last" aria-live="polite"></span>
+      <button type="button" class="board-zoom-reset" hidden>全体表示</button>
     </div>
   `
 
   const svg = container.querySelector(".board-svg")
   svg.addEventListener("click", handleBoardTap)
+  setupBoardZoomGestures(svg)
 
-  renderBoardMarkers()
+  container.querySelector(".board-zoom-reset").addEventListener("click", resetBoardZoom)
+
+  updateBoardZoomView()
 }
 
 // 画面上のタップ位置を、ボードの位置（ダブルの外側 = 1）に変換する。
-// SVG は縦横の短い方に合わせ、左右は中央・上下は上詰めで描かれる（preserveAspectRatio="xMidYMin meet"）
-function toBoardPosition(svg, clientX, clientY) {
+// SVG は縦横の短い方に合わせ、左右は中央・上下は上詰めで描かれる（preserveAspectRatio="xMidYMin meet"）。
+// 拡大中は、今表示している範囲（viewBox）に合わせて計算する
+function toBoardPosition(svg, clientX, clientY, zoom = boardZoom) {
 
   const rect = svg.getBoundingClientRect()
   const size = Math.min(rect.width, rect.height)
   if (!size) return null
 
-  const unit = size / (BOARD_VIEW * 2)
+  const viewSize = BOARD_VIEW * 2 / zoom.scale
+  const unit = size / viewSize
+  const left = rect.left + (rect.width - size) / 2
 
   return {
-    x: (clientX - (rect.left + rect.width / 2)) / unit,
-    y: (clientY - (rect.top + size / 2)) / unit
+    x: zoom.cx - viewSize / 2 + (clientX - left) / unit,
+    y: zoom.cy - viewSize / 2 + (clientY - rect.top) / unit
+  }
+}
+
+
+// ===============================
+// ===== 拡大・移動（2 本指） =====
+// ===============================
+function getBoardViewBox() {
+
+  const size = BOARD_VIEW * 2 / boardZoom.scale
+  const x = boardZoom.cx - size / 2
+  const y = boardZoom.cy - size / 2
+
+  return [x, y, size, size].map(n => +n.toFixed(4)).join(" ")
+}
+
+// 表示範囲がボードの外（-BOARD_VIEW〜BOARD_VIEW）へはみ出さないようにする
+function clampBoardZoom() {
+
+  boardZoom.scale = Math.max(1, Math.min(BOARD_MAX_ZOOM, boardZoom.scale))
+
+  const limit = BOARD_VIEW - BOARD_VIEW / boardZoom.scale
+  boardZoom.cx = Math.max(-limit, Math.min(limit, boardZoom.cx))
+  boardZoom.cy = Math.max(-limit, Math.min(limit, boardZoom.cy))
+}
+
+function updateBoardZoomView() {
+
+  const svg = document.querySelector(".board-svg")
+  if (svg) svg.setAttribute("viewBox", getBoardViewBox())
+
+  const resetBtn = document.querySelector(".board-zoom-reset")
+  if (resetBtn) resetBtn.hidden = boardZoom.scale <= 1.01
+
+  // 印は拡大しても同じ大きさに見えるよう描き直す
+  renderBoardMarkers()
+}
+
+function resetBoardZoom() {
+
+  boardZoom.scale = 1
+  boardZoom.cx = 0
+  boardZoom.cy = 0
+  updateBoardZoomView()
+}
+
+function getTouchCenter(touches) {
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2
+  }
+}
+
+function getTouchDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX
+  const dy = touches[0].clientY - touches[1].clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+function setupBoardZoomGestures(svg) {
+
+  svg.addEventListener("touchstart", event => {
+    if (event.touches.length !== 2) return
+
+    event.preventDefault()
+
+    const start = { scale: boardZoom.scale, cx: boardZoom.cx, cy: boardZoom.cy }
+    const center = getTouchCenter(event.touches)
+
+    boardGesture = {
+      start,
+      distance: getTouchDistance(event.touches) || 1,
+      // 指の間にあるボードの位置。拡大・移動してもこの位置が指の間に来るようにする
+      anchor: toBoardPosition(svg, center.x, center.y, start)
+    }
+  }, { passive: false })
+
+  svg.addEventListener("touchmove", event => {
+    if (!boardGesture || event.touches.length !== 2) return
+
+    event.preventDefault()
+
+    const rect = svg.getBoundingClientRect()
+    const size = Math.min(rect.width, rect.height)
+    if (!size || !boardGesture.anchor) return
+
+    const center = getTouchCenter(event.touches)
+    const ratio = getTouchDistance(event.touches) / boardGesture.distance
+
+    boardZoom.scale = Math.max(1, Math.min(BOARD_MAX_ZOOM, boardGesture.start.scale * ratio))
+
+    const viewSize = BOARD_VIEW * 2 / boardZoom.scale
+    const unit = size / viewSize
+    const left = rect.left + (rect.width - size) / 2
+
+    boardZoom.cx = boardGesture.anchor.x - (center.x - left) / unit + viewSize / 2
+    boardZoom.cy = boardGesture.anchor.y - (center.y - rect.top) / unit + viewSize / 2
+
+    clampBoardZoom()
+    updateBoardZoomView()
+  }, { passive: false })
+
+  const endGesture = event => {
+    if (!boardGesture) return
+    if (event.touches.length >= 2) return
+
+    // 2 本指の操作のあと、残った指を離したときのタップは入力にしない
+    boardGesture = null
+    boardIgnoreClickUntil = Date.now() + 350
+  }
+
+  svg.addEventListener("touchend", endGesture)
+  svg.addEventListener("touchcancel", endGesture)
+
+  // iPad / iPhone の Safari で、ボードの上の 2 本指操作で画面全体が拡大されないようにする
+  svg.addEventListener("gesturestart", event => event.preventDefault())
+}
+
+// 設定が「ラウンドごとに戻す」のとき、ラウンドが変わったら全体表示に戻す
+function autoResetBoardZoom() {
+
+  if (boardZoomRound === game.currentRound) return
+  boardZoomRound = game.currentRound
+
+  if (boardZoomReset === "round" && boardZoom.scale > 1) {
+    resetBoardZoom()
   }
 }
 
 function handleBoardTap(event) {
+
+  if (boardGesture || Date.now() < boardIgnoreClickUntil) return
 
   const pos = toBoardPosition(event.currentTarget, event.clientX, event.clientY)
   if (!pos) return
@@ -218,7 +363,12 @@ function renderBoardMarkers() {
   const layer = document.querySelector(".board-markers")
   if (!layer) return
 
+  autoResetBoardZoom()
+
   const limit = BOARD_VIEW - 0.04
+  // 拡大しても画面上の大きさが変わらないよう、倍率で割る
+  const radius = +(0.045 / boardZoom.scale).toFixed(4)
+  const fontSize = +(0.06 / boardZoom.scale).toFixed(4)
 
   // ボタンで入れた矢には位置がないので印は付けない（番号は何投目かのまま）
   layer.innerHTML = getMarkerRound()
@@ -227,8 +377,8 @@ function renderBoardMarkers() {
       const x = Math.max(-limit, Math.min(limit, dart.boardTap.x))
       const y = Math.max(-limit, Math.min(limit, dart.boardTap.y))
       return `<g class="board-marker">` +
-        `<circle cx="${x}" cy="${y}" r="0.045"/>` +
-        `<text x="${x}" y="${y}">${i + 1}</text>` +
+        `<circle cx="${x}" cy="${y}" r="${radius}"/>` +
+        `<text x="${x}" y="${y}" style="font-size:${fontSize}px">${i + 1}</text>` +
         `</g>`
     })
     .join("")

@@ -185,7 +185,8 @@ body .number-table.board-mode {
   width: 100%;
   height: 100%;
 
-  touch-action: manipulation;
+  /* 2 本指の拡大・移動はボード側で行う（board_input.js）。ブラウザの拡大・スクロールは止める */
+  touch-action: none;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
@@ -197,9 +198,11 @@ body .number-table.board-mode {
   fill: #0b0e13;
 }
 
+/* 線は拡大しても太くならないよう、画面上の太さで指定する */
 .board-svg .seg {
   stroke: rgba(255, 255, 255, .14);
-  stroke-width: .006;
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
 }
 
 .seg-single.seg-a { fill: #1c212b; }
@@ -212,7 +215,7 @@ body .number-table.board-mode {
 .seg-double.seg-b { fill: #2f6fb3; }
 
 .board-svg .seg-outer-bull { fill: #b8404c; }
-.board-svg .seg-inner-bull { fill: #12161d; stroke: var(--accent); stroke-width: .012; }
+.board-svg .seg-inner-bull { fill: #12161d; stroke: var(--accent); stroke-width: 2.5px; }
 
 /* 押したところが分かるよう、触れている間だけ明るくする */
 .board-svg .seg:active {
@@ -238,13 +241,14 @@ body .number-table.board-mode {
 .board-marker circle {
   fill: var(--accent);
   stroke: #0b0e13;
-  stroke-width: .012;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
 }
 
+/* 文字の大きさは拡大の倍率に合わせて board_input.js で指定する */
 .board-marker text {
   fill: #0b0e13;
 
-  font-size: .06px;
   font-weight: 700;
 
   text-anchor: middle;
@@ -352,4 +356,28 @@ body.phone.landscape.input-board.hide-round-area.hide-stats-area .top-buttons {
 
 body.phone.landscape.input-board.hide-round-area.hide-stats-area .top-buttons button {
   font-size: 15px;
+}
+
+
+/* 拡大中だけ出す「全体表示」ボタン（ボードの右上） */
+.board-zoom-reset {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  padding: 6px 12px;
+
+  border: 1px solid rgb(var(--accent-rgb) / 0.5);
+  border-radius: 999px;
+  background: rgba(17, 21, 28, .9);
+
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.board-zoom-reset[hidden] {
+  display: none;
 }

@@ -19,6 +19,9 @@ let bullMode = "fat"
 // 入力形式（"buttons" ボタン / "board" ダーツボード）
 let inputMode = "buttons"
 
+// ボード入力で拡大したとき、いつ全体表示に戻すか（"manual" 全体表示ボタンまで / "round" ラウンドが変わったら）
+let boardZoomReset = "manual"
+
 // Undoロック
 let lockedRound = -1
 

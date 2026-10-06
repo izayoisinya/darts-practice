@@ -4,6 +4,8 @@ const DEFAULT_SETTINGS = {
   bullMode: "fat",
   inputMode: "buttons",
   boardZoomReset: "manual",
+  boardUndoButton: false,
+  undoSwipeDirection: "left",
   orientationMode: "auto",
   gamePanels: { round: true, stats: true },
   dataTabs: { analysis: true, day: true, week: true, month: true, year: true }
@@ -71,6 +73,14 @@ function loadSettings() {
   if (boardZoomSelect) {
     boardZoomSelect.value = settings.boardZoomReset === "round" ? "round" : "manual"
   }
+  const boardUndoInput = document.getElementById("boardUndoButtonSetting")
+  if (boardUndoInput) {
+    boardUndoInput.checked = settings.boardUndoButton === true
+  }
+  const undoSwipeSelect = document.getElementById("undoSwipeSetting")
+  if (undoSwipeSelect) {
+    undoSwipeSelect.value = settings.undoSwipeDirection === "right" ? "right" : "left"
+  }
   const orientationSelect = document.getElementById("orientationSetting")
   if (orientationSelect) {
     orientationSelect.value = settings.orientationMode
@@ -92,6 +102,8 @@ function saveSettings() {
     bullMode: document.getElementById("bullModeSetting").value,
     inputMode: document.getElementById("inputModeSetting")?.value || "buttons",
     boardZoomReset: document.getElementById("boardZoomResetSetting")?.value || "manual",
+    boardUndoButton: !!document.getElementById("boardUndoButtonSetting")?.checked,
+    undoSwipeDirection: document.getElementById("undoSwipeSetting")?.value || "left",
     orientationMode: document.getElementById("orientationSetting")?.value || "auto",
     gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES),
     dataTabs: readTogglesFromForm(DATA_TAB_TOGGLES)
@@ -343,10 +355,10 @@ async function initSettingsPage() {
   if (inputModeSelect) {
     inputModeSelect.addEventListener("change", saveSettings)
   }
-  const boardZoomSelect = document.getElementById("boardZoomResetSetting")
-  if (boardZoomSelect) {
-    boardZoomSelect.addEventListener("change", saveSettings)
-  }
+  ["boardZoomResetSetting", "boardUndoButtonSetting", "undoSwipeSetting"].forEach(id => {
+    const input = document.getElementById(id)
+    if (input) input.addEventListener("change", saveSettings)
+  })
   Object.values(GAME_PANEL_TOGGLES)
     .concat(Object.values(DATA_TAB_TOGGLES))
     .forEach(id => {

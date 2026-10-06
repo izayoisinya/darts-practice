@@ -22,6 +22,9 @@ let inputMode = "buttons"
 // ボード入力で拡大したとき、いつ全体表示に戻すか（"manual" 全体表示ボタンまで / "round" ラウンドが変わったら）
 let boardZoomReset = "manual"
 
+// 3 本指スワイプで戻るときの向き（"left" / "right"）
+let undoSwipeDirection = "left"
+
 // Undoロック
 let lockedRound = -1
 

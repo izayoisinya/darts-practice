@@ -335,7 +335,7 @@ function toggleAreaLayout(className, onDone) {
 // ===============================
 // ===== 3 本指スワイプで戻る =====
 // ===============================
-// 3 本指で左にスワイプすると、最後の 1 投を取り消す（戻るボタンと同じ）。
+// 3 本指で左（設定で右にもできる）にスワイプすると、最後の 1 投を取り消す（戻るボタンと同じ）。
 // 指は少しずつずれて置かれるので、3 本そろったところから離すまでの動きで判定する
 const THREE_FINGER_SWIPE_MIN = 60
 
@@ -378,7 +378,10 @@ function setupThreeFingerUndo(target) {
     const dy = threeFingerSwipe.last.y - threeFingerSwipe.start.y
     threeFingerSwipe = null
 
-    if (dx <= -THREE_FINGER_SWIPE_MIN && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    // 設定した向き（undoSwipeDirection）へ動いたときだけ戻る
+    const moved = undoSwipeDirection === "right" ? dx : -dx
+
+    if (moved >= THREE_FINGER_SWIPE_MIN && Math.abs(dx) > Math.abs(dy) * 1.5) {
       const before = `${game.currentRound}-${game.currentDart}`
       undoDart()
       // 確定済みのラウンドなどで戻れなかったときは表示しない

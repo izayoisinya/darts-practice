@@ -204,7 +204,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 | 区分 | 項目 | 内容 |
 | --- | --- | --- |
-| GAME | Input Style | カウントアップの入力形式。Buttons（1〜20 と D / T のボタン、値 `buttons`）と Board（ダーツボード、値 `board`）の切り替え。進行中のゲームはそのまま |
+| GAME | Input Style | カウントアップの入力形式。Board（ダーツボード、値 `board`。初期値）と Buttons（1〜20 と D / T のボタン、値 `buttons`）の切り替え。進行中のゲームはそのまま |
 | GAME | Bull Mode | FAT（アウター 50 / インナー 50、値 `fat`）と SEPARATE（アウター 25 / インナー 50、値 `double`）の切り替え。変更すると進行中のゲームはリセットされる |
 | GAME | Board Zoom | ボード入力で 2 本指で拡大したとき、いつ全体表示に戻すか。Keep（値 `manual`。全体表示ボタンで戻す）/ Reset Each Round（値 `round`。ラウンドが変わったら戻す） |
 | GAME | Board Undo Button | ボード入力のときに戻るボタンを表示するか（`boardUndoButton`。初期値は表示しない） |
@@ -292,7 +292,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `TOTAL_ROUNDS` | ラウンド数（8） |
 | `MAX_SCORE` | 1 ラウンドの最大スコア（180） |
 | `bullMode` | ブルモード（`"fat"` / `"double"`） |
-| `inputMode` | 入力形式（`"buttons"` / `"board"`） |
+| `inputMode` | 入力形式（`"board"`〔初期値〕 / `"buttons"`） |
 | `boardZoomReset` | ボードの拡大を戻すタイミング（`"manual"` / `"round"`） |
 | `undoSwipeDirection` | 3 本指スワイプで戻る向き（`"left"` / `"right"`） |
 | `lockedRound` | Undo で戻れない確定済みラウンド |
@@ -617,7 +617,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 ```js
 {
   bullMode: "fat" | "double",
-  inputMode: "buttons" | "board",
+  inputMode: "board" | "buttons",                                     // 保存されていなければ "board"
   boardZoomReset: "manual" | "round",                                 // ボードの拡大を戻すタイミング
   boardUndoButton: boolean,                                           // ボード入力で戻るボタンを出すか（ないときは出さない）
   undoSwipeDirection: "left" | "right",                               // 3 本指スワイプで戻る向き
@@ -824,3 +824,4 @@ graph LR
 | 2026.10.7 | ヘッダーのラウンドの得点をヘッダーの真ん中に固定し、合計スコアと同じ光る数字のデザインにした |
 | 2026.10.7 | ゲーム履歴に 1 投ごとの記録（刺さった場所と、ボード入力なら本物のボードの比率での位置）を保存するようにした。バックアップのファイル形式を 2 に上げた |
 | 2026.10.7 | データ画面の Analysis タブにヒートマップ（刺さった位置の分布と、よく刺さった場所の割合）を追加（`heatmap.js`） |
+| 2026.10.7 | 入力形式の初期値をボードに変更（設定画面で Buttons を選んで保存していれば今までどおり） |

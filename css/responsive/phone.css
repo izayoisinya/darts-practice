@@ -19,7 +19,7 @@
   
   gap: 8px;
   
-  padding: 5px 40px 0 5px;
+  padding: 5px var(--gutter-right) 0 var(--gutter-left);
 }
 
 
@@ -37,8 +37,9 @@
 
 /* ===== Rounds ===== */
 
+/* 横向きの iPhone は Rounds の列が狭いので、3 投のマスを列の幅に合わせて縮め、右のマスや合計が切れないようにする */
 .phone.landscape .round {
-  grid-template-columns: 50px max-content auto;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
 
   column-gap: 8px;
   row-gap: 4px;
@@ -46,9 +47,14 @@
 
 .phone.landscape .round-darts {
   gap: 4px;
+  min-width: 0;
 }
 
 .phone.landscape .dart {
+  flex: 1 1 0;
+  width: auto;
+  max-width: 50px;
+  min-width: 0;
   padding: 4px 0;
 }
 
@@ -196,7 +202,7 @@
   
   gap: 12px;
   
-  padding: 5px 25px 10px 20px;
+  padding: 5px var(--gutter-right) 10px var(--gutter-left);
 }
 
 

@@ -6,12 +6,12 @@ main {
   height: calc(100dvh - 80px); /* header分引く */
   overflow: hidden;
   max-width: auto;
-  padding: 10px 40px 0 20px;
+  padding: 10px var(--gutter-right) 0 var(--gutter-left);
 }
 
 .header {
   height: calc(var(--header-height) + var(--safe-top) + 20px);
-  padding: var(--safe-top) 25px 0 20px;
+  padding: var(--safe-top) var(--gutter-right) 0 var(--gutter-left);
   
   margin-bottom: 1px;
   
@@ -30,7 +30,7 @@ main {
 @media (min-width: 768px) and (max-width: 1366px) {
   .tablet .header {
     height: calc(var(--safe-top) + 52px);
-    padding: var(--safe-top) 12px 0 10px;
+    padding: var(--safe-top) var(--gutter-right) 0 var(--gutter-left);
   }
 
   .tablet .header h1 {
@@ -1489,7 +1489,7 @@ body.page-data main.data-container {
   /* 高さはボタンに合わせる。下の余白は通常の余白（10px）とホームバーの分の大きい方だけ */
   height: auto;
   
-  padding: 10px 20px max(10px, env(safe-area-inset-bottom));
+  padding: 10px var(--gutter-right) max(10px, env(safe-area-inset-bottom)) var(--gutter-left);
   gap: 20px;
   
   /* 固定位置 */
@@ -1732,12 +1732,11 @@ body.page-data main.data-container {
 
 .phone.landscape {
   --data-footer-spacer: calc(98px + env(safe-area-inset-bottom));
-  --phone-menu-edge-space: 20px;
 }
 
 .phone.landscape .header {
   height: calc(var(--safe-top) + 42px);
-  padding: var(--safe-top) calc(6px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 4px;
+  padding: var(--safe-top) var(--gutter-right) 0 var(--gutter-left);
 }
 
 .phone.landscape .header h1 {
@@ -1747,12 +1746,12 @@ body.page-data main.data-container {
 }
 
 .phone.landscape main.data-container {
-  padding: 2px calc(6px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 4px;
+  padding: 2px var(--gutter-right) 0 var(--gutter-left);
 }
 
 .phone.landscape .footer-bar {
   height: calc(48px + env(safe-area-inset-bottom));
-  padding: 4px calc(6px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) 4px;
+  padding: 4px var(--gutter-right) calc(4px + env(safe-area-inset-bottom)) var(--gutter-left);
   gap: 8px;
 }
 
@@ -1866,12 +1865,11 @@ body.phone.landscape.data-detail-view .session-card-body {
 
 .phone.portrait {
   --data-footer-spacer: calc(150px + env(safe-area-inset-bottom));
-  --phone-menu-edge-space: 20px;
 }
 
 .phone.portrait .header {
   height: calc(var(--safe-top) + 52px);
-  padding: var(--safe-top) calc(8px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 12px;
+  padding: var(--safe-top) var(--gutter-right) 0 var(--gutter-left);
 }
 
 .phone.portrait .header h1 {
@@ -1882,7 +1880,7 @@ body.phone.landscape.data-detail-view .session-card-body {
 
 .phone.portrait main.data-container {
   grid-template-columns: 1fr;
-  padding: 8px calc(10px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 10px;
+  padding: 8px var(--gutter-right) 0 var(--gutter-left);
 }
 
 .phone.portrait .data-panel-top {
@@ -1922,7 +1920,7 @@ body.phone.landscape.data-detail-view .session-card-body {
 .phone.portrait .footer-bar {
   flex-direction: column;
   height: auto;
-  padding: 8px calc(10px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) 10px;
+  padding: 8px var(--gutter-right) calc(8px + env(safe-area-inset-bottom)) var(--gutter-left);
   gap: 6px;
   align-items: stretch;
 }

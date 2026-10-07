@@ -64,7 +64,8 @@
   top: 0;
   right: 0;
   
-  width: 20px;
+  /* 画面の余白（base.css の --gutter。スマホは 12px）より細くして、中身のボタンに重ならないようにする */
+  width: 10px;
   height: 100dvh;
   
   background: transparent;

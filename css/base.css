@@ -24,6 +24,22 @@
   }
 }
 
+/*
+  画面の左右の余白（ゲーム・データ・設定・お知らせの各画面で共通）。左右は同じ幅にし、
+  横向きの iPhone の丸い角・切り欠きの分（安全領域）はそれぞれの側に足す。
+  サイドメニューを開く右端の帯（lay_menu.css の .menu-edge）は余白より細くしてあるので、右だけ広げる必要はない。
+  --gutter を端末ごとに変えたときに左右の値も計算し直されるよう、body に書く
+*/
+body {
+  --gutter: 20px;
+  --gutter-left: calc(var(--gutter) + env(safe-area-inset-left, 0px));
+  --gutter-right: calc(var(--gutter) + env(safe-area-inset-right, 0px));
+}
+
+body.phone {
+  --gutter: 12px;
+}
+
 /* 横スクロールでの「戻る・進む」（Chrome / Android など）を止める。端からのスワイプは main.js の setupEdgeSwipeGuard() */
 html,
 body {

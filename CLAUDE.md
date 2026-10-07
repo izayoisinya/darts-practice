@@ -25,6 +25,7 @@
 - 主な利用環境：iPad Pro 11inch の**横画面**
 - 一般公開時はスマホ利用が多い想定なので、スマホ縦・横でも崩れないこと
 - テスト端末に iPhone 7 / iPhone XR など古い iOS Safari も含む。新しすぎる JS/CSS 機能は避ける
+- 画面の左右の余白は `base.css` の `--gutter-left` / `--gutter-right` を使い、左右同じにする（左右の安全領域もこれに含まれる）
 - 画面上部の安全領域は `env(safe-area-inset-top)` を直接使わず `base.css` の `--safe-top` を使う（iOS のホーム画面アプリでは上端のぼかしの分だけ余分に下げている）
 - 端末判定は `core.js` の `detectDevice()` が `body` に `phone` / `tablet` / `desktop` と `portrait` / `landscape` クラスを付与し、`css/responsive/*.css` がそれを見て切り替える（メディアクエリより body クラスが基本）
 

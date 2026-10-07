@@ -43,7 +43,7 @@ body {
 
   margin-top: var(--safe-top);
 
-  padding: 5px 25px 10px 20px;
+  padding: 5px var(--gutter-right) 10px var(--gutter-left);
 }
 
 
@@ -70,7 +70,7 @@ body.page-countup .header {
   flex: none;
 
   height: auto;
-  padding: calc(8px + var(--safe-top)) 25px 8px 20px;
+  padding: calc(8px + var(--safe-top)) var(--gutter-right) 8px var(--gutter-left);
   margin-bottom: 0;
 }
 

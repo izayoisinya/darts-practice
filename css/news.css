@@ -20,7 +20,7 @@ body.page-info .header {
   display: flex;
   align-items: center;
 
-  padding: calc(var(--safe-top) + 12px) 24px 12px 20px;
+  padding: calc(var(--safe-top) + 12px) var(--gutter-right) 12px var(--gutter-left);
 
   background: var(--bg-panel);
   border-bottom: 1px solid var(--border-main);
@@ -47,9 +47,9 @@ body.page-info .header h1 {
 
   padding:
     18px
-    max(36px, calc((100% - var(--info-max-width)) / 2))
+    max(var(--gutter-right), calc((100% - var(--info-max-width)) / 2))
     calc(20px + env(safe-area-inset-bottom))
-    max(16px, calc((100% - var(--info-max-width)) / 2));
+    max(var(--gutter-left), calc((100% - var(--info-max-width)) / 2));
 }
 
 .info-panel {

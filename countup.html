@@ -92,8 +92,14 @@
 
         <!-- このゲームのヒートマップ（ボードの横が空いているときだけ出す。cu_ui.js の renderGameHeatmap()） -->
         <div id="gameHeatmap" class="game-heatmap" hidden>
-          <div class="game-heatmap-title">This Game</div>
-          <canvas id="gameHeatmapCanvas"></canvas>
+          <div class="game-heatmap-title">
+            <span>This Game</span>
+            <span id="gameHeatmapCount" class="game-heatmap-count"></span>
+          </div>
+          <div class="game-radar">
+            <canvas id="gameHeatmapCanvas"></canvas>
+            <div class="game-radar-sweep"></div>
+          </div>
         </div>
       </section>
 

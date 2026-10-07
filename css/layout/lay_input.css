@@ -464,13 +464,69 @@ body.landscape.input-board .stats-area {
 }
 
 .game-heatmap-title {
-  color: rgb(var(--accent-rgb) / 0.7);
-  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+
+  color: rgb(var(--accent-rgb) / 0.75);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
+  text-shadow: 0 0 6px rgb(var(--accent-rgb) / 0.5);
+}
+
+.game-heatmap-count {
+  color: rgb(var(--accent-rgb) / 0.5);
+  letter-spacing: 1px;
+}
+
+/* レーダーの画面（描画は heatmap.js の paintRadarHeatmap()）。外側にうっすら光を出す */
+.game-radar {
+  position: relative;
+
+  width: var(--radar-size, 200px);
+  height: var(--radar-size, 200px);
+
+  border-radius: 50%;
+  box-shadow:
+    0 0 18px rgb(var(--accent-rgb) / 0.18),
+    inset 0 0 24px rgb(var(--accent-rgb) / 0.12);
 }
 
 .game-heatmap canvas {
   display: block;
+}
+
+/* 回る走査線（扇形のグラデーションを 4 秒で 1 周させる） */
+.game-radar-sweep {
+  position: absolute;
+  top: 1.7%;
+  right: 1.7%;
+  bottom: 1.7%;
+  left: 1.7%;
+
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgb(var(--accent-rgb) / 0) 0deg,
+    rgb(var(--accent-rgb) / 0) 280deg,
+    rgb(var(--accent-rgb) / 0.08) 330deg,
+    rgb(var(--accent-rgb) / 0.32) 359deg,
+    rgb(var(--accent-rgb) / 0) 360deg
+  );
+
+  animation: radar-sweep 4s linear infinite;
+}
+
+@keyframes radar-sweep {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-radar-sweep {
+    animation: none;
+    opacity: 0;
+  }
 }

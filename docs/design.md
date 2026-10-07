@@ -126,7 +126,7 @@ GitHub 上のリポジトリ（`izayoisinya/darts-practice`）を iPad 及びタ
 | --- | --- |
 | ヘッダー | 合計スコア、ヘッダーの真ん中に今のラウンド（R1〜R8）の各ダーツの得点（合計スコアと同じ光る数字。色はトリプル＝青・ダブル＝赤・インブル＝金・それ以外は緑、ミスと未入力は薄く。3 投目のあとは次の 1 投目まで入れ終わったラウンド。幅 360px 未満のスマホ縦では出さない。入れた数字をタップするとその 1 投を消し、後ろの投を前に詰める。確定済みのラウンドは消せない）、NEXT GAME ボタン（8 ラウンド終了で押せる） |
 | Rounds | 各ラウンド（R1〜R8）の 1 投ごとの得点とラウンド合計 |
-| Input | ブルモード表示、Bull / In（インナーブル）/ Miss / 戻る、1〜20 と D（ダブル）・T（トリプル）の入力ボタン。設定で Board にすると、入力ボタンの代わりにダーツボードを表示する（下記）。横向きでボードの左に幅 120px 以上の空きがあるとき（Rounds / Stats を隠したときなど）は、左下にこのゲームのヒートマップ（「This Game」。ボード入力で入れた投の位置、今のラウンドの投は白い点）を出す |
+| Input | ブルモード表示、Bull / In（インナーブル）/ Miss / 戻る、1〜20 と D（ダブル）・T（トリプル）の入力ボタン。設定で Board にすると、入力ボタンの代わりにダーツボードを表示する（下記）。横向きでボードの左に幅 120px 以上の空きがあるとき（Rounds / Stats を隠したときなど）は、左下にこのゲームのヒートマップ（「This Game」と投数。レーダー風の画面に、ボード入力で入れた投の位置を光る点で出す。古い投ほど薄く、今のラウンドの投は白く光る点と輪。走査線が 4 秒で 1 周する）を出す |
 | Stats | PPD・投げた本数・平均ラウンドスコア・最高ラウンドスコア、ブル数とブル率、インナーブル数と率、獲得アワード、ラウンドスコアのグラフ |
 
 **画面の縦方向の割り付け**
@@ -386,7 +386,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `updateUI()` | 画面全体を更新し、ゲーム状態を保存する |
 | `renderDart()` | 1 投分の表示を作る（ブル・ダブル・トリプル・ミスで色分け） |
 | `renderRounds()` | ラウンド一覧を表示する |
-| `renderGameHeatmap()` / `getGameHeatmapSize()` | Input エリアの左下に、このゲームのヒートマップを描く。ボードの左の空き幅（最大 300px、高さの半分まで）が 120px 未満なら出さない。`updateUI()` と `createNumberTable()`（向き・大きさが変わったとき）から呼ぶ |
+| `renderGameHeatmap()` / `getGameHeatmapSize()` / `getAccentRgb()` | Input エリアの左下に、このゲームのヒートマップ（レーダー風。`paintRadarHeatmap()`）を描く。ボードの左の空き幅（最大 300px、高さの半分まで）が 120px 未満なら出さない。`updateUI()` と `createNumberTable()`（向き・大きさが変わったとき）から呼ぶ |
 | `renderHeaderRound()` / `getDisplayRoundIndex()` | ヘッダーの真ん中に、今のラウンドの各ダーツの得点を表示する。数字のタップで `deleteDart()` を呼ぶ |
 | `getDartClass()` | 1 投の種類（ミス・ブル・トリプル・ダブル）に合わせた色分けのクラス。Rounds とヘッダーで共通 |
 | `createNumberTable()` / `createNumberRow()` | 1〜20 と D / T の入力ボタンを生成する |
@@ -492,6 +492,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `renderAnalysisHeatmap()` | 期間で絞った記録を集計し、ヒートマップと「よく刺さった場所」を表示する（`drawAnalysisCharts()` から呼ぶ） |
 | `collectHeatmapData(sessions)` | 位置のある投の位置の一覧、刺さった場所ごとの本数、投数・ゲーム数を集める |
 | `drawHeatmap(points)` / `paintHeatmap(ctx, width, height, points, highlight)` / `drawHeatmapBoard()` | ボードの図（本物の比率）を描き、その上に色を重ね、1 投ずつの位置を小さな点で描く（`highlight` の位置は白い縁取りの点） |
+| `paintRadarHeatmap(ctx, width, height, points, highlight, rgb)` | ゲーム画面用のレーダー風の描画。暗い緑の円に、ボードの輪・区画の線・十字線・外周の目盛り・数字を描き、刺さった位置をぼかした光（`lighter` で重ねる）で表す。回る走査線は CSS の `.game-radar-sweep`（`conic-gradient` を回転。動きを減らす設定では止める） |
 | `createHeatLayer()` / `getHeatmapPalette()` | 1 投ずつぼかした円を足し合わせ（`lighter`）、いちばん多い場所を最大にした相対値で 青→水色→緑→黄→赤 に色付けした画像を作る |
 
 - 位置があるのはボード入力で入れた投だけ。「よく刺さった場所」はボタン入力の投も含めて数える
@@ -846,3 +847,4 @@ graph LR
 | 2026.10.7 | ヘッダーの今のラウンドの数字をタップすると、その 1 投を消せるようにした（`deleteDart()`）。Android で 3 本指のジェスチャーを OS 側で使いたい場合の代わり |
 | 2026.10.7 | 各画面の左右の余白を `--gutter-left` / `--gutter-right` にそろえた（右だけ広かったのをやめ、横向きの iPhone では左右の安全領域も空ける）。iPhone 横の Rounds で 3 投目のマスと合計が切れていたのを直した。Android ではサイドメニューを開くスワイプを右端 96px 以内から始められるようにした |
 | 2026.10.7 | ゲーム画面で、ボードの左に空きがあるとき（横向きで Input だけのときなど）左下にこのゲームのヒートマップを出すようにした（`renderGameHeatmap()`。`heatmap.js` の描画を `paintHeatmap()` に分けて共用） |
+| 2026.10.7 | ゲーム画面のこのゲームのヒートマップをレーダー風のデザインにした（`paintRadarHeatmap()`、回る走査線） |

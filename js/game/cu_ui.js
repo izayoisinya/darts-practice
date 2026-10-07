@@ -422,7 +422,7 @@ function toggleAreaLayout(className, onDone) {
 // ===============================
 // 3 本指で左（設定で右にもできる）にスワイプすると、最後の 1 投を取り消す（戻るボタンと同じ）。
 // 指は少しずつずれて置かれるので、3 本そろったところから離すまでの動きで判定する
-const THREE_FINGER_SWIPE_MIN = 60
+const THREE_FINGER_SWIPE_MIN = 50
 
 let threeFingerSwipe = null
 
@@ -441,12 +441,14 @@ function getTouchesCentroid(touches) {
 
 function setupThreeFingerUndo(target) {
 
+  // 指は 1 本ずつ少しずれて置かれるので、3 本そろった時点から測る。
+  // 画面のどこで始めても効くよう、ページ全体で先に受け取る（capture）
   target.addEventListener("touchstart", event => {
-    if (event.touches.length !== 3) return
+    if (event.touches.length < 3) return
 
     const point = getTouchesCentroid(event.touches)
     threeFingerSwipe = { start: point, last: point }
-  }, { passive: true })
+  }, { passive: true, capture: true })
 
   target.addEventListener("touchmove", event => {
     if (!threeFingerSwipe || event.touches.length < 3) return
@@ -454,10 +456,10 @@ function setupThreeFingerUndo(target) {
     // 3 本指のあいだは、画面のスクロールなどを止める
     event.preventDefault()
     threeFingerSwipe.last = getTouchesCentroid(event.touches)
-  }, { passive: false })
+  }, { passive: false, capture: true })
 
-  const finish = event => {
-    if (!threeFingerSwipe || event.touches.length > 0) return
+  const finish = () => {
+    if (!threeFingerSwipe) return
 
     const dx = threeFingerSwipe.last.x - threeFingerSwipe.start.x
     const dy = threeFingerSwipe.last.y - threeFingerSwipe.start.y
@@ -474,10 +476,14 @@ function setupThreeFingerUndo(target) {
     }
   }
 
-  target.addEventListener("touchend", finish)
-  target.addEventListener("touchcancel", () => {
-    threeFingerSwipe = null
-  })
+  // 全部の指を離したときに判定する
+  target.addEventListener("touchend", event => {
+    if (event.touches.length === 0) finish()
+  }, { capture: true })
+
+  // Android では、3 本指の操作の途中で OS やブラウザがタッチを打ち切る（touchcancel）ことがあるので、
+  // そこまでの動きで判定する
+  target.addEventListener("touchcancel", finish, { capture: true })
 }
 
 // 戻ったことが分かるよう、画面の中央に「戻る」を少しのあいだ出す

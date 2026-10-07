@@ -2532,6 +2532,8 @@ body.data-01 #zeroOneView {
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* 右端の数字がスクロールバーに隠れないよう少し空ける */
+  padding-right: 6px;
   padding-bottom: calc(16px + env(safe-area-inset-bottom));
 }
 
@@ -2695,4 +2697,63 @@ body.data-01.portrait .z1-history {
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.z1-section {
+  margin-top: 14px;
+}
+
+.z1-note {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.z1-rating {
+  margin: 8px 0 0;
+}
+
+/* 上がりナンバーの割合 */
+.z1-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.z1-bar-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 52px 32px;
+  align-items: center;
+  gap: 8px;
+
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.z1-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.z1-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, rgb(var(--accent-rgb) / 0.5), var(--accent));
+}
+
+.z1-bar-rate {
+  color: var(--accent);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.z1-bar-count {
+  color: #64748b;
+  font-size: 11px;
+  text-align: right;
 }

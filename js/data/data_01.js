@@ -142,6 +142,7 @@ function renderZeroOneData() {
         <select id="z1ConfigSelect" aria-label="01 の設定">${options}</select>
       </div>
       ${renderZeroOneSummary(list)}
+      ${renderZeroOneRating(list)}
       <section class="z1-section">
         <h3 class="data-section-title">Darts to Finish（Last ${DATA_01_CHART_GAMES} Games）</h3>
         <canvas id="z1Chart"></canvas>
@@ -150,6 +151,7 @@ function renderZeroOneData() {
           <span><i class="z1-dot fail"></i>上がれなかった</span>
         </div>
       </section>
+      ${renderZeroOneFinishNumbers(list)}
     </div>
     <div class="z1-history">
       <h3 class="data-section-title">History</h3>
@@ -318,4 +320,134 @@ function drawZeroOneChart(list) {
   ctx.fillText("old", left, height - 6)
   ctx.textAlign = "right"
   ctx.fillText("new", width - right, height - 6)
+}
+
+
+// ===============================
+// ===== 上がりナンバー ===========
+// ===============================
+// 上がったゲームの最後の 1 投（刺さった場所）を数える
+function getZeroOneFinishHit(session) {
+  const darts = Array.isArray(session.darts) ? session.darts : []
+  for (let i = darts.length - 1; i >= 0; i--) {
+    if (darts[i]) return darts[i].hit
+  }
+  return null
+}
+
+function formatZeroOneHit(hit) {
+  if (hit === "OB") return "Bull"
+  if (hit === "IB") return "In-Bull"
+  if (hit === "MISS") return "Miss"
+  return hit
+}
+
+function renderZeroOneFinishNumbers(list) {
+
+  const counts = {}
+  let total = 0
+  list.forEach(session => {
+    if (!session.zeroOne.finished) return
+    const hit = getZeroOneFinishHit(session)
+    if (!hit) return
+    counts[hit] = (counts[hit] || 0) + 1
+    total++
+  })
+
+  if (!total) {
+    return `
+      <section class="z1-section">
+        <h3 class="data-section-title">Finish Numbers</h3>
+        <p class="z1-note">上がったゲームがまだありません。</p>
+      </section>
+    `
+  }
+
+  const hits = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 10)
+  const max = counts[hits[0]]
+
+  return `
+    <section class="z1-section">
+      <h3 class="data-section-title">Finish Numbers（${total} 回）</h3>
+      <div class="z1-bars">
+        ${hits.map(hit => `
+          <div class="z1-bar-row">
+            <span class="z1-bar-name">${formatZeroOneHit(hit)}</span>
+            <span class="z1-bar"><span style="width:${(counts[hit] / max * 100).toFixed(1)}%"></span></span>
+            <span class="z1-bar-rate">${(counts[hit] / total * 100).toFixed(1)}%</span>
+            <span class="z1-bar-count">${counts[hit]}</span>
+          </div>
+        `).join("")}
+      </div>
+    </section>
+  `
+}
+
+
+// ===============================
+// ===== レーティングの目安 =======
+// ===============================
+// 01 のスタッツは「最初の点数の 80% を減らすまで」の 1 ラウンドあたりの平均点（80% スタッツ）で見るのが一般的なので、
+// 1 ゲームごとに 80% に届いたラウンドまでの平均を出し、直近 30 ゲームの平均を rating.js の換算表で Rt の目安にする。
+// 実際のレーティングはクリケットの成績や各社の計算方法でも変わるので、あくまで 01 だけから見たざっくりした目安
+const DATA_01_RATING_GAMES = 30
+
+function getZeroOneStats80(session) {
+
+  const z = session.zeroOne
+  const scores = Array.isArray(session.roundScores) ? session.roundScores : []
+  const darts = Array.isArray(session.darts) ? session.darts : []
+  const goal = z.start * 0.8
+
+  let sum = 0
+  let rounds = 0
+  for (let i = 0; i < scores.length; i++) {
+    // 投げていないラウンド（上がったあと・記録がない）は数えない
+    const thrown = darts.slice(i * 3, i * 3 + 3).some(dart => dart)
+    if (!thrown && darts.length) break
+    sum += Number(scores[i]) || 0
+    rounds++
+    if (sum >= goal) break
+  }
+
+  return rounds ? sum / rounds : null
+}
+
+function renderZeroOneRating(list) {
+
+  const stats = list
+    .slice(-DATA_01_RATING_GAMES)
+    .map(getZeroOneStats80)
+    .filter(value => value !== null)
+
+  if (!stats.length || typeof calcDartsLiveRT !== "function") return ""
+
+  const ppr = stats.reduce((a, b) => a + b, 0) / stats.length
+  const ppd = ppr / 3
+  const rt = calcDartsLiveRT(ppd)
+  const phx = calcPhoenixRating(ppd)
+
+  return `
+    <section class="z1-section">
+      <h3 class="data-section-title">Rating（目安）</h3>
+      <div class="z1-tiles z1-rating">
+        <div class="z1-tile">
+          <span class="z1-tile-label">80% STATS</span>
+          <span class="z1-tile-value">${ppr.toFixed(1)}</span>
+          <span class="z1-tile-sub">PPR（PPD ${ppd.toFixed(2)}）</span>
+        </div>
+        <div class="z1-tile">
+          <span class="z1-tile-label">DARTSLIVE</span>
+          <span class="z1-tile-value">Rt.${rt}</span>
+          <span class="z1-tile-sub">01 のみ</span>
+        </div>
+        <div class="z1-tile">
+          <span class="z1-tile-label">PHOENIX</span>
+          <span class="z1-tile-value">Rt.${phx}</span>
+          <span class="z1-tile-sub">01 のみ</span>
+        </div>
+      </div>
+      <p class="z1-note">直近 ${stats.length} ゲームの 80% スタッツ（最初の点数の 80% を減らすまでの 1 ラウンドの平均点）から出した、01 だけで見たざっくりした目安です。実際のレーティングはクリケットの成績などでも変わります。</p>
+    </section>
+  `
 }

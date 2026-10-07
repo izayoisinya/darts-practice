@@ -572,7 +572,12 @@ function renderGameHeatmap(size) {
   const highlight = current.filter(dart => dart && dart.pos).map(dart => dart.pos)
 
   const count = document.getElementById("gameHeatmapCount")
-  if (count) count.textContent = `${points.length} HIT${points.length === 1 ? "" : "S"}`
+  if (count) {
+    // カウントアップ（ブルを狙う）のときは、中心からの距離（半分の投が入る円の半径）も出す
+    const range = GAME_TYPE === "countup" && typeof getRangeStats === "function" ? getRangeStats(points) : null
+    count.textContent = `${points.length} HIT${points.length === 1 ? "" : "S"}` +
+      (range ? ` · R50 ${range.r50Mm.toFixed(0)}mm` : "")
+  }
 
   paintRadarHeatmap(ctx, size, size, points, highlight, getAccentRgb())
 }

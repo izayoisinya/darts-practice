@@ -102,7 +102,11 @@
           <div class="heatmap-board">
             <canvas id="heatmapCanvas"></canvas>
           </div>
-          <div id="heatmapHits" class="heatmap-hits"></div>
+          <div class="heatmap-side">
+            <!-- 中心からの距離（heatmap.js の renderHeatmapRange()） -->
+            <div id="heatmapRange" class="heatmap-range"></div>
+            <div id="heatmapHits" class="heatmap-hits"></div>
+          </div>
         </div>
 
         <h3>Tag Scatter</h3>

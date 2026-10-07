@@ -23,6 +23,9 @@ const HEATMAP_PERIODS = { all: 0, d30: 30, d7: 7, d1: 1 }
 // 数字の字体（データ画面のグラフと同じ。ゲーム画面では data.js を読み込まないのでここで持つ）
 const HEATMAP_FONT = "'Segoe UI', 'Noto Sans JP', sans-serif"
 
+// ボードの中心からダブルの外側までの実際の長さ（mm。スティールボードの規格）。位置（ダブルの外側 = 1）を mm に直すのに使う
+const HEATMAP_BOARD_RADIUS_MM = 170
+
 let heatmapPeriod = "all"
 let heatmapPalette = null
 
@@ -77,6 +80,7 @@ function renderAnalysisHeatmap() {
   const data = collectHeatmapData(getHeatmapSessions())
 
   renderHeatmapSummary(data)
+  renderHeatmapRange(data.points)
   drawHeatmap(data.points)
 }
 
@@ -157,6 +161,7 @@ function drawHeatmap(points) {
 
   const { ctx, width, height } = canvasState
   paintHeatmap(ctx, width, height, points)
+  drawRangeCircles(ctx, width, height, getRangeStats(points))
 }
 
 // ボードの図と、刺さった位置の色・点を描く（width / height は CSS ピクセル）
@@ -475,4 +480,84 @@ function paintRadarHeatmap(ctx, width, height, points, highlight = [], rgb = "0,
   ctx.beginPath()
   ctx.arc(cx, cy, r(outer) - 0.75, 0, Math.PI * 2)
   ctx.stroke()
+}
+
+
+// ===============================
+// ===== レンジ（中心からの距離） ==
+// ===============================
+// 刺さった位置がボードの中心（ブル）からどれくらい離れているか。位置はタップした場所なので、ざっくりした目安
+//   avg：平均 / r50：半分の投が入る円の半径（中央値）/ r80：8 割の投が入る円の半径。どれも mm と、位置の単位（ダブルの外側 = 1）の両方
+function getRangeStats(points) {
+
+  if (!points || points.length < 3) return null
+
+  const distances = points
+    .map(p => Math.sqrt(p.x * p.x + p.y * p.y))
+    .sort((a, b) => a - b)
+
+  const at = rate => distances[Math.min(distances.length - 1, Math.max(0, Math.ceil(distances.length * rate) - 1))]
+  const avg = distances.reduce((a, b) => a + b, 0) / distances.length
+
+  return {
+    count: distances.length,
+    avg,
+    r50: at(0.5),
+    r80: at(0.8),
+    avgMm: avg * HEATMAP_BOARD_RADIUS_MM,
+    r50Mm: at(0.5) * HEATMAP_BOARD_RADIUS_MM,
+    r80Mm: at(0.8) * HEATMAP_BOARD_RADIUS_MM
+  }
+}
+
+function renderHeatmapRange(points) {
+
+  const box = document.getElementById("heatmapRange")
+  if (!box) return
+
+  const range = getRangeStats(points)
+  if (!range) {
+    box.innerHTML = ""
+    return
+  }
+
+  box.innerHTML = `
+    <div class="heatmap-range-title">Range（中心からの距離）</div>
+    <div class="heatmap-range-values">
+      <span><b>${range.r50Mm.toFixed(0)}</b> mm<small>50% の円</small></span>
+      <span><b>${range.r80Mm.toFixed(0)}</b> mm<small>80% の円</small></span>
+      <span><b>${range.avgMm.toFixed(0)}</b> mm<small>平均</small></span>
+    </div>
+    <p class="heatmap-range-note">ボード入力でタップした位置からのざっくりした目安です（ブルの外側の円は半径 約 16mm、インブルは 約 6mm）。図の点線の円が 50%・80% の範囲です。</p>
+  `
+}
+
+// ヒートマップの図に、50%・80% の範囲の円を点線で重ねる
+function drawRangeCircles(ctx, width, height, range) {
+
+  if (!range) return
+
+  const unit = Math.min(width, height) / (HEATMAP_VIEW * 2)
+  const cx = width / 2
+  const cy = height / 2
+
+  ctx.save()
+  ctx.setLineDash([4, 4])
+  ctx.lineWidth = 1.5
+  ctx.font = `700 10px ${HEATMAP_FONT}`
+  ctx.textAlign = "left"
+  ctx.textBaseline = "bottom"
+
+  ;[[range.r50, "50%", "rgba(255, 255, 255, 0.85)"], [range.r80, "80%", "rgba(255, 213, 79, 0.85)"]].forEach(([r, label, color]) => {
+    ctx.strokeStyle = color
+    ctx.beginPath()
+    ctx.arc(cx, cy, r * unit, 0, Math.PI * 2)
+    ctx.stroke()
+
+    ctx.fillStyle = color
+    const a = -Math.PI / 4
+    ctx.fillText(label, cx + Math.cos(a) * r * unit + 3, cy + Math.sin(a) * r * unit - 2)
+  })
+
+  ctx.restore()
 }

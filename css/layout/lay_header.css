@@ -6,7 +6,7 @@
 
 .header {
   height: calc(var(--header-height) + var(--safe-top) + 20px);
-  padding: var(--safe-top) 25px 0 20px;
+  padding: var(--safe-top) var(--gutter-right) 0 var(--gutter-left);
   
   margin-bottom: 1px;
 

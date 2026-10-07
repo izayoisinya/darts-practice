@@ -252,15 +252,23 @@ function registerEvents() {
 //   閉じる：外側をタップ / メニューを右へスワイプ / メニューのボタンを押す
 // スワイプ中は指に合わせて動き、離したときに半分以上（または素早く）動かしていれば開閉する
 const SIDE_MENU_SWIPE_SPEED = 0.4  // px / ms。これより速く払ったら距離が短くても開閉する
-const SIDE_MENU_SWIPE_ZONE = 48    // 画面の右端からこの幅の中で触れたら、メニューを開くスワイプとして扱う
+// 画面の右端からこの幅の中で触れたら、メニューを開くスワイプとして扱う。
+// Android はジェスチャーナビゲーションの「戻る」が画面の端を使うので、端から少し内側で始めても開けるよう広くする
+const SIDE_MENU_SWIPE_ZONE = 48
+const SIDE_MENU_SWIPE_ZONE_ANDROID = 96
 
-// 画面の左右の端から触れたときは、ブラウザの「端からスワイプして戻る・進む」を止める（setupEdgeSwipeGuard()）
-const EDGE_SWIPE_GUARD = 24
+// 画面の左右の端から触れたときは、ブラウザの「端からスワイプして戻る・進む」を止める（setupEdgeSwipeGuard()）。
+// 画面の余白（base.css の --gutter。スマホは 12px）より狭くして、端のボタンのタップを止めないようにする
+const EDGE_SWIPE_GUARD = 10
+
+function getSideMenuSwipeZone() {
+  return /Android/i.test(navigator.userAgent) ? SIDE_MENU_SWIPE_ZONE_ANDROID : SIDE_MENU_SWIPE_ZONE
+}
 
 // 右端付近からのタッチか（データ画面の History / Stats の切り替えスワイプと重ならないようにするため）
 function isSideMenuSwipeStart(clientX) {
   return !!document.getElementById("sideMenu") &&
-    clientX >= window.innerWidth - SIDE_MENU_SWIPE_ZONE
+    clientX >= window.innerWidth - getSideMenuSwipeZone()
 }
 
 function setSideMenuOpen(open) {

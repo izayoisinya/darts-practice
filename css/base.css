@@ -7,6 +7,23 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/*
+  上の安全領域（ステータスバー）の高さ。ヘッダーなどはこの値の分だけ下げる。
+  iOS 26 以降のホーム画面アプリは、ステータスバーの下まで画面の上端がぼかされて見えにくくなるため、
+  iOS（-webkit-touch-callout は iOS の Safari だけが対応）のホーム画面アプリでは少し余分に下げる
+*/
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+@media (display-mode: standalone) {
+  @supports (-webkit-touch-callout: none) {
+    :root {
+      --safe-top: calc(env(safe-area-inset-top, 0px) + 16px);
+    }
+  }
+}
+
 /* 横スクロールでの「戻る・進む」（Chrome / Android など）を止める。端からのスワイプは main.js の setupEdgeSwipeGuard() */
 html,
 body {
@@ -23,7 +40,7 @@ body {
 body {
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 
-  padding-top: env(safe-area-inset-top);
+  padding-top: var(--safe-top);
   padding-bottom: env(safe-area-inset-bottom);
   /* left/right は各ページの CSS で per-element 管理するため body では除外 */
   padding-left: 0;

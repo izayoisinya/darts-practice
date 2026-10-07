@@ -5,8 +5,8 @@
 /* ===== Header Layout ===== */
 
 .header {
-  height: calc(var(--header-height) + env(safe-area-inset-top) + 20px);
-  padding: env(safe-area-inset-top) 25px 0 20px;
+  height: calc(var(--header-height) + var(--safe-top) + 20px);
+  padding: var(--safe-top) 25px 0 20px;
   
   margin-bottom: 1px;
 

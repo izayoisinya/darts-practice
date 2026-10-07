@@ -723,6 +723,7 @@ graph LR
 - `sw.js` は、HTML はネットワーク優先、それ以外（JS・CSS・画像）はキャッシュ優先で配信する
 - **JS / CSS を変更したら `sw.js` のキャッシュ名（`darts-app-vN` / `darts-runtime-vN`）の番号を上げる。** 上げないと、利用者の端末に古いファイルが残り続ける
 - 新しいファイルを追加したら `PRECACHE_URLS` にも追加する
+- **上の安全領域（`--safe-top`）**：各画面のヘッダー・サイドメニューなどは、`env(safe-area-inset-top)` を直接使わず、`base.css` の CSS 変数 `--safe-top` の分だけ下げる。iOS 26 以降（2026.10 に iOS 27 で確認）のホーム画面アプリでは、ステータスバーの下まで画面の上端がぼかされてヘッダーが見にくくなるため、iOS のホーム画面アプリ（`display-mode: standalone` かつ `-webkit-touch-callout` に対応）のときだけ 16px 余分に下げている。新しく画面の上に部品を置くときも `--safe-top` を使う
 - 公開：GitHub Pages（main ブランチの / root）で `https://izayoisinya.github.io/darts-practice/` に公開している。main が更新されるたびに GitHub Actions の「pages build and deployment」が走って反映される（通常 1〜2 分）。GitHub Actions の障害で公開処理が順番待ちのまま止まり、取り消しもできなくなることがある。また、こちらの変更と関係なく deploy のステップが「GITHUB_TOKEN に id-token: write の権限がない」というエラーで失敗し、やり直しも順番待ちのまま止まることがある（2026.10.7）。どちらも main に新しいコミットを入れると、公開処理が新しく走り直す
 - アイコン：Android などは `manifest.json` の `icon-192.png`（192px）/ `icon-512.png`（512px）、iPad・iPhone は各 HTML の `apple-touch-icon.png`（180px）を使う。iOS は画像をそのまま角丸で切り抜くため、Android 用より D を小さく（高さ約 50%）している
 - **iOS 26 のホーム画面アプリの高さの不具合（WebKit Bug 301108）**：`viewport-fit=cover` ＋ `black-translucent` で起動すると、`height: 100%` / `100dvh` / `100svh` / `innerHeight` が上の安全領域の分（iPad で約 32px）だけ短くなり、画面の下に隙間ができる。画面に固定（`position: fixed`）した要素の下端もその分上にずれる。対策として、`@media (display-mode: standalone)` かつ iOS（`@supports (-webkit-touch-callout: none)`。iOS の Safari だけが対応）のときだけ以下を指定している。Android のホーム画面アプリでは起動直後の `100lvh` が実際の画面より高くなり、画面を回転するまで下が見切れるため、Android には適用しない
@@ -836,3 +837,4 @@ graph LR
 | 2026.10.7 | 横向きのボード入力で、ボードが入力エリアの高さいっぱいになるよう入力エリアの幅を決めるようにした |
 | 2026.10.7 | 設定画面：画面の向きと関係ない項目を変えたときに、回転ロックの結果の文が出ないようにした。Free は解除の命令が使えない端末でも「回転モード: Free」と表示し、開いたときの「この端末では回転設定を制御できません」の誤表示も直した |
 | 2026.10.7 | サイドメニューを開くスワイプを、画面の右端から 48px 以内のどこから始めても効くようにした。画面の端からのスワイプでブラウザが戻る・進むのを止めた |
+| 2026.10.7 | iOS のホーム画面アプリで、画面の上端のぼかし（iOS 26 以降）にヘッダーが重ならないよう、全画面の上の余白を 16px 広げた（`--safe-top`） |

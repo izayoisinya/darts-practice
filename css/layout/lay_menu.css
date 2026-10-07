@@ -21,7 +21,7 @@
   
   /* ステータスバー・ホームバー・横向きの丸い角に重ならないよう、安全領域の分だけ内側に寄せる */
   padding:
-    calc(16px + env(safe-area-inset-top))
+    calc(16px + var(--safe-top))
     calc(20px + env(safe-area-inset-right))
     calc(20px + env(safe-area-inset-bottom))
     20px;

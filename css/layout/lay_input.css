@@ -300,9 +300,9 @@ body.landscape.input-board.hide-round-area.hide-stats-area .input-area {
   display: grid;
 
   grid-template-columns: minmax(0, 1fr) 240px;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  /* タイトル（Input）は出さないので、ボードを上から置く */
+  grid-template-rows: auto minmax(0, 1fr);
   grid-template-areas:
-    "title title"
     "board bull"
     "board buttons";
 
@@ -314,8 +314,9 @@ body.landscape.input-board.hide-round-area.hide-stats-area .bull-setting {
   margin-bottom: 0;
 }
 
-body.landscape.input-board.hide-round-area.hide-stats-area .input-area h2 {
-  grid-area: title;
+/* Rounds / Stats を両方隠して Input だけのときは、エリアのタイトル（Input）を出さない（向き・入力形式に関係なく） */
+body.hide-round-area.hide-stats-area .input-area h2 {
+  display: none;
 }
 
 body.landscape.input-board.hide-round-area.hide-stats-area .bull-setting {

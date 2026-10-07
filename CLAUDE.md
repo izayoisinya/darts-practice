@@ -59,7 +59,7 @@ manifest.json   PWA マニフェスト
 | data/ | data.js | データ画面の統括（ビュー切替、タブの表示/非表示、Stats/Awards 表示、グラフ、Analysis：タグ別散布図・期間比較） |
 | data/ | data_grouped.js | Day/Week/Month/Year のグループビュー、日別メモ・タグ |
 | data/ | data_detail.js | グループ内のゲーム一覧（詳細ビュー）、カレンダー、比較 |
-| data/ | heatmap.js | Analysis タブのヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合） |
+| data/ | heatmap.js | Analysis タブのヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
 | data/ | rating.js | PPD から DARTSLIVE / PHOENIX のレーティング目安を算出 |
 | ui/ | chart.js | ゲーム画面のグラフ描画のみ（計算は stats.js 側） |
 | ui/ | settings.js | 設定画面のロジック |

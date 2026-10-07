@@ -89,6 +89,12 @@
         </div>
 
         <div id="numberTable" class="number-table"></div>
+
+        <!-- このゲームのヒートマップ（ボードの横が空いているときだけ出す。cu_ui.js の renderGameHeatmap()） -->
+        <div id="gameHeatmap" class="game-heatmap" hidden>
+          <div class="game-heatmap-title">This Game</div>
+          <canvas id="gameHeatmapCanvas"></canvas>
+        </div>
       </section>
 
       <!-- ===== STATS ===== -->
@@ -262,6 +268,7 @@
     <script src="js/game/game_core.js" defer></script>
     <script src="js/game/game_countup.js" defer></script>
     <script src="js/game/board_input.js" defer></script>
+    <script src="js/data/heatmap.js" defer></script>
     <script src="js/game/cu_ui.js" defer></script>
 
     <!-- UI -->

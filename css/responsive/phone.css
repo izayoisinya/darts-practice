@@ -519,34 +519,20 @@ body.page-countup.phone.portrait.input-board.hide-round-area.hide-stats-area .co
 /* ===================================================== */
 
 /* ヘッダーの今のラウンドの得点（lay_header.css）をスマホでは小さくする */
-.phone .header-round {
-  gap: 4px;
-  margin-left: 0;
-}
-
 .phone .header-round-label {
-  min-width: 0;
-  font-size: 13px;
+  font-size: 10px;
+  letter-spacing: 2px;
 }
 
-.phone .header-round .dart {
-  width: 36px;
-  height: 30px;
-
-  font-size: 15px;
+.phone .header-round-darts {
+  gap: 16px;
 }
 
-.phone.landscape .header-round {
-  margin-left: 12px;
-  gap: 6px;
+.phone .header-dart {
+  font-size: 28px;
 }
 
-.phone.landscape .header-round .dart {
-  width: 48px;
-  height: 32px;
-}
-
-/* スマホ縦は幅が狭いので、ラウンド番号は出さず、得点・NEXT GAME も少し詰める */
+/* スマホ縦は幅が狭いので、得点・NEXT GAME とラウンドの得点を少し詰める */
 .phone.portrait .score-block {
   flex: none;
 }
@@ -555,17 +541,17 @@ body.page-countup.phone.portrait.input-board.hide-round-area.hide-stats-area .co
   gap: 8px;
 }
 
-.phone.portrait .header-round-label {
-  display: none;
-}
-
 .phone.portrait .score-value {
   font-size: 36px;
 }
 
-.phone.portrait .header-round .dart {
-  width: 30px;
-  font-size: 14px;
+.phone.portrait .header-round-darts {
+  gap: 6px;
+}
+
+.phone.portrait .header-dart {
+  min-width: 1.4em;
+  font-size: 19px;
 }
 
 .phone.portrait .next-button {

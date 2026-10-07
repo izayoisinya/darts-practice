@@ -90,7 +90,7 @@
 
         <div id="numberTable" class="number-table"></div>
 
-        <!-- このゲームのヒートマップ（ボードの横が空いているときだけ出す。cu_ui.js の renderGameHeatmap()） -->
+        <!-- ボードの左右のパネル（ボードの横が空いているときだけ出す。cu_ui.js の renderGameSidePanels()） -->
         <div id="gameHeatmap" class="game-heatmap" hidden>
           <div class="game-heatmap-title">
             <span>This Game</span>
@@ -100,6 +100,16 @@
             <canvas id="gameHeatmapCanvas"></canvas>
             <div class="game-radar-sweep"></div>
           </div>
+        </div>
+
+        <div id="gameSideChart" class="game-side-panel game-side-chart" hidden>
+          <div class="game-heatmap-title"><span>Round Score</span></div>
+          <canvas id="gameSideChartCanvas"></canvas>
+        </div>
+
+        <div id="gameSideStats" class="game-side-panel game-side-stats" hidden>
+          <div class="game-heatmap-title"><span>Stats</span></div>
+          <div id="gameSideStatsGrid" class="game-side-stats-grid"></div>
         </div>
       </section>
 

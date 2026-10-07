@@ -459,8 +459,74 @@ body.landscape.input-board .stats-area {
   pointer-events: none;
 }
 
-.game-heatmap[hidden] {
+.game-heatmap[hidden],
+.game-side-panel[hidden] {
   display: none;
+}
+
+/* 右上のグラフ・右下の Stats（cu_ui.js が top / right / bottom を指定する）。ヒートマップと同じ暗い緑の画面に揃える */
+.game-side-panel {
+  position: absolute;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  pointer-events: none;
+}
+
+.game-side-chart canvas {
+  display: block;
+
+  border-radius: 10px;
+  background: radial-gradient(ellipse at center, #06231c 0%, #020b09 100%);
+  box-shadow:
+    0 0 0 1px rgb(var(--accent-rgb) / 0.35),
+    0 0 18px rgb(var(--accent-rgb) / 0.15);
+}
+
+.game-side-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.game-side-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+
+  padding: 7px 4px 6px;
+
+  border-radius: 10px;
+  background: radial-gradient(ellipse at center, #06231c 0%, #020b09 100%);
+  box-shadow:
+    0 0 0 1px rgb(var(--accent-rgb) / 0.3),
+    0 0 12px rgb(var(--accent-rgb) / 0.1);
+}
+
+.game-side-stat-label {
+  color: rgb(var(--accent-rgb) / 0.55);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.game-side-stat-value {
+  color: rgb(var(--accent-rgb));
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  text-shadow: 0 0 8px rgb(var(--accent-rgb) / 0.6);
+}
+
+.game-side-stat-sub {
+  color: rgb(var(--accent-rgb) / 0.5);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 10px;
 }
 
 .game-heatmap-title {

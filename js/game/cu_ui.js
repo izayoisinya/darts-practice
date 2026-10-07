@@ -7,7 +7,7 @@ function updateUI() {
   if (typeof renderBoardMarkers === "function") {
     renderBoardMarkers()
   }
-  renderGameHeatmap()
+  renderGameSidePanels()
   saveGame()
 }
 
@@ -143,7 +143,7 @@ function createNumberTable() {
   
   if (useBoard) {
     renderBoardInput(table);
-    renderGameHeatmap();
+    renderGameSidePanels();
     return;
   }
   
@@ -268,43 +268,103 @@ function fitBoardColumn(useBoard) {
 
 
 // ===============================
-// ===== このゲームのヒートマップ ==
+// ===== ボードの左右のパネル =====
 // ===============================
-// ボード入力で入れた投の位置を、Input エリアの左下にレーダー風のヒートマップで出す（今のラウンドの投は白く光る点）。
-// ボードの横に置ける幅があるとき（横向きで Rounds / Stats を隠したときなど）だけ出す
-const GAME_HEATMAP_MIN = 120   // これより小さくしか置けないときは出さない（px）
-const GAME_HEATMAP_MAX = 300
+// 横向きのボード入力で、ボードの左右に空きがあるとき（Rounds / Stats を隠したときなど）、Input エリアの空いたところに
+//   左下：このゲームのヒートマップ（レーダー風。今のラウンドの投は白く光る点）
+//   右上：ラウンドスコアのグラフ
+//   右下：Stats（PPD・平均・最高・ブル・インブル・投数）
+// を出す。ボードは左右中央に描かれるので、左右の空き幅は同じ
+const GAME_SIDE_MIN = 120   // 空き幅がこれより狭いときは出さない（px）
+const GAME_SIDE_MAX = 300
 
-function renderGameHeatmap() {
+function renderGameSidePanels() {
 
-  const box = document.getElementById("gameHeatmap")
-  const canvas = document.getElementById("gameHeatmapCanvas")
   const inputArea = document.querySelector(".input-area")
   const table = document.getElementById("numberTable")
-  if (!box || !canvas || !inputArea || !table || typeof paintRadarHeatmap !== "function") return
+  const panels = ["gameHeatmap", "gameSideChart", "gameSideStats"].map(id => document.getElementById(id))
+  if (!inputArea || !table || panels.some(panel => !panel)) return
 
-  const size = getGameHeatmapSize(inputArea, table)
-  if (!size) {
-    box.hidden = true
+  const [heatmapBox, chartBox, statsBox] = panels
+  const layout = getGameSideLayout(inputArea, table)
+
+  if (!layout) {
+    panels.forEach(panel => { panel.hidden = true })
     return
   }
 
-  const areaStyle = getComputedStyle(inputArea)
-  box.hidden = false
-  box.style.width = `${size}px`
-  box.style.setProperty("--radar-size", `${size}px`)
-  box.style.left = areaStyle.paddingLeft
-  box.style.bottom = areaStyle.paddingBottom
+  const { size, padding, top, height } = layout
 
-  const ratio = window.devicePixelRatio || 1
-  canvas.style.width = `${size}px`
-  canvas.style.height = `${size}px`
-  canvas.width = Math.round(size * ratio)
-  canvas.height = Math.round(size * ratio)
+  // 左下：ヒートマップ
+  heatmapBox.hidden = false
+  heatmapBox.style.width = `${size}px`
+  heatmapBox.style.left = `${padding.left}px`
+  heatmapBox.style.bottom = `${padding.bottom}px`
+  renderGameHeatmap(size)
 
-  const ctx = canvas.getContext("2d")
+  // 右下：Stats
+  statsBox.hidden = false
+  statsBox.style.width = `${size}px`
+  statsBox.style.right = `${padding.right}px`
+  statsBox.style.bottom = `${padding.bottom}px`
+  renderGameSideStats()
+
+  // 右上：グラフ（Stats の上に残った高さに収める。低すぎるときは出さない）
+  const chartHeight = Math.min(Math.round(size * 0.7), height - statsBox.offsetHeight - 16)
+  if (chartHeight < 90) {
+    chartBox.hidden = true
+    return
+  }
+  chartBox.hidden = false
+  chartBox.style.width = `${size}px`
+  chartBox.style.right = `${padding.right}px`
+  chartBox.style.top = `${top}px`
+  renderGameSideChart(size, chartHeight)
+}
+
+// ボード（縦横の短い方に合わせて左右中央に描かれる）の横に空いている幅と、パネルを置ける縦の範囲
+function getGameSideLayout(inputArea, table) {
+
+  if (inputMode !== "board" || !document.body.classList.contains("landscape")) return null
+
+  const tableRect = table.getBoundingClientRect()
+  const areaRect = inputArea.getBoundingClientRect()
+  if (!tableRect.width || !tableRect.height) return null
+
+  const boardSize = Math.min(tableRect.width, tableRect.height)
+  const boardLeft = tableRect.left + (tableRect.width - boardSize) / 2
+
+  const style = getComputedStyle(inputArea)
+  const padding = {
+    left: parseFloat(style.paddingLeft) || 0,
+    right: parseFloat(style.paddingRight) || 0,
+    bottom: parseFloat(style.paddingBottom) || 0
+  }
+
+  // Input エリアの左の余白からボードの左端まで（ボードとの間を 12px 空ける）
+  const free = boardLeft - areaRect.left - padding.left - 12
+
+  const size = Math.floor(Math.min(free, GAME_SIDE_MAX, tableRect.height * 0.5))
+  if (size < GAME_SIDE_MIN) return null
+
+  return {
+    size,
+    padding,
+    // 縦はボードを置く場所（タイトルの下）の範囲に収める
+    top: Math.round(tableRect.top - areaRect.top),
+    height: Math.round(tableRect.height)
+  }
+}
+
+function renderGameHeatmap(size) {
+
+  const canvas = document.getElementById("gameHeatmapCanvas")
+  if (!canvas || typeof paintRadarHeatmap !== "function") return
+
+  document.getElementById("gameHeatmap").style.setProperty("--radar-size", `${size}px`)
+
+  const ctx = setupGameSideCanvas(canvas, size, size)
   if (!ctx) return
-  ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
 
   const points = []
   game.rounds.forEach(round => round.forEach(dart => {
@@ -320,31 +380,67 @@ function renderGameHeatmap() {
   paintRadarHeatmap(ctx, size, size, points, highlight, getAccentRgb())
 }
 
+function renderGameSideChart(width, height) {
+
+  const canvas = document.getElementById("gameSideChartCanvas")
+  if (!canvas || typeof paintRoundScoreChart !== "function") return
+
+  // タイトルの行の分を引いた高さをグラフにする
+  const title = document.querySelector("#gameSideChart .game-heatmap-title")
+  const chartHeight = Math.max(60, height - (title ? title.offsetHeight + 6 : 0))
+
+  const ctx = setupGameSideCanvas(canvas, width, chartHeight)
+  if (!ctx) return
+
+  paintRoundScoreChart(ctx, width, chartHeight, getAccentRgb())
+}
+
+function renderGameSideStats() {
+
+  const box = document.getElementById("gameSideStatsGrid")
+  if (!box) return
+
+  const stats = calculateStats()
+  const items = [
+    ["PPD", stats.ppd.toFixed(2), ""],
+    ["AVG", stats.roundAvg.toFixed(1), ""],
+    ["MAX", stats.maxRound, ""],
+    ["DARTS", stats.totalDarts, ""],
+    ["BULL", stats.bullCount, `${stats.bullRate.toFixed(1)}%`],
+    ["IN-BULL", stats.innerBullCount, `${stats.innerBullRate.toFixed(1)}%`]
+  ]
+
+  box.innerHTML = items
+    .map(([label, value, sub]) => `
+      <div class="game-side-stat">
+        <span class="game-side-stat-label">${label}</span>
+        <span class="game-side-stat-value">${value}</span>
+        ${sub ? `<span class="game-side-stat-sub">${sub}</span>` : ""}
+      </div>
+    `)
+    .join("")
+}
+
+// canvas を表示の大きさに合わせ、画面の倍率に合わせて細かく描けるようにする
+function setupGameSideCanvas(canvas, width, height) {
+
+  const ratio = window.devicePixelRatio || 1
+  canvas.style.width = `${width}px`
+  canvas.style.height = `${height}px`
+  canvas.width = Math.round(width * ratio)
+  canvas.height = Math.round(height * ratio)
+
+  const ctx = canvas.getContext("2d")
+  if (!ctx) return null
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+  return ctx
+}
+
 // テーマの色（theme.css の --accent-rgb。"0 255 200" の形）を canvas で使える "0, 255, 200" の形にする
 function getAccentRgb() {
   const value = getComputedStyle(document.body).getPropertyValue("--accent-rgb").trim()
   const parts = value.split(/[\s,]+/).filter(Boolean)
   return parts.length === 3 ? parts.join(", ") : "0, 255, 200"
-}
-
-// ボード（縦横の短い方に合わせて左右中央に描かれる）の左側に空いている幅から大きさを決める
-function getGameHeatmapSize(inputArea, table) {
-
-  if (inputMode !== "board" || !document.body.classList.contains("landscape")) return 0
-
-  const tableRect = table.getBoundingClientRect()
-  const areaRect = inputArea.getBoundingClientRect()
-  if (!tableRect.width || !tableRect.height) return 0
-
-  const boardSize = Math.min(tableRect.width, tableRect.height)
-  const boardLeft = tableRect.left + (tableRect.width - boardSize) / 2
-
-  // Input エリアの左の余白からボードの左端まで（ボードとの間を 12px 空ける）
-  const padding = parseFloat(getComputedStyle(inputArea).paddingLeft) || 0
-  const free = boardLeft - areaRect.left - padding - 12
-
-  const size = Math.floor(Math.min(free, GAME_HEATMAP_MAX, tableRect.height * 0.5))
-  return size >= GAME_HEATMAP_MIN ? size : 0
 }
 
 

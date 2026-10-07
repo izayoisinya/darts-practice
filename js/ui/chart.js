@@ -141,3 +141,118 @@ const maxRoundScore = validScores.length ?
     );
   }
 }
+
+// ===============================
+// ===== 小さなラウンドスコアのグラフ（ボードの右上） =====
+// ===============================
+// cu_ui.js の renderGameSideChart() から呼ぶ。レーダー風のヒートマップに合わせ、暗い画面に光る線で描く
+//   終わったラウンドは線でつなぎ、投げている途中のラウンドは薄い点で今の合計を出す。最高のラウンドは金色
+//   rgb：色（"0, 255, 200" の形）
+function paintRoundScoreChart(ctx, width, height, rgb = "0, 255, 200") {
+
+  const color = alpha => `rgba(${rgb}, ${alpha})`
+  const font = "ui-monospace, Menlo, monospace"
+
+  const left = 26
+  const right = 8
+  const top = 8
+  const bottom = 18
+  const graphWidth = width - left - right
+  const graphHeight = height - top - bottom
+  const stepX = TOTAL_ROUNDS > 1 ? graphWidth / (TOTAL_ROUNDS - 1) : 0
+
+  const xAt = i => left + stepX * i
+  const yAt = score => top + graphHeight - (Math.min(score, MAX_SCORE) / MAX_SCORE) * graphHeight
+
+  ctx.clearRect(0, 0, width, height)
+
+  // 横の目盛り（0・60・120・180）
+  ctx.font = `600 9px ${font}`
+  ctx.textAlign = "right"
+  ctx.textBaseline = "middle"
+  ;[0, 60, 120, 180].forEach(value => {
+    const y = yAt(value)
+    ctx.strokeStyle = color(value === 0 ? 0.3 : 0.1)
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(left, y)
+    ctx.lineTo(width - right, y)
+    ctx.stroke()
+
+    ctx.fillStyle = color(0.45)
+    ctx.fillText(String(value), left - 5, y)
+  })
+
+  // 縦の目盛りとラウンドの番号
+  ctx.textAlign = "center"
+  ctx.textBaseline = "alphabetic"
+  for (let i = 0; i < TOTAL_ROUNDS; i++) {
+    ctx.strokeStyle = color(0.06)
+    ctx.beginPath()
+    ctx.moveTo(xAt(i), top)
+    ctx.lineTo(xAt(i), top + graphHeight)
+    ctx.stroke()
+
+    ctx.fillStyle = color(0.45)
+    ctx.fillText(String(i + 1), xAt(i), height - 4)
+  }
+
+  // ラウンドスコア（終わったラウンドだけ。途中のラウンドは今の合計）
+  const rounds = game.rounds.map(round => {
+    const darts = round.filter(dart => dart !== null)
+    return {
+      done: darts.length === 3,
+      score: darts.reduce((sum, dart) => sum + dart.score, 0),
+      thrown: darts.length
+    }
+  })
+  const done = rounds.map((round, i) => ({ ...round, i })).filter(round => round.done)
+  const best = done.length ? Math.max(...done.map(round => round.score)) : 0
+
+  if (done.length) {
+    // 線の下をうっすら塗る
+    const fill = ctx.createLinearGradient(0, top, 0, top + graphHeight)
+    fill.addColorStop(0, color(0.25))
+    fill.addColorStop(1, color(0))
+    ctx.fillStyle = fill
+    ctx.beginPath()
+    ctx.moveTo(xAt(done[0].i), top + graphHeight)
+    done.forEach(round => ctx.lineTo(xAt(round.i), yAt(round.score)))
+    ctx.lineTo(xAt(done[done.length - 1].i), top + graphHeight)
+    ctx.closePath()
+    ctx.fill()
+
+    // 光る線
+    ctx.shadowColor = color(0.9)
+    ctx.shadowBlur = 8
+    ctx.strokeStyle = color(0.95)
+    ctx.lineWidth = 1.8
+    ctx.beginPath()
+    done.forEach((round, n) => {
+      if (n === 0) ctx.moveTo(xAt(round.i), yAt(round.score))
+      else ctx.lineTo(xAt(round.i), yAt(round.score))
+    })
+    ctx.stroke()
+
+    // 点（最高のラウンドは金色）
+    done.forEach(round => {
+      const isBest = best > 0 && round.score === best
+      ctx.shadowColor = isBest ? "#ffcc00" : color(0.9)
+      ctx.fillStyle = isBest ? "#ffcc00" : "#eafffa"
+      ctx.beginPath()
+      ctx.arc(xAt(round.i), yAt(round.score), isBest ? 3.5 : 2.6, 0, Math.PI * 2)
+      ctx.fill()
+    })
+    ctx.shadowBlur = 0
+  }
+
+  // 投げている途中のラウンド
+  rounds.forEach((round, i) => {
+    if (round.done || !round.thrown) return
+    ctx.strokeStyle = color(0.8)
+    ctx.lineWidth = 1.2
+    ctx.beginPath()
+    ctx.arc(xAt(i), yAt(round.score), 3, 0, Math.PI * 2)
+    ctx.stroke()
+  })
+}

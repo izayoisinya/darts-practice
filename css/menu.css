@@ -526,3 +526,67 @@ body.page-menu::before {
   opacity: 0.45;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
+
+/* 更新情報の「すべて見る」（お知らせ画面へ） */
+.info-more {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 10px;
+
+  border: 1px solid rgb(var(--accent-rgb) / 0.35);
+  border-radius: 10px;
+  background: transparent;
+
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* ============================== */
+/* PHONE LANDSCAPE（高さに余裕があるとき）*/
+/* ============================== */
+
+/*
+  Android タブレット（RedMagic Astra など）はスマホ判定になるが、横向きでは高さに余裕がある。
+  そのときはタブレット横と同じく列を画面の高さに収め、更新情報は欄の中でスクロールさせる
+  （ページ全体が更新情報の分だけ縦に伸びないようにする）
+*/
+@media (min-height: 560px) {
+  .phone.landscape .menu-col {
+    min-height: 0;
+  }
+
+  .phone.landscape .updates-panel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .phone.landscape .updates-panel .info-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    align-content: start;
+  }
+
+  .phone.landscape .news-panel {
+    flex: none;
+  }
+
+  /* 左列の余った高さは CountUp が使う（タブレット横と同じ） */
+  .phone.landscape .hero-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .phone.landscape .hero-btn {
+    flex: 1;
+  }
+}

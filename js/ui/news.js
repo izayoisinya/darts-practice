@@ -142,8 +142,17 @@ function getUpdatesNewestFirst() {
     .map(({ item }) => item)
 }
 
+// メイン画面の更新情報は新しい方から数件だけ出す（全件はお知らせ画面）
+const MAIN_UPDATES_LIMIT = 4
+
 function initMainInfoSections() {
-  renderInfoList("mainUpdatesList", getUpdatesNewestFirst())
+  renderInfoList("mainUpdatesList", getUpdatesNewestFirst().slice(0, MAIN_UPDATES_LIMIT))
+
+  const list = document.getElementById("mainUpdatesList")
+  if (list && INFO_CONTENT.updates.length > MAIN_UPDATES_LIMIT) {
+    list.insertAdjacentHTML("afterend",
+      `<button type="button" class="info-more" onclick="location.href = 'news.html'">すべての更新情報（${INFO_CONTENT.updates.length} 件）</button>`)
+  }
   renderInfoList("mainNoticesList", INFO_CONTENT.notice)
 }
 

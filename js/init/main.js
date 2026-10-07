@@ -175,10 +175,9 @@ function registerEvents() {
   
   const nextBtn = document.getElementById("nextGameBtn")
 
-  // カウントアップ画面：3 本指で左にスワイプして戻る（cu_ui.js）
-  const gameContainer = document.querySelector(".container")
-  if (gameContainer && document.getElementById("roundContainer")) {
-    setupThreeFingerUndo(gameContainer)
+  // カウントアップ画面：3 本指でスワイプして戻る（cu_ui.js。画面のどこからでも）
+  if (document.getElementById("roundContainer")) {
+    setupThreeFingerUndo(document)
   }
   
   if (nextBtn) {

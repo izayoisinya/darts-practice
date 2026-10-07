@@ -46,8 +46,35 @@ function detectDevice() {
 }
 
 
+// Android では、端末の「戻る」で前の画面に戻ったとき（ページがキャッシュから表示されたとき）などに、
+// height: 100% の高さが古いまま残り、画面の下に空白ができることがある。
+// 実際の画面の高さ（window.innerHeight）を html の高さに直接入れて合わせる。
+// iOS は base.css の 100lvh の対応があるので触らない
+const IS_ANDROID = /Android/i.test(navigator.userAgent)
+
+function fitViewportHeight() {
+
+  if (!IS_ANDROID) return
+
+  const height = window.innerHeight
+  if (height > 0) {
+    document.documentElement.style.height = `${height}px`
+  }
+}
+
+// 画面の大きさが落ち着くまで少し時間がかかることがあるので、何回か合わせ直す
+function refitViewportHeightSoon() {
+
+  if (!IS_ANDROID) return
+
+  fitViewportHeight()
+  ;[100, 400, 1000].forEach(delay => setTimeout(fitViewportHeight, delay))
+}
+
+
 function refreshLayout() {
   
+  fitViewportHeight()
   detectDevice()
   
   if (typeof applyGamePanelVisibility === "function") {

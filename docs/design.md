@@ -311,6 +311,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | --- | --- |
 | `detectDevice()` | 端末種別と向きを判定し、`body` にクラスを付ける |
 | `refreshLayout()` | 画面回転やリサイズ時にレイアウトを再設定する |
+| `fitViewportHeight()` / `refitViewportHeightSoon()` | Android だけ、`html` の高さを `window.innerHeight` に合わせる（端末の「戻る」でキャッシュから表示したときなどに、`height: 100%` が古い高さのまま残って画面の下に空白ができることがあるため）。`refreshLayout()`・`visualViewport` の resize で合わせ、`pageshow` と画面に戻ったときは 0.1 / 0.4 / 1 秒後にも合わせ直す |
 | `setupLinks()` | 画面間ナビゲーションをセットアップする |
 
 #### core/storage.js
@@ -856,3 +857,4 @@ graph LR
 | 2026.10.7 | ボードの左上に Awards のパネルを追加。右上のグラフと左上の Awards を、「全体表示」ボタン・直前の 1 投の表示と重ならない位置に下げた |
 | 2026.10.7 | Rounds / Stats を両方隠して Input だけのときは、エリアのタイトル（Input）を出さないようにした（その分ボードが大きくなる） |
 | 2026.10.7 | ボードを拡大したときは、ボードを置く場所いっぱいに広げ、横のパネルはボードの裏に隠れるようにした（`getBoardViewBox(svg)`） |
+| 2026.10.8 | Android で端末の「戻る」を使うと、たまに画面の下に空白ができるのを直した（`html` の高さを `window.innerHeight` に合わせる。`fitViewportHeight()`） |

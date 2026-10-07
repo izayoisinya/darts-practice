@@ -75,12 +75,20 @@
       <div class="menu-header">Menu</div>
 
       <button data-link="index.html">Main Menu</button>
-      <button data-link="countup.html">CountUp</button>
-      <button disabled>01(Coming Soon)</button>
-      <button disabled>Cricket(Coming Soon)</button>
-      <button data-link="data.html">Data</button>
-      <button data-link="settings.html">Settings</button>
-      <button data-link="news.html">Info</button>
+
+      <div class="menu-group">
+        <div class="menu-group-title">Game</div>
+        <button data-link="countup.html">CountUp</button>
+        <button disabled>01<span class="menu-soon">Coming Soon</span></button>
+        <button disabled>Cricket<span class="menu-soon">Coming Soon</span></button>
+      </div>
+
+      <div class="menu-group">
+        <div class="menu-group-title">Utility</div>
+        <button data-link="data.html">Data</button>
+        <button data-link="settings.html">Settings</button>
+        <button data-link="news.html" class="current" aria-current="page">Info</button>
+      </div>
     </div>
 
     <script src="js/core/state.js" defer></script>

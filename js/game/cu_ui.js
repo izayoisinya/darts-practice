@@ -7,6 +7,7 @@ function updateUI() {
   if (typeof renderBoardMarkers === "function") {
     renderBoardMarkers()
   }
+  renderGameHeatmap()
   saveGame()
 }
 
@@ -142,6 +143,7 @@ function createNumberTable() {
   
   if (useBoard) {
     renderBoardInput(table);
+    renderGameHeatmap();
     return;
   }
   
@@ -262,6 +264,76 @@ function fitBoardColumn(useBoard) {
   const width = Math.min(boardHeight + sideSpace, container.clientWidth * maxRatio)
 
   container.style.setProperty("--board-col", `${Math.round(width)}px`)
+}
+
+
+// ===============================
+// ===== このゲームのヒートマップ ==
+// ===============================
+// ボード入力で入れた投の位置を、Input エリアの左下に小さなヒートマップで出す（今のラウンドの投は白い点）。
+// ボードの横に置ける幅があるとき（横向きで Rounds / Stats を隠したときなど）だけ出す
+const GAME_HEATMAP_MIN = 120   // これより小さくしか置けないときは出さない（px）
+const GAME_HEATMAP_MAX = 300
+
+function renderGameHeatmap() {
+
+  const box = document.getElementById("gameHeatmap")
+  const canvas = document.getElementById("gameHeatmapCanvas")
+  const inputArea = document.querySelector(".input-area")
+  const table = document.getElementById("numberTable")
+  if (!box || !canvas || !inputArea || !table || typeof paintHeatmap !== "function") return
+
+  const size = getGameHeatmapSize(inputArea, table)
+  if (!size) {
+    box.hidden = true
+    return
+  }
+
+  const areaStyle = getComputedStyle(inputArea)
+  box.hidden = false
+  box.style.width = `${size}px`
+  box.style.left = areaStyle.paddingLeft
+  box.style.bottom = areaStyle.paddingBottom
+
+  const ratio = window.devicePixelRatio || 1
+  canvas.style.width = `${size}px`
+  canvas.style.height = `${size}px`
+  canvas.width = Math.round(size * ratio)
+  canvas.height = Math.round(size * ratio)
+
+  const ctx = canvas.getContext("2d")
+  if (!ctx) return
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+
+  const points = []
+  game.rounds.forEach(round => round.forEach(dart => {
+    if (dart && dart.pos) points.push(dart.pos)
+  }))
+
+  const current = game.rounds[Math.min(getDisplayRoundIndex(), TOTAL_ROUNDS - 1)] || []
+  const highlight = current.filter(dart => dart && dart.pos).map(dart => dart.pos)
+
+  paintHeatmap(ctx, size, size, points, highlight)
+}
+
+// ボード（縦横の短い方に合わせて左右中央に描かれる）の左側に空いている幅から大きさを決める
+function getGameHeatmapSize(inputArea, table) {
+
+  if (inputMode !== "board" || !document.body.classList.contains("landscape")) return 0
+
+  const tableRect = table.getBoundingClientRect()
+  const areaRect = inputArea.getBoundingClientRect()
+  if (!tableRect.width || !tableRect.height) return 0
+
+  const boardSize = Math.min(tableRect.width, tableRect.height)
+  const boardLeft = tableRect.left + (tableRect.width - boardSize) / 2
+
+  // Input エリアの左の余白からボードの左端まで（ボードとの間を 12px 空ける）
+  const padding = parseFloat(getComputedStyle(inputArea).paddingLeft) || 0
+  const free = boardLeft - areaRect.left - padding - 12
+
+  const size = Math.floor(Math.min(free, GAME_HEATMAP_MAX, tableRect.height * 0.5))
+  return size >= GAME_HEATMAP_MIN ? size : 0
 }
 
 

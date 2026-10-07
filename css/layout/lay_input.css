@@ -441,3 +441,36 @@ body.landscape.input-board .input-area,
 body.landscape.input-board .stats-area {
   min-width: 0;
 }
+
+
+/* このゲームのヒートマップ（cu_ui.js の renderGameHeatmap()）。Input エリアの左下、ボードの横の空いたところに置く */
+.input-area {
+  position: relative;
+}
+
+.game-heatmap {
+  position: absolute;
+  /* left / bottom は Input エリアの余白に合わせて JS で指定する */
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  pointer-events: none;
+}
+
+.game-heatmap[hidden] {
+  display: none;
+}
+
+.game-heatmap-title {
+  color: rgb(var(--accent-rgb) / 0.7);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.game-heatmap canvas {
+  display: block;
+}

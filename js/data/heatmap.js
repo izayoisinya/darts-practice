@@ -4,6 +4,7 @@
 // ゲーム履歴の 1 投ごとの記録（session.darts）から、刺さった位置の多いところを
 // ボードの図の上に色の濃さで表示する。位置があるのはボード入力で入れた投だけ。
 // あわせて、刺さった場所（T20・S20 など）の多い順の割合も出す（ボタン入力の投も含む）。
+// 図の描画（paintHeatmap()）は、ゲーム画面の「このゲームのヒートマップ」（cu_ui.js）でも使う。
 
 // 本物のボードの比率での各輪の外側の半径（ダブルの外側 = 1）。board_input.js の REAL_BOARD_RADIUS と同じ値
 const HEATMAP_RING_RADIUS = [0.0374, 0.0935, 0.5824, 0.6294, 0.9529, 1]
@@ -18,6 +19,9 @@ const HEATMAP_SPREAD = 0.07
 
 // 期間の選択肢（日数。0 は全期間）
 const HEATMAP_PERIODS = { all: 0, d30: 30, d7: 7, d1: 1 }
+
+// 数字の字体（データ画面のグラフと同じ。ゲーム画面では data.js を読み込まないのでここで持つ）
+const HEATMAP_FONT = "'Segoe UI', 'Noto Sans JP', sans-serif"
 
 let heatmapPeriod = "all"
 let heatmapPalette = null
@@ -152,6 +156,13 @@ function drawHeatmap(points) {
   resetChartRetry("heatmap")
 
   const { ctx, width, height } = canvasState
+  paintHeatmap(ctx, width, height, points)
+}
+
+// ボードの図と、刺さった位置の色・点を描く（width / height は CSS ピクセル）
+//   highlight：特に目立たせたい位置（ゲーム画面で今のラウンドの投に使う）
+function paintHeatmap(ctx, width, height, points, highlight = []) {
+
   const size = Math.min(width, height)
   const unit = size / (HEATMAP_VIEW * 2)
   const cx = width / 2
@@ -173,6 +184,17 @@ function drawHeatmap(points) {
     ctx.beginPath()
     ctx.arc(cx + p.x * unit, cy + p.y * unit, 1.3, 0, Math.PI * 2)
     ctx.fill()
+  })
+
+  // 目立たせる位置は白い縁取りの点にする
+  ctx.lineWidth = 1.5
+  highlight.forEach(p => {
+    ctx.beginPath()
+    ctx.arc(cx + p.x * unit, cy + p.y * unit, Math.max(3, unit * 0.04), 0, Math.PI * 2)
+    ctx.fillStyle = "rgba(255, 255, 255, 0.9)"
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.6)"
+    ctx.fill()
+    ctx.stroke()
   })
 }
 
@@ -210,7 +232,7 @@ function drawHeatmapBoard(ctx, cx, cy, unit) {
 
     const a = (i * 18 - 90) * Math.PI / 180
     ctx.fillStyle = "rgba(255, 255, 255, 0.5)"
-    ctx.font = `600 ${Math.max(9, Math.round(unit * 0.09))}px ${chartAxisFontFamily}`
+    ctx.font = `600 ${Math.max(9, Math.round(unit * 0.09))}px ${HEATMAP_FONT}`
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
     ctx.fillText(String(num), cx + Math.cos(a) * r(HEATMAP_NUMBER_RADIUS), cy + Math.sin(a) * r(HEATMAP_NUMBER_RADIUS))

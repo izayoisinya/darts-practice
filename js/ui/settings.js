@@ -344,6 +344,158 @@ function initBackupControls() {
   }
 }
 
+// ===============================
+// ===== 画面の配置のプレビュー ====
+// ===============================
+// カウントアップ画面（横向き・縦向き）とデータ画面のタブの並びを、今のフォームの値で簡単な図にする。
+// 実際の画面の目安（端末の大きさで細かな配置は変わる）
+function getPreviewSettingsFromForm() {
+  return {
+    inputMode: document.getElementById("inputModeSetting")?.value || "board",
+    boardUndoButton: !!document.getElementById("boardUndoButtonSetting")?.checked,
+    gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES),
+    dataTabs: readTogglesFromForm(DATA_TAB_TOGGLES)
+  }
+}
+
+function renderPreviewInput(settings, landscape) {
+
+  const board = settings.inputMode !== "buttons"
+  const showUndo = !board || settings.boardUndoButton
+  const inputOnly = !settings.gamePanels.round && !settings.gamePanels.stats
+
+  let main
+  if (board) {
+    // 縦横の短い方に合わせた円（上詰め。実際のボードと同じ置き方）
+    main = `
+      <div class="pv-board-wrap">
+        <svg class="pv-board" viewBox="-1 -1 2 2" preserveAspectRatio="xMidYMin meet">
+          <circle r="1" fill="#0b0e13"/>
+          <circle r="0.86" fill="#b8404c"/>
+          <circle r="0.8" fill="#2b313d"/>
+          <circle r="0.54" fill="#2f6fb3"/>
+          <circle r="0.48" fill="#2b313d"/>
+          <circle r="0.13" fill="#b8404c"/>
+          <circle r="0.06" fill="#12161d"/>
+        </svg>
+      </div>`
+  } else {
+    const cells = Array.from({ length: 20 }, () => "<span></span>").join("")
+    main = `<div class="pv-buttons">${cells}<span class="pv-special"></span><span class="pv-special"></span><span class="pv-special"></span></div>`
+  }
+
+  // 横向きの Input だけ・ボード・戻るボタンなしのときは、ボードの四隅にパネルが出る
+  const corners = landscape && inputOnly && board && !settings.boardUndoButton
+    ? `<span class="pv-corner tl">Awards</span><span class="pv-corner bl">Map</span>` +
+      `<span class="pv-corner tr">Graph</span><span class="pv-corner br">Stats</span>`
+    : ""
+
+  return `
+    <div class="pv-area pv-input">
+      ${inputOnly ? "" : `<span class="pv-area-label">Input</span>`}
+      <div class="pv-input-body">
+        ${main}
+        ${showUndo ? `<span class="pv-undo">戻る</span>` : ""}
+        ${corners}
+      </div>
+    </div>
+  `
+}
+
+function renderPreviewScreen(settings, landscape) {
+
+  const rounds = settings.gamePanels.round
+    ? `<div class="pv-area pv-rounds"><span class="pv-area-label">Rounds</span><div class="pv-lines">${"<span></span>".repeat(landscape ? 8 : 3)}</div></div>`
+    : ""
+  const stats = settings.gamePanels.stats
+    ? `<div class="pv-area pv-stats"><span class="pv-area-label">Stats</span><div class="pv-tiles">${"<span></span>".repeat(landscape ? 6 : 4)}</div></div>`
+    : ""
+  const input = renderPreviewInput(settings, landscape)
+
+  return `
+    <div class="pv-screen ${landscape ? "landscape-screen" : "portrait-screen"}">
+      <div class="pv-header">
+        <span class="pv-score"></span>
+        <span class="pv-round"><span></span><span></span><span></span></span>
+        <span class="pv-next"></span>
+      </div>
+      <div class="pv-body">
+        ${landscape ? rounds + input + stats : input + rounds + stats}
+      </div>
+    </div>
+  `
+}
+
+function renderLayoutPreview(flashTarget = null) {
+
+  const box = document.getElementById("layoutPreview")
+  if (!box) return
+
+  const settings = getPreviewSettingsFromForm()
+
+  const tabNames = { analysis: "Analysis", day: "Day", week: "Week", month: "Month", year: "Year" }
+  const tabs = `<span class="pv-tab active">Game</span>` +
+    Object.keys(tabNames)
+      .map(key => `<span class="pv-tab${settings.dataTabs[key] ? "" : " off"}">${tabNames[key]}</span>`)
+      .join("")
+
+  box.innerHTML = `
+    <figure class="pv-figure" data-preview="game">
+      <figcaption class="pv-caption">COUNT-UP（横）</figcaption>
+      ${renderPreviewScreen(settings, true)}
+    </figure>
+    <figure class="pv-figure" data-preview="game">
+      <figcaption class="pv-caption">（縦）</figcaption>
+      ${renderPreviewScreen(settings, false)}
+    </figure>
+    <figure class="pv-figure" data-preview="data">
+      <figcaption class="pv-caption">DATA のタブ</figcaption>
+      <div class="pv-tabs">${tabs}</div>
+    </figure>
+  `
+
+  const note = document.getElementById("layoutPreviewNote")
+  if (note) note.textContent = getLayoutPreviewNote(settings)
+
+  // 変えた設定に関係するプレビューを少し光らせる
+  if (flashTarget) {
+    box.querySelectorAll(`[data-preview="${flashTarget}"] .pv-screen, [data-preview="${flashTarget}"] .pv-tabs`)
+      .forEach(el => el.classList.add("pv-flash"))
+  }
+}
+
+function getLayoutPreviewNote(settings) {
+
+  const board = settings.inputMode !== "buttons"
+  const inputOnly = !settings.gamePanels.round && !settings.gamePanels.stats
+
+  if (inputOnly && board && !settings.boardUndoButton) {
+    return "Input だけのときは、横向きでボードの四隅に Awards・ヒートマップ・グラフ・Stats を表示します（画面に余裕があるとき）。配置は端末の大きさで少し変わります。"
+  }
+  if (inputOnly && board) {
+    return "戻るボタンを表示しているときは、ボードの四隅のパネルは出ません。配置は端末の大きさで少し変わります。"
+  }
+  return "実際の配置は端末の大きさで少し変わります。"
+}
+
+// プレビューに関係する設定を変えたら描き直す
+function setupLayoutPreview() {
+
+  const watch = [
+    ["inputModeSetting", "game"],
+    ["boardUndoButtonSetting", "game"]
+  ]
+    .concat(Object.values(GAME_PANEL_TOGGLES).map(id => [id, "game"]))
+    .concat(Object.values(DATA_TAB_TOGGLES).map(id => [id, "data"]))
+
+  watch.forEach(([id, target]) => {
+    const input = document.getElementById(id)
+    if (input) input.addEventListener("change", () => renderLayoutPreview(target))
+  })
+
+  renderLayoutPreview()
+}
+
 async function initSettingsPage() {
   const bullSelect = document.getElementById("bullModeSetting")
   const roundSelect = document.getElementById("roundSetting")
@@ -382,6 +534,7 @@ async function initSettingsPage() {
   initBackupControls()
 
   loadSettings()
+  setupLayoutPreview()
   // 向きを適用する関数（main.js の applyOrientationPreference）は、このファイルより後に読み込まれるため、
   // ページの読み込みが終わってから適用する
   window.addEventListener("DOMContentLoaded", () => {

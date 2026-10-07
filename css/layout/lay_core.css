@@ -38,10 +38,10 @@ body {
   gap: 5px;
 
   height: calc(
-    100dvh - var(--header-height) - env(safe-area-inset-top) - 20px
+    100dvh - var(--header-height) - var(--safe-top) - 20px
   );
 
-  margin-top: env(safe-area-inset-top);
+  margin-top: var(--safe-top);
 
   padding: 5px 25px 10px 20px;
 }
@@ -70,7 +70,7 @@ body.page-countup .header {
   flex: none;
 
   height: auto;
-  padding: calc(8px + env(safe-area-inset-top)) 25px 8px 20px;
+  padding: calc(8px + var(--safe-top)) 25px 8px 20px;
   margin-bottom: 0;
 }
 

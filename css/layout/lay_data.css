@@ -10,8 +10,8 @@ main {
 }
 
 .header {
-  height: calc(var(--header-height) + env(safe-area-inset-top) + 20px);
-  padding: env(safe-area-inset-top) 25px 0 20px;
+  height: calc(var(--header-height) + var(--safe-top) + 20px);
+  padding: var(--safe-top) 25px 0 20px;
   
   margin-bottom: 1px;
   
@@ -29,8 +29,8 @@ main {
 
 @media (min-width: 768px) and (max-width: 1366px) {
   .tablet .header {
-    height: calc(env(safe-area-inset-top) + 52px);
-    padding: env(safe-area-inset-top) 12px 0 10px;
+    height: calc(var(--safe-top) + 52px);
+    padding: var(--safe-top) 12px 0 10px;
   }
 
   .tablet .header h1 {
@@ -56,21 +56,21 @@ body.page-data {
   padding-bottom: 0;
 
   /* ヘッダーの高さ（端末ごとの値。下の .tablet .header / .phone.* .header の指定と同じ値にする） */
-  --data-header-height: calc(var(--header-height, 60px) + env(safe-area-inset-top) + 20px);
+  --data-header-height: calc(var(--header-height, 60px) + var(--safe-top) + 20px);
 }
 
 @media (min-width: 768px) and (max-width: 1366px) {
   body.page-data.tablet {
-    --data-header-height: calc(env(safe-area-inset-top) + 52px);
+    --data-header-height: calc(var(--safe-top) + 52px);
   }
 }
 
 body.page-data.phone.landscape {
-  --data-header-height: calc(env(safe-area-inset-top) + 42px);
+  --data-header-height: calc(var(--safe-top) + 42px);
 }
 
 body.page-data.phone.portrait {
-  --data-header-height: calc(env(safe-area-inset-top) + 52px);
+  --data-header-height: calc(var(--safe-top) + 52px);
 }
 
 /* ヘッダーの高さもこの値で指定し、メイン部分の位置と必ず一致させる */
@@ -1736,8 +1736,8 @@ body.page-data main.data-container {
 }
 
 .phone.landscape .header {
-  height: calc(env(safe-area-inset-top) + 42px);
-  padding: env(safe-area-inset-top) calc(6px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 4px;
+  height: calc(var(--safe-top) + 42px);
+  padding: var(--safe-top) calc(6px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 4px;
 }
 
 .phone.landscape .header h1 {
@@ -1870,8 +1870,8 @@ body.phone.landscape.data-detail-view .session-card-body {
 }
 
 .phone.portrait .header {
-  height: calc(env(safe-area-inset-top) + 52px);
-  padding: env(safe-area-inset-top) calc(8px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 12px;
+  height: calc(var(--safe-top) + 52px);
+  padding: var(--safe-top) calc(8px + var(--phone-menu-edge-space) + env(safe-area-inset-right)) 0 12px;
 }
 
 .phone.portrait .header h1 {

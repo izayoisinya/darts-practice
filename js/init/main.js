@@ -31,7 +31,14 @@ async function initApp() {
   }
   
   if (document.getElementById("roundContainer")) {
+    // 01 で進行中のゲームがないときは、始める前に設定（点数・上がり方・ラウンド）を選ぶ
+    const hasSavedGame = !!localStorage.getItem(SAVE_KEY)
     initGame(true)
+    setupZeroOneScreen()
+    if (GAME_TYPE === "01") {
+      renderZeroOneRecord()
+      if (!hasSavedGame) openZeroOneSetup()
+    }
   }
   
   registerEvents()

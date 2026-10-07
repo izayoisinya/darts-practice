@@ -219,3 +219,149 @@
   color: rgb(255 255 255 / 0.22);
   text-shadow: none;
 }
+
+
+/* ===== 01 ===== */
+/* 01 のときだけ出すもの（ヘッダーの設定・Stats の上がり率など） */
+body:not(.game-01) .zeroone-only {
+  display: none !important;
+}
+
+.zeroone-info {
+  display: block;
+
+  margin-top: 4px;
+  padding: 2px 10px;
+
+  border: 1px solid rgb(var(--accent-rgb) / 0.35);
+  border-radius: 999px;
+  background: rgb(var(--accent-rgb) / 0.08);
+
+  color: rgb(var(--accent-rgb) / 0.85);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.phone .zeroone-info {
+  font-size: 9px;
+  padding: 1px 6px;
+}
+
+/* 01 の設定の画面（始める前・ヘッダーの設定を押したとき） */
+.zeroone-setup {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1500;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 16px;
+
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.zeroone-setup[hidden] {
+  display: none;
+}
+
+.zeroone-setup-panel {
+  width: min(520px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  padding: 20px;
+
+  border-radius: 16px;
+  border: 1px solid rgb(var(--accent-rgb) / 0.3);
+  background: linear-gradient(165deg, #151922 0%, #10141d 100%);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.zeroone-setup-title {
+  margin: 0;
+
+  color: var(--accent);
+  font-size: 20px;
+  letter-spacing: 2px;
+}
+
+.zeroone-setup-label {
+  margin-bottom: 8px;
+
+  color: rgb(var(--accent-rgb) / 0.8);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.zeroone-setup-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.zeroone-setup-options button {
+  flex: 1 1 auto;
+  min-width: 64px;
+  min-height: 42px;
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: #1c212b;
+
+  color: #e2e8f0;
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.zeroone-setup-options button.selected {
+  border-color: var(--accent);
+  background: rgb(var(--accent-rgb) / 0.16);
+  color: var(--accent);
+}
+
+.zeroone-setup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.zeroone-setup-actions button {
+  min-width: 110px;
+  min-height: 44px;
+
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.zeroone-setup-cancel {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: #cbd5e1;
+}
+
+.zeroone-setup-start {
+  border: none;
+  background: var(--accent);
+  color: #04110d;
+}

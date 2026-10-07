@@ -325,7 +325,7 @@ function changeView(mode) {
     currentPage = 1
     groupedPageMode = 'game'
     
-    const sessions = readSessions()
+    const sessions = readDataSessions()
     
     const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
     
@@ -371,7 +371,7 @@ function renderView() {
 
 function loadStats() {
   
-  const sessions = readSessions()
+  const sessions = readDataSessions()
   
   const statsContainer = document.getElementById("statsContainer")
   const awardsContainer = document.getElementById("awardsContainer")
@@ -525,6 +525,7 @@ window.addEventListener("pageshow", () => {
 })
 
 function isLikelyGeneratedTestSession(session) {
+  if ((session?.gameType || "countup") !== "countup") return false
   const roundScores = Array.isArray(session?.roundScores)
     ? session.roundScores
     : Array.isArray(session?.rounds)
@@ -557,6 +558,7 @@ function isLikelyGeneratedTestSession(session) {
 }
 
 function removeGeneratedTestData() {
+  // 書き戻すので、01 も含めた全部の記録から探す（消すのはカウントアップのテストデータだけ）
   const sessions = readSessions()
   if (!Array.isArray(sessions) || sessions.length === 0) {
     alert("削除対象データがありません")
@@ -596,7 +598,7 @@ function drawGameScoresChart() {
   ctx.clearRect(0, 0, width, height)
   setScoreChartTitle("Score Trend (Last 30 Games)")
   
-  const sessions = readSessions()
+  const sessions = readDataSessions()
   
   if (sessions.length === 0) {
     ctx.fillStyle = "rgba(255,255,255,0.3)"
@@ -1011,7 +1013,7 @@ function drawSelectedRangeChart() {
   const legend = document.getElementById("rangeChartLegend")
   if (!canvas || !startInput || !endInput || !compareStartInput || !compareEndInput) return
 
-  const sessions = readSessions()
+  const sessions = readDataSessions()
   ensureRangeDefaults(sessions)
 
   const canvasState = setupHiDPICanvas(canvas, 220)
@@ -1242,7 +1244,7 @@ function renderScatterTagControls(sessions) {
 }
 
 function renderAnalysisScatter() {
-  const sessions = readSessions()
+  const sessions = readDataSessions()
   const tags = renderScatterTagControls(sessions)
   drawScatterChart(sessions, tags)
 }

@@ -33,7 +33,7 @@
 
 ```
 index.html      メインメニュー（ゲーム選択 / Data / Settings / Info）
-countup.html    COUNT-UP ゲーム画面（Rounds / Input / Stats の 3 エリア）
+countup.html    COUNT-UP ゲーム画面（Rounds / Input / Stats の 3 エリア）。?game=01 で 01（同じ画面を GAME_TYPE で切り替え）
 data.html       スコア記録データの表示（Statistics）
 settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、表示エリア・データタブの表示/非表示、画面向き、ストレージ状況）
 news.html       お知らせ
@@ -51,7 +51,8 @@ manifest.json   PWA マニフェスト
 | core/ | backup.js | バックアップの書き出し・読み込み（ゲーム記録と日別メモの JSON 化・取り込み）。DOM 操作なし（UI は settings.js） |
 | init/ | main.js | 初期化（`initApp()`）、イベント登録（`registerEvents()`）、SW 登録、メニュー画面のサマリー |
 | game/ | game_core.js | ゲーム共通ロジック（次ゲーム、Undo、終了判定、リセット）。UI 生成は含まない |
-| game/ | game_countup.js | COUNT-UP 固有ロジック（`initGame()`, `addDart()`）。UI 生成は含まない |
+| game/ | game_countup.js | COUNT-UP 固有ロジック（`initGame()`, `addDart()`）。UI 生成は含まない。01 もこの流れを使う |
+| game/ | game_01.js | 01 のルール（バスト・上がり・残りの計算 `computeZeroOne()`、次に入れる場所 `syncZeroOnePosition()`、設定、上がり率の集計）。UI 生成は含まない |
 | game/ | cu_ui.js | COUNT-UP の UI 生成・DOM 操作 |
 | game/ | board_input.js | ボード形式の入力（ダーツボードの SVG 生成・タップ位置の判定）。設定 `inputMode` が `"board"` のとき `createNumberTable()` から使う |
 | game/ | stats.js | スタッツ・アワード計算。**UI 表示・DOM 操作は含まない**（再利用できる形にする） |
@@ -79,13 +80,14 @@ manifest.json   PWA マニフェスト
 | キー | 保存先 | 内容 |
 | --- | --- | --- |
 | `dartsPracticeDB` / store `app` / key `sessions` | IndexedDB | 終了したゲームの履歴。使えない環境では LocalStorage `dartsSessionsV2` にフォールバック（旧形式 `dartsSessions` から移行） |
-| `dartsPractice` | LocalStorage | 進行中ゲームの状態（`saveGame()` / `loadGame()`） |
+| `dartsPractice` / `dartsPractice01` | LocalStorage | 進行中ゲームの状態（カウントアップ / 01。`saveGame()` / `loadGame()`。キーは `SAVE_KEY`） |
+| `dartsZeroOne` | LocalStorage | 01 の設定（点数・上がり方・ラウンドの上限） |
 | `dartsSettings` | LocalStorage | 設定 |
 | `dartsDayNotesV2` | LocalStorage | 日別メモ（コメント・タグ・画像） |
 
 - セッションは保存時に短縮キーへシリアライズされる（`serializeSessionForStorage()`：`d` date, `s` score, `p` ppd, `r` roundScores, `a` awards 配列, `dt` 1 投ごとの記録（刺さった場所・ボード入力の位置）など）。アプリ内では `normalizeSessionForApp()` の形で扱う
 - フィールドを追加するときは serialize / deserialize / normalize の 3 箇所を揃え、**既存ユーザーの保存データを壊さない**（欠損時のデフォルト値を用意する）
-- `gameType` は現在 `"countup"` のみ。新しいゲームはこれで区別する
+- `gameType` は `"countup"` / `"01"`。01 の結果は `zeroOne`（保存時 `z`）。データ画面は今はカウントアップだけを扱う（`readDataSessions()`）
 - 保存するデータを増やしたら、バックアップ（`backup.js` の書き出し・読み込み）にも含めるか検討する。ファイル形式を変えるときは `BACKUP_VERSION` を上げ、古い形式も読めるようにする
 
 ## Service Worker の注意
@@ -96,7 +98,7 @@ manifest.json   PWA マニフェスト
 
 ## 今後の予定
 
-- ゲーム追加：01、Cricket、Half-it、Shoot-out（メニュー・サイドメニューに `Coming Soon` のボタンあり）、プロテストモード（内容は未定）
+- ゲーム追加：Cricket、Half-it、Shoot-out（メニュー・サイドメニューに `Coming Soon` のボタンあり）、プロテストモード（内容は未定）
 - 機能追加：高度な分析機能、将来的にはユーザーアカウント・オンライン対戦・AI 対戦
 - ダーツボード形式の入力：入力パネルをボード（SVG）にし、設定画面でボタン形式と切り替え（実装済み。`board_input.js`）。最終目標は刺さった位置（座標）を保存して分析すること。詳細は `docs/design.md` の「11. 今後の拡張予定」
 - カメラからの自動入力（入力の最終形）：カメラ映像を表示し 20・6・3・11 の 4 点でキャリブレーション。映像を見張って撮影ボタンなしで 3 投を自動判定し、だめなときは撮影ボタン、外れたときはボード形式の入力で修正。位置はセグメント内 6 分割程度の粗さで十分、保存は座標で行い区画分けは分析時に決める。詳細は `docs/design.md` の「11. 今後の拡張予定」

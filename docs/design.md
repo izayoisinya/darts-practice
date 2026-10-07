@@ -179,6 +179,20 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 `element.animate()` が使えないブラウザや、端末で「視差効果を減らす」が有効な場合はアニメーションせずに切り替える。CSS 側でエリアの幅に transition を付けると測定がずれるため付けないこと。
 
+### 4.2.1 01（countup.html?game=01）
+
+01 はカウントアップと同じ画面（`countup.html`）を `?game=01` で開く。HTML・CSS・入力（ボード / ボタン）・戻る・ヘッダーの数字の削除・ボードの横のパネルはカウントアップと共用し、ゲームの種類（`state.js` の `GAME_TYPE`）で違うところだけ切り替える。
+
+- **設定**：点数（301 / 501 / 701 / 901 / 1101 / 1501）、上がり方（Open Out / Double Out / Master Out）、ラウンドの上限（R5 / R10 / R15 / R20）。進行中のゲームがないときは始める前に設定の画面を出す。ヘッダーの設定の表示（例：`501 · Double Out · R15`）を押すと変えられる（投げている途中なら確かめてから、今のゲームは記録せずに始め直す。終わったゲームは記録してから始める）。設定は LocalStorage の `dartsZeroOne` に残し、NEXT GAME では同じ設定で続ける
+- **ルール**（`game_01.js`）：
+  - 残り点数より多く取る、Double / Master Out で残り 1 にする、上がり方に合わない 1 投で 0 にする → **バスト**。そのラウンドは 0 点で、残りはラウンドの前に戻り、次のラウンドへ進む
+  - ちょうど 0 → **上がり**（ゲーム終了）。Double Out はダブル（FAT のブル・インブルを含む。SEPARATE の 25 点のブルは不可）、Master Out はダブルかトリプルで上がる
+  - ラウンドの上限まで終わったら上がれなくても終了
+  - 1 投ごとの記録（`game.rounds`）はカウントアップと同じ形で持ち、残り・バスト・上がりは毎回そこから計算し直す（`computeZeroOne()`）。次に入れる場所も計算で決める（`syncZeroOnePosition()`）ので、戻る・ヘッダーの数字の削除をしてもずれない
+- **表示**：ヘッダーの大きな数字は残り点数。Rounds の右はそのラウンドのあとの残り（バストは BUST、上がりは OUT）。Stats とボードの横の Stats パネルに、今の設定（点数・上がり方・ラウンドが同じ）で終えたゲームの**上がり率**（上がった数 / ゲーム数）と**上がるまでの平均ダーツ数**（ベスト）を出す。ゲームが終わったら画面の中央に「OUT · 18 DARTS」か「NO OUT」を出す
+- **集計**：PPD・平均・最高は、バストのラウンドを 0 点として計算する（実際に減らした点 ÷ 投げた本数）。アワードはカウントアップと同じ判定
+- データ画面は今はカウントアップの記録だけを出す（`data_loader.js` の `readDataSessions()`）。01 の記録の表示は今後
+
 ### 4.3 data.html（データ表示画面）
 
 ![データ表示画面 Game ビュー（タブレット横）](images/data_tablet.jpg)
@@ -370,6 +384,21 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `deleteDart(roundIndex, dartIndex)` | 今のラウンドの 1 投だけを消して後ろの投を前に詰める（ヘッダーの数字のタップ。確定済みラウンドは消せない） |
 | `isGameComplete()` | 全ラウンド入力済みかを判定する |
 | `forceResetGame()` | 進行中のゲームだけをリセットする（確認ダイアログあり。保存済みの記録は消さない） |
+
+#### game/game_01.js
+
+01 のルール（UI は含まない）。
+
+| 名前 | 内容 |
+| --- | --- |
+| `ZERO_ONE_STARTS` / `ZERO_ONE_OUTS` / `ZERO_ONE_ROUND_LIMITS` | 選べる点数・上がり方・ラウンドの上限 |
+| `readZeroOneConfig()` / `writeZeroOneConfig()` / `normalizeZeroOneConfig()` | 01 の設定（`dartsZeroOne`）の読み書き |
+| `isZeroOneFinishDart()` / `isZeroOneBust()` | 上がれる 1 投か / バストか |
+| `computeZeroOne(rounds, config)` | 全ラウンドを頭から計算し、ラウンドごとの点・バスト・上がり・残り、上がるまでのダーツ数などを返す |
+| `syncZeroOnePosition()` | 次に入れる場所（`currentRound` / `currentDart`）を計算で決め直す。バスト・上がりのラウンドの残りの枠と、上がったあとのラウンドは空にする |
+| `getZeroOneRecord(config)` | 同じ設定で終えたゲームの上がり率・上がるまでの平均 / 最少ダーツ数 |
+| `getZeroOneResult()` | 終えたゲームの結果（履歴の `zeroOne`） |
+| `getRoundScoreList()` | ラウンドごとの点と終わったか（カウントアップと 01 で共通の形。グラフ・集計で使う） |
 
 #### game/game_countup.js
 
@@ -572,7 +601,9 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | --- | --- | --- |
 | `dartsPracticeDB` / store `app` / key `sessions` | IndexedDB | ゲーム履歴。IndexedDB が使えない場合は LocalStorage の `dartsSessionsV2` に保存 |
 | `dartsSessions` | LocalStorage | 旧形式のゲーム履歴（読み込み時に新形式へ移行） |
-| `dartsPractice` | LocalStorage | 進行中のゲーム |
+| `dartsPractice` | LocalStorage | 進行中のゲーム（カウントアップ） |
+| `dartsPractice01` | LocalStorage | 進行中のゲーム（01） |
+| `dartsZeroOne` | LocalStorage | 01 の設定（`{ start, out, rounds }`） |
 | `dartsSettings` | LocalStorage | 設定 |
 | `dartsDayNotesV2` | LocalStorage | 日別メモ |
 
@@ -583,7 +614,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | アプリ内 | 保存時 | 内容 |
 | --- | --- | --- |
 | `date` | `d` | 終了日時（ミリ秒） |
-| `score` | `s` | 合計スコア |
+| `score` | `s` | 合計スコア（01 は減らした点。バストのラウンドは 0） |
 | `ppd` | `p` | 1 投あたりの平均点 |
 | `bulls` | `b` | ブル数（アウター＋インナー） |
 | `innerBulls` | `i` | インナーブル数 |
@@ -594,7 +625,8 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `awards` | `a` | アワードごとの回数（保存時は配列） |
 | `totalAwards` | `ta` | アワード合計数 |
 | `roundScores` | `r` | 各ラウンドのスコア |
-| `gameType` | `g` | ゲームの種類（現在は `"countup"` のみ） |
+| `gameType` | `g` | ゲームの種類（`"countup"` / `"01"`） |
+| `zeroOne` | `z` | 01 の結果（カウントアップは `null`。保存時は省く）。`{ start, out, rounds, finished, finishDarts, remaining }`、保存時は `[start, 上がり方（0 open / 1 double / 2 master）, rounds, 上がったか 1/0, finishDarts, remaining]` |
 | `darts` | `dt` | 1 投ごとの記録（2026.10.7 から。下記）。それより前の記録は空の配列（保存時は `dt` 自体を省く） |
 
 **1 投ごとの記録（`darts`）**
@@ -614,8 +646,8 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 
 ```js
 {
-  gameType: "countup",
-  rounds: [                 // 8 ラウンド × 3 投。未入力は null
+  gameType: "countup",      // 01 は "01" で、zeroOne: { start, out, rounds } も持つ
+  rounds: [                 // 8 ラウンド（01 は設定のラウンド数）× 3 投。未入力は null
     [{ value, multiplier, score, special, boardTap?, pos? }, …],
     …
   ],
@@ -865,3 +897,4 @@ graph LR
 | 2026.10.8 | サイドメニューをグループ（Game / Utility / This Game）に分け、今いる画面のボタンを目立たせた |
 | 2026.10.8 | サイドメニューを共通化し、各 HTML に直書きしていた中身を `core.js` の `renderSideMenu()` で作るようにした |
 | 2026.10.8 | Service Worker が HTML を毎回サーバーに確かめて取るようにし、インストール時の先読みもブラウザの古いファイルを使わないようにした（更新直後に画面ごとに新旧が混ざるのを防ぐ） |
+| 2026.10.8 | 01 を追加（`countup.html?game=01`、`game_01.js`）。点数 301〜1501・Open / Double / Master Out・ラウンドの上限 R5〜R20 を選べ、上がり率と上がるまでのダーツ数を表示する。データ画面はカウントアップの記録だけを出すようにした |

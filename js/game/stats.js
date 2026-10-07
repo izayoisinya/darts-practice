@@ -125,6 +125,17 @@ function calculateStats() {
 
 
   // ------------------------------------------
+  // 01：バストのラウンドは点を減らせていないので 0 点として数える
+  // ------------------------------------------
+  if (GAME_TYPE === "01" && typeof getRoundScoreList === "function") {
+    const list = getRoundScoreList().filter(round => round.thrown > 0)
+    totalScore = list.reduce((sum, round) => sum + round.score, 0)
+    maxRound = list.reduce((max, round) => Math.max(max, round.score), 0)
+    completedRounds = list.length
+  }
+
+
+  // ------------------------------------------
   // ⑤ 平均計算
   // ------------------------------------------
   const ppd = totalDarts ?
@@ -172,8 +183,10 @@ function updateStats() {
   
   const stats = calculateStats()
   
-  // ===== Header =====
-  $("totalScore").textContent = stats.totalScore
+  // ===== Header =====（01 は残り点数）
+  $("totalScore").textContent = GAME_TYPE === "01"
+    ? computeZeroOne().remaining
+    : stats.totalScore
   
   // ===== Basic =====
   $("bullCount").textContent = stats.bullCount

@@ -184,6 +184,31 @@ body.page-countup.hide-round-area.hide-stats-area .container {
   animation: undoToast 0.9s ease forwards;
 }
 
+/* 01 のバスト（赤）・上がり（金）は大きく、少し長く出す */
+.undo-toast.bust,
+.undo-toast.out {
+  padding: 14px 36px;
+  font-size: 30px;
+  letter-spacing: 3px;
+}
+
+.undo-toast.bust {
+  border-color: rgba(255, 90, 90, 0.8);
+  color: #ff6b6b;
+  text-shadow: 0 0 12px rgba(255, 90, 90, 0.7);
+}
+
+.undo-toast.out {
+  border-color: rgba(255, 213, 79, 0.8);
+  color: #ffd54f;
+  text-shadow: 0 0 12px rgba(255, 213, 79, 0.7);
+}
+
+.undo-toast.bust.show,
+.undo-toast.out.show {
+  animation-duration: 1.6s;
+}
+
 @keyframes undoToast {
   0% { opacity: 0; transform: translate(-50%, -40%); }
   15% { opacity: 1; transform: translate(-50%, -50%); }

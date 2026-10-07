@@ -126,6 +126,9 @@ function createNumberTable() {
   document.body.classList.toggle("input-board", useBoard);
   table.classList.toggle("board-mode", useBoard);
   
+  // 横向きでボードの大きさに合わせて入力エリアの幅を決める（ボード以外のときは解除）
+  fitBoardColumn(useBoard);
+  
   if (useBoard) {
     renderBoardInput(table);
     return;
@@ -205,6 +208,49 @@ function createNumberRow(num) {
   row.appendChild(triple);
   
   return row;
+}
+
+
+// ===============================
+// ===== ボードに合わせた入力エリアの幅 =====
+// ===============================
+// 横向きのボード入力では、ボードが入力エリアの「高さ」いっぱいの大きさになるよう、
+// 入力エリアの列の幅をボードの高さに合わせる（--board-col。使う側は lay_input.css）。
+// 幅が足りないとき（ほかのエリアが狭くなりすぎるとき）は上限で止め、ボードは幅に合わせて小さくなる
+const BOARD_COLUMN_MAX_RATIO = { three: 0.42, two: 0.62 }
+
+function fitBoardColumn(useBoard) {
+
+  const container = document.querySelector(".container")
+  const table = document.getElementById("numberTable")
+  if (!container || !table) return
+
+  const body = document.body
+
+  if (!useBoard || !body.classList.contains("landscape")) {
+    container.style.removeProperty("--board-col")
+    return
+  }
+
+  // 列の幅を変えてもボードを置く場所の高さは変わらないので、描き直す前に測れる
+  const inputArea = document.querySelector(".input-area")
+  const boardHeight = table.clientHeight
+  if (!inputArea || !boardHeight) return
+
+  const style = getComputedStyle(inputArea)
+  const sideSpace =
+    parseFloat(style.paddingLeft) + parseFloat(style.paddingRight) +
+    parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth)
+
+  const columns =
+    1 +
+    (body.classList.contains("hide-round-area") ? 0 : 1) +
+    (body.classList.contains("hide-stats-area") ? 0 : 1)
+
+  const maxRatio = columns >= 3 ? BOARD_COLUMN_MAX_RATIO.three : BOARD_COLUMN_MAX_RATIO.two
+  const width = Math.min(boardHeight + sideSpace, container.clientWidth * maxRatio)
+
+  container.style.setProperty("--board-col", `${Math.round(width)}px`)
 }
 
 

@@ -2404,10 +2404,69 @@ main.data-container.analysis-mode .pagination {
   height: 100%;
 }
 
-.heatmap-hits {
+.heatmap-side {
   flex: 1 1 220px;
   min-width: 0;
   max-width: 420px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.heatmap-hits {
+  min-width: 0;
+}
+
+/* 中心からの距離（レンジ） */
+.heatmap-range:empty {
+  display: none;
+}
+
+.heatmap-range-title {
+  margin-bottom: 8px;
+
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.heatmap-range-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.heatmap-range-values span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 8px 4px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(71, 85, 105, 0.45);
+  background: rgba(15, 23, 42, 0.85);
+
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.heatmap-range-values b {
+  color: var(--accent);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.heatmap-range-values small {
+  font-size: 10px;
+}
+
+.heatmap-range-note {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .heatmap-hits-title {

@@ -539,6 +539,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `collectHeatmapData(sessions)` | 位置のある投の位置の一覧、刺さった場所ごとの本数、投数・ゲーム数を集める |
 | `drawHeatmap(points)` / `paintHeatmap(ctx, width, height, points, highlight)` / `drawHeatmapBoard()` | ボードの図（本物の比率）を描き、その上に色を重ね、1 投ずつの位置を小さな点で描く（`highlight` の位置は白い縁取りの点） |
 | `paintRadarHeatmap(ctx, width, height, points, highlight, rgb)` | ゲーム画面用のレーダー風の描画。暗い緑の円に、ボードの輪・区画の線・外周の目盛り・数字を描き、刺さった位置をぼかした光（`lighter` で重ねる）で表す。回る走査線は CSS の `.game-radar-sweep`（`conic-gradient` を回転。動きを減らす設定では止める） |
+| `getRangeStats(points)` / `renderHeatmapRange()` / `drawRangeCircles()` | レンジ（中心からの距離）：位置の中心からの距離の 50%・80% の円の半径と平均を mm（ダブルの外側 = 170mm）で出し、ヒートマップに点線の円で重ねる。ゲーム画面のレーダーの投数の横にも、カウントアップのときだけ R50 を出す。タップした位置からのざっくりした目安 |
 | `createHeatLayer()` / `getHeatmapPalette()` | 1 投ずつぼかした円を足し合わせ（`lighter`）、いちばん多い場所を最大にした相対値で 青→水色→緑→黄→赤 に色付けした画像を作る |
 
 - 位置があるのはボード入力で入れた投だけ。「よく刺さった場所」はボタン入力の投も含めて数える
@@ -914,3 +915,4 @@ graph LR
 | 2026.10.8 | ボードの印（何投目か）の縁取りを SVG の単位で描くようにした（`vector-effect: non-scaling-stroke` だと iPad の Safari で、印を描き直したときに前の印の縁が線になって残ることがあったため） |
 | 2026.10.8 | データ画面に Count-Up / 01 の切り替えを追加し、01 の記録（設定ごとの上がり率・上がるまでのダーツ数・推移・一覧）を見られるようにした（`data_01.js`） |
 | 2026.10.8 | データ画面の 01 に、上がりナンバーの割合（Finish Numbers）と、80% スタッツから出したレーティングの目安を追加 |
+| 2026.10.8 | レンジ（ブルの中心からの距離）の目安を追加。データ画面の Analysis に 50%・80% の円の半径と平均（mm）を出してヒートマップに円を重ね、ゲーム画面のレーダーにもこのゲームの R50 を出す（カウントアップのみ） |

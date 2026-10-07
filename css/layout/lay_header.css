@@ -142,27 +142,69 @@
 /* ====== CURRENT ROUND DARTS ====== */
 /* ================================= */
 
-/* 合計スコアの右に出す、今のラウンドの各ダーツの得点（cu_ui.js の renderHeaderRound()） */
-.header-round {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/*
+  今のラウンドの各ダーツの得点（cu_ui.js の renderHeaderRound()）。
+  合計スコアの桁数に関係なく、ヘッダーの横方向の真ん中に固定する。
+  数字は合計スコアと同じ光る数字で、色だけ投げた場所（トリプル・ダブル・ブル・ミス）で変える
+*/
+.score-panel {
+  position: relative;
+}
 
-  margin-left: 24px;
+.header-round {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .header-round-label {
-  min-width: 40px;
-
-  color: var(--text-muted);
-  font-size: 22px;
+  color: rgb(var(--accent-rgb) / 0.6);
+  font-size: 13px;
   font-weight: 700;
+  letter-spacing: 3px;
+  line-height: 1;
 }
 
-.header-round .dart {
-  width: 76px;
-  height: 52px;
+.header-round-darts {
+  display: flex;
+  align-items: baseline;
+  gap: 28px;
+}
 
-  font-size: 26px;
-  font-weight: 700;
+.header-dart {
+  --dart-glow: var(--accent-rgb);
+
+  min-width: 1.6em;
+
+  color: rgb(var(--dart-glow));
+  font-size: 44px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+
+  text-shadow:
+    0 0 6px rgb(var(--dart-glow) / 0.8),
+    0 0 16px rgb(var(--dart-glow) / 0.6),
+    0 0 32px rgb(var(--dart-glow) / 0.35);
+}
+
+/* 色は Rounds エリアと同じ意味（トリプル＝青、ダブル＝赤、インブル＝金、アウターブル＝緑） */
+.header-dart.triple { --dart-glow: 77 171 255; }
+.header-dart.double { --dart-glow: 255 90 90; }
+.header-dart.inner-bull { --dart-glow: 255 213 79; }
+.header-dart.outer-bull { --dart-glow: var(--accent-rgb); }
+
+.header-dart.miss,
+.header-dart.empty {
+  color: rgb(255 255 255 / 0.22);
+  text-shadow: none;
 }

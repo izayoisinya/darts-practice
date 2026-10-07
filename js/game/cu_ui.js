@@ -14,21 +14,25 @@ function updateUI() {
 // ===============================
 // ===== ダーツ1本描画 ==========
 // ===============================
+// 1 投の種類に合わせた色分けのクラス（ミス・ブル・トリプル・ダブル）
+function getDartClass(dart) {
+  
+  if (!dart) return ""
+  if (dart.score === 0) return " miss"
+  if (dart.special === "innerBull") return " inner-bull"
+  if (dart.special === "outerBull") return " outer-bull"
+  if (dart.multiplier === 3) return " triple"
+  if (dart.multiplier === 2) return " double"
+  return ""
+}
+
 function renderDart(dart) {
   
   if (!dart) {
     return `<span class="dart">-</span>`
   }
   
-  let cls = ""
-  
-  if (dart.score === 0) cls = " miss"
-  else if (dart.special === "innerBull") cls = " inner-bull"
-  else if (dart.special === "outerBull") cls = " outer-bull"
-  else if (dart.multiplier === 3) cls = " triple"
-  else if (dart.multiplier === 2) cls = " double"
-  
-  return `<span class="dart${cls}">
+  return `<span class="dart${getDartClass(dart)}">
     ${dart.score}
   </span>`
 }
@@ -93,9 +97,16 @@ function renderHeaderRound() {
   const index = Math.min(getDisplayRoundIndex(), TOTAL_ROUNDS - 1)
   const round = game.rounds[index] || [null, null, null]
 
+  // 合計スコアと同じ光る数字で出す（まだ投げていない分は薄い「-」）
+  const darts = round
+    .map(dart => dart
+      ? `<span class="header-dart${getDartClass(dart)}">${dart.score}</span>`
+      : `<span class="header-dart empty">-</span>`)
+    .join("")
+
   el.innerHTML = `
     <span class="header-round-label">R${index + 1}</span>
-    ${renderDart(round[0])}${renderDart(round[1])}${renderDart(round[2])}
+    <span class="header-round-darts">${darts}</span>
   `
 }
 

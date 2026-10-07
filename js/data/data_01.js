@@ -371,6 +371,11 @@ function createZeroOneCardHtml(session, gameNumber) {
           ${rateRow("In", hits.inner, " inner")}
           ${rateRow("T", hits.triples, " triple")}
         </div>
+
+        <div class="session-meta-block session-triple-block">
+          <div class="session-meta-title">Triple</div>
+          ${createZeroOneTripleHtml(session)}
+        </div>
       </div>
 
       <div class="session-side-block">
@@ -384,6 +389,24 @@ function createZeroOneCardHtml(session, gameNumber) {
     <div class="session-meta-block session-awards-block">
       <div class="session-meta-title">Awards</div>
       <div class="session-awards-grid">${createAwardsHtml(session)}</div>
+    </div>
+  `
+}
+
+// 20〜15 のトリプルの本数（カウントアップの履歴カードの Triple と同じ形。1 投ごとの記録から数える）
+function createZeroOneTripleHtml(session) {
+  const counts = {}
+  for (let n = 15; n <= 20; n++) counts[n] = 0
+  ;(Array.isArray(session.darts) ? session.darts : []).forEach(dart => {
+    const match = dart && /^T(\d+)$/.exec(dart.hit)
+    if (match && counts[match[1]] !== undefined) counts[match[1]]++
+  })
+
+  return `
+    <div class="session-triple-grid">
+      ${[20, 19, 18, 17, 16, 15].map(n => `
+        <div class="session-triple-item"><span class="session-triple-label">${n}:</span><span class="session-triple-value">${counts[n]}</span></div>
+      `).join("")}
     </div>
   `
 }

@@ -101,7 +101,7 @@ function showGameDetails(dateKey, gamesList) {
 }
 
 function getSessionsGroupedByDay() {
-  const sessions = readSessions()
+  const sessions = readDataSessions()
   const grouped = {}
   ;(sessions || []).forEach(s => {
     if (!s || !s.date) return

@@ -14,8 +14,15 @@ function initGame(load = true) {
   boardZoomReset = settings.boardZoomReset === "round" ? "round" : "manual"
   undoSwipeDirection = settings.undoSwipeDirection === "right" ? "right" : "left"
 
+  // 01：設定（点数・上がり方・ラウンドの上限）を読み込む。進行中のゲームがあれば、そのゲームの設定を使う（loadGame()）
+  if (GAME_TYPE === "01") {
+    zeroOneConfig = readZeroOneConfig()
+    TOTAL_ROUNDS = zeroOneConfig.rounds
+  }
+
   if (load && loadGame()) {
     // セーブデータ読み込み成功
+    if (GAME_TYPE === "01") syncZeroOnePosition()
   } else {
 
     game.currentRound = 0
@@ -50,6 +57,7 @@ function initGame(load = true) {
 function addDart(value, multiplier, special = null, boardTap = null, pos = null) {
   
   if (game.currentRound >= TOTAL_ROUNDS) return
+  if (GAME_TYPE === "01" && isGameComplete()) return
   
   if (game.currentDart === 0 && game.currentRound > lockedRound + 1) {
     lockedRound = game.currentRound - 1
@@ -74,11 +82,16 @@ function addDart(value, multiplier, special = null, boardTap = null, pos = null)
 
   game.rounds[game.currentRound][game.currentDart] = dart
   
-  game.currentDart++
-  
-  if (game.currentDart === 3) {
-    game.currentDart = 0
-    game.currentRound++
+  if (GAME_TYPE === "01") {
+    // バスト・上がりのときは 3 本そろわなくてもラウンドが終わる
+    syncZeroOnePosition()
+  } else {
+    game.currentDart++
+    
+    if (game.currentDart === 3) {
+      game.currentDart = 0
+      game.currentRound++
+    }
   }
   
   updateUI()

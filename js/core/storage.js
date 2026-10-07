@@ -1,4 +1,5 @@
-const SAVE_KEY = "dartsPractice"
+// 進行中のゲーム（カウントアップと 01 は別々に持つ）
+const SAVE_KEY = typeof GAME_TYPE !== "undefined" && GAME_TYPE === "01" ? "dartsPractice01" : "dartsPractice"
 const SESSIONS_KEY = "dartsSessionsV2"
 const LEGACY_SESSIONS_KEY = "dartsSessions"
 const SESSION_DB_NAME = "dartsPracticeDB"
@@ -136,6 +137,46 @@ function serializeDartRecords(darts) {
   })
 }
 
+// 01 のゲームの結果（カウントアップは null）
+//   アプリ内：{ start, out, rounds, finished, finishDarts, remaining }
+//   保存時：[start, 上がり方（0 open / 1 double / 2 master）, rounds, 上がったか（1/0）, finishDarts, remaining]
+const ZERO_ONE_OUT_CODES = ["open", "double", "master"]
+
+function normalizeZeroOneRecord(value) {
+  if (!value || typeof value !== "object") return null
+
+  const source = Array.isArray(value)
+    ? {
+        start: value[0],
+        out: ZERO_ONE_OUT_CODES[value[1]],
+        rounds: value[2],
+        finished: value[3] === 1,
+        finishDarts: value[4],
+        remaining: value[5]
+      }
+    : value
+
+  return {
+    start: toFiniteNumber(source.start, 501),
+    out: ZERO_ONE_OUT_CODES.includes(source.out) ? source.out : "double",
+    rounds: toFiniteNumber(source.rounds, 15),
+    finished: source.finished === true,
+    finishDarts: toFiniteNumber(source.finishDarts, 0),
+    remaining: toFiniteNumber(source.remaining, 0)
+  }
+}
+
+function serializeZeroOneRecord(record) {
+  return [
+    record.start,
+    Math.max(0, ZERO_ONE_OUT_CODES.indexOf(record.out)),
+    record.rounds,
+    record.finished ? 1 : 0,
+    record.finishDarts,
+    record.remaining
+  ]
+}
+
 function normalizeSessionForApp(session) {
   if (!session || typeof session !== "object") return null
 
@@ -163,7 +204,8 @@ function normalizeSessionForApp(session) {
     roundScores,
     // 1 投ごとの記録（2026.10.7 から。それより前の記録は空）
     darts: normalizeDartRecords(session.darts),
-    gameType: String(session.gameType || "countup")
+    gameType: String(session.gameType || "countup"),
+    zeroOne: normalizeZeroOneRecord(session.zeroOne)
   }
 }
 
@@ -185,7 +227,8 @@ function serializeSessionForStorage(session) {
     ta: normalized.totalAwards,
     r: normalized.roundScores,
     g: normalized.gameType,
-    ...(normalized.darts.length ? { dt: serializeDartRecords(normalized.darts) } : {})
+    ...(normalized.darts.length ? { dt: serializeDartRecords(normalized.darts) } : {}),
+    ...(normalized.zeroOne ? { z: serializeZeroOneRecord(normalized.zeroOne) } : {})
   }
 }
 
@@ -206,7 +249,8 @@ function deserializeSessionFromStorage(session) {
     totalAwards: session.ta,
     roundScores: session.r,
     darts: session.dt,
-    gameType: session.g
+    gameType: session.g,
+    zeroOne: session.z
   })
 }
 
@@ -452,7 +496,8 @@ function getSessionsStorageBackend() {
 function saveGame() {
   
   const data = {
-    gameType: "countup",
+    gameType: GAME_TYPE,
+    ...(GAME_TYPE === "01" ? { zeroOne: zeroOneConfig } : {}),
     rounds: game.rounds,
     currentRound: game.currentRound,
     currentDart: game.currentDart,
@@ -470,6 +515,11 @@ function loadGame() {
   if (!data) return false
   
   const saved = JSON.parse(data)
+
+  if (GAME_TYPE === "01" && typeof normalizeZeroOneConfig === "function") {
+    zeroOneConfig = normalizeZeroOneConfig(saved.zeroOne)
+    TOTAL_ROUNDS = zeroOneConfig.rounds
+  }
   
   game.rounds = saved.rounds
   game.currentRound = saved.currentRound
@@ -520,10 +570,12 @@ function saveSession() {
     ).length
   }
   
-  // ===== Round Avg =====
-  const roundScores = game.rounds.map(round =>
-    round.reduce((sum, d) => sum + (d?.score || 0), 0)
-  )
+  // ===== Round Avg =====（01 はバストのラウンドを 0 点にした、実際に減らした点）
+  const roundScores = typeof getRoundScoreList === "function"
+    ? getRoundScoreList().map(round => round.score)
+    : game.rounds.map(round =>
+      round.reduce((sum, d) => sum + (d?.score || 0), 0)
+    )
   
   const validRounds = roundScores.filter(s => s > 0)
   
@@ -581,7 +633,10 @@ function saveSession() {
   roundScores,
 
   // 1 投ごとの記録（刺さった場所。ボード入力なら位置も）
-  darts: game.rounds.flat().map(toDartRecord)
+  darts: game.rounds.flat().map(toDartRecord),
+
+  gameType: GAME_TYPE,
+  ...(GAME_TYPE === "01" && typeof computeZeroOne === "function" ? { zeroOne: getZeroOneResult() } : {})
   })
   
   writeSessions(sessions)

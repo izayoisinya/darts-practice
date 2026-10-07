@@ -275,6 +275,25 @@ body.page-menu::before {
   letter-spacing: 0.02em;
 }
 
+/* 遊べるゲーム（01） */
+button.coming-card {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.coming-card.playable {
+  opacity: 1;
+  border-color: rgb(var(--accent-rgb) / 0.4);
+  background: linear-gradient(160deg, rgb(var(--accent-rgb) / 0.14) 0%, #11151d 100%);
+}
+
+.coming-card.playable .coming-tag {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .coming-tag {
   align-self: flex-start;
   font-size: 11px;

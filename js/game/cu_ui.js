@@ -1,4 +1,5 @@
 function updateUI() {
+  renderZeroOneRecord()
   renderRounds()
   renderHeaderRound()
   updateStats()
@@ -8,7 +9,140 @@ function updateUI() {
     renderBoardMarkers()
   }
   renderGameSidePanels()
+  showZeroOneResultIfDone()
   saveGame()
+}
+
+
+// ===============================
+// ===== 01 の表示 ================
+// ===============================
+// ヘッダーの設定の表示、今の設定での上がり率・上がるまでのダーツ数、ゲームが終わったときの結果、設定の画面
+let zeroOneWasComplete = false
+let zeroOneSetupDraft = null
+
+function renderZeroOneRecord() {
+
+  if (GAME_TYPE !== "01") return
+
+  const info = document.getElementById("zeroOneInfo")
+  if (info) info.textContent = formatZeroOneConfig(zeroOneConfig)
+
+  const record = getZeroOneRecord()
+  const rate = record.games ? `${record.rate.toFixed(0)}%` : "-"
+  const avg = record.avgDarts ? record.avgDarts.toFixed(1) : "-"
+
+  const set = (id, text) => {
+    const el = document.getElementById(id)
+    if (el) el.textContent = text
+  }
+  set("zeroOneRate", rate)
+  set("zeroOneRateSub", record.games ? `${record.finished} / ${record.games}` : "")
+  set("zeroOneAvgDarts", avg)
+  set("zeroOneBestDarts", record.bestDarts ? `BEST ${record.bestDarts}` : "")
+  set("zeroOneRateCompact", rate)
+  set("zeroOneAvgDartsCompact", record.avgDarts ? `${avg} darts` : "")
+}
+
+// ゲームが終わった瞬間に、結果（上がったダーツ数 / 上がれなかった）を画面の中央に出す
+function showZeroOneResultIfDone() {
+
+  if (GAME_TYPE !== "01") return
+
+  const complete = isGameComplete()
+  if (complete && !zeroOneWasComplete) {
+    const state = computeZeroOne()
+    showUndoToast(state.finished ? `OUT · ${state.finishDarts} DARTS` : "NO OUT")
+  }
+  zeroOneWasComplete = complete
+}
+
+function setupZeroOneScreen() {
+
+  if (GAME_TYPE !== "01") return
+
+  document.body.classList.add("game-01")
+  document.title = "01 | Darts Practice"
+  zeroOneWasComplete = isGameComplete()
+
+  const info = document.getElementById("zeroOneInfo")
+  if (info) info.addEventListener("click", () => openZeroOneSetup())
+
+  const cancel = document.getElementById("zeroOneSetupCancel")
+  if (cancel) cancel.addEventListener("click", closeZeroOneSetup)
+
+  const start = document.getElementById("zeroOneSetupStart")
+  if (start) start.addEventListener("click", applyZeroOneSetup)
+}
+
+function openZeroOneSetup() {
+
+  const box = document.getElementById("zeroOneSetup")
+  if (!box) return
+
+  zeroOneSetupDraft = { ...zeroOneConfig }
+
+  const options = {
+    start: ZERO_ONE_STARTS.map(value => [value, String(value)]),
+    out: ZERO_ONE_OUTS.map(value => [value, ZERO_ONE_OUT_LABELS[value]]),
+    rounds: ZERO_ONE_ROUND_LIMITS.map(value => [value, `R${value}`])
+  }
+
+  box.querySelectorAll(".zeroone-setup-options").forEach(group => {
+    const key = group.dataset.key
+    group.innerHTML = options[key]
+      .map(([value, label]) => `<button type="button" data-value="${value}">${label}</button>`)
+      .join("")
+
+    group.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        zeroOneSetupDraft[key] = key === "out" ? btn.dataset.value : Number(btn.dataset.value)
+        markZeroOneSetupSelection(box)
+      })
+    })
+  })
+
+  markZeroOneSetupSelection(box)
+  box.hidden = false
+}
+
+function markZeroOneSetupSelection(box) {
+  box.querySelectorAll(".zeroone-setup-options").forEach(group => {
+    const key = group.dataset.key
+    group.querySelectorAll("button").forEach(btn => {
+      btn.classList.toggle("selected", String(zeroOneSetupDraft[key]) === btn.dataset.value)
+    })
+  })
+}
+
+function closeZeroOneSetup() {
+  const box = document.getElementById("zeroOneSetup")
+  if (box) box.hidden = true
+}
+
+// 設定を決めて新しいゲームを始める。投げている途中なら確かめてから（今のゲームは保存せずに消す）
+function applyZeroOneSetup() {
+
+  const config = normalizeZeroOneConfig(zeroOneSetupDraft)
+  const thrown = game.rounds.some(round => round.some(dart => dart))
+  const changed = JSON.stringify(config) !== JSON.stringify(zeroOneConfig)
+
+  if (thrown && !isGameComplete()) {
+    if (!confirm("今のゲームを終えずに、新しい設定で始め直しますか？\n（今のゲームは記録されません）")) return
+  } else if (thrown && isGameComplete()) {
+    // 終わったゲームは記録してから始める（NEXT GAME と同じ）
+    saveSession()
+  } else if (!changed) {
+    closeZeroOneSetup()
+    return
+  }
+
+  writeZeroOneConfig(config)
+  localStorage.removeItem(SAVE_KEY)
+  closeZeroOneSetup()
+  initGame(false)
+  zeroOneWasComplete = false
+  updateUI()
 }
 
 
@@ -49,6 +183,9 @@ function renderRounds() {
   
   container.innerHTML = ""
   
+  // 01：ラウンドの点の代わりに、そのラウンドのあとの残り点数を出す（バストは BUST、上がりは OUT）
+  const zeroOne = GAME_TYPE === "01" ? computeZeroOne() : null
+
   game.rounds.forEach((round, index) => {
     
     const row = document.createElement("div")
@@ -58,6 +195,20 @@ function renderRounds() {
       (sum, d) => sum + (d ? d.score : 0),
       0
     )
+
+    let scoreHtml = `<span class="round-score">${roundScore}</span>`
+    if (zeroOne) {
+      const info = zeroOne.rounds[index]
+      if (info.bust) {
+        row.classList.add("bust")
+        scoreHtml = `<span class="round-score round-bust">BUST</span>`
+      } else if (info.finished) {
+        row.classList.add("finished")
+        scoreHtml = `<span class="round-score round-out">OUT</span>`
+      } else {
+        scoreHtml = `<span class="round-score">${info.thrown ? info.remaining : ""}</span>`
+      }
+    }
     
     row.innerHTML = `
       <span class="round-label">R${index + 1}</span>
@@ -68,7 +219,7 @@ ${ renderDart(round[1]) }
 ${ renderDart(round[2]) }
       </span>
 
-      <span class="round-score">${roundScore}</span>
+      ${scoreHtml}
     `
     
     container.appendChild(row)
@@ -428,15 +579,32 @@ function renderGameSideStats() {
   if (!box) return
 
   const stats = calculateStats()
-  const items = [
+
+  if (GAME_TYPE === "01") {
+    const record = getZeroOneRecord()
+    const state = computeZeroOne()
+    renderGameSideStatItems(box, [
+      ["PPD", stats.ppd.toFixed(2), ""],
+      ["DARTS", stats.totalDarts, state.finished ? "OUT" : ""],
+      ["FINISH", record.games ? `${record.rate.toFixed(0)}%` : "-", record.games ? `${record.finished} / ${record.games}` : ""],
+      ["AVG DARTS", record.avgDarts ? record.avgDarts.toFixed(1) : "-", record.bestDarts ? `BEST ${record.bestDarts}` : ""],
+      ["AVG", stats.roundAvg.toFixed(1), ""],
+      ["BULL", stats.bullCount, `${stats.bullRate.toFixed(1)}%`]
+    ])
+    return
+  }
+
+  renderGameSideStatItems(box, [
     ["PPD", stats.ppd.toFixed(2), ""],
     ["AVG", stats.roundAvg.toFixed(1), ""],
     ["MAX", stats.maxRound, ""],
     ["DARTS", stats.totalDarts, ""],
     ["BULL", stats.bullCount, `${stats.bullRate.toFixed(1)}%`],
     ["IN-BULL", stats.innerBullCount, `${stats.innerBullRate.toFixed(1)}%`]
-  ]
+  ])
+}
 
+function renderGameSideStatItems(box, items) {
   box.innerHTML = items
     .map(([label, value, sub]) => `
       <div class="game-side-stat">

@@ -1,3 +1,8 @@
+// データ画面で扱うゲームの記録（今はカウントアップだけ。01 の記録は混ぜない）
+function readDataSessions() {
+  return readSessions().filter(session => (session.gameType || "countup") === "countup")
+}
+
 function createRoundChartHtml(roundSource) {
   const scores = Array.isArray(roundSource)
     ? (roundSource.length > 0 && typeof roundSource[0] === "number"
@@ -226,7 +231,7 @@ function createSessionCardHtml(session, gameNumber) {
 
 function loadSessions() {
   
-  const sessions = readSessions()
+  const sessions = readDataSessions()
   
   const container = document.getElementById("sessionsContainer")
   container.innerHTML = ""
@@ -403,7 +408,7 @@ function changePage(direction) {
 
   if (groupedPageMode === 'game') {
     // Game ビュー
-      const sessions = readSessions()
+      const sessions = readDataSessions()
     const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
     
     if (direction === 'Prev' && currentPage > 1) currentPage--
@@ -500,7 +505,7 @@ async function initDataPage() {
     await initSessionsStorage()
   }
 
-  const sessions = readSessions()
+  const sessions = readDataSessions()
   
   const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
   

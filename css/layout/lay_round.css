@@ -23,7 +23,8 @@
 .round {
   display: grid;
   
-  grid-template-columns: 60px max-content auto;
+  /* 3 投のマスは列の幅に合わせて縮め、右の合計（3 桁・01 の BUST など）が切れないようにする */
+  grid-template-columns: 52px minmax(0, 1fr) auto;
   
   column-gap: 8px;
   row-gap: 4px;
@@ -64,9 +65,13 @@
   align-items: center;
   
   gap: 6px;
+  min-width: 0;
 }
 
 .dart {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 50px;
   width: 50px;
   height: 38px;
   
@@ -111,4 +116,23 @@
 .divider {
   margin: 0 14px;
   color: #6b7280;
+}
+
+
+/* 01：バストのラウンド・上がったラウンド */
+.round.bust .dart {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.round-score.round-bust {
+  color: #ff6b6b;
+  font-size: 16px;
+  text-shadow: none;
+}
+
+.round-score.round-out {
+  color: #ffd54f;
+  font-size: 18px;
+  text-shadow: 0 0 8px rgb(255 213 79 / 0.6);
 }

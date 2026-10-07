@@ -51,6 +51,8 @@
       <div class="score-panel">
         <div class="score-block">
           <div class="score-value" id="totalScore">0</div>
+          <!-- 01 の設定（点数・上がり方・ラウンドの上限）。押すと設定を変えられる（cu_ui.js の openZeroOneSetup()） -->
+          <button type="button" id="zeroOneInfo" class="zeroone-info zeroone-only"></button>
         </div>
 
         <!-- 今のラウンドの各ダーツの得点（cu_ui.js の renderHeaderRound()） -->
@@ -61,6 +63,34 @@
         </button>
       </div>
     </header>
+
+    <!-- ================= 01 の設定 ================= -->
+    <!-- 01 を始めるときに、点数・上がり方・ラウンドの上限を選ぶ（cu_ui.js の openZeroOneSetup()） -->
+    <div id="zeroOneSetup" class="zeroone-setup" hidden>
+      <div class="zeroone-setup-panel" role="dialog" aria-modal="true" aria-labelledby="zeroOneSetupTitle">
+        <h2 id="zeroOneSetupTitle" class="zeroone-setup-title">01 Settings</h2>
+
+        <div class="zeroone-setup-group">
+          <div class="zeroone-setup-label">Score</div>
+          <div class="zeroone-setup-options" data-key="start"></div>
+        </div>
+
+        <div class="zeroone-setup-group">
+          <div class="zeroone-setup-label">Out</div>
+          <div class="zeroone-setup-options" data-key="out"></div>
+        </div>
+
+        <div class="zeroone-setup-group">
+          <div class="zeroone-setup-label">Rounds</div>
+          <div class="zeroone-setup-options" data-key="rounds"></div>
+        </div>
+
+        <div class="zeroone-setup-actions">
+          <button type="button" id="zeroOneSetupCancel" class="zeroone-setup-cancel">Cancel</button>
+          <button type="button" id="zeroOneSetupStart" class="zeroone-setup-start">Start</button>
+        </div>
+      </div>
+    </div>
 
     <!-- ================= MAIN ================= -->
     <main class="container">
@@ -124,6 +154,12 @@
 
         <!-- コンパクト表示 -->
         <div class="stats-compact">
+          <div class="compact-block zeroone-only">
+            <div class="compact-label">Finish</div>
+            <div class="compact-value" id="zeroOneRateCompact">-</div>
+            <div class="compact-sub" id="zeroOneAvgDartsCompact"></div>
+          </div>
+
           <div class="compact-block">
             <div class="compact-label">Bulls</div>
             <div class="compact-value" id="bullCountCompact">0</div>
@@ -155,6 +191,21 @@
         <!-- 詳細表示 -->
         <div class="stats-detail">
           <div class="stats-left">
+            <!-- ===== 01：今の設定での上がり率・上がるまでのダーツ数（cu_ui.js の renderZeroOneRecord()） ===== -->
+            <div class="stats-kpi zeroone-only">
+              <div class="kpi-item">
+                <div class="kpi-label">FINISH</div>
+                <div class="kpi-value" id="zeroOneRate">-</div>
+                <div class="kpi-sub" id="zeroOneRateSub"></div>
+              </div>
+
+              <div class="kpi-item">
+                <div class="kpi-label">AVG DARTS</div>
+                <div class="kpi-value" id="zeroOneAvgDarts">-</div>
+                <div class="kpi-sub" id="zeroOneBestDarts"></div>
+              </div>
+            </div>
+
             <!-- ===== KPI行 ===== -->
             <div class="stats-kpi">
               <div class="kpi-item">
@@ -270,6 +321,7 @@
     <!-- ゲーム関連 -->
     <script src="js/game/stats.js" defer></script>
     <script src="js/game/game_core.js" defer></script>
+    <script src="js/game/game_01.js" defer></script>
     <script src="js/game/game_countup.js" defer></script>
     <script src="js/game/board_input.js" defer></script>
     <script src="js/data/heatmap.js" defer></script>

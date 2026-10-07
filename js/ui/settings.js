@@ -121,6 +121,7 @@ function saveSettings() {
   const shouldResetGame = prevSettings.bullMode !== settings.bullMode
   if (shouldResetGame) {
     localStorage.removeItem("dartsPractice")
+    localStorage.removeItem("dartsPractice01")
     alert("Bull設定を変更したため現在のゲームをリセットしました")
   }
 }

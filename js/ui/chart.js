@@ -31,11 +31,14 @@ const graphHeight = height - padding * 2
   0
   
   // ===== ラウンドスコア取得 =====
-  const roundScores = game.rounds.map(round =>
-    round.every(d => d !== null) ?
-    round.reduce((sum, d) => sum + d.score, 0) :
-    null
-  );
+  // 終わったラウンドだけ（01 はバスト・上がりのラウンドも終わり。バストは 0 点）
+  const roundScores = typeof getRoundScoreList === "function"
+    ? getRoundScoreList().map(round => round.done ? round.score : null)
+    : game.rounds.map(round =>
+      round.every(d => d !== null) ?
+      round.reduce((sum, d) => sum + d.score, 0) :
+      null
+    );
   
 const validScores = roundScores.filter(s => s !== null);
 
@@ -131,6 +134,8 @@ const maxRoundScore = validScores.length ?
   ctx.font = "12px sans-serif";
   
   for (let i = 0; i < TOTAL_ROUNDS; i++) {
+    // ラウンドが多いとき（01 の 15・20 ラウンド）は 5 ラウンドごとに出す
+    if (!shouldLabelRound(i)) continue
     const x = padding + stepX * i;
     
     // ★修正③
@@ -193,19 +198,13 @@ function paintRoundScoreChart(ctx, width, height, rgb = "0, 255, 200") {
     ctx.lineTo(xAt(i), top + graphHeight)
     ctx.stroke()
 
+    if (!shouldLabelRound(i)) continue
     ctx.fillStyle = color(0.45)
     ctx.fillText(String(i + 1), xAt(i), height - 4)
   }
 
   // ラウンドスコア（終わったラウンドだけ。途中のラウンドは今の合計）
-  const rounds = game.rounds.map(round => {
-    const darts = round.filter(dart => dart !== null)
-    return {
-      done: darts.length === 3,
-      score: darts.reduce((sum, dart) => sum + dart.score, 0),
-      thrown: darts.length
-    }
-  })
+  const rounds = getRoundScoreList()
   const done = rounds.map((round, i) => ({ ...round, i })).filter(round => round.done)
   const best = done.length ? Math.max(...done.map(round => round.score)) : 0
 
@@ -255,4 +254,9 @@ function paintRoundScoreChart(ctx, width, height, rgb = "0, 255, 200") {
     ctx.arc(xAt(i), yAt(round.score), 3, 0, Math.PI * 2)
     ctx.stroke()
   })
+}
+
+// グラフの横軸にラウンドの番号を出すか（10 ラウンドまでは全部、それより多いときは 1 と 5 の倍数だけ）
+function shouldLabelRound(index) {
+  return TOTAL_ROUNDS <= 10 || index === 0 || (index + 1) % 5 === 0
 }

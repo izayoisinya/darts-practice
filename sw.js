@@ -1,5 +1,5 @@
-const APP_CACHE = "darts-app-v54"
-const RUNTIME_CACHE = "darts-runtime-v54"
+const APP_CACHE = "darts-app-v55"
+const RUNTIME_CACHE = "darts-runtime-v55"
 
 const PRECACHE_URLS = [
   "./",
@@ -39,6 +39,7 @@ const PRECACHE_URLS = [
   "./js/game/board_input.js",
   "./js/game/cu_ui.js",
   "./js/game/game_core.js",
+  "./js/game/game_01.js",
   "./js/game/game_countup.js",
   "./js/game/stats.js",
   "./js/init/main.js",
@@ -88,7 +89,8 @@ self.addEventListener("fetch", event => {
           caches.open(RUNTIME_CACHE).then(cache => cache.put(event.request, cloned))
           return response
         })
-        .catch(() => caches.match(event.request))
+        // オフラインのときは保存しておいた HTML を出す（countup.html?game=01 も countup.html で開けるよう、? 以降は見ない）
+        .catch(() => caches.match(event.request, { ignoreSearch: true }))
     )
     return
   }

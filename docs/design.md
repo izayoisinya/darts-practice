@@ -717,7 +717,7 @@ graph LR
 - `sw.js` は、HTML はネットワーク優先、それ以外（JS・CSS・画像）はキャッシュ優先で配信する
 - **JS / CSS を変更したら `sw.js` のキャッシュ名（`darts-app-vN` / `darts-runtime-vN`）の番号を上げる。** 上げないと、利用者の端末に古いファイルが残り続ける
 - 新しいファイルを追加したら `PRECACHE_URLS` にも追加する
-- 公開：GitHub Pages（main ブランチの / root）で `https://izayoisinya.github.io/darts-practice/` に公開している。main が更新されるたびに GitHub Actions の「pages build and deployment」が走って反映される（通常 1〜2 分）。GitHub Actions の障害で公開処理が順番待ちのまま止まり、取り消しもできなくなることがある。そのときは main に新しいコミットを入れると、公開処理が新しく走り直す
+- 公開：GitHub Pages（main ブランチの / root）で `https://izayoisinya.github.io/darts-practice/` に公開している。main が更新されるたびに GitHub Actions の「pages build and deployment」が走って反映される（通常 1〜2 分）。GitHub Actions の障害で公開処理が順番待ちのまま止まり、取り消しもできなくなることがある。また、こちらの変更と関係なく deploy のステップが「GITHUB_TOKEN に id-token: write の権限がない」というエラーで失敗し、やり直しも順番待ちのまま止まることがある（2026.10.7）。どちらも main に新しいコミットを入れると、公開処理が新しく走り直す
 - アイコン：Android などは `manifest.json` の `icon-192.png`（192px）/ `icon-512.png`（512px）、iPad・iPhone は各 HTML の `apple-touch-icon.png`（180px）を使う。iOS は画像をそのまま角丸で切り抜くため、Android 用より D を小さく（高さ約 50%）している
 - **iOS 26 のホーム画面アプリの高さの不具合（WebKit Bug 301108）**：`viewport-fit=cover` ＋ `black-translucent` で起動すると、`height: 100%` / `100dvh` / `100svh` / `innerHeight` が上の安全領域の分（iPad で約 32px）だけ短くなり、画面の下に隙間ができる。画面に固定（`position: fixed`）した要素の下端もその分上にずれる。対策として、`@media (display-mode: standalone)` かつ iOS（`@supports (-webkit-touch-callout: none)`。iOS の Safari だけが対応）のときだけ以下を指定している。Android のホーム画面アプリでは起動直後の `100lvh` が実際の画面より高くなり、画面を回転するまで下が見切れるため、Android には適用しない
   - `html { height: 100lvh }`（`base.css`。`100lvh` だけが正しい高さを返す）
@@ -825,3 +825,4 @@ graph LR
 | 2026.10.7 | ゲーム履歴に 1 投ごとの記録（刺さった場所と、ボード入力なら本物のボードの比率での位置）を保存するようにした。バックアップのファイル形式を 2 に上げた |
 | 2026.10.7 | データ画面の Analysis タブにヒートマップ（刺さった位置の分布と、よく刺さった場所の割合）を追加（`heatmap.js`） |
 | 2026.10.7 | 入力形式の初期値をボードに変更（設定画面で Buttons を選んで保存していれば今までどおり） |
+| 2026.10.7 | PWA の章の公開処理のメモに、deploy が権限エラーで失敗した場合を追記 |

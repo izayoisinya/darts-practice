@@ -162,6 +162,8 @@
 body .number-table.board-mode {
   display: block;
   position: relative;
+  /* ボードの横のパネル（.game-heatmap / .game-side-panel）より手前に出す。拡大したボードはパネルの上に広がる */
+  z-index: 1;
 
   flex: 1;
   height: auto;
@@ -451,6 +453,7 @@ body.landscape.input-board .stats-area {
 
 .game-heatmap {
   position: absolute;
+  z-index: 0;
   /* left / bottom は Input エリアの余白に合わせて JS で指定する */
 
   display: flex;
@@ -468,6 +471,7 @@ body.landscape.input-board .stats-area {
 /* 右上のグラフ・右下の Stats（cu_ui.js が top / right / bottom を指定する）。ヒートマップと同じ暗い緑の画面に揃える */
 .game-side-panel {
   position: absolute;
+  z-index: 0;
 
   display: flex;
   flex-direction: column;

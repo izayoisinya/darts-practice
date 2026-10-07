@@ -9,7 +9,8 @@ function initGame(load = true) {
     bullMode = settings.bullMode
   }
 
-  inputMode = settings.inputMode === "board" ? "board" : "buttons"
+  // 入力形式は保存されていなければボード（2026.10.7 から初期値をボードに変更）
+  inputMode = settings.inputMode === "buttons" ? "buttons" : "board"
   boardZoomReset = settings.boardZoomReset === "round" ? "round" : "manual"
   undoSwipeDirection = settings.undoSwipeDirection === "right" ? "right" : "left"
 

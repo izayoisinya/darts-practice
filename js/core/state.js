@@ -16,8 +16,8 @@ const accent = getComputedStyle(document.documentElement)
 // Bullモード
 let bullMode = "fat"
 
-// 入力形式（"buttons" ボタン / "board" ダーツボード）
-let inputMode = "buttons"
+// 入力形式（"board" ダーツボード〔初期値〕 / "buttons" ボタン）
+let inputMode = "board"
 
 // ボード入力で拡大したとき、いつ全体表示に戻すか（"manual" 全体表示ボタンまで / "round" ラウンドが変わったら）
 let boardZoomReset = "manual"

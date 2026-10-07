@@ -2,7 +2,7 @@ const SETTINGS_KEY = "dartsSettings"
 
 const DEFAULT_SETTINGS = {
   bullMode: "fat",
-  inputMode: "buttons",
+  inputMode: "board",
   boardZoomReset: "manual",
   boardUndoButton: false,
   undoSwipeDirection: "left",
@@ -67,7 +67,7 @@ function loadSettings() {
   document.getElementById("bullModeSetting").value = settings.bullMode
   const inputModeSelect = document.getElementById("inputModeSetting")
   if (inputModeSelect) {
-    inputModeSelect.value = settings.inputMode === "board" ? "board" : "buttons"
+    inputModeSelect.value = settings.inputMode === "buttons" ? "buttons" : "board"
   }
   const boardZoomSelect = document.getElementById("boardZoomResetSetting")
   if (boardZoomSelect) {
@@ -100,7 +100,7 @@ function saveSettings() {
 
   const settings = {
     bullMode: document.getElementById("bullModeSetting").value,
-    inputMode: document.getElementById("inputModeSetting")?.value || "buttons",
+    inputMode: document.getElementById("inputModeSetting")?.value || "board",
     boardZoomReset: document.getElementById("boardZoomResetSetting")?.value || "manual",
     boardUndoButton: !!document.getElementById("boardUndoButtonSetting")?.checked,
     undoSwipeDirection: document.getElementById("undoSwipeSetting")?.value || "left",

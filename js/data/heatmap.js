@@ -340,3 +340,158 @@ function getHeatmapPalette() {
   heatmapPalette = ctx.getImageData(0, 0, 256, 1).data
   return heatmapPalette
 }
+
+
+// ===============================
+// ===== レーダー風（ゲーム画面） ==
+// ===============================
+// ゲーム画面の「このゲームのヒートマップ」用。暗い緑の画面に輪と線だけでボードを描き、
+// 刺さった位置を光る点（ブリップ）で表す。重なるほど明るく、古い投ほど薄く、今のラウンドの投は輪付きで強く光らせる。
+// 回る走査線は CSS（lay_input.css の .game-radar-sweep）で重ねる
+//   points：古い順の位置の一覧 / highlight：今のラウンドの投の位置 / rgb：色（"0, 255, 200" の形）
+function paintRadarHeatmap(ctx, width, height, points, highlight = [], rgb = "0, 255, 200") {
+
+  const size = Math.min(width, height)
+  const unit = size / (HEATMAP_VIEW * 2)
+  const cx = width / 2
+  const cy = height / 2
+  const r = value => value * unit
+  const color = alpha => `rgba(${rgb}, ${alpha})`
+  const outer = HEATMAP_VIEW - 0.02
+
+  ctx.clearRect(0, 0, width, height)
+
+  // 画面：中心ほど少し明るい暗緑の円
+  const back = ctx.createRadialGradient(cx, cy, 0, cx, cy, r(outer))
+  back.addColorStop(0, "#06231c")
+  back.addColorStop(1, "#020b09")
+  ctx.fillStyle = back
+  ctx.beginPath()
+  ctx.arc(cx, cy, r(outer), 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(cx, cy, r(outer), 0, Math.PI * 2)
+  ctx.clip()
+
+  // 20 区画の境目の線（ブルの外から）
+  ctx.strokeStyle = color(0.1)
+  ctx.lineWidth = 1
+  for (let i = 0; i < 20; i++) {
+    const a = (i * 18 - 9 - 90) * Math.PI / 180
+    ctx.beginPath()
+    ctx.moveTo(cx + Math.cos(a) * r(HEATMAP_RING_RADIUS[1]), cy + Math.sin(a) * r(HEATMAP_RING_RADIUS[1]))
+    ctx.lineTo(cx + Math.cos(a) * r(1), cy + Math.sin(a) * r(1))
+    ctx.stroke()
+  }
+
+  // 十字の照準線（画面の端まで）
+  ctx.strokeStyle = color(0.22)
+  ctx.beginPath()
+  ctx.moveTo(cx - r(outer), cy)
+  ctx.lineTo(cx + r(outer), cy)
+  ctx.moveTo(cx, cy - r(outer))
+  ctx.lineTo(cx, cy + r(outer))
+  ctx.stroke()
+
+  // トリプル・ダブルの輪は帯を薄く塗り、ボードの輪は線で描く
+  const [ib, ob, , t, os, d] = HEATMAP_RING_RADIUS
+  ctx.fillStyle = color(0.07)
+  ;[[os, d], [HEATMAP_RING_RADIUS[2], t]].forEach(([inner, outerR]) => {
+    ctx.beginPath()
+    ctx.arc(cx, cy, r(outerR), 0, Math.PI * 2)
+    ctx.arc(cx, cy, r(inner), 0, Math.PI * 2, true)
+    ctx.fill()
+  })
+
+  HEATMAP_RING_RADIUS.forEach(value => {
+    ctx.strokeStyle = color(value === d ? 0.55 : 0.28)
+    ctx.beginPath()
+    ctx.arc(cx, cy, r(value), 0, Math.PI * 2)
+    ctx.stroke()
+  })
+
+  // 距離の目盛り（点線の輪）
+  ctx.setLineDash([2, 4])
+  ctx.strokeStyle = color(0.16)
+  ;[0.3, 0.8].forEach(value => {
+    ctx.beginPath()
+    ctx.arc(cx, cy, r(value), 0, Math.PI * 2)
+    ctx.stroke()
+  })
+  ctx.setLineDash([])
+
+  // 外周の目盛り（4.5 度ごと。区画の境目は長め。区画の中心は数字があるので描かない）
+  for (let deg = 0; deg < 360; deg += 4.5) {
+    if (deg % 18 === 0) continue
+    const a = (deg - 90) * Math.PI / 180
+    const long = deg % 18 === 9
+    const r1 = r(outer) - (long ? 7 : 3)
+    ctx.strokeStyle = color(long ? 0.5 : 0.22)
+    ctx.beginPath()
+    ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1)
+    ctx.lineTo(cx + Math.cos(a) * r(outer), cy + Math.sin(a) * r(outer))
+    ctx.stroke()
+  }
+
+  // 数字
+  ctx.fillStyle = color(0.6)
+  ctx.font = `600 ${Math.max(8, Math.round(unit * 0.085))}px ui-monospace, Menlo, monospace`
+  ctx.textAlign = "center"
+  ctx.textBaseline = "middle"
+  HEATMAP_NUMBERS.forEach((num, i) => {
+    const a = (i * 18 - 90) * Math.PI / 180
+    ctx.fillText(String(num), cx + Math.cos(a) * r(HEATMAP_NUMBER_RADIUS), cy + Math.sin(a) * r(HEATMAP_NUMBER_RADIUS))
+  })
+
+  // ブリップ：光をぼかして足し合わせる（重なるほど明るい）。古い投ほど薄く
+  ctx.globalCompositeOperation = "lighter"
+  const glow = Math.max(7, unit * 0.11)
+  points.forEach((p, index) => {
+    const age = points.length > 1 ? index / (points.length - 1) : 1
+    const alpha = 0.25 + age * 0.35
+    const x = cx + p.x * unit
+    const y = cy + p.y * unit
+    const g = ctx.createRadialGradient(x, y, 0, x, y, glow)
+    g.addColorStop(0, color(alpha))
+    g.addColorStop(1, color(0))
+    ctx.fillStyle = g
+    ctx.fillRect(x - glow, y - glow, glow * 2, glow * 2)
+
+    ctx.fillStyle = color(0.45 + age * 0.4)
+    ctx.beginPath()
+    ctx.arc(x, y, 1.6, 0, Math.PI * 2)
+    ctx.fill()
+  })
+  ctx.globalCompositeOperation = "source-over"
+
+  // 今のラウンドの投：白く光る点と輪
+  highlight.forEach(p => {
+    const x = cx + p.x * unit
+    const y = cy + p.y * unit
+
+    ctx.shadowColor = color(1)
+    ctx.shadowBlur = 10
+    ctx.fillStyle = "#eafffa"
+    ctx.beginPath()
+    ctx.arc(x, y, 2.6, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.shadowBlur = 0
+
+    ctx.strokeStyle = color(0.85)
+    ctx.lineWidth = 1.2
+    ctx.beginPath()
+    ctx.arc(x, y, Math.max(6, unit * 0.07), 0, Math.PI * 2)
+    ctx.stroke()
+  })
+
+  ctx.restore()
+
+  // 外枠
+  ctx.strokeStyle = color(0.6)
+  ctx.lineWidth = 1.5
+  ctx.beginPath()
+  ctx.arc(cx, cy, r(outer) - 0.75, 0, Math.PI * 2)
+  ctx.stroke()
+}

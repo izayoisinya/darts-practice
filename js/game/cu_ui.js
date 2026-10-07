@@ -270,7 +270,7 @@ function fitBoardColumn(useBoard) {
 // ===============================
 // ===== このゲームのヒートマップ ==
 // ===============================
-// ボード入力で入れた投の位置を、Input エリアの左下に小さなヒートマップで出す（今のラウンドの投は白い点）。
+// ボード入力で入れた投の位置を、Input エリアの左下にレーダー風のヒートマップで出す（今のラウンドの投は白く光る点）。
 // ボードの横に置ける幅があるとき（横向きで Rounds / Stats を隠したときなど）だけ出す
 const GAME_HEATMAP_MIN = 120   // これより小さくしか置けないときは出さない（px）
 const GAME_HEATMAP_MAX = 300
@@ -281,7 +281,7 @@ function renderGameHeatmap() {
   const canvas = document.getElementById("gameHeatmapCanvas")
   const inputArea = document.querySelector(".input-area")
   const table = document.getElementById("numberTable")
-  if (!box || !canvas || !inputArea || !table || typeof paintHeatmap !== "function") return
+  if (!box || !canvas || !inputArea || !table || typeof paintRadarHeatmap !== "function") return
 
   const size = getGameHeatmapSize(inputArea, table)
   if (!size) {
@@ -292,6 +292,7 @@ function renderGameHeatmap() {
   const areaStyle = getComputedStyle(inputArea)
   box.hidden = false
   box.style.width = `${size}px`
+  box.style.setProperty("--radar-size", `${size}px`)
   box.style.left = areaStyle.paddingLeft
   box.style.bottom = areaStyle.paddingBottom
 
@@ -313,7 +314,17 @@ function renderGameHeatmap() {
   const current = game.rounds[Math.min(getDisplayRoundIndex(), TOTAL_ROUNDS - 1)] || []
   const highlight = current.filter(dart => dart && dart.pos).map(dart => dart.pos)
 
-  paintHeatmap(ctx, size, size, points, highlight)
+  const count = document.getElementById("gameHeatmapCount")
+  if (count) count.textContent = `${points.length} HIT${points.length === 1 ? "" : "S"}`
+
+  paintRadarHeatmap(ctx, size, size, points, highlight, getAccentRgb())
+}
+
+// テーマの色（theme.css の --accent-rgb。"0 255 200" の形）を canvas で使える "0, 255, 200" の形にする
+function getAccentRgb() {
+  const value = getComputedStyle(document.body).getPropertyValue("--accent-rgb").trim()
+  const parts = value.split(/[\s,]+/).filter(Boolean)
+  return parts.length === 3 ? parts.join(", ") : "0, 255, 200"
 }
 
 // ボード（縦横の短い方に合わせて左右中央に描かれる）の左側に空いている幅から大きさを決める

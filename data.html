@@ -39,6 +39,11 @@
   <body class="page-data" onload="initDataPage()">
     <header class="header">
       <h1>Statistics</h1>
+      <!-- 表示するゲームの切り替え（data_01.js の initDataGameSwitch()） -->
+      <div id="dataGameSwitch" class="data-game-switch" role="tablist" aria-label="ゲームの種類">
+        <button type="button" data-game="countup">Count-Up</button>
+        <button type="button" data-game="01">01</button>
+      </div>
     </header>
 
 <main class="data-container">
@@ -132,6 +137,8 @@
   </div>
   <!-- タブボタンを右下に配置 -->
   <!-- フッター：パネル切替 / ページネーション / ビュータブ -->
+<!-- 01 の記録（data_01.js の renderZeroOneData()。01 を選んでいるときだけ出す） -->
+<div id="zeroOneView" class="zeroone-view"></div>
 <div class="footer-bar">
   <div class="pagination" id="paginationContainer">
     <button id="prevBtn" onclick="changePage('Prev')">Prev</button>
@@ -198,6 +205,7 @@
     <script src="js/data/rating.js" defer></script>
     <script src="js/data/data.js" defer></script>
     <script src="js/data/heatmap.js" defer></script>
+    <script src="js/data/data_01.js" defer></script>
 
     <!-- 初期化（最後に読み込む） -->
     <script src="js/init/main.js" defer></script>

@@ -515,5 +515,7 @@ async function initDataPage() {
   
   loadSessions()
   updatePaginationUI(totalPages)
+
+  if (typeof initDataGameSwitch === "function") initDataGameSwitch()
 }
 

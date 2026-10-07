@@ -2460,3 +2460,239 @@ main.data-container.analysis-mode .pagination {
   font-size: 13px;
   line-height: 1.5;
 }
+
+
+/* ================================= */
+/* ====== 01（data_01.js） ========= */
+/* ================================= */
+
+/* ヘッダーの COUNT-UP / 01 の切り替え */
+.data-game-switch {
+  display: flex;
+  gap: 4px;
+
+  margin-left: auto;
+  padding: 3px;
+
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.data-game-switch button {
+  min-width: 64px;
+  padding: 6px 14px;
+
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+
+  cursor: pointer;
+}
+
+.data-game-switch button.active {
+  background: rgb(var(--accent-rgb) / 0.18);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgb(var(--accent-rgb) / 0.6);
+}
+
+.phone .data-game-switch button {
+  min-width: 48px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+/* 01 を選んでいるときは、カウントアップの表示を隠して 01 の画面だけを出す */
+#zeroOneView {
+  display: none;
+}
+
+body.data-01 main.data-container > :not(#zeroOneView) {
+  display: none !important;
+}
+
+body.data-01 #zeroOneView {
+  grid-column: 1 / -1;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 1rem;
+
+  height: 100%;
+  min-height: 0;
+}
+
+.z1-main,
+.z1-history {
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+.z1-history {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 縦向きは 1 列にして、全体をスクロールする */
+body.data-01.portrait #zeroOneView {
+  display: block;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.data-01.portrait .z1-main,
+body.data-01.portrait .z1-history {
+  overflow: visible;
+}
+
+.z1-filter select {
+  width: 100%;
+  padding: 10px 12px;
+
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  border-radius: 10px;
+  background: #111827;
+
+  color: #e2e8f0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.z1-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+
+  margin: 12px 0;
+}
+
+.z1-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  padding: 10px 6px;
+
+  border-radius: 12px;
+  border: 1px solid rgba(71, 85, 105, 0.45);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+}
+
+.z1-tile-label {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.z1-tile-value {
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.z1-tile-sub {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.z1-section canvas {
+  display: block;
+  width: 100%;
+  height: 200px;
+}
+
+.z1-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.z1-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 5px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.z1-dot.out { background: var(--accent); }
+.z1-dot.fail { background: #ff6b6b; }
+
+.z1-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.z1-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  padding: 10px 12px;
+
+  border-radius: 12px;
+  border: 1px solid rgba(71, 85, 105, 0.45);
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.z1-card-top,
+.z1-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.z1-card-date {
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.z1-card-bottom {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.z1-result {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.z1-result.out { color: #ffd54f; }
+.z1-result.fail { color: #ff6b6b; }
+
+.z1-empty {
+  grid-column: 1 / -1;
+  align-self: center;
+  justify-self: center;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.z1-play {
+  padding: 10px 20px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: rgb(var(--accent-rgb) / 0.12);
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}

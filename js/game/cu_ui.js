@@ -19,6 +19,7 @@ function updateUI() {
 // ===============================
 // ヘッダーの設定の表示、今の設定での上がり率・上がるまでのダーツ数、ゲームが終わったときの結果、設定の画面
 let zeroOneWasComplete = false
+let zeroOneBustCount = 0
 let zeroOneSetupDraft = null
 
 function renderZeroOneRecord() {
@@ -44,17 +45,27 @@ function renderZeroOneRecord() {
   set("zeroOneAvgDartsCompact", record.avgDarts ? `${avg} darts` : "")
 }
 
-// ゲームが終わった瞬間に、結果（上がったダーツ数 / 上がれなかった）を画面の中央に出す
+// バストしたとき・ゲームが終わった瞬間に、画面の中央に出す（BUST / 上がったダーツ数 / 上がれなかった）
 function showZeroOneResultIfDone() {
 
   if (GAME_TYPE !== "01") return
 
+  const state = computeZeroOne()
   const complete = isGameComplete()
+  const bustCount = countZeroOneBusts(state)
+
   if (complete && !zeroOneWasComplete) {
-    const state = computeZeroOne()
-    showUndoToast(state.finished ? `OUT · ${state.finishDarts} DARTS` : "NO OUT")
+    showUndoToast(state.finished ? `OUT · ${state.finishDarts} DARTS` : "NO OUT", state.finished ? "out" : "bust")
+  } else if (bustCount > zeroOneBustCount) {
+    showUndoToast("BUST", "bust")
   }
+
   zeroOneWasComplete = complete
+  zeroOneBustCount = bustCount
+}
+
+function countZeroOneBusts(state = computeZeroOne()) {
+  return state.rounds.filter(info => info.bust).length
 }
 
 function setupZeroOneScreen() {
@@ -64,6 +75,7 @@ function setupZeroOneScreen() {
   document.body.classList.add("game-01")
   document.title = "01 | Darts Practice"
   zeroOneWasComplete = isGameComplete()
+  zeroOneBustCount = countZeroOneBusts()
 
   const info = document.getElementById("zeroOneInfo")
   if (info) info.addEventListener("click", () => openZeroOneSetup())
@@ -142,6 +154,7 @@ function applyZeroOneSetup() {
   closeZeroOneSetup()
   initGame(false)
   zeroOneWasComplete = false
+  zeroOneBustCount = 0
   updateUI()
 }
 
@@ -259,8 +272,14 @@ function renderHeaderRound() {
       : `<span class="header-dart empty">-</span>`)
     .join("")
 
+  // 01：表示しているラウンドがバスト・上がりなら、ラウンドの番号の横に出す
+  const info = GAME_TYPE === "01" ? computeZeroOne().rounds[index] : null
+  const status = info && info.bust ? "bust" : info && info.finished ? "out" : ""
+  el.classList.toggle("bust", status === "bust")
+  el.classList.toggle("out", status === "out")
+
   el.innerHTML = `
-    <span class="header-round-label">R${index + 1}</span>
+    <span class="header-round-label">R${index + 1}${status ? ` · ${status.toUpperCase()}` : ""}</span>
     <span class="header-round-darts">${darts}</span>
   `
 
@@ -893,7 +912,8 @@ function setupThreeFingerUndo(target) {
 }
 
 // 戻ったことが分かるよう、画面の中央に「戻る」を少しのあいだ出す
-function showUndoToast(text = "戻る") {
+// kind：色の種類（"bust" 赤、"out" 金。なしは通常）
+function showUndoToast(text = "戻る", kind = "") {
 
   let toast = document.querySelector(".undo-toast")
 
@@ -903,6 +923,8 @@ function showUndoToast(text = "戻る") {
     document.body.appendChild(toast)
   }
   toast.textContent = text
+  toast.classList.toggle("bust", kind === "bust")
+  toast.classList.toggle("out", kind === "out")
 
   toast.classList.remove("show")
   void toast.offsetWidth

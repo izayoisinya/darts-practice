@@ -365,3 +365,18 @@ body:not(.game-01) .zeroone-only {
   background: var(--accent);
   color: #04110d;
 }
+
+/* 01：ヘッダーに出ているラウンドがバスト（赤・数字に線）・上がり（金） */
+.header-round.bust .header-round-label {
+  color: #ff6b6b;
+}
+
+.header-round.bust .header-dart:not(.empty) {
+  opacity: 0.5;
+  text-decoration: line-through;
+  text-decoration-thickness: 3px;
+}
+
+.header-round.out .header-round-label {
+  color: #ffd54f;
+}

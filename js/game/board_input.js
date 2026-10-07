@@ -183,7 +183,7 @@ function createBoardSvgHtml() {
   })
 
   return `
-    <svg class="board-svg" viewBox="${getBoardViewBox()}"
+    <svg class="board-svg" viewBox="${getBoardViewBox(null)}"
       preserveAspectRatio="xMidYMin meet"
       xmlns="${SVG_NS}" role="img" aria-label="ダーツボード">
       <circle class="board-back" r="${BOARD_VIEW}"/>
@@ -242,13 +242,30 @@ function toBoardPosition(svg, clientX, clientY, zoom = boardZoom) {
 // ===============================
 // ===== 拡大・移動（2 本指） =====
 // ===============================
-function getBoardViewBox() {
+// 拡大していないときは、ボードの正方形の範囲だけ。
+// 拡大中は、正方形の外（左右・下の余り）にも拡大したボードを描き、ボードを置く場所いっぱいに広げる
+// （ボードの横に出しているパネルは、ボードの裏になる）。正方形の部分の位置と倍率は変えないので、
+// タップ位置の計算（toBoardPosition()）はそのまま使える
+function getBoardViewBox(svg = document.querySelector(".board-svg")) {
 
   const size = BOARD_VIEW * 2 / boardZoom.scale
-  const x = boardZoom.cx - size / 2
+  let x = boardZoom.cx - size / 2
   const y = boardZoom.cy - size / 2
+  let width = size
+  let height = size
 
-  return [x, y, size, size].map(n => +n.toFixed(4)).join(" ")
+  const rect = svg && boardZoom.scale > 1.01 ? svg.getBoundingClientRect() : null
+  const square = rect ? Math.min(rect.width, rect.height) : 0
+
+  if (square) {
+    const unit = square / size
+    const side = (rect.width - square) / 2 / unit
+    x -= side
+    width += side * 2
+    height += (rect.height - square) / unit
+  }
+
+  return [x, y, width, height].map(n => +n.toFixed(4)).join(" ")
 }
 
 // 表示範囲がボードの外（-BOARD_VIEW〜BOARD_VIEW）へはみ出さないようにする
@@ -264,7 +281,7 @@ function clampBoardZoom() {
 function updateBoardZoomView() {
 
   const svg = document.querySelector(".board-svg")
-  if (svg) svg.setAttribute("viewBox", getBoardViewBox())
+  if (svg) svg.setAttribute("viewBox", getBoardViewBox(svg))
 
   const resetBtn = document.querySelector(".board-zoom-reset")
   if (resetBtn) resetBtn.hidden = boardZoom.scale <= 1.01

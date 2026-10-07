@@ -197,6 +197,17 @@
     0 0 32px rgb(var(--dart-glow) / 0.35);
 }
 
+/* 入れた数字はタップで消せる（ヘッダーの他の部分はタップを下へ通す） */
+.header-dart[role="button"] {
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header-dart[role="button"]:active {
+  opacity: 0.5;
+}
+
 /* 色は Rounds エリアと同じ意味（トリプル＝青、ダブル＝赤、インブル＝金、アウターブル＝緑） */
 .header-dart.triple { --dart-glow: 77 171 255; }
 .header-dart.double { --dart-glow: 255 90 90; }

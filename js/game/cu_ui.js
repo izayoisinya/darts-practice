@@ -97,10 +97,13 @@ function renderHeaderRound() {
   const index = Math.min(getDisplayRoundIndex(), TOTAL_ROUNDS - 1)
   const round = game.rounds[index] || [null, null, null]
 
+  // 確定したラウンド（次のラウンドを投げ始めた後）は消せない
+  const deletable = index > lockedRound
+
   // 合計スコアと同じ光る数字で出す（まだ投げていない分は薄い「-」）
   const darts = round
     .map(dart => dart
-      ? `<span class="header-dart${getDartClass(dart)}">${dart.score}</span>`
+      ? `<span class="header-dart${getDartClass(dart)}"${deletable ? ` role="button" aria-label="${dart.score} を消す"` : ""}>${dart.score}</span>`
       : `<span class="header-dart empty">-</span>`)
     .join("")
 
@@ -108,6 +111,14 @@ function renderHeaderRound() {
     <span class="header-round-label">R${index + 1}</span>
     <span class="header-round-darts">${darts}</span>
   `
+
+  // 入れた数字をタップするとその 1 投を消す
+  el.querySelectorAll(".header-round-darts .header-dart").forEach((span, dartIndex) => {
+    if (!deletable || !round[dartIndex]) return
+    span.addEventListener("click", () => {
+      if (deleteDart(index, dartIndex)) showUndoToast("削除")
+    })
+  })
 }
 
 
@@ -487,16 +498,16 @@ function setupThreeFingerUndo(target) {
 }
 
 // 戻ったことが分かるよう、画面の中央に「戻る」を少しのあいだ出す
-function showUndoToast() {
+function showUndoToast(text = "戻る") {
 
   let toast = document.querySelector(".undo-toast")
 
   if (!toast) {
     toast = document.createElement("div")
     toast.className = "undo-toast"
-    toast.textContent = "戻る"
     document.body.appendChild(toast)
   }
+  toast.textContent = text
 
   toast.classList.remove("show")
   void toast.offsetWidth

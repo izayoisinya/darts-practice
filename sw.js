@@ -1,5 +1,5 @@
-const APP_CACHE = "darts-app-v39"
-const RUNTIME_CACHE = "darts-runtime-v39"
+const APP_CACHE = "darts-app-v40"
+const RUNTIME_CACHE = "darts-runtime-v40"
 
 const PRECACHE_URLS = [
   "./",

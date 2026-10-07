@@ -61,6 +61,7 @@ manifest.json   PWA マニフェスト
 | data/ | data_grouped.js | Day/Week/Month/Year のグループビュー、日別メモ・タグ |
 | data/ | data_detail.js | グループ内のゲーム一覧（詳細ビュー）、カレンダー、比較 |
 | data/ | heatmap.js | Analysis タブのヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
+| data/ | data_01.js | データ画面の Count-Up / 01 の切り替えと、01 の記録の表示（設定ごとの上がり率・上がるまでのダーツ数・推移・一覧） |
 | data/ | rating.js | PPD から DARTSLIVE / PHOENIX のレーティング目安を算出 |
 | ui/ | chart.js | ゲーム画面のグラフ描画のみ（計算は stats.js 側） |
 | ui/ | settings.js | 設定画面のロジック |
@@ -84,10 +85,11 @@ manifest.json   PWA マニフェスト
 | `dartsZeroOne` | LocalStorage | 01 の設定（点数・上がり方・ラウンドの上限） |
 | `dartsSettings` | LocalStorage | 設定 |
 | `dartsDayNotesV2` | LocalStorage | 日別メモ（コメント・タグ・画像） |
+| `dartsDataGame` | LocalStorage | データ画面で最後に見ていたゲーム（`"countup"` / `"01"`） |
 
 - セッションは保存時に短縮キーへシリアライズされる（`serializeSessionForStorage()`：`d` date, `s` score, `p` ppd, `r` roundScores, `a` awards 配列, `dt` 1 投ごとの記録（刺さった場所・ボード入力の位置）など）。アプリ内では `normalizeSessionForApp()` の形で扱う
 - フィールドを追加するときは serialize / deserialize / normalize の 3 箇所を揃え、**既存ユーザーの保存データを壊さない**（欠損時のデフォルト値を用意する）
-- `gameType` は `"countup"` / `"01"`。01 の結果は `zeroOne`（保存時 `z`）。データ画面は今はカウントアップだけを扱う（`readDataSessions()`）
+- `gameType` は `"countup"` / `"01"`。01 の結果は `zeroOne`（保存時 `z`）。データ画面のカウントアップの表示は `readDataSessions()`（カウントアップだけ）、01 は `data_01.js` が別の画面で出す
 - 保存するデータを増やしたら、バックアップ（`backup.js` の書き出し・読み込み）にも含めるか検討する。ファイル形式を変えるときは `BACKUP_VERSION` を上げ、古い形式も読めるようにする
 
 ## Service Worker の注意

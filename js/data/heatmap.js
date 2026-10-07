@@ -386,15 +386,6 @@ function paintRadarHeatmap(ctx, width, height, points, highlight = [], rgb = "0,
     ctx.stroke()
   }
 
-  // 十字の照準線（画面の端まで）
-  ctx.strokeStyle = color(0.22)
-  ctx.beginPath()
-  ctx.moveTo(cx - r(outer), cy)
-  ctx.lineTo(cx + r(outer), cy)
-  ctx.moveTo(cx, cy - r(outer))
-  ctx.lineTo(cx, cy + r(outer))
-  ctx.stroke()
-
   // トリプル・ダブルの輪は帯を薄く塗り、ボードの輪は線で描く
   const [ib, ob, , t, os, d] = HEATMAP_RING_RADIUS
   ctx.fillStyle = color(0.07)
@@ -411,16 +402,6 @@ function paintRadarHeatmap(ctx, width, height, points, highlight = [], rgb = "0,
     ctx.arc(cx, cy, r(value), 0, Math.PI * 2)
     ctx.stroke()
   })
-
-  // 距離の目盛り（点線の輪）
-  ctx.setLineDash([2, 4])
-  ctx.strokeStyle = color(0.16)
-  ;[0.3, 0.8].forEach(value => {
-    ctx.beginPath()
-    ctx.arc(cx, cy, r(value), 0, Math.PI * 2)
-    ctx.stroke()
-  })
-  ctx.setLineDash([])
 
   // 外周の目盛り（4.5 度ごと。区画の境目は長め。区画の中心は数字があるので描かない）
   for (let deg = 0; deg < 360; deg += 4.5) {

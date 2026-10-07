@@ -57,6 +57,8 @@
     <section id="sessionsContainer"></section>
   </div>
   <div id="leftPanel">
+    <!-- 01 の Stats（data_01.js の renderZeroOneData()。01 を選んでいるときだけ出し、下のカウントアップの欄は隠す） -->
+    <div id="zeroOneStatsPanel" class="zeroone-stats-panel"></div>
     <section id="statsSection" class="data-summary-section">
       <h3 class="data-section-title">Stats</h3>
       <div id="statsContainer"></div>
@@ -141,8 +143,6 @@
   </div>
   <!-- タブボタンを右下に配置 -->
   <!-- フッター：パネル切替 / ページネーション / ビュータブ -->
-<!-- 01 の記録（data_01.js の renderZeroOneData()。01 を選んでいるときだけ出す） -->
-<div id="zeroOneView" class="zeroone-view"></div>
 <div class="footer-bar">
   <div class="pagination" id="paginationContainer">
     <button id="prevBtn" onclick="changePage('Prev')">Prev</button>

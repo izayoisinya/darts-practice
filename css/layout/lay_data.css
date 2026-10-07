@@ -2566,52 +2566,53 @@ main.data-container.analysis-mode .pagination {
   font-size: 12px;
 }
 
-/* 01 を選んでいるときは、カウントアップの表示を隠して 01 の画面だけを出す */
-#zeroOneView {
+/* 01 を選んでいるときは、左の欄をカウントアップの Stats から 01 の Stats（#zeroOneStatsPanel）に入れ替える。
+   右の History（#sessionsContainer）は同じ場所に 01 のカードを出すのでそのまま。フッターのタブ（Analysis など）はカウントアップ用なので隠す */
+#zeroOneStatsPanel {
   display: none;
 }
 
-body.data-01 main.data-container > :not(#zeroOneView) {
+body.data-01 #zeroOneStatsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+body.data-01 #leftPanel > :not(#zeroOneStatsPanel) {
   display: none !important;
 }
 
-body.data-01 #zeroOneView {
-  grid-column: 1 / -1;
-
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-  gap: 1rem;
-
-  height: 100%;
-  min-height: 0;
+body.data-01 .tabs-container {
+  display: none !important;
 }
 
-.z1-main,
-.z1-history {
-  min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  /* 右端の数字がスクロールバーに隠れないよう少し空ける */
-  padding-right: 6px;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
-}
-
-.z1-history {
+/* Stats・Awards のカード（カウントアップの #statsContainer / #awardsContainer と同じ並び） */
+.z1-stat-cards,
+.z1-award-cards {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.6rem;
 }
 
-/* 縦向きは 1 列にして、全体をスクロールする */
-body.data-01.portrait #zeroOneView {
+.z1-stat-cards .data-card,
+.z1-award-cards .data-card {
+  flex: 1 1 calc(50% - 0.3rem);
+  min-width: 0;
+}
+
+/* グラフの枠（カウントアップの #scoreChart と同じ） */
+.z1-chart {
   display: block;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  height: 220px;
+  border: 1px solid #333;
+  border-radius: 4px;
 }
 
-body.data-01.portrait .z1-main,
-body.data-01.portrait .z1-history {
-  overflow: visible;
-}
+/* History のカードの上がり（金）・上がれなかった残り（赤） */
+.session-kpi-value.z1-out { color: #ffd54f; }
+.session-kpi-value.z1-fail { color: #ff6b6b; }
 
 .z1-filter select {
   width: 100%;
@@ -2626,51 +2627,6 @@ body.data-01.portrait .z1-history {
   font-weight: 700;
 }
 
-.z1-tiles {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-
-  margin: 12px 0;
-}
-
-.z1-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-
-  padding: 10px 6px;
-
-  border-radius: 12px;
-  border: 1px solid rgba(71, 85, 105, 0.45);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
-}
-
-.z1-tile-label {
-  color: #94a3b8;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.z1-tile-value {
-  color: var(--accent);
-  font-size: 24px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-.z1-tile-sub {
-  color: #64748b;
-  font-size: 11px;
-}
-
-.z1-section canvas {
-  display: block;
-  width: 100%;
-  height: 200px;
-}
 
 .z1-legend {
   display: flex;
@@ -2693,59 +2649,6 @@ body.data-01.portrait .z1-history {
 .z1-dot.out { background: var(--accent); }
 .z1-dot.fail { background: #ff6b6b; }
 
-.z1-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.z1-card {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  padding: 10px 12px;
-
-  border-radius: 12px;
-  border: 1px solid rgba(71, 85, 105, 0.45);
-  background: rgba(15, 23, 42, 0.85);
-}
-
-.z1-card-top,
-.z1-card-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.z1-card-date {
-  color: #cbd5e1;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.z1-card-bottom {
-  color: #94a3b8;
-  font-size: 12px;
-}
-
-.z1-result {
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-}
-
-.z1-result.out { color: #ffd54f; }
-.z1-result.fail { color: #ff6b6b; }
-
-.z1-empty {
-  grid-column: 1 / -1;
-  align-self: center;
-  justify-self: center;
-  text-align: center;
-  color: #94a3b8;
-}
 
 .z1-play {
   padding: 10px 20px;
@@ -2758,9 +2661,6 @@ body.data-01.portrait .z1-history {
   cursor: pointer;
 }
 
-.z1-section {
-  margin-top: 14px;
-}
 
 .z1-note {
   margin: 4px 0 0;
@@ -2769,9 +2669,6 @@ body.data-01.portrait .z1-history {
   line-height: 1.5;
 }
 
-.z1-rating {
-  margin: 8px 0 0;
-}
 
 /* 上がりナンバーの割合 */
 .z1-bars {

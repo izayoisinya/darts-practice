@@ -90,7 +90,7 @@ manifest.json   PWA マニフェスト
 
 ## Service Worker の注意
 
-- `sw.js` は静的ファイルを **cache-first** で配信する（HTML のみ network-first）
+- `sw.js` は静的ファイルを **cache-first** で配信する（HTML のみ network-first。HTML は `cache: "no-cache"`、先読みは `cache: "reload"` で取り、ブラウザに残った古いファイルを使わない）
 - JS / CSS を変更したら `sw.js` の `APP_CACHE` / `RUNTIME_CACHE` のバージョン（`darts-app-vN` / `darts-runtime-vN`）を上げる。上げないと既存ユーザーに古いファイルが残る
 - 新しいファイルを追加したら `PRECACHE_URLS` にも追加する
 

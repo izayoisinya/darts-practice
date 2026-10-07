@@ -1,5 +1,5 @@
-const APP_CACHE = "darts-app-v52"
-const RUNTIME_CACHE = "darts-runtime-v52"
+const APP_CACHE = "darts-app-v54"
+const RUNTIME_CACHE = "darts-runtime-v54"
 
 const PRECACHE_URLS = [
   "./",
@@ -49,7 +49,10 @@ const PRECACHE_URLS = [
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(APP_CACHE).then(cache => cache.addAll(PRECACHE_URLS))
+    // ブラウザが手元に残している古いファイル（GitHub Pages は 10 分ほど残る）ではなく、必ずサーバーから取り直して入れる
+    caches.open(APP_CACHE).then(cache =>
+      cache.addAll(PRECACHE_URLS.map(url => new Request(url, { cache: "reload" })))
+    )
   )
   self.skipWaiting()
 })
@@ -74,10 +77,12 @@ self.addEventListener("fetch", event => {
   if (requestUrl.origin !== self.location.origin) return
 
   // HTML is network-first so users receive updates quickly.
+  // ブラウザが手元に残している HTML をそのまま使わず、毎回サーバーに新しいか確かめる（cache: "no-cache"）。
+  // これがないと、更新直後に画面ごとに新しい HTML と古い HTML が混ざることがある
   const isDocumentRequest = event.request.mode === "navigate"
   if (isDocumentRequest) {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request.url, { cache: "no-cache", credentials: "same-origin" })
         .then(response => {
           const cloned = response.clone()
           caches.open(RUNTIME_CACHE).then(cache => cache.put(event.request, cloned))

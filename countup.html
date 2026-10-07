@@ -264,19 +264,24 @@
 
       <button data-link="index.html">Main Menu</button>
 
-      <button data-link="countup.html">CountUp</button>
+      <div class="menu-group">
+        <div class="menu-group-title">Game</div>
+        <button data-link="countup.html" class="current" aria-current="page">CountUp</button>
+        <button disabled>01<span class="menu-soon">Coming Soon</span></button>
+        <button disabled>Cricket<span class="menu-soon">Coming Soon</span></button>
+      </div>
 
-      <button disabled>01(Coming Soon)</button>
+      <div class="menu-group">
+        <div class="menu-group-title">Utility</div>
+        <button data-link="data.html">Data</button>
+        <button data-link="settings.html">Settings</button>
+        <button data-link="news.html">Info</button>
+      </div>
 
-      <button disabled>Cricket(Coming Soon)</button>
-
-      <button onclick="location.href = 'data.html'">Data</button>
-
-      <button onclick="location.href = 'settings.html'">Settings</button>
-
-      <button onclick="location.href = 'news.html'">Info</button>
-
-      <button onclick="forceResetGame()">Reset Game</button>
+      <div class="menu-group">
+        <div class="menu-group-title">This Game</div>
+        <button class="menu-danger" onclick="forceResetGame()">Reset Game</button>
+      </div>
     </div>
 
     <!-- コア機能（最初に読み込む） -->

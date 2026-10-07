@@ -246,6 +246,11 @@ function registerEvents() {
   
   document.querySelectorAll("[data-link]").forEach(btn => {
     btn.addEventListener("click", () => {
+      // サイドメニューの今いる画面のボタンは、開き直さずにメニューを閉じるだけ
+      if (btn.classList.contains("current")) {
+        setSideMenuOpen(false)
+        return
+      }
       location.href = btn.dataset.link
     })
   })

@@ -106,3 +106,86 @@ function setupLinks() {
   
 }
 
+
+// ==========================
+// サイドメニュー（全画面共通）
+// ==========================
+// 各画面の <div id="sideMenu"> の中身をここで作る。メニューを変えるときはここだけ直す。
+// 開閉の動き（スワイプなど）は main.js の setupSideMenu()
+const SIDE_MENU_GROUPS = [
+  {
+    title: "Game",
+    items: [
+      { label: "CountUp", link: "countup.html" },
+      { label: "01", soon: true },
+      { label: "Cricket", soon: true }
+    ]
+  },
+  {
+    title: "Utility",
+    items: [
+      { label: "Data", link: "data.html" },
+      { label: "Settings", link: "settings.html" },
+      { label: "Info", link: "news.html" }
+    ]
+  },
+  {
+    // 進行中のゲームの操作（カウントアップ画面だけ）
+    title: "This Game",
+    page: "countup.html",
+    items: [
+      { label: "Reset Game", action: "forceResetGame", danger: true }
+    ]
+  }
+]
+
+function getCurrentPageName() {
+  const name = location.pathname.split("/").pop()
+  return name || "index.html"
+}
+
+function renderSideMenuItem(item, page) {
+
+  if (item.soon) {
+    return `<button type="button" disabled>${item.label}<span class="menu-soon">Coming Soon</span></button>`
+  }
+
+  if (item.action) {
+    return `<button type="button" class="${item.danger ? "menu-danger" : ""}" data-action="${item.action}">${item.label}</button>`
+  }
+
+  const current = item.link === page ? ' class="current" aria-current="page"' : ""
+  return `<button type="button" data-link="${item.link}"${current}>${item.label}</button>`
+}
+
+function renderSideMenu() {
+
+  const menu = document.getElementById("sideMenu")
+  if (!menu) return
+
+  const page = getCurrentPageName()
+
+  const groups = SIDE_MENU_GROUPS
+    .filter(group => !group.page || group.page === page)
+    .map(group => `
+      <div class="menu-group">
+        <div class="menu-group-title">${group.title}</div>
+        ${group.items.map(item => renderSideMenuItem(item, page)).join("")}
+      </div>
+    `)
+    .join("")
+
+  menu.innerHTML = `
+    <div class="menu-header">Menu</div>
+    ${renderSideMenuItem({ label: "Main Menu", link: "index.html" }, page)}
+    ${groups}
+  `
+
+  // 操作のボタン（Reset Game など）は、その画面にある関数を呼ぶ
+  menu.querySelectorAll("[data-action]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const action = window[btn.dataset.action]
+      if (typeof action === "function") action()
+    })
+  })
+}

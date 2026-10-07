@@ -46,7 +46,7 @@ manifest.json   PWA マニフェスト
 | フォルダ | ファイル | 責務 |
 | --- | --- | --- |
 | core/ | state.js | グローバル変数・定数のみ（`TOTAL_ROUNDS`, `game`, `sessions`, `bullMode` など）。**関数は書かない** |
-| core/ | core.js | 全画面共通：`detectDevice()`, `refreshLayout()`, `setupLinks()` |
+| core/ | core.js | 全画面共通：`detectDevice()`, `refreshLayout()`, `setupLinks()`, サイドメニューの中身（`renderSideMenu()`。メニューの項目は `SIDE_MENU_GROUPS` だけ直す。各 HTML には空の `#sideMenu` だけ置く） |
 | core/ | storage.js | 永続化のみ。**ビジネスロジックを入れない・他モジュールに依存しない** |
 | core/ | backup.js | バックアップの書き出し・読み込み（ゲーム記録と日別メモの JSON 化・取り込み）。DOM 操作なし（UI は settings.js） |
 | init/ | main.js | 初期化（`initApp()`）、イベント登録（`registerEvents()`）、SW 登録、メニュー画面のサマリー |

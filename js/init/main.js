@@ -13,6 +13,7 @@ function registerServiceWorker() {
 
 async function initApp() {
   registerServiceWorker()
+  renderSideMenu()
 
   if (typeof initSessionsStorage === "function") {
     await initSessionsStorage()

@@ -5,7 +5,9 @@
 // 画面操作は含まない（ボタンなどの UI は ui/settings.js）。
 
 const BACKUP_APP_ID = "darts-practice"
-const BACKUP_VERSION = 1
+// 1：最初の形式
+// 2：ゲームの記録に 1 投ごとの記録（darts）が加わった（1 の形式もそのまま読める）
+const BACKUP_VERSION = 2
 const BACKUP_DAY_NOTES_KEY = "dartsDayNotesV2"
 
 

@@ -20,6 +20,17 @@ const BOARD_RADIUS = {
   double: 1
 }
 
+// 本物のボードの比率での各輪の外側の半径（ダブルの外側 = 1。スティールボードの規格寸法から）。
+// 刺さった位置を記録するときは、太く描いた輪の上の位置をこの比率に直す（toRealBoardPosition()）
+const REAL_BOARD_RADIUS = {
+  innerBull: 0.0374,
+  outerBull: 0.0935,
+  innerSingle: 0.5824,
+  triple: 0.6294,
+  outerSingle: 0.9529,
+  double: 1
+}
+
 // 数字を書く輪の半径と、SVG の表示範囲（-BOARD_VIEW 〜 BOARD_VIEW）
 const BOARD_NUMBER_RADIUS = 1.09
 const BOARD_VIEW = 1.2
@@ -79,6 +90,41 @@ function getBoardHit(x, y) {
     return { value, multiplier: 1, special: null, label: `S${value}` }
   }
   return { value, multiplier: 2, special: null, label: `D${value}` }
+}
+
+
+// 太く描いたボードの上の位置を、本物のボードの比率での位置に直す。
+// 角度はそのままで、中心からの距離だけを輪ごとに比例で置き換える（輪の中での相対的な位置は変わらない）。
+// ダブルの外（Miss）は、そのままの距離にする
+function toRealBoardPosition(x, y) {
+
+  const r = Math.sqrt(x * x + y * y)
+  if (!r) return { x: 0, y: 0 }
+
+  const keys = ["innerBull", "outerBull", "innerSingle", "triple", "outerSingle", "double"]
+  let realR = r
+  let inner = 0
+  let realInner = 0
+
+  for (let i = 0; i < keys.length; i++) {
+    const outer = BOARD_RADIUS[keys[i]]
+    const realOuter = REAL_BOARD_RADIUS[keys[i]]
+
+    if (r <= outer) {
+      realR = realInner + (r - inner) / (outer - inner) * (realOuter - realInner)
+      break
+    }
+
+    inner = outer
+    realInner = realOuter
+  }
+
+  const scale = realR / r
+
+  return {
+    x: +(x * scale).toFixed(4),
+    y: +(y * scale).toFixed(4)
+  }
 }
 
 
@@ -343,7 +389,7 @@ function handleBoardTap(event) {
   addDart(hit.value, hit.multiplier, hit.special, {
     x: +pos.x.toFixed(3),
     y: +pos.y.toFixed(3)
-  })
+  }, toRealBoardPosition(pos.x, pos.y))
 
   showBoardLastHit(hit)
 }

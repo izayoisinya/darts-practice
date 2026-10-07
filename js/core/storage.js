@@ -69,6 +69,73 @@ function fromAwardsArray(data) {
   return awards
 }
 
+// ===== 1 投ごとの記録（darts）=====
+// アプリ内：{ hit: "T20" | "D5" | "S1" | "OB" | "IB" | "MISS", score, pos: { x, y } | null }
+//   pos はボード入力のときだけ。本物のボードの比率での位置（中心が原点、ダブルの外側 = 1、y は下向きが正）
+// 保存時：[hit, score] または [hit, score, x, y] の配列（未入力は 0）
+// 並びは 1 ラウンド目の 1 投目から順（i 番目は (i / 3 の整数部分 + 1) ラウンド目）
+const DART_HIT_PATTERN = /^(?:[SDT](?:[1-9]|1[0-9]|20)|OB|IB|MISS)$/
+
+function toDartHitCode(dart) {
+  if (!dart) return null
+  if (dart.special === "innerBull") return "IB"
+  if (dart.special === "outerBull") return "OB"
+  if (!dart.score) return "MISS"
+
+  const prefix = dart.multiplier === 3 ? "T" : dart.multiplier === 2 ? "D" : "S"
+  return `${prefix}${dart.value}`
+}
+
+// 進行中のゲームの 1 投から、履歴に残す形を作る
+function toDartRecord(dart) {
+  const hit = toDartHitCode(dart)
+  if (!hit) return null
+
+  const x = Number(dart.pos?.x)
+  const y = Number(dart.pos?.y)
+
+  return {
+    hit,
+    score: toFiniteNumber(dart.score, 0),
+    pos: Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null
+  }
+}
+
+// 保存形式（配列）とアプリ内の形（オブジェクト）のどちらからでも、アプリ内の形にそろえる。
+// 読めない 1 投は null にして、並び（何ラウンド目の何投目か）は崩さない
+function normalizeDartRecord(entry) {
+  if (!entry) return null
+
+  const source = Array.isArray(entry)
+    ? { hit: entry[0], score: entry[1], pos: entry.length >= 4 ? { x: entry[2], y: entry[3] } : null }
+    : entry
+
+  const hit = String(source.hit || "")
+  if (!DART_HIT_PATTERN.test(hit)) return null
+
+  const x = Number(source.pos?.x)
+  const y = Number(source.pos?.y)
+
+  return {
+    hit,
+    score: toFiniteNumber(source.score, 0),
+    pos: source.pos && Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null
+  }
+}
+
+function normalizeDartRecords(list) {
+  return Array.isArray(list) ? list.map(normalizeDartRecord) : []
+}
+
+function serializeDartRecords(darts) {
+  return darts.map(dart => {
+    if (!dart) return 0
+    return dart.pos
+      ? [dart.hit, dart.score, dart.pos.x, dart.pos.y]
+      : [dart.hit, dart.score]
+  })
+}
+
 function normalizeSessionForApp(session) {
   if (!session || typeof session !== "object") return null
 
@@ -94,6 +161,8 @@ function normalizeSessionForApp(session) {
       Object.values(awards).reduce((sum, count) => sum + count, 0)
     ),
     roundScores,
+    // 1 投ごとの記録（2026.10.7 から。それより前の記録は空）
+    darts: normalizeDartRecords(session.darts),
     gameType: String(session.gameType || "countup")
   }
 }
@@ -115,7 +184,8 @@ function serializeSessionForStorage(session) {
     a: toAwardsArray(normalized.awards),
     ta: normalized.totalAwards,
     r: normalized.roundScores,
-    g: normalized.gameType
+    g: normalized.gameType,
+    ...(normalized.darts.length ? { dt: serializeDartRecords(normalized.darts) } : {})
   }
 }
 
@@ -135,6 +205,7 @@ function deserializeSessionFromStorage(session) {
     awards: session.a,
     totalAwards: session.ta,
     roundScores: session.r,
+    darts: session.dt,
     gameType: session.g
   })
 }
@@ -507,7 +578,10 @@ function saveSession() {
   awards,
   totalAwards,
 
-  roundScores
+  roundScores,
+
+  // 1 投ごとの記録（刺さった場所。ボード入力なら位置も）
+  darts: game.rounds.flat().map(toDartRecord)
   })
   
   writeSessions(sessions)

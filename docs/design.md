@@ -492,7 +492,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `renderAnalysisHeatmap()` | 期間で絞った記録を集計し、ヒートマップと「よく刺さった場所」を表示する（`drawAnalysisCharts()` から呼ぶ） |
 | `collectHeatmapData(sessions)` | 位置のある投の位置の一覧、刺さった場所ごとの本数、投数・ゲーム数を集める |
 | `drawHeatmap(points)` / `paintHeatmap(ctx, width, height, points, highlight)` / `drawHeatmapBoard()` | ボードの図（本物の比率）を描き、その上に色を重ね、1 投ずつの位置を小さな点で描く（`highlight` の位置は白い縁取りの点） |
-| `paintRadarHeatmap(ctx, width, height, points, highlight, rgb)` | ゲーム画面用のレーダー風の描画。暗い緑の円に、ボードの輪・区画の線・十字線・外周の目盛り・数字を描き、刺さった位置をぼかした光（`lighter` で重ねる）で表す。回る走査線は CSS の `.game-radar-sweep`（`conic-gradient` を回転。動きを減らす設定では止める） |
+| `paintRadarHeatmap(ctx, width, height, points, highlight, rgb)` | ゲーム画面用のレーダー風の描画。暗い緑の円に、ボードの輪・区画の線・外周の目盛り・数字を描き、刺さった位置をぼかした光（`lighter` で重ねる）で表す。回る走査線は CSS の `.game-radar-sweep`（`conic-gradient` を回転。動きを減らす設定では止める） |
 | `createHeatLayer()` / `getHeatmapPalette()` | 1 投ずつぼかした円を足し合わせ（`lighter`）、いちばん多い場所を最大にした相対値で 青→水色→緑→黄→赤 に色付けした画像を作る |
 
 - 位置があるのはボード入力で入れた投だけ。「よく刺さった場所」はボタン入力の投も含めて数える
@@ -848,3 +848,4 @@ graph LR
 | 2026.10.7 | 各画面の左右の余白を `--gutter-left` / `--gutter-right` にそろえた（右だけ広かったのをやめ、横向きの iPhone では左右の安全領域も空ける）。iPhone 横の Rounds で 3 投目のマスと合計が切れていたのを直した。Android ではサイドメニューを開くスワイプを右端 96px 以内から始められるようにした |
 | 2026.10.7 | ゲーム画面で、ボードの左に空きがあるとき（横向きで Input だけのときなど）左下にこのゲームのヒートマップを出すようにした（`renderGameHeatmap()`。`heatmap.js` の描画を `paintHeatmap()` に分けて共用） |
 | 2026.10.7 | ゲーム画面のこのゲームのヒートマップをレーダー風のデザインにした（`paintRadarHeatmap()`、回る走査線） |
+| 2026.10.7 | ゲーム画面のレーダー風ヒートマップから十字線と点線の輪を消した |

@@ -86,7 +86,7 @@ GitHub 上のリポジトリ（`izayoisinya/darts-practice`）を iPad 及びタ
 | `settings.html` | 設定画面 |
 | `news.html` | お知らせ画面 |
 
-メイン画面以外では、画面右端をタップするとサイドメニューが開き、各画面へ遷移できる。サイドメニューの「Reset Game」（`forceResetGame()`：進行中のゲームだけをリセット。保存済みの記録は消さない）はカウントアップ画面にだけ置く。
+メイン画面以外では、画面右端の細い帯をタップするか、右端から左へスワイプするとサイドメニューが右から横にすべって出てきて、各画面へ遷移できる。メニューを右へスワイプするか、外側をタップすると閉じる。スワイプ中はメニューが指に合わせて動き、離したときに半分以上（または素早く）動かしていれば開閉する（`main.js` の `setupSideMenu()` / `setSideMenuOpen()`、`lay_menu.css`）。メニューの中身は、ステータスバー・ホームバー・横向きの丸い角に重ならないよう安全領域の分だけ内側に寄せる。サイドメニューの「Reset Game」（`forceResetGame()`：進行中のゲームだけをリセット。保存済みの記録は消さない）はカウントアップ画面にだけ置く。
 
 ### 4.1 index.html（メイン画面）
 
@@ -343,6 +343,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | --- | --- |
 | `initApp()` | アプリの初期化（SW 登録、保存領域の準備、端末判定、ゲーム初期化など） |
 | `registerEvents()` | サイドメニュー、NEXT GAME、スマホでのエリア開閉などのイベントを登録する |
+| `setupSideMenu()` / `setSideMenuOpen(open)` | サイドメニューの開閉（右端の帯のタップ・スワイプ。スワイプ中は指に合わせて動かす） |
 | `registerServiceWorker()` | Service Worker を登録する |
 | `applyOrientationPreference()` | 設定に従って画面の向きを固定・解除する |
 | `applyGamePanelVisibility()` | 設定の Game Panels に従って、カウントアップ画面の Rounds / Stats を隠す（`body.hide-round-area` / `hide-stats-area`）。ボード入力の戻るボタンの表示（`body.hide-undo-button`）もここで切り替える |
@@ -826,3 +827,4 @@ graph LR
 | 2026.10.7 | データ画面の Analysis タブにヒートマップ（刺さった位置の分布と、よく刺さった場所の割合）を追加（`heatmap.js`） |
 | 2026.10.7 | 入力形式の初期値をボードに変更（設定画面で Buttons を選んで保存していれば今までどおり） |
 | 2026.10.7 | PWA の章の公開処理のメモに、deploy が権限エラーで失敗した場合を追記 |
+| 2026.10.7 | サイドメニューを右から横にすべって出るようにし、右端からのスワイプで開く・右へのスワイプで閉じるようにした。メニューの中身が安全領域（ステータスバーなど）に重ならないようにした |

@@ -185,13 +185,10 @@ function registerEvents() {
     nextBtn.addEventListener("click", nextGame)
   }
   
-  // ===== menu open =====
+  // ===== side menu（右端タップ・スワイプで開閉） =====
   
-  if (edge && menu) {
-    edge.addEventListener("click", () => {
-      menu.classList.add("open")
-      body.classList.add("menu-open")
-    })
+  if (edge && menu && overlay) {
+    setupSideMenu(menu, edge, overlay)
   }
   
   // ===== round open (phone portrait) =====
@@ -227,21 +224,11 @@ function registerEvents() {
     })
   }
   
-  // ===== side menu =====
+  // ===== side menu（ボタンを押したら閉じる） =====
   
   if (menu) {
     menu.querySelectorAll("button:not([data-link])").forEach(btn => {
-      btn.addEventListener("click", () => {
-        menu.classList.remove("open")
-        body.classList.remove("menu-open")
-      })
-    })
-  }
-  
-  if (overlay && menu) {
-    overlay.addEventListener("click", () => {
-      menu.classList.remove("open")
-      body.classList.remove("menu-open")
+      btn.addEventListener("click", () => setSideMenuOpen(false))
     })
   }
   
@@ -253,3 +240,113 @@ function registerEvents() {
   
 }
 
+
+// ===============================
+// ===== サイドメニュー ===========
+// ===============================
+// 右から横にすべって出てくるメニュー（lay_menu.css）。
+//   開く：右端の細い帯をタップ / 右端から左へスワイプ
+//   閉じる：外側をタップ / メニューを右へスワイプ / メニューのボタンを押す
+// スワイプ中は指に合わせて動き、離したときに半分以上（または素早く）動かしていれば開閉する
+const SIDE_MENU_SWIPE_SPEED = 0.4  // px / ms。これより速く払ったら距離が短くても開閉する
+
+function setSideMenuOpen(open) {
+
+  const menu = document.getElementById("sideMenu")
+  const overlay = document.getElementById("menuOverlay")
+  if (!menu) return
+
+  menu.classList.remove("dragging")
+  menu.style.transform = ""
+  if (overlay) {
+    overlay.classList.remove("dragging")
+    overlay.style.opacity = ""
+  }
+
+  menu.classList.toggle("open", open)
+  document.body.classList.toggle("menu-open", open)
+}
+
+function setupSideMenu(menu, edge, overlay) {
+
+  edge.addEventListener("click", () => setSideMenuOpen(true))
+  overlay.addEventListener("click", () => setSideMenuOpen(false))
+
+  let drag = null
+
+  // fromOpen：開いた状態から閉じる向きに動かしているか
+  const start = (event, fromOpen) => {
+    if (event.touches.length !== 1) return
+    const touch = event.touches[0]
+    drag = {
+      fromOpen,
+      startX: touch.clientX,
+      startY: touch.clientY,
+      lastX: touch.clientX,
+      startTime: Date.now(),
+      width: menu.offsetWidth,
+      moving: false
+    }
+  }
+
+  const move = event => {
+    if (!drag || event.touches.length !== 1) return
+
+    const touch = event.touches[0]
+    const dx = touch.clientX - drag.startX
+    const dy = touch.clientY - drag.startY
+
+    // 縦の動きが大きいときは、メニューの中のスクロールとして扱う
+    if (!drag.moving) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
+      if (Math.abs(dy) > Math.abs(dx)) {
+        drag = null
+        return
+      }
+      drag.moving = true
+      menu.classList.add("dragging")
+      overlay.classList.add("dragging")
+      document.body.classList.add("menu-open")
+    }
+
+    event.preventDefault()
+    drag.lastX = touch.clientX
+
+    // メニューが画面に出ている幅（0〜メニューの幅）
+    const shown = drag.fromOpen
+      ? Math.max(0, Math.min(drag.width, drag.width - dx))
+      : Math.max(0, Math.min(drag.width, -dx))
+
+    menu.style.transform = `translateX(${drag.width - shown}px)`
+    overlay.style.opacity = String(shown / drag.width)
+  }
+
+  const end = () => {
+    if (!drag) return
+
+    const current = drag
+    drag = null
+    if (!current.moving) return
+
+    const dx = current.lastX - current.startX
+    const speed = dx / Math.max(1, Date.now() - current.startTime)
+    const shown = current.fromOpen ? current.width - dx : -dx
+
+    let open = shown > current.width / 2
+    if (speed <= -SIDE_MENU_SWIPE_SPEED) open = true
+    if (speed >= SIDE_MENU_SWIPE_SPEED) open = false
+
+    setSideMenuOpen(open)
+  }
+
+  edge.addEventListener("touchstart", event => start(event, false), { passive: true })
+  menu.addEventListener("touchstart", event => start(event, true), { passive: true })
+  overlay.addEventListener("touchstart", event => start(event, true), { passive: true })
+
+  const targets = [edge, menu, overlay]
+  targets.forEach(target => {
+    target.addEventListener("touchmove", move, { passive: false })
+    target.addEventListener("touchend", end)
+    target.addEventListener("touchcancel", end)
+  })
+}

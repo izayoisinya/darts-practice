@@ -126,7 +126,7 @@ GitHub 上のリポジトリ（`izayoisinya/darts-practice`）を iPad 及びタ
 | --- | --- |
 | ヘッダー | 合計スコア、ヘッダーの真ん中に今のラウンド（R1〜R8）の各ダーツの得点（合計スコアと同じ光る数字。色はトリプル＝青・ダブル＝赤・インブル＝金・それ以外は緑、ミスと未入力は薄く。3 投目のあとは次の 1 投目まで入れ終わったラウンド。幅 360px 未満のスマホ縦では出さない。入れた数字をタップするとその 1 投を消し、後ろの投を前に詰める。確定済みのラウンドは消せない）、NEXT GAME ボタン（8 ラウンド終了で押せる） |
 | Rounds | 各ラウンド（R1〜R8）の 1 投ごとの得点とラウンド合計 |
-| Input | ブルモード表示、Bull / In（インナーブル）/ Miss / 戻る、1〜20 と D（ダブル）・T（トリプル）の入力ボタン。設定で Board にすると、入力ボタンの代わりにダーツボードを表示する（下記）。横向きでボードの左に幅 120px 以上の空きがあるとき（Rounds / Stats を隠したときなど）は、左下にこのゲームのヒートマップ（「This Game」と投数。レーダー風の画面に、ボード入力で入れた投の位置を光る点で出す。古い投ほど薄く、今のラウンドの投は白く光る点と輪。走査線が 4 秒で 1 周する）を出す |
+| Input | ブルモード表示、Bull / In（インナーブル）/ Miss / 戻る、1〜20 と D（ダブル）・T（トリプル）の入力ボタン。設定で Board にすると、入力ボタンの代わりにダーツボードを表示する（下記）。横向きでボードの左右に幅 120px 以上の空きがあるとき（Rounds / Stats を隠したときなど）は、ボードの横に 3 つのパネルを出す。右上はラウンドスコアのグラフ（「Round Score」。終わったラウンドを光る線で結び、最高は金色、途中のラウンドは輪で今の合計）、右下は Stats（PPD・AVG・MAX・DARTS・BULL・IN-BULL）、左下はこのゲームのヒートマップ（「This Game」と投数。レーダー風の画面に、ボード入力で入れた投の位置を光る点で出す。古い投ほど薄く、今のラウンドの投は白く光る点と輪。走査線が 4 秒で 1 周する）を出す |
 | Stats | PPD・投げた本数・平均ラウンドスコア・最高ラウンドスコア、ブル数とブル率、インナーブル数と率、獲得アワード、ラウンドスコアのグラフ |
 
 **画面の縦方向の割り付け**
@@ -386,7 +386,9 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `updateUI()` | 画面全体を更新し、ゲーム状態を保存する |
 | `renderDart()` | 1 投分の表示を作る（ブル・ダブル・トリプル・ミスで色分け） |
 | `renderRounds()` | ラウンド一覧を表示する |
-| `renderGameHeatmap()` / `getGameHeatmapSize()` / `getAccentRgb()` | Input エリアの左下に、このゲームのヒートマップ（レーダー風。`paintRadarHeatmap()`）を描く。ボードの左の空き幅（最大 300px、高さの半分まで）が 120px 未満なら出さない。`updateUI()` と `createNumberTable()`（向き・大きさが変わったとき）から呼ぶ |
+| `renderGameSidePanels()` / `getGameSideLayout()` | ボードの左右のパネル（左下：ヒートマップ、右上：グラフ、右下：Stats）を置く。ボードの横の空き幅（最大 300px、高さの半分まで）が 120px 未満なら全部出さない。グラフは Stats の上に 90px 以上残るときだけ。`updateUI()` と `createNumberTable()`（向き・大きさが変わったとき）から呼ぶ |
+| `renderGameHeatmap(size)` / `renderGameSideChart(width, height)` / `renderGameSideStats()` | 各パネルの中身を描く（`paintRadarHeatmap()` / `paintRoundScoreChart()` / `calculateStats()`） |
+| `setupGameSideCanvas()` / `getAccentRgb()` | canvas を画面の倍率に合わせる / テーマの色を canvas 用の形にする |
 | `renderHeaderRound()` / `getDisplayRoundIndex()` | ヘッダーの真ん中に、今のラウンドの各ダーツの得点を表示する。数字のタップで `deleteDart()` を呼ぶ |
 | `getDartClass()` | 1 投の種類（ミス・ブル・トリプル・ダブル）に合わせた色分けのクラス。Rounds とヘッダーで共通 |
 | `createNumberTable()` / `createNumberRow()` | 1〜20 と D / T の入力ボタンを生成する |
@@ -536,6 +538,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | 関数 | 内容 |
 | --- | --- |
 | `drawScoreChart()` | カウントアップ画面のラウンドスコアのグラフを描く。計算は行わず描画のみ。画面の倍率（devicePixelRatio）に合わせて細かく描き、ぼやけないようにする |
+| `paintRoundScoreChart(ctx, width, height, rgb)` | ボードの右上の小さなラウンドスコアのグラフ（暗い画面に光る線。レーダー風のヒートマップに合わせたデザイン） |
 
 #### ui/settings.js
 
@@ -849,3 +852,4 @@ graph LR
 | 2026.10.7 | ゲーム画面で、ボードの左に空きがあるとき（横向きで Input だけのときなど）左下にこのゲームのヒートマップを出すようにした（`renderGameHeatmap()`。`heatmap.js` の描画を `paintHeatmap()` に分けて共用） |
 | 2026.10.7 | ゲーム画面のこのゲームのヒートマップをレーダー風のデザインにした（`paintRadarHeatmap()`、回る走査線） |
 | 2026.10.7 | ゲーム画面のレーダー風ヒートマップから十字線と点線の輪を消した |
+| 2026.10.7 | ゲーム画面のボードの右側にも、右上にラウンドスコアのグラフ、右下に Stats を出すようにした（`renderGameSidePanels()`、`chart.js` の `paintRoundScoreChart()`） |

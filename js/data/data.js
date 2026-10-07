@@ -1128,6 +1128,7 @@ const SCATTER_NO_TAG_COLOR = "rgba(154,164,178,0.35)"
 
 function drawAnalysisCharts() {
   if (viewMode !== "analysis") return
+  if (typeof renderAnalysisHeatmap === "function") renderAnalysisHeatmap()
   renderAnalysisScatter()
   drawSelectedRangeChart()
 }

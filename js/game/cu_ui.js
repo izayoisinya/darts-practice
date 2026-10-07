@@ -274,18 +274,32 @@ function fitBoardColumn(useBoard) {
 //   左下：このゲームのヒートマップ（レーダー風。今のラウンドの投は白く光る点）
 //   右上：ラウンドスコアのグラフ
 //   右下：Stats（PPD・平均・最高・ブル・インブル・投数）
-// を出す。ボードは左右中央に描かれるので、左右の空き幅は同じ
+//   左上：Awards（このゲームで取ったアワードの数）
+// を出す。ボードは左右中央に描かれるので、左右の空き幅は同じ。
+// 上の 2 つは、ボードの左上に出る直前の 1 投の表示・右上の「全体表示」ボタンと重ならないよう、その分だけ下げる
 const GAME_SIDE_MIN = 120   // 空き幅がこれより狭いときは出さない（px）
 const GAME_SIDE_MAX = 300
+const GAME_SIDE_TOP_SPACE = 44   // 上の 2 つのパネルを、ボードを置く場所の上端からこれだけ下げる（px）
+const GAME_SIDE_GAP = 16         // 上下のパネルの間（px）
+
+const GAME_SIDE_AWARDS = [
+  ["hatTrick", "HAT TRICK"],
+  ["threeInTheBlack", "3 IN BLACK"],
+  ["ton80", "TON 80"],
+  ["highTon", "HIGH TON"],
+  ["lowTon", "LOW TON"],
+  ["threeInTheBed", "3 IN A BED"],
+  ["whiteHorse", "WHITE HORSE"]
+]
 
 function renderGameSidePanels() {
 
   const inputArea = document.querySelector(".input-area")
   const table = document.getElementById("numberTable")
-  const panels = ["gameHeatmap", "gameSideChart", "gameSideStats"].map(id => document.getElementById(id))
+  const panels = ["gameHeatmap", "gameSideChart", "gameSideStats", "gameSideAwards"].map(id => document.getElementById(id))
   if (!inputArea || !table || panels.some(panel => !panel)) return
 
-  const [heatmapBox, chartBox, statsBox] = panels
+  const [heatmapBox, chartBox, statsBox, awardsBox] = panels
   const layout = getGameSideLayout(inputArea, table)
 
   if (!layout) {
@@ -309,17 +323,30 @@ function renderGameSidePanels() {
   statsBox.style.bottom = `${padding.bottom}px`
   renderGameSideStats()
 
+  const upperTop = top + GAME_SIDE_TOP_SPACE
+  const upperSpace = height - GAME_SIDE_TOP_SPACE - GAME_SIDE_GAP
+
   // 右上：グラフ（Stats の上に残った高さに収める。低すぎるときは出さない）
-  const chartHeight = Math.min(Math.round(size * 0.7), height - statsBox.offsetHeight - 16)
+  const chartHeight = Math.min(Math.round(size * 0.7), upperSpace - statsBox.offsetHeight)
   if (chartHeight < 90) {
     chartBox.hidden = true
-    return
+  } else {
+    chartBox.hidden = false
+    chartBox.style.width = `${size}px`
+    chartBox.style.right = `${padding.right}px`
+    chartBox.style.top = `${upperTop}px`
+    renderGameSideChart(size, chartHeight)
   }
-  chartBox.hidden = false
-  chartBox.style.width = `${size}px`
-  chartBox.style.right = `${padding.right}px`
-  chartBox.style.top = `${top}px`
-  renderGameSideChart(size, chartHeight)
+
+  // 左上：Awards（ヒートマップの上に収まるときだけ）
+  awardsBox.hidden = false
+  awardsBox.style.width = `${size}px`
+  awardsBox.style.left = `${padding.left}px`
+  awardsBox.style.top = `${upperTop}px`
+  renderGameSideAwards()
+  if (awardsBox.offsetHeight > upperSpace - heatmapBox.offsetHeight) {
+    awardsBox.hidden = true
+  }
 }
 
 // ボード（縦横の短い方に合わせて左右中央に描かれる）の横に空いている幅と、パネルを置ける縦の範囲
@@ -418,6 +445,27 @@ function renderGameSideStats() {
         ${sub ? `<span class="game-side-stat-sub">${sub}</span>` : ""}
       </div>
     `)
+    .join("")
+}
+
+// このゲームで取ったアワードの数（取っていないものは薄く）
+function renderGameSideAwards() {
+
+  const box = document.getElementById("gameSideAwardsGrid")
+  if (!box) return
+
+  const stats = calculateStats()
+
+  box.innerHTML = GAME_SIDE_AWARDS
+    .map(([key, label]) => {
+      const count = stats[key] || 0
+      return `
+        <div class="game-side-award${count ? " earned" : ""}">
+          <span class="game-side-award-label">${label}</span>
+          <span class="game-side-award-value">${count}</span>
+        </div>
+      `
+    })
     .join("")
 }
 

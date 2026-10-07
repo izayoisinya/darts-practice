@@ -223,14 +223,15 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 レイアウトとデザインはカウントアップの Game の表示とそろえ、同じ場所に同じ部品で出す。
 
-- **右（History）**：カウントアップと同じ `#sessionsContainer` に、同じ形のカード（Game n・日時・3 つの数字・押すと開いて Round Scores と Awards）を新しい順に出す。数字は Out Darts（上がったダーツ数。金）か Left（上がれなかった残り。赤）、PPD、80% Stats。下の要約に設定と上がりナンバー（`OUT D16` / `NO OUT`）。ページ送りもフッターの Prev / Next（01 のときは `changePage()` を 01 用に切り替える）
+- **右（History）**：カウントアップと同じ `#sessionsContainer` に、同じ形のカード（Game n・日時・3 つの数字・押すと開いて Round Scores と Awards）を新しい順に出す。数字は Out Darts（上がったダーツ数。金）か Left（上がれなかった残り。赤）、PPD、80% Stats。下の要約に設定・上がりナンバー（`OUT D16` / `NO OUT`）・ブルとトリプルの本数と割合。開くと Bull / In / T の割合のバーも出す。ページ送りもフッターの Prev / Next（01 のときは `changePage()` を 01 用に切り替える）
 - **左（Stats）**：`#zeroOneStatsPanel` に出し、カウントアップの左の欄は隠す
   - 上の選択で設定（点数・上がり方・ラウンド）ごとに絞る（初めは最後に遊んだ設定。All Settings で全部。History も同じ絞り込み）
-  - Stats（`.data-card`）：Games Played・Finish Rate（上がり率）・Avg Darts（上がったゲームの平均ダーツ数）・Best Darts・Average PPD・Recent 10（直近 10 ゲームの上がり率）
+  - Stats（`.data-card`）：Games Played・Finish Rate（上がり率）・Avg Darts（上がったゲームの平均ダーツ数）・Best Darts・Average PPD・Finish Rate (Last 10)（直近 10 ゲームの上がり率）
   - Awards（`.data-card`）
+  - Bull / Triple：全投数に対するブル（アウター＋インナー）・インナーブル（金）・トリプル（青）の本数と割合（1 投ごとの記録 `darts` から数える。カウントアップの詳細の Bull Rate と同じ部品。`renderZeroOneHitRates()`）
   - Darts to Finish：直近 30 ゲームの上がるまでのダーツ数の推移（最少は金色）。上がれなかったゲームは上の段に赤い ×
   - レーティング参考値（カウントアップと同じカード）：直近 30 ゲームの **80% スタッツ**（1 ゲームごとに、最初の点数の 80% を減らしたラウンドまでの 1 ラウンドの平均点。バストは 0 点）の平均を PPR として出し、PPD（÷ 3）を `rating.js` の換算表で DARTSLIVE / PHOENIX の目安にする（`getZeroOneStats80()` / `renderZeroOneRating()`）
-  - Finish Numbers：上がったゲームの最後の 1 投（`darts` の最後の記録）の場所ごとの割合（上位 10 か所。`renderZeroOneFinishNumbers()`）
+  - Finish Numbers：上がったゲームの最後の 1 投（`darts` の最後の記録）の場所ごとの割合（上位 10 か所。バーの長さは全体に対する割合。`renderZeroOneFinishNumbers()`）
 - フッターのタブ（Analysis・Day など）はカウントアップ用なので 01 のときは隠す。Analysis などを見ていたときに 01 に切り替えると Game の表示に戻してから 01 を出し、カウントアップに戻すと `changeView()` で描き直す
 - スマホ縦は、カウントアップと同じ History / Stats の切り替えで見る
 
@@ -922,3 +923,4 @@ graph LR
 | 2026.10.8 | データ画面の 01 に、上がりナンバーの割合（Finish Numbers）と、80% スタッツから出したレーティングの目安を追加 |
 | 2026.10.8 | レンジ（ブルの中心からの距離）の目安を追加。データ画面の Analysis に 50%・80% の円の半径と平均（mm）を出してヒートマップに円を重ね、ゲーム画面のレーダーにもこのゲームの R50 を出す（カウントアップのみ） |
 | 2026.10.8 | データ画面の 01 を、カウントアップと同じレイアウト（右に History、左に Stats）・同じ部品（履歴カード・`.data-card`・レーティングのカード・グラフの枠）で出すようにした。スマホ縦の History / Stats の切り替え、フッターの Prev / Next も共通 |
+| 2026.10.8 | データ画面の 01 に、ブル・インナーブル・トリプルの本数と割合を追加（全体と各ゲーム）。Finish Numbers のバーを全体に対する割合で描くようにした（同じ回数だと全部いっぱいに見えていた）。Recent 10 を Finish Rate (Last 10) に改名。スマホ縦で Stats を開いたときに 01 のグラフが描かれないのを直した |

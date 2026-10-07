@@ -161,6 +161,7 @@ function renderZeroOneData() {
       <h3 class="data-section-title">Awards</h3>
       <div class="z1-award-cards">${renderZeroOneAwardCards(list)}</div>
     </section>
+    ${renderZeroOneHitRates(list)}
     <section class="data-summary-section">
       <h3 class="data-section-title">Darts to Finish (Last ${DATA_01_CHART_GAMES} Games)</h3>
       <canvas id="z1Chart" class="z1-chart"></canvas>
@@ -185,6 +186,62 @@ function renderZeroOneData() {
   requestAnimationFrame(() => drawZeroOneChart(list))
 }
 
+// 1 ゲームの投数・ブル（アウター＋インナー）・インナーブル・トリプルの本数（1 投ごとの記録から）
+function getZeroOneHitCounts(session) {
+  const counts = { darts: 0, bulls: 0, inner: 0, triples: 0 }
+  ;(Array.isArray(session.darts) ? session.darts : []).forEach(dart => {
+    if (!dart) return
+    counts.darts++
+    if (dart.hit === "OB" || dart.hit === "IB") counts.bulls++
+    if (dart.hit === "IB") counts.inner++
+    if (/^T\d+$/.test(dart.hit)) counts.triples++
+  })
+  return counts
+}
+
+function sumZeroOneHitCounts(list) {
+  return list.reduce((total, session) => {
+    const counts = getZeroOneHitCounts(session)
+    Object.keys(total).forEach(key => { total[key] += counts[key] })
+    return total
+  }, { darts: 0, bulls: 0, inner: 0, triples: 0 })
+}
+
+// ブル・インナーブル・トリプルの本数と割合（全投数に対して）。カウントアップの詳細の Bull Rate と同じ部品
+function renderZeroOneHitRates(list) {
+
+  const total = sumZeroOneHitCounts(list)
+  if (!total.darts) return ""
+
+  const item = (label, count, extraClass = "") => {
+    const rate = count / total.darts * 100
+    return `
+      <div class="detail-bull-rate-item">
+        <div class="detail-bull-rate-head">
+          <span class="detail-bull-rate-label">${label}</span>
+          <span class="detail-bull-rate-value">${count}（${rate.toFixed(1)}%）</span>
+        </div>
+        <div class="detail-bull-rate-bar-bg">
+          <div class="detail-bull-rate-bar-fill${extraClass}" style="width:${Math.min(100, rate).toFixed(1)}%"></div>
+        </div>
+      </div>
+    `
+  }
+
+  return `
+    <section class="data-summary-section">
+      <h3 class="data-section-title">Bull / Triple（全 ${total.darts} 投）</h3>
+      <div class="detail-bull-rate">
+        <div class="detail-bull-rate-grid">
+          ${item("Bull", total.bulls)}
+          ${item("Inner Bull", total.inner, " inner")}
+          ${item("Triple", total.triples, " triple")}
+        </div>
+      </div>
+    </section>
+  `
+}
+
 // カウントアップの Stats と同じ「名前と数字」のカード（.data-card）
 function renderZeroOneStatCards(list) {
 
@@ -201,7 +258,8 @@ function renderZeroOneStatCards(list) {
     ["Avg Darts", avgDarts ? avgDarts.toFixed(1) : "-"],
     ["Best Darts", darts.length ? Math.min(...darts) : "-"],
     ["Average PPD", avgPpd.toFixed(2)],
-    ["Recent 10", recent.length ? `${recentRate.toFixed(0)}%` : "-"]
+    // 直近 10 ゲームだけで見た上がり率（最近の調子の目安）
+    ["Finish Rate (Last 10)", recent.length ? `${recentRate.toFixed(0)}%` : "-"]
   ]
     .map(([title, value]) => `
       <div class="data-card">
@@ -259,10 +317,26 @@ function createZeroOneCardHtml(session, gameNumber) {
   const finishHit = z.finished ? getZeroOneFinishHit(session) : null
   const stats80 = getZeroOneStats80(session)
 
+  const hits = getZeroOneHitCounts(session)
+  const rate = count => hits.darts ? (count / hits.darts * 100).toFixed(1) : "0.0"
+
   const summary = [
     formatZeroOneConfigKey(getZeroOneConfigKey(z)),
-    z.finished ? `OUT${finishHit ? ` ${formatZeroOneHit(finishHit)}` : ""}` : "NO OUT"
+    z.finished ? `OUT${finishHit ? ` ${formatZeroOneHit(finishHit)}` : ""}` : "NO OUT",
+    `Bull ${hits.bulls}（${rate(hits.bulls)}%）`,
+    `T ${hits.triples}（${rate(hits.triples)}%）`
   ].join(" · ")
+
+  const rateRow = (label, count, extraClass = "") => `
+    <div class="stat-row session-stat-row">
+      <span class="label">${label}</span>
+      <span class="count">${count}</span>
+      <div class="bar-bg">
+        <div class="bar-fill${extraClass}" style="width:${rate(count)}%"></div>
+      </div>
+      <span class="percent">${rate(count)}%</span>
+    </div>
+  `
 
   return `
     <div class="session-card-header">
@@ -291,6 +365,12 @@ function createZeroOneCardHtml(session, gameNumber) {
         </div>
 
         <div class="session-compact-summary">${summary}</div>
+
+        <div class="session-rate-group">
+          ${rateRow("Bull", hits.bulls)}
+          ${rateRow("In", hits.inner, " inner")}
+          ${rateRow("T", hits.triples, " triple")}
+        </div>
       </div>
 
       <div class="session-side-block">
@@ -317,6 +397,16 @@ function updateZeroOnePagination(totalPages) {
   if (next) next.disabled = data01Page >= totalPages
 }
 
+// パネルの切り替え（スマホ縦の History / Stats）・回転のあとのグラフの描き直しは、01 のときは 01 のグラフを描く
+const redrawVisibleChartsForCountUp = typeof redrawVisibleCharts === "function" ? redrawVisibleCharts : null
+window.redrawVisibleCharts = function () {
+  if (dataGameType === "01") {
+    drawZeroOneChart(getZeroOneFilteredSessions())
+    return
+  }
+  if (redrawVisibleChartsForCountUp) redrawVisibleChartsForCountUp()
+}
+
 // フッターの Prev / Next は、01 を見ているときは 01 の History のページを送る
 const changePageForCountUp = typeof changePage === "function" ? changePage : null
 window.changePage = function (direction) {
@@ -336,6 +426,8 @@ function drawZeroOneChart(list) {
   const canvas = document.getElementById("z1Chart")
   if (!canvas || typeof setupHiDPICanvas !== "function") return
 
+  // 隠れている（スマホ縦で History を見ている）ときは大きさが測れないので、Stats を開いたときに描く（redrawVisibleCharts）
+  if (!canvas.offsetWidth) return
   const state = setupHiDPICanvas(canvas, 200)
   if (!state) return
 
@@ -469,7 +561,6 @@ function renderZeroOneFinishNumbers(list) {
   }
 
   const hits = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 10)
-  const max = counts[hits[0]]
 
   return `
     <section class="data-summary-section">
@@ -478,7 +569,7 @@ function renderZeroOneFinishNumbers(list) {
         ${hits.map(hit => `
           <div class="z1-bar-row">
             <span class="z1-bar-name">${formatZeroOneHit(hit)}</span>
-            <span class="z1-bar"><span style="width:${(counts[hit] / max * 100).toFixed(1)}%"></span></span>
+            <span class="z1-bar"><span style="width:${(counts[hit] / total * 100).toFixed(1)}%"></span></span>
             <span class="z1-bar-rate">${(counts[hit] / total * 100).toFixed(1)}%</span>
             <span class="z1-bar-count">${counts[hit]}</span>
           </div>

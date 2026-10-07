@@ -43,9 +43,10 @@ function initGame(load = true) {
 // ===============================
 // ===== ダーツ追加 ==============
 // ===============================
-// boardTap：ボード形式で入力したときのタップ位置（{ x, y }。ボードの中心が原点、ダブルの外側 = 1。
-// 本物より太く描いた輪の上での位置）。進行中のゲームの印の表示にだけ使い、ゲーム履歴には保存しない
-function addDart(value, multiplier, special = null, boardTap = null) {
+// ボード形式で入力したときは、タップした位置も 1 投に持たせる（どちらも { x, y }。ボードの中心が原点、ダブルの外側 = 1）
+//   boardTap：本物より太く描いた輪の上での位置。ボード上の印の表示に使う（ゲーム履歴には保存しない）
+//   pos     ：本物のボードの比率に直した位置。ゲーム履歴に保存して、刺さった位置の分析に使う
+function addDart(value, multiplier, special = null, boardTap = null, pos = null) {
   
   if (game.currentRound >= TOTAL_ROUNDS) return
   
@@ -64,6 +65,10 @@ function addDart(value, multiplier, special = null, boardTap = null) {
 
   if (boardTap) {
     dart.boardTap = boardTap
+  }
+
+  if (pos) {
+    dart.pos = pos
   }
 
   game.rounds[game.currentRound][game.currentDart] = dart

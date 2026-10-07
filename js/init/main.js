@@ -39,10 +39,19 @@ async function initApp() {
   window.addEventListener("orientationchange", refreshLayout)
 
   // 設定画面から戻ったとき（ページがキャッシュから表示されたとき）も表示エリアの設定を反映する
-  window.addEventListener("pageshow", refreshLayout)
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") refreshLayout()
+  window.addEventListener("pageshow", () => {
+    refreshLayout()
+    refitViewportHeightSoon()
   })
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      refreshLayout()
+      refitViewportHeightSoon()
+    }
+  })
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", fitViewportHeight)
+  }
   
 }
 

@@ -408,3 +408,36 @@ body.landscape.input-board.hide-round-area.hide-stats-area.hide-undo-button .inp
     "board"
     "board";
 }
+
+
+/* ================================= */
+/* ====== BOARD COLUMN (LANDSCAPE) = */
+/* ================================= */
+
+/*
+  横向きのボード入力では、入力エリアの列の幅をボードの高さに合わせる（cu_ui.js の fitBoardColumn() が
+  --board-col を入れる）。残りの幅を Rounds / Stats で分ける。
+  Input だけのとき（ボードと右の列）と、スマホ横で Stats を開いたときは、それぞれの指定のままにする
+*/
+body.page-countup.landscape.input-board:not(.iphone-stats-open) .container {
+  grid-template-columns: minmax(0, 1fr) var(--board-col, minmax(0, 1fr)) minmax(0, 1fr);
+}
+
+body.page-countup.landscape.input-board.hide-round-area:not(.iphone-stats-open) .container {
+  grid-template-columns: var(--board-col, minmax(0, 1fr)) minmax(0, 1fr);
+}
+
+body.page-countup.landscape.input-board.hide-stats-area:not(.iphone-stats-open) .container {
+  grid-template-columns: minmax(0, 1fr) var(--board-col, minmax(0, 1fr));
+}
+
+body.page-countup.landscape.input-board.hide-round-area.hide-stats-area .container {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* 列の最小幅（tablet.css）があるとボードの列が狭められないため、ボード入力のときは外す */
+body.landscape.input-board .round-area,
+body.landscape.input-board .input-area,
+body.landscape.input-board .stats-area {
+  min-width: 0;
+}

@@ -111,8 +111,12 @@ function saveSettings() {
 
   writeSettings(settings)
 
-  updateOrientationStatus("適用中...")
-  applyOrientationMode(settings.orientationMode)
+  // 画面の向きの設定を変えたときだけ向きを適用し、その結果を表示する
+  // （ほかの項目を変えたときに「回転ロックが適用されませんでした」などが出ないように）
+  if (prevSettings.orientationMode !== settings.orientationMode) {
+    updateOrientationStatus("適用中...")
+    applyOrientationMode(settings.orientationMode)
+  }
 
   const shouldResetGame = prevSettings.bullMode !== settings.bullMode
   if (shouldResetGame) {
@@ -134,7 +138,8 @@ function applyOrientationMode(mode) {
   }
 
   window.applyOrientationPreference(mode).then(success => {
-    if (success) {
+    // Free は端末のふだんの動きと同じなので、解除の命令が使えない端末でも Free と表示する
+    if (success || mode === "auto") {
       if (mode === "auto") {
         updateOrientationStatus("回転モード: Free")
       } else if (mode === "portrait") {
@@ -377,7 +382,11 @@ async function initSettingsPage() {
   initBackupControls()
 
   loadSettings()
-  applyOrientationMode(readSettings().orientationMode)
+  // 向きを適用する関数（main.js の applyOrientationPreference）は、このファイルより後に読み込まれるため、
+  // ページの読み込みが終わってから適用する
+  window.addEventListener("DOMContentLoaded", () => {
+    applyOrientationMode(readSettings().orientationMode)
+  })
   await updateStorageStatus()
 }
 

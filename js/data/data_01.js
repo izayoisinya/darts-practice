@@ -2,7 +2,7 @@
 // ===== データ画面の 01 ===========
 // ===============================
 // ヘッダーの COUNT-UP / 01 の切り替えと、01 の記録の表示（設定ごとの上がり率・上がるまでのダーツ数・推移・一覧）。
-// カウントアップの表示（data.js など）には手を入れず、01 のときは body に data-01 を付けて 01 用の画面（#zeroOneView）に入れ替える
+// 01 のときは body に data-01 を付け、カウントアップと同じ場所（右の History・左の Stats）に 01 の記録を出す
 
 const DATA_GAME_KEY = "dartsDataGame"
 const DATA_01_OUT_LABELS = { open: "Open Out", double: "Double Out", master: "Master Out" }
@@ -74,10 +74,12 @@ function setDataGameType(type) {
   })
 
   if (dataGameType === "01") {
+    // 01 は Game の表示（左に Stats、右に History）だけ。Analysis や Day などを見ていたら Game に戻してから 01 を描く
+    if (typeof changeView === "function" && (viewMode !== "game" || detailViewMode)) changeView("game")
     renderZeroOneData()
-  } else if (typeof redrawVisibleCharts === "function") {
-    // 隠していた間に大きさが測れなかったグラフを描き直す
-    requestAnimationFrame(() => redrawVisibleCharts())
+  } else if (typeof changeView === "function" && document.getElementById("zeroOneStatsPanel")?.innerHTML) {
+    // 01 で上書きした History をカウントアップの表示に戻す
+    changeView(viewMode || "game")
   }
 }
 
@@ -87,30 +89,43 @@ window.addEventListener("resize", () => {
   if (dataGameType !== "01") return
   clearTimeout(data01ResizeTimer)
   data01ResizeTimer = setTimeout(() => {
-    const list = data01ConfigKey === "all"
-      ? readZeroOneSessions()
-      : readZeroOneSessions().filter(session => getZeroOneConfigKey(session.zeroOne) === data01ConfigKey)
-    drawZeroOneChart(list)
+    drawZeroOneChart(getZeroOneFilteredSessions())
   }, 150)
 })
 
 // ===============================
 // ===== 01 の表示 ================
 // ===============================
+// カウントアップと同じ場所・同じ部品で出す（レイアウトとデザインをそろえる）
+//   右（History）：#sessionsContainer に同じ形のカード（Game n・日時・3 つの数字・開くとラウンドのグラフ）。ページ送りもフッターの Prev / Next
+//   左（Stats）  ：#zeroOneStatsPanel に Stats・Awards・グラフ・Rating・Finish Numbers（カウントアップの左の欄は隠す）
+let data01Page = 1
+
+function getZeroOneFilteredSessions() {
+  const sessions = readZeroOneSessions()
+  return data01ConfigKey === "all"
+    ? sessions
+    : sessions.filter(session => getZeroOneConfigKey(session.zeroOne) === data01ConfigKey)
+}
+
 function renderZeroOneData() {
 
-  const view = document.getElementById("zeroOneView")
-  if (!view) return
+  const panel = document.getElementById("zeroOneStatsPanel")
+  const history = document.getElementById("sessionsContainer")
+  if (!panel || !history) return
 
   const sessions = readZeroOneSessions()
 
   if (!sessions.length) {
-    view.innerHTML = `
-      <div class="z1-empty">
+    panel.innerHTML = `
+      <section class="data-summary-section">
+        <h3 class="data-section-title">Stats</h3>
         <p>01 の記録はまだありません。</p>
         <button type="button" class="z1-play" onclick="location.href = 'countup.html?game=01'">01 を始める</button>
-      </div>
+      </section>
     `
+    history.innerHTML = "<p>No data</p>"
+    updateZeroOnePagination(0)
     return
   }
 
@@ -125,9 +140,7 @@ function renderZeroOneData() {
     data01ConfigKey = keys[0]
   }
 
-  const list = data01ConfigKey === "all"
-    ? sessions
-    : sessions.filter(session => getZeroOneConfigKey(session.zeroOne) === data01ConfigKey)
+  const list = getZeroOneFilteredSessions()
 
   const options = [`<option value="all">All Settings（${sessions.length}）</option>`]
     .concat(keys.map(key => {
@@ -136,93 +149,185 @@ function renderZeroOneData() {
     }))
     .join("")
 
-  view.innerHTML = `
-    <div class="z1-main">
-      <div class="z1-filter">
-        <select id="z1ConfigSelect" aria-label="01 の設定">${options}</select>
+  panel.innerHTML = `
+    <div class="z1-filter">
+      <select id="z1ConfigSelect" aria-label="01 の設定">${options}</select>
+    </div>
+    <section class="data-summary-section">
+      <h3 class="data-section-title">Stats</h3>
+      <div class="z1-stat-cards">${renderZeroOneStatCards(list)}</div>
+    </section>
+    <section class="data-summary-section">
+      <h3 class="data-section-title">Awards</h3>
+      <div class="z1-award-cards">${renderZeroOneAwardCards(list)}</div>
+    </section>
+    <section class="data-summary-section">
+      <h3 class="data-section-title">Darts to Finish (Last ${DATA_01_CHART_GAMES} Games)</h3>
+      <canvas id="z1Chart" class="z1-chart"></canvas>
+      <div class="z1-legend">
+        <span><i class="z1-dot out"></i>上がったダーツ数</span>
+        <span><i class="z1-dot fail"></i>上がれなかった</span>
       </div>
-      ${renderZeroOneSummary(list)}
-      ${renderZeroOneRating(list)}
-      <section class="z1-section">
-        <h3 class="data-section-title">Darts to Finish（Last ${DATA_01_CHART_GAMES} Games）</h3>
-        <canvas id="z1Chart"></canvas>
-        <div class="z1-legend">
-          <span><i class="z1-dot out"></i>上がったダーツ数</span>
-          <span><i class="z1-dot fail"></i>上がれなかった</span>
-        </div>
-      </section>
-      ${renderZeroOneFinishNumbers(list)}
-    </div>
-    <div class="z1-history">
-      <h3 class="data-section-title">History</h3>
-      <div class="z1-list">${list.slice().reverse().map(renderZeroOneCard).join("")}</div>
-    </div>
+    </section>
+    ${renderZeroOneRating(list)}
+    ${renderZeroOneFinishNumbers(list)}
   `
 
   const select = document.getElementById("z1ConfigSelect")
   select.value = data01ConfigKey
   select.addEventListener("change", () => {
     data01ConfigKey = select.value
+    data01Page = 1
     renderZeroOneData()
   })
 
+  renderZeroOneHistory(list)
   requestAnimationFrame(() => drawZeroOneChart(list))
 }
 
-function renderZeroOneSummary(list) {
+// カウントアップの Stats と同じ「名前と数字」のカード（.data-card）
+function renderZeroOneStatCards(list) {
 
   const finished = list.filter(session => session.zeroOne.finished)
   const darts = finished.map(session => session.zeroOne.finishDarts).filter(n => n > 0)
   const avgDarts = darts.length ? darts.reduce((a, b) => a + b, 0) / darts.length : 0
   const avgPpd = list.length ? list.reduce((sum, session) => sum + (session.ppd || 0), 0) / list.length : 0
-
-  // 直近 10 ゲームの上がり率（調子の目安）
   const recent = list.slice(-10)
   const recentRate = recent.length ? recent.filter(session => session.zeroOne.finished).length / recent.length * 100 : 0
 
-  const tiles = [
-    ["FINISH", list.length ? `${(finished.length / list.length * 100).toFixed(0)}%` : "-", `${finished.length} / ${list.length}`],
-    ["AVG DARTS", avgDarts ? avgDarts.toFixed(1) : "-", "上がったゲーム"],
-    ["BEST", darts.length ? Math.min(...darts) : "-", "darts"],
-    ["PPD", avgPpd.toFixed(2), "平均"],
-    ["RECENT 10", recent.length ? `${recentRate.toFixed(0)}%` : "-", "上がり率"],
-    ["GAMES", list.length, ""]
+  return [
+    ["Games Played", list.length],
+    ["Finish Rate", list.length ? `${(finished.length / list.length * 100).toFixed(0)}%` : "-"],
+    ["Avg Darts", avgDarts ? avgDarts.toFixed(1) : "-"],
+    ["Best Darts", darts.length ? Math.min(...darts) : "-"],
+    ["Average PPD", avgPpd.toFixed(2)],
+    ["Recent 10", recent.length ? `${recentRate.toFixed(0)}%` : "-"]
   ]
+    .map(([title, value]) => `
+      <div class="data-card">
+        <span class="data-title">${title}</span>
+        <span class="data-value">${value}</span>
+      </div>
+    `)
+    .join("")
+}
+
+function renderZeroOneAwardCards(list) {
+
+  const totals = {}
+  AWARD_LABELS.forEach(([key]) => { totals[key] = 0 })
+  list.forEach(session => {
+    const awards = getSessionAwards(session)
+    AWARD_LABELS.forEach(([key]) => { totals[key] += awards[key] || 0 })
+  })
+
+  return AWARD_LABELS
+    .map(([key, label]) => `
+      <div class="data-card">
+        <span class="data-title">${label}</span>
+        <span class="data-value">${totals[key]}</span>
+      </div>
+    `)
+    .join("")
+}
+
+// History：カウントアップと同じ形のカード（新しい順、PAGE_SIZE ごとにページ送り）
+function renderZeroOneHistory(list) {
+
+  const container = document.getElementById("sessionsContainer")
+  container.innerHTML = ""
+
+  const reversed = list.slice().reverse()
+  const totalPages = Math.max(1, Math.ceil(reversed.length / PAGE_SIZE))
+  data01Page = Math.min(Math.max(1, data01Page), totalPages)
+
+  const start = (data01Page - 1) * PAGE_SIZE
+  reversed.slice(start, start + PAGE_SIZE).forEach((session, index) => {
+    const gameNumber = reversed.length - (start + index)
+    container.appendChild(createSessionCardElement(createZeroOneCardHtml(session, gameNumber)))
+  })
+
+  updateZeroOnePagination(totalPages)
+}
+
+function createZeroOneCardHtml(session, gameNumber) {
+
+  const z = session.zeroOne
+  const result = z.finished
+    ? `<span class="session-kpi-value z1-out">${z.finishDarts}</span>`
+    : `<span class="session-kpi-value z1-fail">${z.remaining}</span>`
+  const finishHit = z.finished ? getZeroOneFinishHit(session) : null
+  const stats80 = getZeroOneStats80(session)
+
+  const summary = [
+    formatZeroOneConfigKey(getZeroOneConfigKey(z)),
+    z.finished ? `OUT${finishHit ? ` ${formatZeroOneHit(finishHit)}` : ""}` : "NO OUT"
+  ].join(" · ")
 
   return `
-    <div class="z1-tiles">
-      ${tiles.map(([label, value, sub]) => `
-        <div class="z1-tile">
-          <span class="z1-tile-label">${label}</span>
-          <span class="z1-tile-value">${value}</span>
-          ${sub ? `<span class="z1-tile-sub">${sub}</span>` : ""}
+    <div class="session-card-header">
+      <strong>Game ${gameNumber}</strong>
+      <span class="session-card-header-right">
+        <span class="session-date">${new Date(session.date).toLocaleString()}</span>
+        <span class="session-toggle-icon" aria-hidden="true"></span>
+      </span>
+    </div>
+
+    <div class="session-card-body">
+      <div class="session-main-block">
+        <div class="session-kpi-grid">
+          <div class="session-kpi-item">
+            <span class="session-kpi-label">${z.finished ? "Out Darts" : "Left"}</span>
+            ${result}
+          </div>
+          <div class="session-kpi-item">
+            <span class="session-kpi-label">PPD</span>
+            <span class="session-kpi-value">${Number(session.ppd || 0).toFixed(2)}</span>
+          </div>
+          <div class="session-kpi-item">
+            <span class="session-kpi-label">80% Stats</span>
+            <span class="session-kpi-value">${stats80 !== null ? stats80.toFixed(1) : "-"}</span>
+          </div>
         </div>
-      `).join("")}
+
+        <div class="session-compact-summary">${summary}</div>
+      </div>
+
+      <div class="session-side-block">
+        <div class="session-meta-block session-round-block">
+          <div class="session-meta-title">Round Scores</div>
+          <div class="round-chart">${createRoundChartHtml(session.roundScores || [])}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="session-meta-block session-awards-block">
+      <div class="session-meta-title">Awards</div>
+      <div class="session-awards-grid">${createAwardsHtml(session)}</div>
     </div>
   `
 }
 
-function renderZeroOneCard(session) {
+function updateZeroOnePagination(totalPages) {
+  const info = document.getElementById("pageInfo")
+  const prev = document.getElementById("prevBtn")
+  const next = document.getElementById("nextBtn")
+  if (info) info.textContent = `${totalPages ? data01Page : 0} / ${totalPages}`
+  if (prev) prev.disabled = data01Page <= 1
+  if (next) next.disabled = data01Page >= totalPages
+}
 
-  const z = session.zeroOne
-  const date = new Date(session.date)
-  const dateText = `${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`
-  const result = z.finished
-    ? `<span class="z1-result out">OUT · ${z.finishDarts} darts</span>`
-    : `<span class="z1-result fail">NO OUT · ${z.remaining} left</span>`
-
-  return `
-    <div class="z1-card">
-      <div class="z1-card-top">
-        <span class="z1-card-date">${dateText}</span>
-        ${result}
-      </div>
-      <div class="z1-card-bottom">
-        <span>${formatZeroOneConfigKey(getZeroOneConfigKey(z))}</span>
-        <span>PPD ${Number(session.ppd || 0).toFixed(2)}</span>
-      </div>
-    </div>
-  `
+// フッターの Prev / Next は、01 を見ているときは 01 の History のページを送る
+const changePageForCountUp = typeof changePage === "function" ? changePage : null
+window.changePage = function (direction) {
+  if (dataGameType !== "01") {
+    if (changePageForCountUp) changePageForCountUp(direction)
+    return
+  }
+  data01Page += direction === "Prev" ? -1 : 1
+  renderZeroOneHistory(getZeroOneFilteredSessions())
+  const container = document.getElementById("sessionsContainer")
+  if (container) container.scrollTop = 0
 }
 
 // 上がるまでのダーツ数の推移。上がれなかったゲームは上の段に赤い × で出す
@@ -356,7 +461,7 @@ function renderZeroOneFinishNumbers(list) {
 
   if (!total) {
     return `
-      <section class="z1-section">
+      <section class="data-summary-section">
         <h3 class="data-section-title">Finish Numbers</h3>
         <p class="z1-note">上がったゲームがまだありません。</p>
       </section>
@@ -367,7 +472,7 @@ function renderZeroOneFinishNumbers(list) {
   const max = counts[hits[0]]
 
   return `
-    <section class="z1-section">
+    <section class="data-summary-section">
       <h3 class="data-section-title">Finish Numbers（${total} 回）</h3>
       <div class="z1-bars">
         ${hits.map(hit => `
@@ -428,26 +533,19 @@ function renderZeroOneRating(list) {
   const phx = calcPhoenixRating(ppd)
 
   return `
-    <section class="z1-section">
-      <h3 class="data-section-title">Rating（目安）</h3>
-      <div class="z1-tiles z1-rating">
-        <div class="z1-tile">
-          <span class="z1-tile-label">80% STATS</span>
-          <span class="z1-tile-value">${ppr.toFixed(1)}</span>
-          <span class="z1-tile-sub">PPR（PPD ${ppd.toFixed(2)}）</span>
+    <section class="rating-reference">
+      <h3>レーティング参考値</h3>
+      <div class="rating-current-grid">
+        <div class="rating-current-card">
+          <div class="rating-current-title">DARTSLIVE</div>
+          <div class="rating-current-value">RT ${rt}</div>
         </div>
-        <div class="z1-tile">
-          <span class="z1-tile-label">DARTSLIVE</span>
-          <span class="z1-tile-value">Rt.${rt}</span>
-          <span class="z1-tile-sub">01 のみ</span>
-        </div>
-        <div class="z1-tile">
-          <span class="z1-tile-label">PHOENIX</span>
-          <span class="z1-tile-value">Rt.${phx}</span>
-          <span class="z1-tile-sub">01 のみ</span>
+        <div class="rating-current-card">
+          <div class="rating-current-title">PHOENIX</div>
+          <div class="rating-current-value">RATING ${phx}</div>
         </div>
       </div>
-      <p class="z1-note">直近 ${stats.length} ゲームの 80% スタッツ（最初の点数の 80% を減らすまでの 1 ラウンドの平均点）から出した、01 だけで見たざっくりした目安です。実際のレーティングはクリケットの成績などでも変わります。</p>
+      <div class="rating-current-note">80% スタッツ ${ppr.toFixed(1)}（PPD ${ppd.toFixed(2)}、直近 ${stats.length} ゲームの平均）から出した、01 だけで見たざっくりした目安です。80% スタッツは最初の点数の 80% を減らすまでの 1 ラウンドの平均点です。</div>
     </section>
   `
 }

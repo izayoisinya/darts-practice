@@ -43,6 +43,33 @@ function undoDart() {
 }
 
 
+// 今のラウンドの 1 投だけを消す（ヘッダーのダーツをタップしたとき）。後ろの投は前に詰める
+// 戻ると同じく、次のラウンドを投げ始めて確定したラウンドは消せない
+function deleteDart(roundIndex, dartIndex) {
+  
+  if (roundIndex <= lockedRound) return false
+  
+  const round = game.rounds[roundIndex]
+  if (!round || !round[dartIndex]) return false
+  
+  // 消せるのは今入力中のラウンド（3 本入れ終わった直後はそのラウンド）だけ
+  const isCurrent = game.currentDart > 0
+    ? roundIndex === game.currentRound
+    : roundIndex === game.currentRound - 1
+  if (!isCurrent) return false
+  
+  round.splice(dartIndex, 1)
+  round.push(null)
+  
+  game.currentRound = roundIndex
+  game.currentDart = round.filter(dart => dart !== null).length
+  
+  updateUI()
+  return true
+  
+}
+
+
 function isGameComplete() {
   
   return game.rounds.every(round =>

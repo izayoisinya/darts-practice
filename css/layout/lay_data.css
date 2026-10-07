@@ -2713,3 +2713,29 @@ body.data-01 .tabs-container {
   font-size: 11px;
   text-align: right;
 }
+
+/* 01：トリプルのバー（青） */
+.bar-fill.triple,
+.detail-bull-rate-bar-fill.triple {
+  background: #4dabff;
+}
+
+/* 01：上がりナンバーのバーは割合（全体に対する）で描く。右端の回数がスクロールバーに隠れないよう空ける */
+.z1-bars {
+  padding-right: 10px;
+}
+
+/* 01：Bull / Inner Bull / Triple の 3 つを横に並べる（スマホ縦は縦に積む） */
+#zeroOneStatsPanel .detail-bull-rate-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.phone.portrait #zeroOneStatsPanel .detail-bull-rate-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* 01：インナーブルは金（トリプルの青と見分けやすく。ゲーム画面の色に合わせる） */
+body.data-01 .bar-fill.inner,
+body.data-01 .detail-bull-rate-bar-fill.inner {
+  background: #ffd54f;
+}

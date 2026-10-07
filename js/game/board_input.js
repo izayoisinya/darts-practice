@@ -444,6 +444,9 @@ function renderBoardMarkers() {
   // 拡大しても画面上の大きさが変わらないよう、倍率で割る
   const radius = +(0.045 / boardZoom.scale).toFixed(4)
   const fontSize = +(0.06 / boardZoom.scale).toFixed(4)
+  // 縁取りの太さも SVG の単位で倍率に合わせる（約 2px。vector-effect: non-scaling-stroke は使わない：
+  // iPad の Safari で印を描き直したとき、前の印の縁が線になって残ることがあるため）
+  const strokeWidth = +(0.009 / boardZoom.scale).toFixed(4)
 
   // ボタンで入れた矢には位置がないので印は付けない（番号は何投目かのまま）
   layer.innerHTML = getMarkerRound()
@@ -452,7 +455,7 @@ function renderBoardMarkers() {
       const x = Math.max(-limit, Math.min(limit, dart.boardTap.x))
       const y = Math.max(-limit, Math.min(limit, dart.boardTap.y))
       return `<g class="board-marker">` +
-        `<circle cx="${x}" cy="${y}" r="${radius}"/>` +
+        `<circle cx="${x}" cy="${y}" r="${radius}" stroke-width="${strokeWidth}"/>` +
         `<text x="${x}" y="${y}" style="font-size:${fontSize}px">${i + 1}</text>` +
         `</g>`
     })

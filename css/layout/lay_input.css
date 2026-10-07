@@ -240,11 +240,10 @@ body .number-table.board-mode {
   pointer-events: none;
 }
 
+/* 縁取りの太さは拡大の倍率に合わせて board_input.js で指定する（non-scaling-stroke は描き直しで線が残るので使わない） */
 .board-marker circle {
   fill: var(--accent);
   stroke: #0b0e13;
-  stroke-width: 2px;
-  vector-effect: non-scaling-stroke;
 }
 
 /* 文字の大きさは拡大の倍率に合わせて board_input.js で指定する */

@@ -190,6 +190,10 @@ function registerEvents() {
   if (edge && menu && overlay) {
     setupSideMenu(menu, edge, overlay)
   }
+
+  // ===== 画面の端からのスワイプで戻る・進むを止める =====
+
+  setupEdgeSwipeGuard()
   
   // ===== round open (phone portrait) =====
   
@@ -245,10 +249,20 @@ function registerEvents() {
 // ===== サイドメニュー ===========
 // ===============================
 // 右から横にすべって出てくるメニュー（lay_menu.css）。
-//   開く：右端の細い帯をタップ / 右端から左へスワイプ
+//   開く：右端の細い帯をタップ / 画面の右端付近（SIDE_MENU_SWIPE_ZONE）から左へスワイプ
 //   閉じる：外側をタップ / メニューを右へスワイプ / メニューのボタンを押す
 // スワイプ中は指に合わせて動き、離したときに半分以上（または素早く）動かしていれば開閉する
 const SIDE_MENU_SWIPE_SPEED = 0.4  // px / ms。これより速く払ったら距離が短くても開閉する
+const SIDE_MENU_SWIPE_ZONE = 48    // 画面の右端からこの幅の中で触れたら、メニューを開くスワイプとして扱う
+
+// 画面の左右の端から触れたときは、ブラウザの「端からスワイプして戻る・進む」を止める（setupEdgeSwipeGuard()）
+const EDGE_SWIPE_GUARD = 24
+
+// 右端付近からのタッチか（データ画面の History / Stats の切り替えスワイプと重ならないようにするため）
+function isSideMenuSwipeStart(clientX) {
+  return !!document.getElementById("sideMenu") &&
+    clientX >= window.innerWidth - SIDE_MENU_SWIPE_ZONE
+}
 
 function setSideMenuOpen(open) {
 
@@ -269,17 +283,37 @@ function setSideMenuOpen(open) {
 
 function setupSideMenu(menu, edge, overlay) {
 
+  // マウス（PC）はクリックで開閉する。タッチは下のスワイプの処理で扱う
   edge.addEventListener("click", () => setSideMenuOpen(true))
   overlay.addEventListener("click", () => setSideMenuOpen(false))
 
   let drag = null
 
-  // fromOpen：開いた状態から閉じる向きに動かしているか
-  const start = (event, fromOpen) => {
-    if (event.touches.length !== 1) return
+  document.addEventListener("touchstart", event => {
+    if (event.touches.length !== 1) {
+      drag = null
+      return
+    }
+
     const touch = event.touches[0]
+    const isOpen = menu.classList.contains("open")
+    const target = event.target instanceof Element ? event.target : null
+
+    let fromOpen
+    if (isOpen) {
+      // 開いているときは、メニューか外側の幕から始めたときだけ
+      if (!target || !(menu.contains(target) || overlay.contains(target))) return
+      fromOpen = true
+    } else {
+      if (!isSideMenuSwipeStart(touch.clientX)) return
+      fromOpen = false
+    }
+
     drag = {
       fromOpen,
+      // 端のタップは、ブラウザのクリックが出ない（setupEdgeSwipeGuard() で止めている）ので自分で開閉する
+      tapOpens: !fromOpen && (touch.clientX >= window.innerWidth - EDGE_SWIPE_GUARD || target === edge),
+      tapCloses: fromOpen && !!target && overlay.contains(target),
       startX: touch.clientX,
       startY: touch.clientY,
       lastX: touch.clientX,
@@ -287,19 +321,19 @@ function setupSideMenu(menu, edge, overlay) {
       width: menu.offsetWidth,
       moving: false
     }
-  }
+  }, { passive: true, capture: true })
 
-  const move = event => {
+  document.addEventListener("touchmove", event => {
     if (!drag || event.touches.length !== 1) return
 
     const touch = event.touches[0]
     const dx = touch.clientX - drag.startX
     const dy = touch.clientY - drag.startY
 
-    // 縦の動きが大きいときは、メニューの中のスクロールとして扱う
+    // 縦の動きが大きいときは、画面やメニューの中のスクロールとして扱う
     if (!drag.moving) {
       if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
-      if (Math.abs(dy) > Math.abs(dx)) {
+      if (Math.abs(dy) > Math.abs(dx) || (!drag.fromOpen && dx > 0)) {
         drag = null
         return
       }
@@ -319,14 +353,20 @@ function setupSideMenu(menu, edge, overlay) {
 
     menu.style.transform = `translateX(${drag.width - shown}px)`
     overlay.style.opacity = String(shown / drag.width)
-  }
+  }, { passive: false, capture: true })
 
-  const end = () => {
-    if (!drag) return
+  const end = event => {
+    if (!drag || event.touches.length > 0) return
 
     const current = drag
     drag = null
-    if (!current.moving) return
+
+    if (!current.moving) {
+      if (event.type !== "touchend") return
+      if (current.tapOpens) setSideMenuOpen(true)
+      if (current.tapCloses) setSideMenuOpen(false)
+      return
+    }
 
     const dx = current.lastX - current.startX
     const speed = dx / Math.max(1, Date.now() - current.startTime)
@@ -339,14 +379,21 @@ function setupSideMenu(menu, edge, overlay) {
     setSideMenuOpen(open)
   }
 
-  edge.addEventListener("touchstart", event => start(event, false), { passive: true })
-  menu.addEventListener("touchstart", event => start(event, true), { passive: true })
-  overlay.addEventListener("touchstart", event => start(event, true), { passive: true })
+  document.addEventListener("touchend", end, { capture: true })
+  document.addEventListener("touchcancel", end, { capture: true })
+}
 
-  const targets = [edge, menu, overlay]
-  targets.forEach(target => {
-    target.addEventListener("touchmove", move, { passive: false })
-    target.addEventListener("touchend", end)
-    target.addEventListener("touchcancel", end)
-  })
+// 画面の左右の端から触れたときは、ブラウザの「端からスワイプして戻る・進む」が動かないよう、
+// そのタッチの既定の動きを止める（iPhone / iPad の Safari 向け）。
+// Chrome などの横スクロールでの戻る・進むは base.css の overscroll-behavior-x で止めている
+function setupEdgeSwipeGuard() {
+
+  document.addEventListener("touchstart", event => {
+    if (event.touches.length !== 1) return
+
+    const x = event.touches[0].clientX
+    if (x <= EDGE_SWIPE_GUARD || x >= window.innerWidth - EDGE_SWIPE_GUARD) {
+      event.preventDefault()
+    }
+  }, { passive: false, capture: true })
 }

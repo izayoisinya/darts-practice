@@ -7,6 +7,12 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* 横スクロールでの「戻る・進む」（Chrome / Android など）を止める。端からのスワイプは main.js の setupEdgeSwipeGuard() */
+html,
+body {
+  overscroll-behavior-x: none;
+}
+
 html,
 body {
   height: 100%;

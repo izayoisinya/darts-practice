@@ -161,6 +161,11 @@ function setupDataPanelSwipe() {
     }
     panelSwipeBlockedByTabs = false
     if (!e.touches || !e.touches[0]) return
+    // 画面の右端付近からのスワイプはサイドメニューを開く操作なので、パネルは切り替えない（main.js）
+    if (typeof isSideMenuSwipeStart === "function" && isSideMenuSwipeStart(e.touches[0].clientX)) {
+      panelSwipeBlockedByTabs = true
+      return
+    }
     panelTouchStartX = e.touches[0].clientX
     panelTouchStartY = e.touches[0].clientY
   }, { passive: true })

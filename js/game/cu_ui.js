@@ -223,12 +223,12 @@ function showCricketResultIfDone() {
 }
 
 // マークの記号（1：/ 2：X 3：丸に X）。古い iOS でも同じに見えるよう SVG で描く
+// マークがまだないときも空の SVG を置き、記号の大きさの分の高さを最初から取っておく（マークが付いてもマスの大きさが変わらない）
 function getCricketMarkSvg(count) {
-  if (!count) return ""
   const slash = '<line x1="5" y1="19" x2="19" y2="5"/>'
   const back = '<line x1="5" y1="5" x2="19" y2="19"/>'
   const circle = '<circle cx="12" cy="12" r="10.5"/>'
-  const body = count >= 3 ? slash + back + circle : count === 2 ? slash + back : slash
+  const body = count >= 3 ? slash + back + circle : count === 2 ? slash + back : count === 1 ? slash : ""
   return `<svg class="cricket-mark-icon" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`
 }
 

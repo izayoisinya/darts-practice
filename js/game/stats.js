@@ -181,7 +181,7 @@ const $ = id => document.getElementById(id)
 
 function updateStats() {
 
-  // クリケットは別の集計（game_cricket.js）。ヘッダーの大きな数字は MPR
+  // クリケットは別の集計（game_cricket.js）。ヘッダーの大きな数字は点（クローズのあとに入れたマークの点）
   if (GAME_TYPE === "cricket") {
     updateCricketStats()
     return
@@ -279,7 +279,7 @@ function updateCricketStats() {
     if (el) el.textContent = text
   }
 
-  set("totalScore", stats.mpr.toFixed(2))
+  set("totalScore", stats.points)
 
   set("cricketMpr", stats.mpr.toFixed(2))
   set("cricketMarks", stats.marks)

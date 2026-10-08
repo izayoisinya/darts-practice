@@ -35,7 +35,7 @@
 index.html      メインメニュー（ゲーム選択 / Data / Settings / Info）
 countup.html    COUNT-UP ゲーム画面（Rounds / Input / Stats の 3 エリア）。?game=01 で 01（同じ画面を GAME_TYPE で切り替え）
 data.html       スコア記録データの表示（Statistics）
-settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、表示エリア・データタブの表示/非表示、画面向き、ストレージ状況）
+settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、ボードの大きさ: soft / steel、表示エリア・データタブの表示/非表示、画面向き、ストレージ状況）
 news.html       お知らせ
 sw.js           Service Worker（プリキャッシュ）
 manifest.json   PWA マニフェスト

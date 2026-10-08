@@ -2766,3 +2766,9 @@ body.data-01 .detail-bull-rate-bar-fill.inner {
 .session-main-block .session-awards-block {
   margin-top: 0;
 }
+
+/* RANGE（刺さった位置から）をいちばん目立たせる */
+.heatmap-range-values span.main {
+  border-color: rgb(var(--accent-rgb) / 0.6);
+  box-shadow: 0 0 12px rgb(var(--accent-rgb) / 0.15);
+}

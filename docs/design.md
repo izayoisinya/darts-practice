@@ -332,6 +332,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `bullMode` | ブルモード（`"fat"` / `"double"`） |
 | `inputMode` | 入力形式（`"board"`〔初期値〕 / `"buttons"`） |
 | `boardZoomReset` | ボードの拡大を戻すタイミング（`"manual"` / `"round"`） |
+| `boardSize` | ボードの大きさ（`"soft"` 15.5 インチ〔初期値〕 / `"steel"` 13.2 インチ）。RANGE を mm で出すときに使う |
 | `undoSwipeDirection` | 3 本指スワイプで戻る向き（`"left"` / `"right"`） |
 | `lockedRound` | Undo で戻れない確定済みラウンド |
 | `game` | ゲーム状態 `{ rounds, currentRound, currentDart }` |
@@ -546,7 +547,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `drawHeatmap(points)` / `paintHeatmap(ctx, width, height, points, highlight)` / `drawHeatmapBoard()` | ボードの図（本物の比率）を描き、その上に色を重ね、1 投ずつの位置を小さな点で描く（`highlight` の位置は白い縁取りの点） |
 | `paintRadarHeatmap(ctx, width, height, points, highlight, rgb)` | ゲーム画面用のレーダー風の描画。暗い緑の円に、ボードの輪・区画の線・外周の目盛り・数字を描き、刺さった位置をぼかした光（`lighter` で重ねる）で表す。回る走査線は CSS の `.game-radar-sweep`（`conic-gradient` を回転。動きを減らす設定では止める） |
 | `createSessionHeatmapHtml(session, showRange)` / `drawSessionHeatmaps(card)` | 履歴カード（カウントアップ・01）を開いたときの、そのゲームのヒートマップ。カードを作るときは位置だけを canvas の `data-points` に持たせ、開いたとき（`toggleSessionCard()`）と画面の大きさが変わったときに描く。カウントアップは 50%・80% の円も重ねる。位置の記録がないゲームは「位置の記録がありません」 |
-| `getRangeStats(points)` / `renderHeatmapRange()` / `drawRangeCircles()` | レンジ（中心からの距離）：位置の中心からの距離の 50%・80% の円の半径と平均を mm（ダブルの外側 = 170mm）で出し、ヒートマップに点線の円で重ねる。ゲーム画面のレーダーの投数の横にも、カウントアップのときだけ R50 を出す。タップした位置からのざっくりした目安 |
+| `getRangeStats(points)` / `getRangeFromBullRate(rate)` / `renderHeatmapRange()` / `drawRangeCircles()` / `getBoardRadiusMm()` | **RANGE の目安**：DARTSLIVE の RANGE（ブルの中心のまわりのまとまりを円の直径 mm で表したもの。算出方法は非公開）に近い値として、ブルの中心を狙ったときの縦横のばらつき σ（中心からの距離の 2 乗の平均 ÷ 2 の平方根）を求め、直径 2σ を RANGE とする（約 4 割の投が入る円。プロの RANGE 30mm 台とブル率の関係とおおむね合う）。位置の記録がないゲームでも、ブル率 = 1 − exp(−R² ÷ 2σ²)（R：アウターブルの半径）から σ を逆算して出す（ブル 0 本なら出さない）。8 割の投が入る円の直径も出す。mm はボードの大きさ（設定の Board Size：Soft 15.5 インチ = ダブルの外側の半径 197mm / Steel 13.2 インチ = 170mm）で直す。ヒートマップに RANGE の円（実線）と 8 割の円（点線）を重ね、ゲーム画面のレーダー（カウントアップのみ）と履歴カードのヒートマップの見出しにも RANGE を出す |
 | `createHeatLayer()` / `getHeatmapPalette()` | 1 投ずつぼかした円を足し合わせ（`lighter`）、いちばん多い場所を最大にした相対値で 青→水色→緑→黄→赤 に色付けした画像を作る |
 
 - 位置があるのはボード入力で入れた投だけ。「よく刺さった場所」はボタン入力の投も含めて数える
@@ -688,6 +689,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
   bullMode: "fat" | "double",
   inputMode: "board" | "buttons",                                     // 保存されていなければ "board"
   boardZoomReset: "manual" | "round",                                 // ボードの拡大を戻すタイミング
+  boardSize: "soft" | "steel",                                        // ボードの大きさ（RANGE の mm に使う）
   boardUndoButton: boolean,                                           // ボード入力で戻るボタンを出すか（ないときは出さない）
   undoSwipeDirection: "left" | "right",                               // 3 本指スワイプで戻る向き
   orientationMode: "auto" | "portrait" | "landscape",
@@ -928,3 +930,4 @@ graph LR
 | 2026.10.8 | データ画面の 01 の履歴カードに、カウントアップと同じ 20〜15 のトリプルの本数（Triple）を追加 |
 | 2026.10.8 | データ画面の履歴カード（カウントアップ・01）を開くと、そのゲームのヒートマップを出すようにした（カウントアップは 50%・80% の円も） |
 | 2026.10.8 | データ画面の履歴カード（カウントアップ・01）で、Awards を横幅いっぱいの段からトリプルの下（左の列）に移した（右の列はグラフとヒートマップ） |
+| 2026.10.8 | レンジを DARTSLIVE の RANGE（直径 mm）に近い目安に変更（ばらつき σ の 2 倍の直径。ブル率からの推定も）。設定に Board Size（Soft 15.5 インチ / Steel 13.2 インチ）を追加し、mm の換算に使う |

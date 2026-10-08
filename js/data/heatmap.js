@@ -23,8 +23,18 @@ const HEATMAP_PERIODS = { all: 0, d30: 30, d7: 7, d1: 1 }
 // 数字の字体（データ画面のグラフと同じ。ゲーム画面では data.js を読み込まないのでここで持つ）
 const HEATMAP_FONT = "'Segoe UI', 'Noto Sans JP', sans-serif"
 
-// ボードの中心からダブルの外側までの実際の長さ（mm。スティールボードの規格）。位置（ダブルの外側 = 1）を mm に直すのに使う
-const HEATMAP_BOARD_RADIUS_MM = 170
+// ボードの中心からダブルの外側までの実際の長さ（mm）。位置（ダブルの外側 = 1）を mm に直すのに使う。
+// 設定画面の Board Size（dartsSettings.boardSize）で選ぶ：ソフト（15.5 インチ。DARTSLIVE などと同じ）/ スティール（13.2 インチ）
+const BOARD_RADIUS_MM = { soft: 197, steel: 170 }
+
+function getBoardRadiusMm() {
+  try {
+    const settings = JSON.parse(localStorage.getItem("dartsSettings")) || {}
+    return settings.boardSize === "steel" ? BOARD_RADIUS_MM.steel : BOARD_RADIUS_MM.soft
+  } catch {
+    return BOARD_RADIUS_MM.soft
+  }
+}
 
 let heatmapPeriod = "all"
 let heatmapPalette = null
@@ -80,7 +90,7 @@ function renderAnalysisHeatmap() {
   const data = collectHeatmapData(getHeatmapSessions())
 
   renderHeatmapSummary(data)
-  renderHeatmapRange(data.points)
+  renderHeatmapRange(data.points, getHeatmapSessions())
   drawHeatmap(data.points)
 }
 
@@ -486,8 +496,11 @@ function paintRadarHeatmap(ctx, width, height, points, highlight = [], rgb = "0,
 // ===============================
 // ===== レンジ（中心からの距離） ==
 // ===============================
-// 刺さった位置がボードの中心（ブル）からどれくらい離れているか。位置はタップした場所なので、ざっくりした目安
-//   avg：平均 / r50：半分の投が入る円の半径（中央値）/ r80：8 割の投が入る円の半径。どれも mm と、位置の単位（ダブルの外側 = 1）の両方
+// 刺さった位置がボードの中心（ブル）からどれくらい離れているか。位置はタップした場所なので、ざっくりした目安。
+// RANGE：DARTSLIVE の RANGE（ブルの中心のまわりのまとまりを円の直径 mm で表したもの。算出方法は非公開）に近い目安として、
+//   ブルの中心を狙ったときの縦横のばらつき（標準偏差 σ。σ² = 中心からの距離の 2 乗の平均 ÷ 2）を求め、直径 2σ の円とする。
+//   この円には約 4 割の投が入る。プロの RANGE（30mm 台）とブル率の関係とおおむね合う
+//   r50 / r80：半分・8 割の投が入る円の半径（位置の単位。ダブルの外側 = 1）
 function getRangeStats(points) {
 
   if (!points || points.length < 3) return null
@@ -497,42 +510,59 @@ function getRangeStats(points) {
     .sort((a, b) => a - b)
 
   const at = rate => distances[Math.min(distances.length - 1, Math.max(0, Math.ceil(distances.length * rate) - 1))]
-  const avg = distances.reduce((a, b) => a + b, 0) / distances.length
+  const sigma = Math.sqrt(distances.reduce((sum, d) => sum + d * d, 0) / distances.length / 2)
+  const mm = getBoardRadiusMm()
 
   return {
     count: distances.length,
-    avg,
+    sigma,
     r50: at(0.5),
     r80: at(0.8),
-    avgMm: avg * HEATMAP_BOARD_RADIUS_MM,
-    r50Mm: at(0.5) * HEATMAP_BOARD_RADIUS_MM,
-    r80Mm: at(0.8) * HEATMAP_BOARD_RADIUS_MM
+    rangeMm: sigma * 2 * mm,
+    d50Mm: at(0.5) * 2 * mm,
+    d80Mm: at(0.8) * 2 * mm
   }
 }
 
-function renderHeatmapRange(points) {
+// ブル率からの RANGE の目安（位置の記録がないボタン入力のゲームでも出せる）。
+// ばらつきが上と同じ形（中心に寄った丸い広がり）と考え、アウターブルの円（半径はボードの大きさの 0.0935 倍）に入る割合が
+// ブル率になる σ を逆算する：ブル率 = 1 − exp(−R² ÷ 2σ²)
+function getRangeFromBullRate(bullRate) {
+  const p = Math.min(0.99, Math.max(0.01, bullRate))
+  const bullRadius = getBoardRadiusMm() * HEATMAP_RING_RADIUS[1]
+  return bullRadius / Math.sqrt(-2 * Math.log(1 - p)) * 2
+}
+
+function renderHeatmapRange(points, sessions = []) {
 
   const box = document.getElementById("heatmapRange")
   if (!box) return
 
   const range = getRangeStats(points)
-  if (!range) {
+
+  // ブル率（カウントアップは 1 ゲーム 24 投）
+  const darts = sessions.length * 24
+  const bulls = sessions.reduce((sum, session) => sum + (session.bulls || 0), 0)
+  // ブルが 0 本だと推定できない（いくらでも大きくなる）ので出さない
+  const fromBull = darts && bulls ? getRangeFromBullRate(bulls / darts) : 0
+
+  if (!range && !darts) {
     box.innerHTML = ""
     return
   }
 
   box.innerHTML = `
-    <div class="heatmap-range-title">Range（中心からの距離）</div>
+    <div class="heatmap-range-title">RANGE（目安）</div>
     <div class="heatmap-range-values">
-      <span><b>${range.r50Mm.toFixed(0)}</b> mm<small>50% の円</small></span>
-      <span><b>${range.r80Mm.toFixed(0)}</b> mm<small>80% の円</small></span>
-      <span><b>${range.avgMm.toFixed(0)}</b> mm<small>平均</small></span>
+      <span class="main"><b>${range ? range.rangeMm.toFixed(1) : "-"}</b> mm<small>刺さった位置から</small></span>
+      <span><b>${fromBull ? fromBull.toFixed(1) : "-"}</b> mm<small>ブル率 ${darts ? (bulls / darts * 100).toFixed(1) : "-"}% から</small></span>
+      <span><b>${range ? range.d80Mm.toFixed(0) : "-"}</b> mm<small>8 割が入る円</small></span>
     </div>
-    <p class="heatmap-range-note">ボード入力でタップした位置からのざっくりした目安です（ブルの外側の円は半径 約 16mm、インブルは 約 6mm）。図の点線の円が 50%・80% の範囲です。</p>
+    <p class="heatmap-range-note">DARTSLIVE の RANGE（ブルの中心のまわりのまとまりを円の直径で表したもの。小さいほどまとまっている）に近い目安です。算出方法は公開されていないので、ばらつき（標準偏差）から出した直径で代わりにしています。位置はタップした場所なので、ざっくりした値として見てください。図の実線の円が RANGE、点線が 8 割の投が入る範囲です。ボードの大きさは設定画面の Board Size で変えられます。</p>
   `
 }
 
-// ヒートマップの図に、50%・80% の範囲の円を点線で重ねる
+// ヒートマップの図に、RANGE の円（実線）と 8 割の投が入る円（点線）を重ねる
 function drawRangeCircles(ctx, width, height, range) {
 
   if (!range) return
@@ -542,21 +572,25 @@ function drawRangeCircles(ctx, width, height, range) {
   const cy = height / 2
 
   ctx.save()
-  ctx.setLineDash([4, 4])
   ctx.lineWidth = 1.5
   ctx.font = `700 10px ${HEATMAP_FONT}`
   ctx.textAlign = "left"
   ctx.textBaseline = "bottom"
 
-  ;[[range.r50, "50%", "rgba(255, 255, 255, 0.85)"], [range.r80, "80%", "rgba(255, 213, 79, 0.85)"]].forEach(([r, label, color]) => {
+  // 文字が重ならないよう、RANGE は右上、80% は左上に書く
+  ;[
+    [range.sigma, "RANGE", "rgba(255, 255, 255, 0.95)", [], -Math.PI / 4, "left", 3],
+    [range.r80, "80%", "rgba(255, 213, 79, 0.9)", [4, 4], -Math.PI * 3 / 4, "right", -3]
+  ].forEach(([r, label, color, dash, a, align, dx]) => {
+    ctx.setLineDash(dash)
     ctx.strokeStyle = color
     ctx.beginPath()
     ctx.arc(cx, cy, r * unit, 0, Math.PI * 2)
     ctx.stroke()
 
     ctx.fillStyle = color
-    const a = -Math.PI / 4
-    ctx.fillText(label, cx + Math.cos(a) * r * unit + 3, cy + Math.sin(a) * r * unit - 2)
+    ctx.textAlign = align
+    ctx.fillText(label, cx + Math.cos(a) * r * unit + dx, cy + Math.sin(a) * r * unit - 2)
   })
 
   ctx.restore()
@@ -580,7 +614,7 @@ function createSessionHeatmapHtml(session, showRange = false) {
 
   return `
     <div class="session-meta-block session-heatmap-block">
-      <div class="session-meta-title">Heatmap${points.length ? `（${points.length} 投）` : ""}</div>
+      <div class="session-meta-title">Heatmap${points.length ? `（${points.length} 投${showRange && points.length >= 3 ? ` · RANGE ${getRangeStats(points.map(([x, y]) => ({ x, y }))).rangeMm.toFixed(1)}mm` : ""}）` : ""}</div>
       ${body}
     </div>
   `

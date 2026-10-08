@@ -129,54 +129,39 @@ function applyOrientationPreference(mode) {
 
 window.applyOrientationPreference = applyOrientationPreference
 
+// メイン画面の各ゲームのカードに、そのゲームの記録のまとめを出す
+//   CountUp：平均スコア・平均ラウンドスコア・ゲーム数
+//   01     ：上がり率・上がったゲームの平均ダーツ数・ゲーム数（設定はまとめて）
+//   Cricket：平均 MPR・全部クローズできた割合・ゲーム数
 function initMenuSummary() {
-  const avgScoreEl = document.getElementById("menuAvgScore")
-  const roundAvgEl = document.getElementById("menuRoundAvg")
-  const gamesEl = document.getElementById("menuGamesPlayed")
 
-  if (!avgScoreEl || !roundAvgEl || !gamesEl) return
+  if (!document.getElementById("menuAvgScore")) return
 
-  const sessions = readSessions()
-
-  if (!Array.isArray(sessions) || sessions.length === 0) {
-    avgScoreEl.textContent = "-"
-    roundAvgEl.textContent = "-"
-    gamesEl.textContent = "0"
-    return
+  const sessions = (typeof readSessions === "function" ? readSessions() : [])
+    .filter(s => s && typeof s === "object")
+  const byType = type => sessions.filter(s => (s.gameType || "countup") === type)
+  const average = list => list.length ? list.reduce((sum, value) => sum + value, 0) / list.length : 0
+  const finite = list => list.map(Number).filter(Number.isFinite)
+  const set = (id, text) => {
+    const el = document.getElementById(id)
+    if (el) el.textContent = text
   }
 
-  const countupSessions = sessions.filter(s => {
-    return !s || typeof s !== "object"
-      ? false
-      : (s.gameType ?? "countup") === "countup"
-  })
+  const countup = byType("countup")
+  set("menuGamesPlayed", String(countup.length))
+  set("menuAvgScore", countup.length ? average(finite(countup.map(s => s.score))).toFixed(1) : "-")
+  set("menuRoundAvg", countup.length ? average(finite(countup.map(s => s.roundAvg))).toFixed(1) : "-")
 
-  const games = countupSessions.length
+  const zeroOne = byType("01").filter(s => s.zeroOne)
+  const finished = zeroOne.filter(s => s.zeroOne.finished)
+  set("menu01Games", String(zeroOne.length))
+  set("menu01Rate", zeroOne.length ? `${Math.round(finished.length / zeroOne.length * 100)}%` : "-")
+  set("menu01Darts", finished.length ? average(finite(finished.map(s => s.zeroOne.finishDarts))).toFixed(1) : "-")
 
-  if (games === 0) {
-    avgScoreEl.textContent = "-"
-    roundAvgEl.textContent = "-"
-    gamesEl.textContent = "0"
-    return
-  }
-
-  const totalScore = countupSessions.reduce((sum, s) => {
-    const score = Number(s?.score)
-    return sum + (Number.isFinite(score) ? score : 0)
-  }, 0)
-
-  const roundAvgList = countupSessions
-    .map(s => Number(s?.roundAvg))
-    .filter(Number.isFinite)
-
-  const avgScore = totalScore / games
-  const roundAvg = roundAvgList.length
-    ? roundAvgList.reduce((sum, value) => sum + value, 0) / roundAvgList.length
-    : 0
-
-  avgScoreEl.textContent = avgScore.toFixed(1)
-  roundAvgEl.textContent = roundAvg.toFixed(1)
-  gamesEl.textContent = String(games)
+  const cricket = byType("cricket").filter(s => s.cricket)
+  set("menuCricketGames", String(cricket.length))
+  set("menuCricketMpr", cricket.length ? average(finite(cricket.map(s => s.cricket.mpr))).toFixed(2) : "-")
+  set("menuCricketClose", cricket.length ? `${Math.round(cricket.filter(s => s.cricket.finished).length / cricket.length * 100)}%` : "-")
 }
 
 

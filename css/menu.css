@@ -5,8 +5,8 @@
 /*
   メイン画面の割り付け：ページの高さは画面に固定し（base.css）、ヘッダーとフッターの間を
   スクロール領域（.menu-container）にする。
-  中身は左列（ゲームと操作）と右列（更新情報・お知らせ）の 2 列で、タブレットでは
-  各列が画面の高さいっぱいに伸び、余った高さは CountUp と更新情報が使う（空白を作らない）。
+  中身は左列（ゲーム 3 つと操作）と右列（更新情報・お知らせ）の 2 列で、タブレットでは
+  各列が画面の高さいっぱいに伸び、余った高さはゲームのカードと更新情報が使う（空白を作らない）。
 */
 body.page-menu {
   position: relative;
@@ -91,20 +91,11 @@ body.page-menu::before {
   min-width: 0;
 }
 
-/* NEXT と UTILITY（スマホ縦では縦に並べる） */
-.menu-sub {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 16px;
-}
-
-
 /* ============================== */
 /* SECTION BASE */
 /* ============================== */
 
-.hero-panel,
-.future-panel,
+.games-panel,
 .utility-panel,
 .updates-panel,
 .news-panel {
@@ -117,8 +108,7 @@ body.page-menu::before {
     0 14px 36px rgba(0, 0, 0, 0.45);
 }
 
-.hero-panel,
-.future-panel {
+.games-panel {
   padding: 14px;
 }
 
@@ -140,84 +130,97 @@ body.page-menu::before {
 
 
 /* ============================== */
-/* HERO */
+/* GAMES */
 /* ============================== */
 
-.hero-btn {
+/* CountUp / 01 / Cricket のカード。色はゲームごと（--game-rgb） */
+.game-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.game-card {
+  --game-rgb: var(--accent-rgb);
+
   position: relative;
   overflow: hidden;
   width: 100%;
   min-height: 118px;
-  padding: 18px 16px;
+  padding: 16px;
   border-radius: 16px;
+
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 6px;
-  border: 1px solid rgb(var(--accent-rgb) / 0.4);
+  align-items: stretch;
+  gap: 12px;
+
+  font: inherit;
+  text-align: left;
   color: #f3fffb;
-  background: linear-gradient(145deg, rgb(var(--accent-rgb) / 0.22) 0%, rgb(var(--accent-rgb) / 0.08) 46%, #15222b 100%);
+  cursor: pointer;
+
+  border: 1px solid rgb(var(--game-rgb) / 0.4);
+  background: linear-gradient(145deg, rgb(var(--game-rgb) / 0.22) 0%, rgb(var(--game-rgb) / 0.07) 46%, #141b24 100%);
   box-shadow:
-    0 0 0 1px rgb(var(--accent-rgb) / 0.15) inset,
-    0 14px 28px rgba(0, 0, 0, 0.45),
-    0 0 24px rgb(var(--accent-rgb) / 0.22);
+    0 0 0 1px rgb(var(--game-rgb) / 0.15) inset,
+    0 12px 26px rgba(0, 0, 0, 0.42),
+    0 0 20px rgb(var(--game-rgb) / 0.16);
 }
 
+.game-01 { --game-rgb: 77 171 255; }
+.game-cricket { --game-rgb: 255 196 64; }
+
 /* ダーツボード風の同心円（飾り） */
-.hero-btn::after {
+.game-card::after {
   content: "";
   position: absolute;
   top: 50%;
-  right: -60px;
-  width: 300px;
-  height: 300px;
+  right: -70px;
+  width: 260px;
+  height: 260px;
   transform: translateY(-50%);
   border-radius: 50%;
   background:
-    radial-gradient(circle, rgb(var(--accent-rgb) / 0.55) 0 6%, transparent 6.5%),
-    repeating-radial-gradient(circle, transparent 0 9%, rgb(var(--accent-rgb) / 0.16) 9.5% 10.5%, transparent 11% 20%);
-  opacity: 0.55;
+    radial-gradient(circle, rgb(var(--game-rgb) / 0.5) 0 6%, transparent 6.5%),
+    repeating-radial-gradient(circle, transparent 0 9%, rgb(var(--game-rgb) / 0.16) 9.5% 10.5%, transparent 11% 20%);
+  opacity: 0.5;
   pointer-events: none;
 }
 
-.hero-btn > * {
+.game-card > * {
   position: relative;
   z-index: 1;
 }
 
-.hero-btn:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 0 0 1px rgb(var(--accent-rgb) / 0.2) inset,
-    0 20px 34px rgba(0, 0, 0, 0.55),
-    0 0 32px rgb(var(--accent-rgb) / 0.3);
+.game-card:active {
+  transform: scale(0.985);
 }
 
-.hero-btn:active {
-  transform: translateY(0) scale(0.985);
+.game-card-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .btn-title {
-  font-size: 30px;
+  font-size: 28px;
   line-height: 1.05;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
 
 .btn-sub {
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.05em;
-  color: rgb(230 237 243 / 0.8);
+  color: rgb(230 237 243 / 0.75);
 }
 
 .hero-metrics {
-  /* 欄が縦に伸びたときは数字を一番下に置く */
-  margin-top: auto;
-  padding-top: 14px;
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -225,10 +228,11 @@ body.page-menu::before {
   min-height: 50px;
   border-radius: 10px;
   padding: 8px;
-  background: rgb(10 17 24 / 0.42);
+  background: rgb(10 17 24 / 0.5);
   border: 1px solid rgb(255 255 255 / 0.08);
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
   gap: 2px;
 }
@@ -244,65 +248,8 @@ body.page-menu::before {
   font-size: 18px;
   font-weight: 700;
   line-height: 1.1;
-}
-
-
-/* ============================== */
-/* COMING SOON */
-/* ============================== */
-
-.coming-grid {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: 1fr 1fr;
-}
-
-.coming-card {
-  min-height: 82px;
-  border-radius: 14px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background: linear-gradient(160deg, #171b24 0%, #11151d 100%);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  opacity: 0.86;
-}
-
-.coming-title {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-/* 遊べるゲーム（01） */
-button.coming-card {
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.coming-card.playable {
-  opacity: 1;
-  border-color: rgb(var(--accent-rgb) / 0.4);
-  background: linear-gradient(160deg, rgb(var(--accent-rgb) / 0.14) 0%, #11151d 100%);
-}
-
-.coming-card.playable .coming-tag {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.coming-tag {
-  align-self: flex-start;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
-  padding: 4px 8px;
+  color: rgb(var(--game-rgb));
+  font-variant-numeric: tabular-nums;
 }
 
 
@@ -380,32 +327,28 @@ button.coming-card {
   flex: 1 1 0;
 }
 
-/* タブレット横・PC：列を画面の高さに収める（余った高さは CountUp と更新情報が使う） */
+/* タブレット横・PC：列を画面の高さに収める（余った高さはゲームのカードと更新情報が使う） */
 .tablet.landscape .menu-col,
 .desktop .menu-col {
   min-height: 0;
 }
 
-/* NEXT と UTILITY を横並び */
-.landscape .menu-sub,
-.desktop .menu-sub {
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+/* タブレット・PC：ゲームのカードは左に名前、右に数字の横並び（スマホは縦横とも名前の下に数字） */
+.desktop .game-card,
+.tablet .game-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
 }
 
-.landscape .utility-actions,
-.desktop .utility-actions {
-  grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
+.desktop .game-card-head,
+.tablet .game-card-head {
+  flex: 0 0 34%;
 }
 
-.landscape .utility-actions button,
-.desktop .utility-actions button {
-  height: 42px;
-}
-
-.landscape .coming-grid,
-.desktop .coming-grid {
-  height: calc(100% - 26px);
+.desktop .game-card .hero-metrics,
+.tablet .game-card .hero-metrics {
+  flex: 1;
 }
 
 
@@ -413,48 +356,54 @@ button.coming-card {
 /* TABLET / DESKTOP：画面の高さいっぱいに伸ばす */
 /* ============================== */
 
-.tablet.landscape .hero-panel,
-.desktop .hero-panel {
+/* ゲームのカードを、左列の残りの高さいっぱいに 3 等分で伸ばす */
+.tablet.landscape .games-panel,
+.desktop .games-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-.tablet.landscape .hero-btn,
-.desktop .hero-btn {
+.tablet.landscape .game-list,
+.desktop .game-list {
   flex: 1;
-  justify-content: flex-start;
-  padding: 26px 24px 22px;
+  min-height: 0;
 }
 
-.tablet.landscape .hero-btn::after,
-.desktop .hero-btn::after {
-  width: 420px;
-  height: 420px;
+.tablet.landscape .game-card,
+.desktop .game-card {
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 18px 22px;
+}
+
+.tablet .game-card::after,
+.desktop .game-card::after {
+  width: 320px;
+  height: 320px;
   right: -90px;
 }
 
 .tablet .btn-title,
 .desktop .btn-title {
-  font-size: 44px;
+  font-size: 38px;
 }
 
 .tablet .btn-sub,
 .desktop .btn-sub {
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .tablet .hero-metrics,
 .desktop .hero-metrics {
-  gap: 12px;
+  gap: 10px;
 }
 
 .tablet .hero-metric,
 .desktop .hero-metric {
-  min-height: 78px;
-  padding: 12px;
-  align-items: center;
+  min-height: 72px;
+  padding: 10px;
 }
 
 .tablet .metric-label,
@@ -464,7 +413,7 @@ button.coming-card {
 
 .tablet .metric-value,
 .desktop .metric-value {
-  font-size: 30px;
+  font-size: 28px;
 }
 
 /* 更新情報は残りの高さを使い、多い分は欄の中でスクロール */
@@ -490,19 +439,14 @@ button.coming-card {
   flex: none;
 }
 
-/* タブレット縦：上に CountUp と NEXT / UTILITY、下の残りの高さに更新情報とお知らせを左右に並べる */
+/* タブレット縦：上にゲームと UTILITY、下の残りの高さに更新情報とお知らせを左右に並べる */
 .tablet.portrait .menu-container {
   --menu-max-width: 900px;
 }
 
-.tablet.portrait .menu-sub {
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-}
-
-.tablet.portrait .hero-btn {
-  min-height: 240px;
-  justify-content: flex-start;
-  padding: 26px 24px 22px;
+.tablet.portrait .game-card {
+  min-height: 120px;
+  padding: 18px 22px;
 }
 
 .tablet.portrait .menu-col-side {
@@ -597,15 +541,21 @@ button.coming-card {
     flex: none;
   }
 
-  /* 左列の余った高さは CountUp が使う（タブレット横と同じ） */
-  .phone.landscape .hero-panel {
+  /* 左列の余った高さはゲームのカードが使う（タブレット横と同じ） */
+  .phone.landscape .games-panel {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
   }
 
-  .phone.landscape .hero-btn {
+  .phone.landscape .game-list {
     flex: 1;
+    min-height: 0;
+  }
+
+  .phone.landscape .game-card {
+    flex: 1 1 0;
+    min-height: 0;
   }
 }

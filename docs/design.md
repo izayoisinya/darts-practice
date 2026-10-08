@@ -229,6 +229,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
   - Stats（`.data-card`）：Games Played・Finish Rate（上がり率）・Avg Darts（上がったゲームの平均ダーツ数）・Best Darts・Average PPD・Finish Rate (Last 10)（直近 10 ゲームの上がり率）
   - Awards（`.data-card`）
   - Bull / Triple：全投数に対するブル（アウター＋インナー）・インナーブル（金）・トリプル（青）の本数と割合（1 投ごとの記録 `darts` から数える。カウントアップの詳細の Bull Rate と同じ部品。`renderZeroOneHitRates()`）
+  - RANGE（目安）：カウントアップの Analysis と同じ出し方（位置から・ブル率から・8 割の円）。01 は上がりでダブルなどを狙うので、80% スタッツと同じ範囲（最初の点数の 80% を減らしたラウンドまで＝ブルを狙う場面）の投だけで出す（`getZeroOne80Darts()` / `renderZeroOneRange()`）。履歴カードのヒートマップ（`createSessionHeatmapHtml(session, true, getZeroOne80Points(session))`）とゲーム画面のレーダー（cu_ui.js の `getZeroOneBullPhasePoints()`）も同じ範囲で RANGE を出す
   - Darts to Finish：直近 30 ゲームの上がるまでのダーツ数の推移（最少は金色）。上がれなかったゲームは上の段に赤い ×
   - レーティング参考値（カウントアップと同じカード）：直近 30 ゲームの **80% スタッツ**（1 ゲームごとに、最初の点数の 80% を減らしたラウンドまでの 1 ラウンドの平均点。バストは 0 点）の平均を PPR として出し、PPD（÷ 3）を `rating.js` の換算表で DARTSLIVE / PHOENIX の目安にする（`getZeroOneStats80()` / `renderZeroOneRating()`）
   - Finish Numbers：上がったゲームの最後の 1 投（`darts` の最後の記録）の場所ごとの割合（上位 10 か所。バーの長さは全体に対する割合。`renderZeroOneFinishNumbers()`）
@@ -547,7 +548,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `drawHeatmap(points)` / `paintHeatmap(ctx, width, height, points, highlight)` / `drawHeatmapBoard()` | ボードの図（本物の比率）を描き、その上に色を重ね、1 投ずつの位置を小さな点で描く（`highlight` の位置は白い縁取りの点） |
 | `paintRadarHeatmap(ctx, width, height, points, highlight, rgb)` | ゲーム画面用のレーダー風の描画。暗い緑の円に、ボードの輪・区画の線・外周の目盛り・数字を描き、刺さった位置をぼかした光（`lighter` で重ねる）で表す。回る走査線は CSS の `.game-radar-sweep`（`conic-gradient` を回転。動きを減らす設定では止める） |
 | `createSessionHeatmapHtml(session, showRange)` / `drawSessionHeatmaps(card)` | 履歴カード（カウントアップ・01）を開いたときの、そのゲームのヒートマップ。カードを作るときは位置だけを canvas の `data-points` に持たせ、開いたとき（`toggleSessionCard()`）と画面の大きさが変わったときに描く。カウントアップは 50%・80% の円も重ねる。位置の記録がないゲームは「位置の記録がありません」 |
-| `getRangeStats(points)` / `getRangeFromBullRate(rate)` / `renderHeatmapRange()` / `drawRangeCircles()` / `getBoardRadiusMm()` | **RANGE の目安**：DARTSLIVE の RANGE（ブルの中心のまわりのまとまりを円の直径 mm で表したもの。算出方法は非公開）に近い値として、ブルの中心を狙ったときの縦横のばらつき σ（中心からの距離の 2 乗の平均 ÷ 2 の平方根）を求め、直径 2σ を RANGE とする（約 4 割の投が入る円。プロの RANGE 30mm 台とブル率の関係とおおむね合う）。位置の記録がないゲームでも、ブル率 = 1 − exp(−R² ÷ 2σ²)（R：アウターブルの半径）から σ を逆算して出す（ブル 0 本なら出さない）。8 割の投が入る円の直径も出す。mm はボードの大きさ（設定の Board Size：Soft 15.5 インチ = ダブルの外側の半径 197mm / Steel 13.2 インチ = 170mm）で直す。ヒートマップに RANGE の円（実線）と 8 割の円（点線）を重ね、ゲーム画面のレーダー（カウントアップのみ）と履歴カードのヒートマップの見出しにも RANGE を出す |
+| `getRangeStats(points)` / `getRangeFromBullRate(rate)` / `renderHeatmapRange()` / `drawRangeCircles()` / `getBoardRadiusMm()` | **RANGE の目安**：DARTSLIVE の RANGE（ブルの中心のまわりのまとまりを円の直径 mm で表したもの。算出方法は非公開）に近い値として、ブルの中心を狙ったときの縦横のばらつき σ（中心からの距離の 2 乗の平均 ÷ 2 の平方根）を求め、直径 2σ を RANGE とする（約 4 割の投が入る円。プロの RANGE 30mm 台とブル率の関係とおおむね合う）。位置の記録がないゲームでも、ブル率 = 1 − exp(−R² ÷ 2σ²)（R：アウターブルの半径）から σ を逆算して出す（ブル 0 本なら出さない）。8 割の投が入る円の直径も出す。mm はボードの大きさ（設定の Board Size：Soft 15.5 インチ = ダブルの外側の半径 197mm / Steel 13.2 インチ = 170mm）で直す。ヒートマップに RANGE の円（実線）と 8 割の円（点線）を重ね、ゲーム画面のレーダーと履歴カードのヒートマップの見出しにも RANGE を出す（01 はブルを狙う場面の投だけ。`createSessionHeatmapHtml()` の第 3 引数 `rangePoints`） |
 | `createHeatLayer()` / `getHeatmapPalette()` | 1 投ずつぼかした円を足し合わせ（`lighter`）、いちばん多い場所を最大にした相対値で 青→水色→緑→黄→赤 に色付けした画像を作る |
 
 - 位置があるのはボード入力で入れた投だけ。「よく刺さった場所」はボタン入力の投も含めて数える
@@ -931,3 +932,4 @@ graph LR
 | 2026.10.8 | データ画面の履歴カード（カウントアップ・01）を開くと、そのゲームのヒートマップを出すようにした（カウントアップは 50%・80% の円も） |
 | 2026.10.8 | データ画面の履歴カード（カウントアップ・01）で、Awards を横幅いっぱいの段からトリプルの下（左の列）に移した（右の列はグラフとヒートマップ） |
 | 2026.10.8 | レンジを DARTSLIVE の RANGE（直径 mm）に近い目安に変更（ばらつき σ の 2 倍の直径。ブル率からの推定も）。設定に Board Size（Soft 15.5 インチ / Steel 13.2 インチ）を追加し、mm の換算に使う |
+| 2026.10.8 | 01 にも RANGE の目安を追加（データ画面の Stats・履歴カードのヒートマップ・ゲーム画面のレーダー）。上がりのダブル狙いを除くため、最初の点数の 80% を減らすまでの投だけで出す |

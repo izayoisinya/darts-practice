@@ -376,6 +376,12 @@ function createZeroOneCardHtml(session, gameNumber) {
           <div class="session-meta-title">Triple</div>
           ${createZeroOneTripleHtml(session)}
         </div>
+
+        <!-- アワードはトリプルの下（左の列）に置く -->
+        <div class="session-meta-block session-awards-block">
+          <div class="session-meta-title">Awards</div>
+          <div class="session-awards-grid">${createAwardsHtml(session)}</div>
+        </div>
       </div>
 
       <div class="session-side-block">
@@ -387,10 +393,6 @@ function createZeroOneCardHtml(session, gameNumber) {
       </div>
     </div>
 
-    <div class="session-meta-block session-awards-block">
-      <div class="session-meta-title">Awards</div>
-      <div class="session-awards-grid">${createAwardsHtml(session)}</div>
-    </div>
   `
 }
 

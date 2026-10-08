@@ -212,6 +212,12 @@ function createSessionCardHtml(session, gameNumber) {
           <div class="session-meta-title">Triple</div>
           ${tripleHtml}
         </div>
+
+        <!-- アワードはトリプルの下（左の列）に置く -->
+        <div class="session-meta-block session-awards-block">
+          <div class="session-meta-title">Awards</div>
+          <div class="session-awards-grid">${awardsHtml}</div>
+        </div>
       </div>
 
       <div class="session-side-block">
@@ -223,10 +229,6 @@ function createSessionCardHtml(session, gameNumber) {
       </div>
     </div>
 
-    <div class="session-meta-block session-awards-block">
-      <div class="session-meta-title">Awards</div>
-      <div class="session-awards-grid">${awardsHtml}</div>
-    </div>
   `
 }
 

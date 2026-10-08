@@ -2761,3 +2761,8 @@ body.data-01 .detail-bull-rate-bar-fill.inner {
 #sessionsContainer .session-card:not(.is-expanded) .session-heatmap-block {
   display: none;
 }
+
+/* アワードは左の列（トリプルの下）に置くので、上の余白は列の間隔だけにする */
+.session-main-block .session-awards-block {
+  margin-top: 0;
+}

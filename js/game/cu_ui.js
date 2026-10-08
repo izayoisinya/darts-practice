@@ -262,6 +262,7 @@ function renderCricketBoard() {
     const num = Number(el.dataset.num)
     const isTarget = CRICKET_TARGETS.includes(num)
     el.classList.toggle("cricket-off", !isTarget)
+    el.classList.toggle("cricket-open", isTarget && state.targets[num] < 3)
     el.classList.toggle("cricket-closed", isTarget && state.targets[num] >= 3)
   })
 }
@@ -721,7 +722,17 @@ function renderGameHeatmap(size) {
       (range ? ` · RANGE ${range.rangeMm.toFixed(0)}mm` : "")
   }
 
-  paintRadarHeatmap(ctx, size, size, points, highlight, getAccentRgb())
+  // クリケット：狙う数字（クローズしたかどうか）をレーダーにも出す
+  let cricket = null
+  if (GAME_TYPE === "cricket") {
+    const state = computeCricket()
+    cricket = {}
+    CRICKET_TARGETS.forEach(target => {
+      cricket[target] = state.targets[target] >= 3 ? "closed" : "open"
+    })
+  }
+
+  paintRadarHeatmap(ctx, size, size, points, highlight, getAccentRgb(), cricket)
 }
 
 // 01：最初の点数の 80% を減らしたラウンドまでの投の位置（データ画面の getZeroOne80Darts() と同じ範囲）

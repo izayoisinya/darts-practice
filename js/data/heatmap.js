@@ -364,7 +364,9 @@ function getHeatmapPalette() {
 // 刺さった位置を光る点（ブリップ）で表す。重なるほど明るく、古い投ほど薄く、今のラウンドの投は輪付きで強く光らせる。
 // 回る走査線は CSS（lay_input.css の .game-radar-sweep）で重ねる
 //   points：古い順の位置の一覧 / highlight：今のラウンドの投の位置 / rgb：色（"0, 255, 200" の形）
-function paintRadarHeatmap(ctx, width, height, points, highlight = [], rgb = "0, 255, 200") {
+//   cricket：クリケットのときだけ、数字ごとの状態 { 20: "open" | "closed", ..., 25: ... }。
+//     狙う数字の区画をうっすら塗って数字を明るく太く、クローズした数字は薄くして線を引き、それ以外の数字は暗くする
+function paintRadarHeatmap(ctx, width, height, points, highlight = [], rgb = "0, 255, 200", cricket = null) {
 
   const size = Math.min(width, height)
   const unit = size / (HEATMAP_VIEW * 2)
@@ -411,6 +413,28 @@ function paintRadarHeatmap(ctx, width, height, points, highlight = [], rgb = "0,
     ctx.fill()
   })
 
+  // クリケット：狙う数字の区画（ブルの外からダブルまで）とブルを塗る。まだクローズしていない数字ほど明るく
+  if (cricket) {
+    const fill = state => color(state === "closed" ? 0.06 : 0.2)
+    HEATMAP_NUMBERS.forEach((num, i) => {
+      if (!cricket[num]) return
+      const a1 = (i * 18 - 9 - 90) * Math.PI / 180
+      const a2 = (i * 18 + 9 - 90) * Math.PI / 180
+      ctx.fillStyle = fill(cricket[num])
+      ctx.beginPath()
+      ctx.arc(cx, cy, r(d), a1, a2)
+      ctx.arc(cx, cy, r(ob), a2, a1, true)
+      ctx.closePath()
+      ctx.fill()
+    })
+    if (cricket[25]) {
+      ctx.fillStyle = fill(cricket[25])
+      ctx.beginPath()
+      ctx.arc(cx, cy, r(ob), 0, Math.PI * 2)
+      ctx.fill()
+    }
+  }
+
   HEATMAP_RING_RADIUS.forEach(value => {
     ctx.strokeStyle = color(value === d ? 0.55 : 0.28)
     ctx.beginPath()
@@ -431,14 +455,34 @@ function paintRadarHeatmap(ctx, width, height, points, highlight = [], rgb = "0,
     ctx.stroke()
   }
 
-  // 数字
-  ctx.fillStyle = color(0.6)
-  ctx.font = `600 ${Math.max(8, Math.round(unit * 0.085))}px ui-monospace, Menlo, monospace`
+  // 数字（クリケットは、狙う数字を明るく太く、クローズした数字は薄くして線を引き、それ以外は暗く）
+  const fontSize = Math.max(8, Math.round(unit * 0.085))
   ctx.textAlign = "center"
   ctx.textBaseline = "middle"
   HEATMAP_NUMBERS.forEach((num, i) => {
     const a = (i * 18 - 90) * Math.PI / 180
-    ctx.fillText(String(num), cx + Math.cos(a) * r(HEATMAP_NUMBER_RADIUS), cy + Math.sin(a) * r(HEATMAP_NUMBER_RADIUS))
+    const x = cx + Math.cos(a) * r(HEATMAP_NUMBER_RADIUS)
+    const y = cy + Math.sin(a) * r(HEATMAP_NUMBER_RADIUS)
+    const state = cricket ? cricket[num] || "off" : ""
+
+    ctx.font = `${state === "open" ? 800 : 600} ${state === "open" ? Math.round(fontSize * 1.25) : fontSize}px ui-monospace, Menlo, monospace`
+    ctx.fillStyle = state === "open" ? color(1) : state === "closed" ? color(0.4) : state === "off" ? color(0.22) : color(0.6)
+    if (state === "open") {
+      ctx.shadowColor = color(0.9)
+      ctx.shadowBlur = 6
+    }
+    ctx.fillText(String(num), x, y)
+    ctx.shadowBlur = 0
+
+    if (state === "closed") {
+      const half = ctx.measureText(String(num)).width / 2 + 1
+      ctx.strokeStyle = color(0.6)
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(x - half, y)
+      ctx.lineTo(x + half, y)
+      ctx.stroke()
+    }
   })
 
   // ブリップ：光をぼかして足し合わせる（重なるほど明るい）。古い投ほど薄く

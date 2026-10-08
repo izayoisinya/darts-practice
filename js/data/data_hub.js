@@ -185,7 +185,7 @@ function renderDataHub() {
 
     <div class="data-hub-bottom">
       ${renderDataHubCalendar(type)}
-      ${renderDataHubRecent(type)}
+      ${dataHubSelectedDay ? renderDataHubDay(type) : renderDataHubRecent(type)}
     </div>
 
     ${type === "countup" ? "" : '<p class="data-hub-note">Analysis は、今は Count-Up の記録だけを集計しています。</p>'}
@@ -195,6 +195,27 @@ function renderDataHub() {
   hub.querySelectorAll("[data-hub-view]").forEach(btn => {
     btn.addEventListener("click", () => openDataView(btn.dataset.hubView))
   })
+
+  // 選んだ日のゲーム（Games 画面と同じ履歴カード。押すと開く）
+  if (dataHubSelectedDay) fillDataHubDay(type)
+
+  hub.querySelectorAll("[data-hub-day]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      dataHubSelectedDay = dataHubSelectedDay === btn.dataset.hubDay ? null : btn.dataset.hubDay
+      renderDataHub()
+      // 縦に並んでいるとき（スマホ縦など）は、出したゲームの一覧が見えるところまで送る
+      const list = document.getElementById("dataHubDay")
+      if (list && !document.body.classList.contains("landscape")) list.scrollIntoView({ block: "start", behavior: "smooth" })
+    })
+  })
+
+  const close = hub.querySelector("[data-hub-day-close]")
+  if (close) {
+    close.addEventListener("click", () => {
+      dataHubSelectedDay = null
+      renderDataHub()
+    })
+  }
 
   hub.querySelectorAll("[data-hub-month]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -208,8 +229,49 @@ function renderDataHub() {
 // ===============================
 // ===== カレンダー ================
 // ===============================
-// 選んでいるゲームを練習した日に印を付ける（その日のゲーム数を小さく出す）。今は見るだけ。‹ › で月を切り替える
+// 選んでいるゲームを練習した日に印を付ける（その日のゲーム数を小さく出す）。‹ › で月を切り替える。
+// 練習した日を押すと、Recent Games の代わりにその日のゲーム（履歴カード）を出す。もう一度押すか Recent で戻す
 let dataHubCalendarMonth = null
+// カレンダーで選んだ日（"YYYY-MM-DD"）。選んでいる間は Recent Games の代わりにその日のゲームを出す
+let dataHubSelectedDay = null
+
+function getDataHubDayKey(time) {
+  const d = new Date(time)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+}
+
+// 選んだ日のゲームの一覧（中身は fillDataHubDay() で入れる）
+function renderDataHubDay(type) {
+  const sessions = getDataHubSessions(type).filter(s => getDataHubDayKey(s.date) === dataHubSelectedDay)
+  const [, m, d] = dataHubSelectedDay.split("-").map(Number)
+  return `
+    <section class="data-hub-recent data-hub-day" id="dataHubDay">
+      <div class="data-hub-day-top">
+        <h3 class="data-hub-section-title">${m}/${d} Games（${sessions.length}）</h3>
+        <button type="button" class="data-hub-day-close" data-hub-day-close>Recent</button>
+      </div>
+      <div id="dataHubDayList" class="data-hub-day-list"></div>
+    </section>
+  `
+}
+
+// 選んだ日のゲームを、Games 画面と同じ履歴カードで出す（Game の番号は全体の通し番号。新しい順）
+function fillDataHubDay(type) {
+
+  const box = document.getElementById("dataHubDayList")
+  if (!box) return
+
+  const all = getDataHubSessions(type)
+  const createHtml = type === "01"
+    ? createZeroOneCardHtml
+    : type === "cricket" ? createCricketCardHtml : createSessionCardHtml
+
+  all
+    .map((session, index) => ({ session, number: index + 1 }))
+    .filter(item => getDataHubDayKey(item.session.date) === dataHubSelectedDay)
+    .reverse()
+    .forEach(item => box.appendChild(createSessionCardElement(createHtml(item.session, item.number))))
+}
 
 function getDataHubSessions(type) {
   if (type === "01") return typeof readZeroOneSessions === "function" ? readZeroOneSessions() : []
@@ -254,9 +316,14 @@ function renderDataHubCalendar(type) {
     if (count) cls.push("played")
     if (count >= 5) cls.push("many")
     if (isThisMonth && today.getDate() === d) cls.push("today")
-    cells += `<span class="${cls.join(" ")}"${count ? ` title="${count} games"` : ""}>` +
-      `<span class="data-hub-cal-num">${d}</span>` +
-      `${count ? `<span class="data-hub-cal-count">${count}</span>` : ""}</span>`
+    const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
+    if (key === dataHubSelectedDay) cls.push("selected")
+    const inner = `<span class="data-hub-cal-num">${d}</span>` +
+      `${count ? `<span class="data-hub-cal-count">${count}</span>` : ""}`
+    // 練習した日は押すとその日のゲームを出す
+    cells += count
+      ? `<button type="button" class="${cls.join(" ")}" data-hub-day="${key}" aria-label="${month + 1}/${d} ${count} games">${inner}</button>`
+      : `<span class="${cls.join(" ")}">${inner}</span>`
   }
 
   return `
@@ -366,11 +433,22 @@ function openDataView(mode) {
 // ヘッダーのゲームの切り替え：トップを出しているときは、トップの中身だけ描き直す
 const setDataGameTypeForViews = typeof setDataGameType === "function" ? setDataGameType : null
 window.setDataGameType = function (type) {
+  if (dataHubOpen && type !== dataGameType) dataHubSelectedDay = null
   if (setDataGameTypeForViews) setDataGameTypeForViews(type)
   if (dataHubOpen) renderDataHub()
 }
 
 function initDataHub() {
+  // トップの履歴カード（選んだ日のゲーム）も、押すと開く（data_loader.js の toggleSessionCard()）
+  const hub = document.getElementById("dataHub")
+  if (hub && !hub.dataset.ready) {
+    hub.dataset.ready = "1"
+    hub.addEventListener("click", e => {
+      const card = e.target instanceof Element ? e.target.closest(".session-card") : null
+      if (card && hub.contains(card)) toggleSessionCard(card)
+    })
+  }
+
   const back = document.getElementById("dataHubBack")
   if (back && !back.dataset.ready) {
     back.dataset.ready = "1"

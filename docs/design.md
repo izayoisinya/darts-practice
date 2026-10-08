@@ -82,7 +82,7 @@ GitHub 上のリポジトリ（`izayoisinya/darts-practice`）を iPad 及びタ
 | --- | --- |
 | `index.html` | メイン画面（メニュー） |
 | `countup.html` | カウントアップ画面 |
-| `data.html` | データ表示画面（Statistics） |
+| `data.html` | データ表示画面（見出しは Data。メニューの名前に合わせる） |
 | `settings.html` | 設定画面 |
 | `news.html` | お知らせ画面 |
 
@@ -229,7 +229,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
   - 01：Games・Finish Rate・Avg Darts・Best Darts・Last Played
   - Cricket：Games・Avg MPR・Best MPR・Close Rate・Last Played
 - その下に、見る画面のカード（Games・Analysis の 2 つ。何が見られるかの説明と件数）。Count-Up は設定画面の Data Tabs で Analysis を隠したらカードも出さない。01・クリケットは Games だけ（Analysis は今は Count-Up だけを集計している）
-- Calendar：選んでいるゲームを練習した日に印を付け、その日のゲーム数を小さく出す（5 ゲーム以上は濃く。今日は白い枠）。今は見るだけ（日付を押しても何もしない）。‹ › で月を切り替え、最初は最後に遊んだ月。下にその月の日数・ゲーム数（`renderDataHubCalendar()`）。横向きは Recent Games と左右に並べる
+- Calendar：選んでいるゲームを練習した日に印を付け、その日のゲーム数を小さく出す（5 ゲーム以上は濃く。今日は白い枠）。練習した日を押すと、Recent Games の代わりにその日のゲームを Games 画面と同じ履歴カード（押すと開く。番号は全体の通し番号、新しい順）で出す（`renderDataHubDay()` / `fillDataHubDay()`。選んだ日は濃く光らせ、もう一度押すか「Recent」で戻す。ヘッダーでゲームを切り替えると選んだ日は外す。履歴カードの開閉の見た目は `#sessionsContainer` と同じ指定を `#dataHubDayList` にも当てる）。‹ › で月を切り替え、最初は最後に遊んだ月。下にその月の日数・ゲーム数（`renderDataHubCalendar()`）。横向きは Recent Games と左右に並べる
 - **Day / Week / Month / Year は一旦お休み**（2026.10.8。データ画面を Games と Analysis の 2 つに絞り、日付はトップのカレンダーで見る）。フッターのタブ・トップのカード・設定の Data Tabs から外したが、コード（`data_grouped.js` / `data_detail.js`）は残してあり、`data.js` の `DATA_VIEW_TABS` に足せば戻せる
 - Recent Games：最近の 5 ゲーム（日時・説明・主な数字）。押すと Games の画面を開く
 - カードを押すとその画面を開き（`openDataView()`）、ヘッダーの左に「‹ Top」を出してトップに戻れるようにする（`backToDataHub()`）。画面を開くときに履歴を 1 つ足すので、端末・ブラウザの「戻る」でもトップに戻る（Day の詳細ビューを開いているときは、まず詳細を閉じる）
@@ -1026,3 +1026,4 @@ graph LR
 | 2026.10.8 | 設定画面の並びを変更。Layout Preview の右に Display（Game Panels）、下に Game を置き、プレビューを止める指定（sticky）はやめた |
 | 2026.10.8 | お知らせ画面（Info）のタブ（すべて / 更新情報 / お知らせ / 更新予定）を、スクロールしても上に残るようにした。スマホでも縦に積まず横 1 列にした |
 | 2026.10.8 | データ画面を Games と Analysis の 2 つに絞った。Day / Week / Month / Year は一旦お休み（フッターのタブ・トップのカード・設定の Data Tabs から外す。コードは残す）にし、日付はトップに練習した日のカレンダー（見るだけ。月の切り替えあり）を出すようにした |
+| 2026.10.8 | データ画面のトップのカレンダーで、練習した日を押すとその日のゲーム（履歴カード）を出すようにした。データ画面の見出しを Statistics から Data に変更（メニューの名前に合わせる） |

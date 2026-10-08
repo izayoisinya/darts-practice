@@ -2,12 +2,13 @@
 // ===== データ画面のトップ =========
 // ===============================
 // データ画面を開いたときに最初に出す画面。選んでいるゲーム（Count-Up / 01 / Cricket）の成績のまとめと、
-// 見る画面（Games・Analysis・Day・Week・Month・Year）のカードを出し、選んだ画面を開く。
+// 見る画面（Games・Analysis）のカード・練習した日のカレンダー・最近のゲームを出し、選んだ画面を開く。
 // 各画面ではヘッダーの「‹ Top」でこの画面に戻る。body に data-hub-open を付けている間は、ふつうの表示（main）を隠す
 
 let dataHubOpen = false
 
-// 見る画面のカード（Count-Up。表示・非表示は設定画面の Data Tabs に従う：data.js の getVisibleViews()）
+// 見る画面のカード（Count-Up。表示・非表示は設定画面の Data Tabs に従う：data.js の getVisibleViews()。
+// 今は Games と Analysis だけ。Day / Week / Month / Year は一旦お休みで、日付はトップのカレンダーで見る）
 const DATA_HUB_VIEWS = {
   game: { title: "Games", desc: "1 ゲームずつの記録・スコアの推移・全体の Stats・レーティング", icon: "list" },
   analysis: { title: "Analysis", desc: "ヒートマップ・RANGE・タグ別の散布図・期間の比較", icon: "target" },
@@ -182,15 +183,96 @@ function renderDataHub() {
       `).join("")}
     </section>
 
-    ${renderDataHubRecent(type)}
+    <div class="data-hub-bottom">
+      ${renderDataHubCalendar(type)}
+      ${renderDataHubRecent(type)}
+    </div>
 
-    ${type === "countup" ? "" : '<p class="data-hub-note">Analysis・Day などの画面は、今は Count-Up の記録だけを集計しています。</p>'}
+    ${type === "countup" ? "" : '<p class="data-hub-note">Analysis は、今は Count-Up の記録だけを集計しています。</p>'}
     ${summary.count ? "" : '<p class="data-hub-note">まだ記録がありません。ゲームを終えると、ここに成績が出ます。</p>'}
   `
 
   hub.querySelectorAll("[data-hub-view]").forEach(btn => {
     btn.addEventListener("click", () => openDataView(btn.dataset.hubView))
   })
+
+  hub.querySelectorAll("[data-hub-month]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      dataHubCalendarMonth = new Date(dataHubCalendarMonth.getFullYear(), dataHubCalendarMonth.getMonth() + Number(btn.dataset.hubMonth), 1)
+      renderDataHub()
+    })
+  })
+}
+
+
+// ===============================
+// ===== カレンダー ================
+// ===============================
+// 選んでいるゲームを練習した日に印を付ける（その日のゲーム数を小さく出す）。今は見るだけ。‹ › で月を切り替える
+let dataHubCalendarMonth = null
+
+function getDataHubSessions(type) {
+  if (type === "01") return typeof readZeroOneSessions === "function" ? readZeroOneSessions() : []
+  if (type === "cricket") return typeof readCricketSessions === "function" ? readCricketSessions() : []
+  return readDataSessions()
+}
+
+function renderDataHubCalendar(type) {
+
+  const sessions = getDataHubSessions(type)
+
+  // 最初は最後に遊んだ月（記録がなければ今月）
+  if (!dataHubCalendarMonth) {
+    const base = sessions.length ? new Date(sessions[sessions.length - 1].date) : new Date()
+    dataHubCalendarMonth = new Date(base.getFullYear(), base.getMonth(), 1)
+  }
+
+  const year = dataHubCalendarMonth.getFullYear()
+  const month = dataHubCalendarMonth.getMonth()
+
+  const counts = {}
+  sessions.forEach(session => {
+    const d = new Date(session.date)
+    if (d.getFullYear() !== year || d.getMonth() !== month) return
+    counts[d.getDate()] = (counts[d.getDate()] || 0) + 1
+  })
+  const days = Object.keys(counts).length
+  const games = Object.values(counts).reduce((a, b) => a + b, 0)
+
+  const today = new Date()
+  const isThisMonth = today.getFullYear() === year && today.getMonth() === month
+
+  // 月曜はじまり
+  const offset = (new Date(year, month, 1).getDay() + 6) % 7
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+
+  let cells = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(d => `<span class="data-hub-cal-head">${d}</span>`).join("")
+  cells += '<span class="data-hub-cal-day empty"></span>'.repeat(offset)
+  for (let d = 1; d <= daysInMonth; d++) {
+    const count = counts[d] || 0
+    const cls = ["data-hub-cal-day"]
+    if (count) cls.push("played")
+    if (count >= 5) cls.push("many")
+    if (isThisMonth && today.getDate() === d) cls.push("today")
+    cells += `<span class="${cls.join(" ")}"${count ? ` title="${count} games"` : ""}>` +
+      `<span class="data-hub-cal-num">${d}</span>` +
+      `${count ? `<span class="data-hub-cal-count">${count}</span>` : ""}</span>`
+  }
+
+  return `
+    <section class="data-hub-calendar">
+      <div class="data-hub-cal-top">
+        <h3 class="data-hub-section-title">Calendar</h3>
+        <span class="data-hub-cal-nav">
+          <button type="button" data-hub-month="-1" aria-label="前の月">‹</button>
+          <span class="data-hub-cal-title">${year}/${month + 1}</span>
+          <button type="button" data-hub-month="1" aria-label="次の月">›</button>
+        </span>
+      </div>
+      <div class="data-hub-cal-grid">${cells}</div>
+      <p class="data-hub-cal-sum">${days} days · ${games} games</p>
+    </section>
+  `
 }
 
 function renderDataHubRecent(type) {

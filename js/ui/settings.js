@@ -14,12 +14,9 @@ const DEFAULT_SETTINGS = {
 
 // 設定画面のチェックボックスと、保存する設定のキーの対応
 const GAME_PANEL_TOGGLES = { round: "gamePanelRound", stats: "gamePanelStats" }
+// Day / Week / Month / Year は一旦お休み（データ画面は Games と Analysis だけ）
 const DATA_TAB_TOGGLES = {
-  analysis: "tabToggleAnalysis",
-  day: "tabToggleDay",
-  week: "tabToggleWeek",
-  month: "tabToggleMonth",
-  year: "tabToggleYear"
+  analysis: "tabToggleAnalysis"
 }
 
 // 保存されていない項目は表示（true）として扱う

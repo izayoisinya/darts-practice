@@ -2889,7 +2889,7 @@ body.page-data.data-hub-open main.data-container {
 /* 見る画面のカード */
 .data-hub-views {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 
   max-width: 1100px;
@@ -2961,10 +2961,140 @@ body.page-data.data-hub-open main.data-container {
   color: rgb(230 237 243 / 0.72);
 }
 
-/* 最近のゲーム */
-.data-hub-recent {
+/* カレンダーと最近のゲーム（横向きは左右に並べる） */
+.data-hub-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+
   max-width: 1100px;
   margin: 22px auto 0;
+}
+
+.landscape .data-hub-bottom,
+.desktop .data-hub-bottom {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.data-hub-calendar {
+  padding: 14px 16px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(165deg, #151922 0%, #10141d 100%);
+}
+
+.data-hub-cal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.data-hub-cal-top .data-hub-section-title {
+  margin: 0;
+}
+
+.data-hub-cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.data-hub-cal-nav button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.data-hub-cal-title {
+  min-width: 70px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-hub-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.data-hub-cal-head {
+  padding: 2px 0 4px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.data-hub-cal-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.data-hub-cal-day.empty {
+  background: none;
+}
+
+.data-hub-cal-num {
+  font-size: 13px;
+  color: rgb(230 237 243 / 0.55);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 練習した日（ゲーム数が多い日は濃く） */
+.data-hub-cal-day.played {
+  background: rgb(var(--accent-rgb) / 0.18);
+  box-shadow: inset 0 0 0 1px rgb(var(--accent-rgb) / 0.4);
+}
+
+.data-hub-cal-day.played.many {
+  background: rgb(var(--accent-rgb) / 0.34);
+}
+
+.data-hub-cal-day.played .data-hub-cal-num {
+  color: #effffb;
+  font-weight: 700;
+}
+
+.data-hub-cal-count {
+  font-size: 10px;
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.data-hub-cal-day.today {
+  outline: 1px solid rgba(255, 255, 255, 0.5);
+  outline-offset: -1px;
+}
+
+.data-hub-cal-sum {
+  margin: 8px 0 0;
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.phone .data-hub-cal-day {
+  height: 34px;
+}
+
+/* 最近のゲーム */
+.data-hub-recent {
+  min-width: 0;
 }
 
 .data-hub-section-title {
@@ -3104,7 +3234,7 @@ body.page-data.data-hub-open main.data-container {
 }
 
 .phone.landscape .data-hub-views {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .phone.landscape .data-hub-card {

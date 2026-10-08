@@ -228,7 +228,9 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
   - Count-Up：Games・Avg Score・Avg PPD・Best Score・Last Played
   - 01：Games・Finish Rate・Avg Darts・Best Darts・Last Played
   - Cricket：Games・Avg MPR・Best MPR・Close Rate・Last Played
-- その下に、見る画面のカード（Games・Analysis・Day・Week・Month・Year。何が見られるかの説明と件数）。Count-Up は設定画面の Data Tabs で隠した画面のカードは出さない。01・クリケットは Games だけ（Analysis などは今は Count-Up だけを集計している）
+- その下に、見る画面のカード（Games・Analysis の 2 つ。何が見られるかの説明と件数）。Count-Up は設定画面の Data Tabs で Analysis を隠したらカードも出さない。01・クリケットは Games だけ（Analysis は今は Count-Up だけを集計している）
+- Calendar：選んでいるゲームを練習した日に印を付け、その日のゲーム数を小さく出す（5 ゲーム以上は濃く。今日は白い枠）。今は見るだけ（日付を押しても何もしない）。‹ › で月を切り替え、最初は最後に遊んだ月。下にその月の日数・ゲーム数（`renderDataHubCalendar()`）。横向きは Recent Games と左右に並べる
+- **Day / Week / Month / Year は一旦お休み**（2026.10.8。データ画面を Games と Analysis の 2 つに絞り、日付はトップのカレンダーで見る）。フッターのタブ・トップのカード・設定の Data Tabs から外したが、コード（`data_grouped.js` / `data_detail.js`）は残してあり、`data.js` の `DATA_VIEW_TABS` に足せば戻せる
 - Recent Games：最近の 5 ゲーム（日時・説明・主な数字）。押すと Games の画面を開く
 - カードを押すとその画面を開き（`openDataView()`）、ヘッダーの左に「‹ Top」を出してトップに戻れるようにする（`backToDataHub()`）。画面を開くときに履歴を 1 つ足すので、端末・ブラウザの「戻る」でもトップに戻る（Day の詳細ビューを開いているときは、まず詳細を閉じる）
 - ヘッダーでゲームを切り替えると、トップの中身を描き直す（`setDataGameType()` を包む）
@@ -241,11 +243,11 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 | --- | --- | --- |
 | Game | 1 ゲームずつのカード（スコア・PPD・ラウンド平均・ブル・トリプル数・ラウンドスコアのグラフ・アワード） | 全体の Stats・Awards、直近 30 ゲームのスコア推移、レーティング目安 |
 | Analysis | （使わない。Stats パネルを 1 列で画面幅いっぱいに表示） | ヒートマップ（刺さった位置の多いところをボードの図の上に色の濃さで表示。期間 All / 30 Days / 7 Days / Today、よく刺さった場所の上位 8 か所の割合）、タグ別の散布図（全ゲームのスコアを日付順に点で描き、その日のメモのタグで色分け。タグのボタンで選んだタグの日だけ色付き）、期間 A/B の比較グラフ |
-| Day / Week / Month / Year | 期間ごとのまとめ（平均スコア・平均 PPD・ブル数）、メモボタン | カレンダー（練習した日に印）、タグ集計 |
+| Day / Week / Month / Year（一旦お休み） | 期間ごとのまとめ（平均スコア・平均 PPD・ブル数）、メモボタン | カレンダー（練習した日に印）、タグ集計 |
 
 ![データ表示画面 Day ビュー（タブレット横）](images/data_day_tablet.jpg)
 
-- 下部のタブは設定画面の Data Tabs で Analysis / Day / Week / Month / Year を表示・非表示にできる（Game は常に表示）。隠したタブが選ばれていたら Game に戻す
+- 下部のタブは Game と Analysis。設定画面の Data Tabs で Analysis を表示・非表示にできる（Game は常に表示）。隠したタブが選ばれていたら Game に戻す
 - Analysis タブと Data Tabs の設定は、2026.4 に develop ブランチで作った機能を 2026.10.6 に今の main へ移植した。期間 A/B の比較グラフは Game から Analysis へ移した（develop での配置に合わせた）
 - Day のカードを選ぶと、その日のゲーム一覧（詳細ビュー）を表示する。詳細ビューではその日のブル率や、他の日との比較グラフを表示できる
 - **Memo**：日ごとにコメント・タグ・セッティング画像を保存できる。タグは絞り込みや比較に使う
@@ -303,7 +305,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 | GAME | Rounds | 8 / 10 / 15 を選べるが保存されず、ゲームは 8 ラウンド固定。01・クリケット実装時に調整予定 |
 | DISPLAY | Screen Orientation | 画面の向きの固定（Free / Portrait Lock / Landscape Lock）。ブラウザによっては効かない |
 | DISPLAY | Game Panels | カウントアップ画面に表示するエリア（Rounds / Stats）。Input は常に表示 |
-| DISPLAY | Data Tabs | データ画面の下に表示するタブ（Analysis / Day / Week / Month / Year）。Game は常に表示 |
+| DISPLAY | Data Tabs | データ画面に Analysis を表示するか（Day / Week / Month / Year は一旦お休みで外した）。Games は常に表示 |
 | データ保存状況 | — | 保存ゲーム数、保存先（IndexedDB / LocalStorage）、使用容量・上限の概算 |
 | データのバックアップ | 書き出し / 読み込み | ゲームの記録と日別メモを JSON ファイルに書き出す・読み込む（詳細は 6.6） |
 
@@ -1023,3 +1025,4 @@ graph LR
 | 2026.10.8 | 設定画面の Layout Preview から DATA のタブの図を外し、横向きでは横幅いっぱいではなく左の列（半分の幅）に置いて、右の欄をスクロールしている間も上に止めて見せるようにした |
 | 2026.10.8 | 設定画面の並びを変更。Layout Preview の右に Display（Game Panels）、下に Game を置き、プレビューを止める指定（sticky）はやめた |
 | 2026.10.8 | お知らせ画面（Info）のタブ（すべて / 更新情報 / お知らせ / 更新予定）を、スクロールしても上に残るようにした。スマホでも縦に積まず横 1 列にした |
+| 2026.10.8 | データ画面を Games と Analysis の 2 つに絞った。Day / Week / Month / Year は一旦お休み（フッターのタブ・トップのカード・設定の Data Tabs から外す。コードは残す）にし、日付はトップに練習した日のカレンダー（見るだけ。月の切り替えあり）を出すようにした |

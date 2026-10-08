@@ -204,6 +204,11 @@ const INFO_CONTENT = {
       date: "2026/10/08",
       badge: "機能追加",
       text: "データ画面の Day / Week / Month / Year のカードに Avg Range（ゲームごとの RANGE の平均）を追加しました。ブルモードがセパレートのゲームは平均に含めません。"
+    },
+    {
+      date: "2026/10/08",
+      badge: "機能追加",
+      text: "データ画面の 01 の Stats に Daily Range（日ごとの RANGE の平均）を追加しました。ブルモードがセパレートのゲームは含めません。"
     }
   ],
   notice: [

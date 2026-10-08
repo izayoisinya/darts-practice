@@ -230,6 +230,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
   - Awards（`.data-card`）
   - Bull / Triple：全投数に対するブル（アウター＋インナー）・インナーブル（金）・トリプル（青）の本数と割合（1 投ごとの記録 `darts` から数える。カウントアップの詳細の Bull Rate と同じ部品。`renderZeroOneHitRates()`）
   - RANGE（目安）：カウントアップの Analysis と同じ出し方（位置から・ブル率から・8 割の円）。01 は上がりでダブルなどを狙うので、80% スタッツと同じ範囲（最初の点数の 80% を減らしたラウンドまで＝ブルを狙う場面）の投だけで出す（`getZeroOne80Darts()` / `renderZeroOneRange()`）。履歴カードのヒートマップ（`createSessionHeatmapHtml(session, true, getZeroOne80Points(session))`）とゲーム画面のレーダー（cu_ui.js の `getZeroOneBullPhasePoints()`）も同じ範囲で RANGE を出す
+  - Daily Range：直近 10 日の、日ごとの RANGE の平均（ゲームごとの RANGE の平均。`getAverageRange()` を使うので、ブルモードがセパレートのゲームと位置の記録がないゲームは含めない）を棒で出す（`renderZeroOneDailyRange()`）
   - Darts to Finish：直近 30 ゲームの上がるまでのダーツ数の推移（最少は金色）。上がれなかったゲームは上の段に赤い ×
   - レーティング参考値（カウントアップと同じカード）：直近 30 ゲームの **80% スタッツ**（1 ゲームごとに、最初の点数の 80% を減らしたラウンドまでの 1 ラウンドの平均点。バストは 0 点）の平均を PPR として出し、PPD（÷ 3）を `rating.js` の換算表で DARTSLIVE / PHOENIX の目安にする（`getZeroOneStats80()` / `renderZeroOneRating()`）
   - Finish Numbers：上がったゲームの最後の 1 投（`darts` の最後の記録）の場所ごとの割合（上位 10 か所。バーの長さは全体に対する割合。`renderZeroOneFinishNumbers()`）
@@ -936,3 +937,4 @@ graph LR
 | 2026.10.8 | レンジを DARTSLIVE の RANGE（直径 mm）に近い目安に変更（ばらつき σ の 2 倍の直径。ブル率からの推定も）。設定に Board Size（Soft 15.5 インチ / Steel 13.2 インチ）を追加し、mm の換算に使う |
 | 2026.10.8 | 01 にも RANGE の目安を追加（データ画面の Stats・履歴カードのヒートマップ・ゲーム画面のレーダー）。上がりのダブル狙いを除くため、最初の点数の 80% を減らすまでの投だけで出す |
 | 2026.10.8 | データ画面のグループビュー（Day / Week / Month / Year）のカードに Avg Range（ゲームごとの RANGE の平均）を追加。ブルモードがセパレートのゲームは含めない。そのためゲームの記録にブルモード（`bm`）を保存するようにした |
+| 2026.10.8 | データ画面の 01 の Stats に Daily Range（直近 10 日の日ごとの RANGE の平均）を追加。ブルモードがセパレートのゲームは含めない |

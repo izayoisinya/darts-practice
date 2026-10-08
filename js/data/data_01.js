@@ -163,6 +163,7 @@ function renderZeroOneData() {
     </section>
     ${renderZeroOneHitRates(list)}
     ${renderZeroOneRange(list)}
+    ${renderZeroOneDailyRange(list)}
     <section class="data-summary-section">
       <h3 class="data-section-title">Darts to Finish (Last ${DATA_01_CHART_GAMES} Games)</h3>
       <canvas id="z1Chart" class="z1-chart"></canvas>
@@ -686,6 +687,47 @@ function renderZeroOneRange(list) {
         </div>
         <p class="heatmap-range-note">最初の点数の 80% を減らすまで（ブルを狙う場面）の ${darts.length} 投から出した、DARTSLIVE の RANGE（ブルのまわりのまとまりの直径）に近い目安です。上がりのためにダブルなどを狙った投は入れていません。</p>
       </div>
+    </section>
+  `
+}
+
+// 日ごとの RANGE の平均（ゲームごとの RANGE の平均。heatmap.js の getAverageRange()：ブルモードがセパレートのゲームは除く）
+const DATA_01_RANGE_DAYS = 10
+
+function renderZeroOneDailyRange(list) {
+
+  if (typeof getAverageRange !== "function") return ""
+
+  const days = {}
+  list.forEach(session => {
+    const key = getLocalDateKey(new Date(session.date))
+    ;(days[key] = days[key] || []).push(session)
+  })
+
+  const rows = Object.keys(days)
+    .sort((a, b) => b.localeCompare(a))
+    .map(key => ({ key, range: getAverageRange(days[key]) }))
+    .filter(row => row.range)
+    .slice(0, DATA_01_RANGE_DAYS)
+
+  if (!rows.length) return ""
+
+  const max = Math.max(...rows.map(row => row.range.avg))
+
+  return `
+    <section class="data-summary-section">
+      <h3 class="data-section-title">Daily Range（直近 ${rows.length} 日）</h3>
+      <div class="z1-bars">
+        ${rows.map(({ key, range }) => `
+          <div class="z1-bar-row">
+            <span class="z1-bar-name">${key.slice(5).replace("-", "/")}</span>
+            <span class="z1-bar"><span style="width:${(range.avg / max * 100).toFixed(1)}%"></span></span>
+            <span class="z1-bar-rate">${range.avg.toFixed(1)}mm</span>
+            <span class="z1-bar-count">${range.games}G</span>
+          </div>
+        `).join("")}
+      </div>
+      <p class="z1-note">その日のゲームごとの RANGE（ブルを狙う場面の投から）の平均。小さいほどまとまっています。ブルモードがセパレートのゲームと、位置の記録がないゲームは含めません。</p>
     </section>
   `
 }

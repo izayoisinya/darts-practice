@@ -573,10 +573,10 @@ function renderGameHeatmap(size) {
 
   const count = document.getElementById("gameHeatmapCount")
   if (count) {
-    // カウントアップ（ブルを狙う）のときは、中心からの距離（半分の投が入る円の半径）も出す
+    // カウントアップ（ブルを狙う）のときは、RANGE の目安（中心のまわりのまとまりの直径。heatmap.js の getRangeStats()）も出す
     const range = GAME_TYPE === "countup" && typeof getRangeStats === "function" ? getRangeStats(points) : null
     count.textContent = `${points.length} HIT${points.length === 1 ? "" : "S"}` +
-      (range ? ` · R50 ${range.r50Mm.toFixed(0)}mm` : "")
+      (range ? ` · RANGE ${range.rangeMm.toFixed(0)}mm` : "")
   }
 
   paintRadarHeatmap(ctx, size, size, points, highlight, getAccentRgb())

@@ -4,6 +4,7 @@ const DEFAULT_SETTINGS = {
   bullMode: "fat",
   inputMode: "board",
   boardZoomReset: "manual",
+  boardSize: "soft",
   boardUndoButton: false,
   undoSwipeDirection: "left",
   orientationMode: "auto",
@@ -69,6 +70,10 @@ function loadSettings() {
   if (inputModeSelect) {
     inputModeSelect.value = settings.inputMode === "buttons" ? "buttons" : "board"
   }
+  const boardSizeSelect = document.getElementById("boardSizeSetting")
+  if (boardSizeSelect) {
+    boardSizeSelect.value = settings.boardSize === "steel" ? "steel" : "soft"
+  }
   const boardZoomSelect = document.getElementById("boardZoomResetSetting")
   if (boardZoomSelect) {
     boardZoomSelect.value = settings.boardZoomReset === "round" ? "round" : "manual"
@@ -102,6 +107,7 @@ function saveSettings() {
     bullMode: document.getElementById("bullModeSetting").value,
     inputMode: document.getElementById("inputModeSetting")?.value || "board",
     boardZoomReset: document.getElementById("boardZoomResetSetting")?.value || "manual",
+    boardSize: document.getElementById("boardSizeSetting")?.value || "soft",
     boardUndoButton: !!document.getElementById("boardUndoButtonSetting")?.checked,
     undoSwipeDirection: document.getElementById("undoSwipeSetting")?.value || "left",
     orientationMode: document.getElementById("orientationSetting")?.value || "auto",
@@ -513,7 +519,7 @@ async function initSettingsPage() {
   if (inputModeSelect) {
     inputModeSelect.addEventListener("change", saveSettings)
   }
-  ["boardZoomResetSetting", "boardUndoButtonSetting", "undoSwipeSetting"].forEach(id => {
+  ["boardZoomResetSetting", "boardSizeSetting", "boardUndoButtonSetting", "undoSwipeSetting"].forEach(id => {
     const input = document.getElementById(id)
     if (input) input.addEventListener("change", saveSettings)
   })

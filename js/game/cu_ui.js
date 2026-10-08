@@ -442,6 +442,8 @@ function createNumberTable() {
   
   if (useBoard) {
     renderBoardInput(table);
+    // クリケット：作り直したボードにも、数字ごとの暗転（クリケットの数字以外・クローズした数字）を付け直す
+    renderCricketBoard();
     renderGameSidePanels();
     return;
   }

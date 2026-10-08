@@ -42,41 +42,73 @@
     </header>
 
     <main class="menu-container">
-      <!-- 左列：ゲームと操作 -->
+      <!-- 左列：ゲーム（CountUp / 01 / Cricket を同じ大きさで並べる）と操作 -->
       <div class="menu-col menu-col-main">
-      <section class="hero-panel">
-        <p class="section-label">Main Game</p>
-        <button class="hero-btn" onclick="location.href = 'countup.html'">
-          <span class="btn-title">CountUp</span>
-          <span class="btn-sub">Classic score attack</span>
-          <div class="hero-metrics" aria-label="CountUp summary">
-            <div class="hero-metric">
-              <span class="metric-label">Avg Score</span>
-              <span class="metric-value" id="menuAvgScore">-</span>
-            </div>
-            <div class="hero-metric">
-              <span class="metric-label">Round Avg</span>
-              <span class="metric-value" id="menuRoundAvg">-</span>
-            </div>
-            <div class="hero-metric">
-              <span class="metric-label">Games</span>
-              <span class="metric-value" id="menuGamesPlayed">0</span>
-            </div>
-          </div>
-        </button>
-      </section>
-
-      <div class="menu-sub">
-      <section class="future-panel">
-        <p class="section-label">Next</p>
-        <div class="coming-grid">
-          <button type="button" class="coming-card playable" data-link="countup.html?game=01">
-            <span class="coming-title">01</span>
-            <span class="coming-tag">Play</span>
+      <section class="games-panel">
+        <p class="section-label">Games</p>
+        <!-- 各ゲームのカード。数字はそのゲームの記録のまとめ（main.js の initMenuSummary()） -->
+        <div class="game-list">
+          <button type="button" class="game-card game-countup" data-link="countup.html">
+            <span class="game-card-head">
+              <span class="btn-title">CountUp</span>
+              <span class="btn-sub">8 rounds score attack</span>
+            </span>
+            <span class="hero-metrics" aria-label="CountUp summary">
+              <span class="hero-metric">
+                <span class="metric-label">Avg Score</span>
+                <span class="metric-value" id="menuAvgScore">-</span>
+              </span>
+              <span class="hero-metric">
+                <span class="metric-label">Round Avg</span>
+                <span class="metric-value" id="menuRoundAvg">-</span>
+              </span>
+              <span class="hero-metric">
+                <span class="metric-label">Games</span>
+                <span class="metric-value" id="menuGamesPlayed">0</span>
+              </span>
+            </span>
           </button>
-          <button type="button" class="coming-card playable" data-link="countup.html?game=cricket">
-            <span class="coming-title">Cricket</span>
-            <span class="coming-tag">Play</span>
+
+          <button type="button" class="game-card game-01" data-link="countup.html?game=01">
+            <span class="game-card-head">
+              <span class="btn-title">01</span>
+              <span class="btn-sub">301 – 1501 finish practice</span>
+            </span>
+            <span class="hero-metrics" aria-label="01 summary">
+              <span class="hero-metric">
+                <span class="metric-label">Finish</span>
+                <span class="metric-value" id="menu01Rate">-</span>
+              </span>
+              <span class="hero-metric">
+                <span class="metric-label">Avg Darts</span>
+                <span class="metric-value" id="menu01Darts">-</span>
+              </span>
+              <span class="hero-metric">
+                <span class="metric-label">Games</span>
+                <span class="metric-value" id="menu01Games">0</span>
+              </span>
+            </span>
+          </button>
+
+          <button type="button" class="game-card game-cricket" data-link="countup.html?game=cricket">
+            <span class="game-card-head">
+              <span class="btn-title">Cricket</span>
+              <span class="btn-sub">Close 20 – 15 &amp; Bull</span>
+            </span>
+            <span class="hero-metrics" aria-label="Cricket summary">
+              <span class="hero-metric">
+                <span class="metric-label">Avg MPR</span>
+                <span class="metric-value" id="menuCricketMpr">-</span>
+              </span>
+              <span class="hero-metric">
+                <span class="metric-label">Close</span>
+                <span class="metric-value" id="menuCricketClose">-</span>
+              </span>
+              <span class="hero-metric">
+                <span class="metric-label">Games</span>
+                <span class="metric-value" id="menuCricketGames">0</span>
+              </span>
+            </span>
           </button>
         </div>
       </section>
@@ -89,7 +121,6 @@
           <button onclick="location.href = 'news.html'">Info</button>
         </div>
       </section>
-      </div>
       </div>
 
       <!-- 右列：更新情報とお知らせ -->

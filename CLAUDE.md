@@ -33,7 +33,7 @@
 
 ```
 index.html      メインメニュー（ゲーム選択 / Data / Settings / Info）
-countup.html    COUNT-UP ゲーム画面（Rounds / Input / Stats の 3 エリア）。?game=01 で 01（同じ画面を GAME_TYPE で切り替え）
+countup.html    COUNT-UP ゲーム画面（Rounds / Input / Stats の 3 エリア）。?game=01 で 01、?game=cricket でクリケット（同じ画面を GAME_TYPE で切り替え）
 data.html       スコア記録データの表示（Statistics）
 settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、ボードの大きさ: soft / steel、表示エリア・データタブの表示/非表示、画面向き、ストレージ状況）
 news.html       お知らせ
@@ -53,6 +53,7 @@ manifest.json   PWA マニフェスト
 | game/ | game_core.js | ゲーム共通ロジック（次ゲーム、Undo、終了判定、リセット）。UI 生成は含まない |
 | game/ | game_countup.js | COUNT-UP 固有ロジック（`initGame()`, `addDart()`）。UI 生成は含まない。01 もこの流れを使う |
 | game/ | game_01.js | 01 のルール（バスト・上がり・残りの計算 `computeZeroOne()`、次に入れる場所 `syncZeroOnePosition()`、設定、上がり率の集計）。UI 生成は含まない |
+| game/ | game_cricket.js | クリケットのルール（マーク・点・クローズの計算 `computeCricket()`、MPR、アワード、設定、成績の集計、保存する履歴 `createCricketSession()`）。UI 生成は含まない。次に入れる場所は 01 と共通の `game_core.js` の `syncPositionFromState()` |
 | game/ | cu_ui.js | COUNT-UP の UI 生成・DOM 操作 |
 | game/ | board_input.js | ボード形式の入力（ダーツボードの SVG 生成・タップ位置の判定）。設定 `inputMode` が `"board"` のとき `createNumberTable()` から使う |
 | game/ | stats.js | スタッツ・アワード計算。**UI 表示・DOM 操作は含まない**（再利用できる形にする） |
@@ -61,7 +62,8 @@ manifest.json   PWA マニフェスト
 | data/ | data_grouped.js | Day/Week/Month/Year のグループビュー、日別メモ・タグ |
 | data/ | data_detail.js | グループ内のゲーム一覧（詳細ビュー）、カレンダー、比較 |
 | data/ | heatmap.js | Analysis タブのヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
-| data/ | data_01.js | データ画面の Count-Up / 01 の切り替えと、01 の記録の表示（設定ごとの上がり率・上がるまでのダーツ数・推移・一覧） |
+| data/ | data_01.js | データ画面の Count-Up / 01 / Cricket の切り替えと、01 の記録の表示（設定ごとの上がり率・上がるまでのダーツ数・推移・一覧） |
+| data/ | data_cricket.js | データ画面のクリケットの記録の表示（MPR・クローズ率・推移・数字ごとのマーク・一覧） |
 | data/ | rating.js | PPD から DARTSLIVE / PHOENIX のレーティング目安を算出 |
 | ui/ | chart.js | ゲーム画面のグラフ描画のみ（計算は stats.js 側） |
 | ui/ | settings.js | 設定画面のロジック |
@@ -72,7 +74,7 @@ manifest.json   PWA マニフェスト
 ### CSS（`css/`）
 
 - `base.css`（全体の基礎）、`theme.css`（色などのデザイン。CSS 変数 `--accent` など）
-- `layout/lay_*.css`：ゲーム画面の各エリア（core / header / round / input / stats）、サイドメニュー（menu）、データ画面（data）
+- `layout/lay_*.css`：ゲーム画面の各エリア（core / header / round / input / stats）、クリケットだけで使うもの（cricket。`.cricket-only` / `.no-cricket`）、サイドメニュー（menu）、データ画面（data）
 - `responsive/phone.css` / `tablet.css` / `desktop.css`：端末別レイアウト
 - `menu.css`（メインメニュー）、`news.css`（お知らせ）
 
@@ -81,15 +83,16 @@ manifest.json   PWA マニフェスト
 | キー | 保存先 | 内容 |
 | --- | --- | --- |
 | `dartsPracticeDB` / store `app` / key `sessions` | IndexedDB | 終了したゲームの履歴。使えない環境では LocalStorage `dartsSessionsV2` にフォールバック（旧形式 `dartsSessions` から移行） |
-| `dartsPractice` / `dartsPractice01` | LocalStorage | 進行中ゲームの状態（カウントアップ / 01。`saveGame()` / `loadGame()`。キーは `SAVE_KEY`） |
+| `dartsPractice` / `dartsPractice01` / `dartsPracticeCricket` | LocalStorage | 進行中ゲームの状態（カウントアップ / 01 / クリケット。`saveGame()` / `loadGame()`。キーは `SAVE_KEY`） |
 | `dartsZeroOne` | LocalStorage | 01 の設定（点数・上がり方・ラウンドの上限） |
+| `dartsCricket` | LocalStorage | クリケットの設定（ラウンドの上限） |
 | `dartsSettings` | LocalStorage | 設定 |
 | `dartsDayNotesV2` | LocalStorage | 日別メモ（コメント・タグ・画像） |
-| `dartsDataGame` | LocalStorage | データ画面で最後に見ていたゲーム（`"countup"` / `"01"`） |
+| `dartsDataGame` | LocalStorage | データ画面で最後に見ていたゲーム（`"countup"` / `"01"` / `"cricket"`） |
 
 - セッションは保存時に短縮キーへシリアライズされる（`serializeSessionForStorage()`：`d` date, `s` score, `p` ppd, `r` roundScores, `a` awards 配列, `dt` 1 投ごとの記録（刺さった場所・ボード入力の位置）, `bm` ブルモード（セパレートのときだけ 1）など）。アプリ内では `normalizeSessionForApp()` の形で扱う
 - フィールドを追加するときは serialize / deserialize / normalize の 3 箇所を揃え、**既存ユーザーの保存データを壊さない**（欠損時のデフォルト値を用意する）
-- `gameType` は `"countup"` / `"01"`。01 の結果は `zeroOne`（保存時 `z`）。データ画面のカウントアップの表示は `readDataSessions()`（カウントアップだけ）、01 は `data_01.js` が別の画面で出す
+- `gameType` は `"countup"` / `"01"` / `"cricket"`。01 の結果は `zeroOne`（保存時 `z`）、クリケットは `cricket`（保存時 `c`。履歴の `roundAvg` は MPR、`roundScores` はマーク数）。データ画面のカウントアップの表示は `readDataSessions()`（カウントアップだけ）、01 は `data_01.js`、クリケットは `data_cricket.js` が別の画面で出す
 - 保存するデータを増やしたら、バックアップ（`backup.js` の書き出し・読み込み）にも含めるか検討する。ファイル形式を変えるときは `BACKUP_VERSION` を上げ、古い形式も読めるようにする
 
 ## Service Worker の注意
@@ -100,7 +103,7 @@ manifest.json   PWA マニフェスト
 
 ## 今後の予定
 
-- ゲーム追加：Cricket、Half-it、Shoot-out（メニュー・サイドメニューに `Coming Soon` のボタンあり）、プロテストモード（内容は未定）
+- ゲーム追加：Half-it、Shoot-out、プロテストモード（内容は未定）
 - 機能追加：高度な分析機能、将来的にはユーザーアカウント・オンライン対戦・AI 対戦
 - ダーツボード形式の入力：入力パネルをボード（SVG）にし、設定画面でボタン形式と切り替え（実装済み。`board_input.js`）。最終目標は刺さった位置（座標）を保存して分析すること。詳細は `docs/design.md` の「11. 今後の拡張予定」
 - カメラからの自動入力（入力の最終形）：カメラ映像を表示し 20・6・3・11 の 4 点でキャリブレーション。映像を見張って撮影ボタンなしで 3 投を自動判定し、だめなときは撮影ボタン、外れたときはボード形式の入力で修正。位置はセグメント内 6 分割程度の粗さで十分、保存は座標で行い区画分けは分析時に決める。詳細は `docs/design.md` の「11. 今後の拡張予定」

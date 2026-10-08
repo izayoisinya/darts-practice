@@ -118,7 +118,7 @@ const SIDE_MENU_GROUPS = [
     items: [
       { label: "CountUp", link: "countup.html" },
       { label: "01", link: "countup.html?game=01" },
-      { label: "Cricket", soon: true }
+      { label: "Cricket", link: "countup.html?game=cricket" }
     ]
   },
   {
@@ -132,17 +132,17 @@ const SIDE_MENU_GROUPS = [
   {
     // 進行中のゲームの操作（カウントアップ画面だけ）
     title: "This Game",
-    pages: ["countup.html", "countup.html?game=01"],
+    pages: ["countup.html", "countup.html?game=01", "countup.html?game=cricket"],
     items: [
       { label: "Reset Game", action: "forceResetGame", danger: true }
     ]
   }
 ]
 
-// 今の画面（01 は countup.html?game=01 として区別する）
+// 今の画面（01 は countup.html?game=01、クリケットは countup.html?game=cricket として区別する）
 function getCurrentPageName() {
   const name = location.pathname.split("/").pop() || "index.html"
-  return typeof GAME_TYPE !== "undefined" && GAME_TYPE === "01" ? `${name}?game=01` : name
+  return typeof GAME_TYPE !== "undefined" && GAME_TYPE !== "countup" ? `${name}?game=${GAME_TYPE}` : name
 }
 
 function renderSideMenuItem(item, page) {

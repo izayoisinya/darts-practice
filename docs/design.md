@@ -33,7 +33,7 @@
 
 本アプリは、ダーツ技術の向上のために、ダーツを家で投げる際の練習を補助し、データを分析することを目的とする。DARTSLIVE などの対戦中心のアプリではなく、練習分析に特化したツールとする。最終的にはアプリケーションとして一般公開を視野に開発する。
 
-現在は、メイン画面・カウントアップ画面・データ表示画面・設定画面・お知らせ画面の 5 画面で構成されている。ゲームの種類はカウントアップのみであるが、今後 01・クリケットをはじめ、ハーフイット・シュートアウトなどのゲームも実装を予定している。
+現在は、メイン画面・カウントアップ画面・データ表示画面・設定画面・お知らせ画面の 5 画面で構成されている。ゲームの種類はカウントアップ・01・クリケットで、今後ハーフイット・シュートアウトなどのゲームも実装を予定している。
 
 基本的には iPad Pro 11inch の横画面表示での使用を想定しているが、一般公開した場合はスマートフォンで使用するユーザーが多いと考えられる。そのため、各端末での動作テストも行いながら開発する。
 
@@ -86,7 +86,7 @@ GitHub 上のリポジトリ（`izayoisinya/darts-practice`）を iPad 及びタ
 | `settings.html` | 設定画面 |
 | `news.html` | お知らせ画面 |
 
-メイン画面以外では、画面右端の細い帯（幅 10px）をタップするか、画面の右端から 48px 以内（Android は OS の「戻る」ジェスチャーが端を使うため 96px 以内）で触れて左へスワイプするとサイドメニューが右から横にすべって出てきて、各画面へ遷移できる。メニューを右へスワイプするか、外側をタップすると閉じる。スワイプ中はメニューが指に合わせて動き、離したときに半分以上（または素早く）動かしていれば開閉する（`main.js` の `setupSideMenu()` / `setSideMenuOpen()`、`lay_menu.css`）。メニューの中身は、ステータスバー・ホームバー・横向きの丸い角に重ならないよう安全領域の分だけ内側に寄せる。中身は全画面共通で、`core.js` の `renderSideMenu()` が `SIDE_MENU_GROUPS` から作る（各 HTML には空の `<div id="sideMenu">` だけを置く。`initApp()` の最初に呼ぶ）。ボタンは Main Menu の下にグループ（`.menu-group`）で分ける：Game（CountUp と Coming Soon の 01・Cricket）、Utility（Data・Settings・Info）、カウントアップ画面だけ This Game（Reset Game。赤系の色）。今いる画面のボタンは色を変え（`.current`）、押すと画面を開き直さずメニューを閉じる。スワイプは document 全体で受けるので、ボードなどの上から始めても開ける。データ画面の History / Stats の切り替えスワイプは、この範囲から始めたときは行わない（`isSideMenuSwipeStart()` / `getSideMenuSwipeZone()`）。
+メイン画面以外では、画面右端の細い帯（幅 10px）をタップするか、画面の右端から 48px 以内（Android は OS の「戻る」ジェスチャーが端を使うため 96px 以内）で触れて左へスワイプするとサイドメニューが右から横にすべって出てきて、各画面へ遷移できる。メニューを右へスワイプするか、外側をタップすると閉じる。スワイプ中はメニューが指に合わせて動き、離したときに半分以上（または素早く）動かしていれば開閉する（`main.js` の `setupSideMenu()` / `setSideMenuOpen()`、`lay_menu.css`）。メニューの中身は、ステータスバー・ホームバー・横向きの丸い角に重ならないよう安全領域の分だけ内側に寄せる。中身は全画面共通で、`core.js` の `renderSideMenu()` が `SIDE_MENU_GROUPS` から作る（各 HTML には空の `<div id="sideMenu">` だけを置く。`initApp()` の最初に呼ぶ）。ボタンは Main Menu の下にグループ（`.menu-group`）で分ける：Game（CountUp・01・Cricket）、Utility（Data・Settings・Info）、カウントアップ画面だけ This Game（Reset Game。赤系の色）。今いる画面のボタンは色を変え（`.current`）、押すと画面を開き直さずメニューを閉じる。スワイプは document 全体で受けるので、ボードなどの上から始めても開ける。データ画面の History / Stats の切り替えスワイプは、この範囲から始めたときは行わない（`isSideMenuSwipeStart()` / `getSideMenuSwipeZone()`）。
 
 **画面の左右の余白**：ゲーム・データ・設定・お知らせの各画面のヘッダーと中身の左右の余白は、`base.css` の `--gutter-left` / `--gutter-right`（`--gutter`：スマホ 12px、それ以外 20px に、その側の安全領域を足したもの）で左右同じにそろえる。以前はサイドメニューの帯の分だけ右を広く空けていたが、帯を余白より細くしたので不要になった。
 
@@ -101,7 +101,7 @@ GitHub 上のリポジトリ（`izayoisinya/darts-practice`）を iPad 及びタ
 | ブロック | 内容 |
 | --- | --- |
 | MAIN GAME | カウントアップ。平均スコア・平均ラウンドスコア・ゲーム数のサマリーを表示 |
-| NEXT | 01・Cricket（Coming Soon で押せない） |
+| NEXT | 01・Cricket（押すとそのゲームを始める） |
 | UTILITY | Data・Settings・Info への遷移ボタン |
 | 更新情報 / お知らせ | `news.js` の `INFO_CONTENT` の内容を表示 |
 
@@ -193,6 +193,29 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 - **集計**：PPD・平均・最高は、バストのラウンドを 0 点として計算する（実際に減らした点 ÷ 投げた本数）。アワードはカウントアップと同じ判定
 - データ画面はヘッダーの Count-Up / 01 で切り替える（4.3）。カウントアップの表示（`readDataSessions()`）には 01 の記録を混ぜない
 
+### 4.2.2 クリケット（countup.html?game=cricket）
+
+クリケット（1 人で練習するスタンダードクリケット）も 01 と同じく `countup.html` を `?game=cricket` で開き、画面・入力・戻る・ヘッダーの数字の削除・ボードの横のパネルを共用する（`body` に `game-cricket`）。
+
+- **設定**：ラウンドの上限（R10 / R15 / R20。初期値 R15）。01 と同じ設定の画面を使い、点数・上がり方の欄は隠す。LocalStorage の `dartsCricket` に残す
+- **ルール**（`game_cricket.js`）：
+  - 狙うのは 20〜15 とブル。シングル 1・ダブル 2・トリプル 3 マーク、アウターブル 1・インナーブル 2 マーク（ブルモードに関係なく）。それ以外の数字・ミスは 0 マーク
+  - 3 マークでその数字はクローズ。1 人なので、クローズしたあとのマークは点になる（数字 × マーク。ブルは 1 マーク 25 点）
+  - 7 つ全部クローズしたらその 1 投で終わり（そのラウンドの残りの投は無効。`syncPositionFromState()`）。ラウンドの上限まで終わってもクローズできなければそこで終わり
+  - **MPR**（1 ラウンドあたりのマーク数）＝ マークの合計 ÷ 投げた本数 × 3。1 人なので入れたマークを全部数える
+  - 1 投ごとの記録（`game.rounds`）は同じ形で持ち、マーク・点・クローズは毎回そこから計算し直す（`computeCricket()`）
+- **アワード**（1 ラウンドに 1 つ、上ほど優先）：3 in the Black（インブル 3 本）、Hat Trick（ブル 3 本）、3 in the Bed（同じ数字のトリプル 3 本）、White Horse（違う数字のトリプル 3 本）、9〜5 Marks（そのラウンドのマーク数）
+- **表示**：
+  - ヘッダーの大きな数字は MPR。今のラウンドの各ダーツは入った場所（`T20` / `S19` / `BULL` / `IN`。クリケットの数字以外は薄く）、ラウンドの番号の横にそのラウンドのマーク数（全部クローズしたら `CLOSED`）
+  - **記入表**：20〜15・BULL の横並びのマス（数字・マークの記号 / ・X・丸に X・クローズのあとの点）。Rounds エリアの上（`#cricketBoard`）と、ボードの横のパネルの左上（Awards の代わり）に出す（`createCricketBoardHtml()`）。記号は古い iOS でも同じに見えるよう SVG で描く
+  - Rounds の右はそのラウンドのマーク数（`6M`）
+  - ボード入力では、クリケットの数字以外の区画を暗く、クローズした数字もうっすら暗くし、数字に線を引く（`board_input.js` の区画・数字に `data-num` を付け、`renderCricketBoard()` がクラスを切り替える）
+  - ボタン入力では 20〜15 の 6 行だけを、入力エリアの高さいっぱいに大きく出す（ブル・インブル・ミスは上のボタン）
+  - Stats：今の設定で終えたゲームの平均 MPR（ベスト）とクローズ率、今のゲームの MPR・マーク・クローズした数・1 ラウンドの最多マーク、ブル・インブル・トリプルの本数と割合、取ったアワード。グラフはラウンドごとのマーク数（縦軸 0〜9）
+  - ボードの横の Stats パネル：MPR・マーク・クローズ・点・ブル・トリプル
+  - ゲームが終わったら画面の中央に「CLOSED · 17 DARTS」（金）か「MPR 2.40」を出す
+- データ画面はヘッダーの Cricket で見る（4.3.2）
+
 ### 4.3 data.html（データ表示画面）
 
 ![データ表示画面 Game ビュー（タブレット横）](images/data_tablet.jpg)
@@ -237,6 +260,20 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 - フッターのタブ（Analysis・Day など）はカウントアップ用なので 01 のときは隠す。Analysis などを見ていたときに 01 に切り替えると Game の表示に戻してから 01 を出し、カウントアップに戻すと `changeView()` で描き直す
 - スマホ縦は、カウントアップと同じ History / Stats の切り替えで見る
 
+#### 4.3.2 クリケットの記録（`data_cricket.js`）
+
+ヘッダー右の **Cricket** で切り替える（`data.html?game=cricket` ならクリケットから）。01 と同じ仕組みで、`body` に `data-01` と `data-cricket` を付け、同じ場所に同じ部品で出す（切り替えは `data_01.js` の `setDataGameType()`。フッターの Prev / Next・グラフの描き直しもクリケット用に切り替える）。
+
+- **右（History）**：カード（MPR・Marks・Close Darts〔全部クローズしたダーツ数。金〕か Close〔クローズした数 n/7。赤〕）、要約（ラウンド数・クローズ・点・ブルとトリプル）。開くと Bull / In / T の割合のバー、20〜15 のトリプルの本数、アワード、ラウンドごとのマーク数のグラフ（縦軸 0〜9。`createRoundChartHtml(scores, 9)`）、そのゲームのヒートマップ
+- **左（Stats）**：`#zeroOneStatsPanel` に出す
+  - 上の選択でラウンドの上限（R10 / R15 / R20）ごとに絞る（All Rounds で全部）
+  - Stats：Games Played・Average MPR・Best MPR・Close Rate（全部クローズできた割合）・Avg / Best Darts to Close・MPR (Last 10)
+  - Awards：クリケットのアワード（`DATA_CRICKET_AWARD_LABELS`）
+  - Bull / Triple（01 と同じ `renderZeroOneHitRates()`）
+  - MPR Trend：直近 30 ゲームの MPR の推移（全部クローズしたゲームは緑、できなかったゲームは赤、最高は金）
+  - レーティング参考値：直近 30 ゲームの平均 MPR を `rating.js` の `DARTSLIVE_MPR_TABLE`（RT 2 が 1.30 で 0.20 ごと、RT 18 が 4.50）に当てた DARTSLIVE の目安（`calcDartsLiveRTFromMpr()`）。1 人の練習なので相手がいるときより高めに出る
+  - Marks by Number：20〜15・BULL それぞれで取ったマーク数の割合
+
 ### 4.4 settings.html（設定画面）
 
 ![設定画面](images/settings_tablet.jpg)
@@ -277,8 +314,8 @@ darts-practice/
 ├── js/
 │   ├── core/            state.js / core.js / storage.js
 │   ├── init/            main.js
-│   ├── game/            game_core.js / game_countup.js / cu_ui.js / board_input.js / stats.js
-│   ├── data/            data_loader.js / data.js / data_grouped.js / data_detail.js / rating.js
+│   ├── game/            game_core.js / game_countup.js / game_01.js / game_cricket.js / cu_ui.js / board_input.js / stats.js
+│   ├── data/            data_loader.js / data.js / data_grouped.js / data_detail.js / rating.js / heatmap.js / data_01.js / data_cricket.js
 │   └── ui/              chart.js / settings.js / news.js
 └── docs/                本設計書と画面画像
 ```
@@ -295,6 +332,7 @@ darts-practice/
 | レイアウト | `layout/lay_input.css` | ゲーム画面の Input エリア |
 | レイアウト | `layout/lay_stats.css` | ゲーム画面の Stats エリア |
 | レイアウト | `layout/lay_menu.css` | サイドメニュー |
+| レイアウト | `layout/lay_cricket.css` | クリケットだけで使うもの（記入表・ボードの暗転・ボタン入力の並び。`.cricket-only` / `.no-cricket` / `.config-only`） |
 | レイアウト | `layout/lay_data.css` | データ表示画面 |
 | レスポンシブ | `responsive/phone.css` | スマートフォンのレイアウト |
 | レスポンシブ | `responsive/tablet.css` | タブレットのレイアウト |
@@ -318,8 +356,8 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | 画面 | 読み込む JS（core / main 以外） |
 | --- | --- |
 | index.html | ui/news.js |
-| countup.html | game/*（stats → game_core → game_countup → cu_ui）、ui/chart.js、ui/settings.js |
-| data.html | game/stats.js（アワード判定）、data/*（data_loader → data_grouped → data_detail → rating → data） |
+| countup.html | game/*（stats → game_core → game_01 → game_cricket → game_countup → board_input）、data/heatmap.js、game/cu_ui.js、ui/chart.js、ui/settings.js |
+| data.html | game/stats.js（アワード判定）、data/*（data_loader → data_grouped → data_detail → rating → data → heatmap → data_01 → data_cricket） |
 | settings.html | core/backup.js、game/*、ui/settings.js |
 | news.html | ui/news.js |
 
@@ -403,7 +441,9 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `nextGame()` | 履歴を保存して次のゲームを始める |
 | `undoDart()` | 最後のダーツの入力を取り消す（確定済みラウンドには戻れない） |
 | `deleteDart(roundIndex, dartIndex)` | 今のラウンドの 1 投だけを消して後ろの投を前に詰める（ヘッダーの数字のタップ。確定済みラウンドは消せない） |
-| `isGameComplete()` | 全ラウンド入力済みかを判定する |
+| `isGameComplete()` | 全ラウンド入力済みかを判定する（01・クリケットは上がり・全部クローズか、上限のラウンドまで終わったか） |
+| `hasRoundState()` / `computeRoundState()` / `syncGamePosition()` | 01・クリケット（ラウンドの途中で終わるゲーム）か / そのゲームのラウンドごとの状態 / 次に入れる場所の決め直し |
+| `syncPositionFromState(state)` | ラウンドごとの状態（`{ thrown, closed, finished }`）から次に入れる場所を決め直す（01・クリケット共通。終わったラウンドの残りの枠と、ゲームが終わったあとのラウンドは空にする） |
 | `forceResetGame()` | 進行中のゲームだけをリセットする（確認ダイアログあり。保存済みの記録は消さない） |
 
 #### game/game_01.js
@@ -416,10 +456,28 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `readZeroOneConfig()` / `writeZeroOneConfig()` / `normalizeZeroOneConfig()` | 01 の設定（`dartsZeroOne`）の読み書き |
 | `isZeroOneFinishDart()` / `isZeroOneBust()` | 上がれる 1 投か / バストか |
 | `computeZeroOne(rounds, config)` | 全ラウンドを頭から計算し、ラウンドごとの点・バスト・上がり・残り、上がるまでのダーツ数などを返す |
-| `syncZeroOnePosition()` | 次に入れる場所（`currentRound` / `currentDart`）を計算で決め直す。バスト・上がりのラウンドの残りの枠と、上がったあとのラウンドは空にする |
+| `syncZeroOnePosition()` | 次に入れる場所（`currentRound` / `currentDart`）を計算で決め直す（`game_core.js` の `syncPositionFromState()`）。バスト・上がりのラウンドの残りの枠と、上がったあとのラウンドは空にする |
 | `getZeroOneRecord(config)` | 同じ設定で終えたゲームの上がり率・上がるまでの平均 / 最少ダーツ数 |
 | `getZeroOneResult()` | 終えたゲームの結果（履歴の `zeroOne`） |
-| `getRoundScoreList()` | ラウンドごとの点と終わったか（カウントアップと 01 で共通の形。グラフ・集計で使う） |
+| `getRoundScoreList()` | ラウンドごとの点と終わったか（カウントアップ・01・クリケットで共通の形。クリケットはマーク数。グラフ・集計で使う） |
+
+#### game/game_cricket.js
+
+クリケットのルール（UI は含まない）。
+
+| 名前 | 内容 |
+| --- | --- |
+| `CRICKET_TARGETS` / `CRICKET_ROUND_LIMITS` | 狙う数字（20〜15・25）/ 選べるラウンドの上限 |
+| `readCricketConfig()` / `writeCricketConfig()` / `normalizeCricketConfig()` | クリケットの設定（`dartsCricket`）の読み書き |
+| `getCricketMark(dart)` | 1 投が入った数字とマーク数（進行中の 1 投と履歴の 1 投のどちらでも） |
+| `computeCricket(rounds)` | 全ラウンドを頭から計算し、ラウンドごとのマーク・点・全部クローズしたか、数字ごとのマーク数と点、クローズまでのダーツ数などを返す |
+| `getCricketMpr(state)` | MPR（マーク ÷ 投げた本数 × 3） |
+| `syncCricketPosition()` | 次に入れる場所を計算で決め直す |
+| `judgeCricketRoundAward()` / `countCricketAwards()` | 1 ラウンドのアワード（`CRICKET_AWARD_KEYS`）/ その数 |
+| `calculateCricketStats()` | 今のゲームの集計（MPR・マーク・点・クローズした数・ブル・トリプル・アワード） |
+| `getCricketRecord(config)` | 同じ設定で終えたゲームのクローズ率・クローズまでの平均 / 最少ダーツ数・平均 / 最高 MPR |
+| `getCricketResult()` / `createCricketSession()` | 終えたゲームの結果（履歴の `cricket`）/ 保存する履歴の 1 件 |
+| `formatCricketDart()` | 1 投の表示（`T20` / `BULL` / `IN` / `MISS`） |
 
 #### game/game_countup.js
 
@@ -628,6 +686,8 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `dartsPractice` | LocalStorage | 進行中のゲーム（カウントアップ） |
 | `dartsPractice01` | LocalStorage | 進行中のゲーム（01） |
 | `dartsZeroOne` | LocalStorage | 01 の設定（`{ start, out, rounds }`） |
+| `dartsPracticeCricket` | LocalStorage | 進行中のゲーム（クリケット） |
+| `dartsCricket` | LocalStorage | クリケットの設定（`{ rounds }`） |
 | `dartsSettings` | LocalStorage | 設定 |
 | `dartsDayNotesV2` | LocalStorage | 日別メモ |
 
@@ -649,8 +709,9 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `awards` | `a` | アワードごとの回数（保存時は配列） |
 | `totalAwards` | `ta` | アワード合計数 |
 | `roundScores` | `r` | 各ラウンドのスコア |
-| `gameType` | `g` | ゲームの種類（`"countup"` / `"01"`） |
+| `gameType` | `g` | ゲームの種類（`"countup"` / `"01"` / `"cricket"`） |
 | `zeroOne` | `z` | 01 の結果（カウントアップは `null`。保存時は省く）。`{ start, out, rounds, finished, finishDarts, remaining }`、保存時は `[start, 上がり方（0 open / 1 double / 2 master）, rounds, 上がったか 1/0, finishDarts, remaining]` |
+| `cricket` | `c` | クリケットの結果（それ以外は `null`。保存時は省く）。`{ rounds, finished, finishDarts, marks, points, mpr }`、保存時は `[rounds, 全部クローズしたか 1/0, finishDarts, marks, points, mpr]`。クリケットの履歴は `score` が点、`ppd` が 0、`roundAvg` が MPR、`roundScores` がラウンドごとのマーク数（投げたラウンドまで）、`awards` がクリケットのアワード（`marks5`〜`marks9` などを `AWARD_KEYS` の後ろに足した。それより前の記録の配列は短いので 0 になる） |
 | `darts` | `dt` | 1 投ごとの記録（2026.10.7 から。下記）。それより前の記録は空の配列（保存時は `dt` 自体を省く） |
 | `bullMode` | `bm` | ブルモード（2026.10.8 から）。セパレート（`"double"`）のときだけ `bm: 1` を保存する。持っていない記録は、アウターブルが 25 点の投があればセパレート、なければ FAT とみなす（`normalizeSessionBullMode()`） |
 
@@ -671,8 +732,8 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 
 ```js
 {
-  gameType: "countup",      // 01 は "01" で、zeroOne: { start, out, rounds } も持つ
-  rounds: [                 // 8 ラウンド（01 は設定のラウンド数）× 3 投。未入力は null
+  gameType: "countup",      // 01 は "01" で zeroOne: { start, out, rounds }、クリケットは "cricket" で cricket: { rounds } も持つ
+  rounds: [                 // 8 ラウンド（01・クリケットは設定のラウンド数）× 3 投。未入力は null
     [{ value, multiplier, score, special, boardTap?, pos? }, …],
     …
   ],
@@ -821,8 +882,6 @@ graph LR
 
 **ゲーム追加**
 
-- 01（ダーツの基本ゲーム）
-- クリケット
 - ハーフイット
 - シュートアウト
 - プロテストモード（内容は未定）
@@ -938,3 +997,4 @@ graph LR
 | 2026.10.8 | 01 にも RANGE の目安を追加（データ画面の Stats・履歴カードのヒートマップ・ゲーム画面のレーダー）。上がりのダブル狙いを除くため、最初の点数の 80% を減らすまでの投だけで出す |
 | 2026.10.8 | データ画面のグループビュー（Day / Week / Month / Year）のカードに Avg Range（ゲームごとの RANGE の平均）を追加。ブルモードがセパレートのゲームは含めない。そのためゲームの記録にブルモード（`bm`）を保存するようにした |
 | 2026.10.8 | データ画面の 01 の Stats に Daily Range（直近 10 日の日ごとの RANGE の平均）を追加。ブルモードがセパレートのゲームは含めない |
+| 2026.10.8 | クリケットを追加（`countup.html?game=cricket`、`game_cricket.js`、`lay_cricket.css`）。1 人で練習するスタンダードクリケット（20〜15・ブル、ラウンドの上限 R10 / R15 / R20）で、記入表・MPR・クローズまでのダーツ数・クリケットのアワードを出す。データ画面に Cricket の切り替えを追加（`data_cricket.js`。MPR の推移・クローズ率・数字ごとのマーク・DARTSLIVE の目安）。01 とクリケットの「次に入れる場所」の計算を `game_core.js` の `syncPositionFromState()` に共通化 |

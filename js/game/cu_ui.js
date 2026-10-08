@@ -1,6 +1,8 @@
 function updateUI() {
   renderZeroOneRecord()
+  renderCricketRecord()
   renderRounds()
+  renderCricketBoard()
   renderHeaderRound()
   updateStats()
   drawScoreChart()
@@ -10,6 +12,7 @@ function updateUI() {
   }
   renderGameSidePanels()
   showZeroOneResultIfDone()
+  showCricketResultIfDone()
   saveGame()
 }
 
@@ -70,10 +73,18 @@ function countZeroOneBusts(state = computeZeroOne()) {
 
 function setupZeroOneScreen() {
 
-  if (GAME_TYPE !== "01") return
+  if (GAME_TYPE !== "01" && GAME_TYPE !== "cricket") return
 
-  document.body.classList.add("game-01")
-  document.title = "01 | Darts Practice"
+  if (GAME_TYPE === "cricket") {
+    document.body.classList.add("game-cricket")
+    document.title = "Cricket | Darts Practice"
+    cricketWasComplete = isGameComplete()
+    const graphTitle = document.querySelector(".stats-right h3")
+    if (graphTitle) graphTitle.textContent = "Marks Graph"
+  } else {
+    document.body.classList.add("game-01")
+    document.title = "01 | Darts Practice"
+  }
   zeroOneWasComplete = isGameComplete()
   zeroOneBustCount = countZeroOneBusts()
 
@@ -87,21 +98,30 @@ function setupZeroOneScreen() {
   if (start) start.addEventListener("click", applyZeroOneSetup)
 }
 
+// クリケットも同じ画面を使う（ラウンドの上限だけ。点数・上がり方の欄は隠す）
 function openZeroOneSetup() {
 
   const box = document.getElementById("zeroOneSetup")
   if (!box) return
 
-  zeroOneSetupDraft = { ...zeroOneConfig }
+  const isCricket = GAME_TYPE === "cricket"
+  zeroOneSetupDraft = isCricket ? { ...cricketConfig } : { ...zeroOneConfig }
 
-  const options = {
-    start: ZERO_ONE_STARTS.map(value => [value, String(value)]),
-    out: ZERO_ONE_OUTS.map(value => [value, ZERO_ONE_OUT_LABELS[value]]),
-    rounds: ZERO_ONE_ROUND_LIMITS.map(value => [value, `R${value}`])
-  }
+  const options = isCricket
+    ? { rounds: CRICKET_ROUND_LIMITS.map(value => [value, `R${value}`]) }
+    : {
+        start: ZERO_ONE_STARTS.map(value => [value, String(value)]),
+        out: ZERO_ONE_OUTS.map(value => [value, ZERO_ONE_OUT_LABELS[value]]),
+        rounds: ZERO_ONE_ROUND_LIMITS.map(value => [value, `R${value}`])
+      }
+
+  const title = document.getElementById("zeroOneSetupTitle")
+  if (title) title.textContent = isCricket ? "Cricket Settings" : "01 Settings"
 
   box.querySelectorAll(".zeroone-setup-options").forEach(group => {
     const key = group.dataset.key
+    group.closest(".zeroone-setup-group").hidden = !options[key]
+    if (!options[key]) return
     group.innerHTML = options[key]
       .map(([value, label]) => `<button type="button" data-value="${value}">${label}</button>`)
       .join("")
@@ -135,9 +155,10 @@ function closeZeroOneSetup() {
 // 設定を決めて新しいゲームを始める。投げている途中なら確かめてから（今のゲームは保存せずに消す）
 function applyZeroOneSetup() {
 
-  const config = normalizeZeroOneConfig(zeroOneSetupDraft)
+  const isCricket = GAME_TYPE === "cricket"
+  const config = isCricket ? normalizeCricketConfig(zeroOneSetupDraft) : normalizeZeroOneConfig(zeroOneSetupDraft)
   const thrown = game.rounds.some(round => round.some(dart => dart))
-  const changed = JSON.stringify(config) !== JSON.stringify(zeroOneConfig)
+  const changed = JSON.stringify(config) !== JSON.stringify(isCricket ? cricketConfig : zeroOneConfig)
 
   if (thrown && !isGameComplete()) {
     if (!confirm("今のゲームを終えずに、新しい設定で始め直しますか？\n（今のゲームは記録されません）")) return
@@ -149,13 +170,100 @@ function applyZeroOneSetup() {
     return
   }
 
-  writeZeroOneConfig(config)
+  if (isCricket) writeCricketConfig(config)
+  else writeZeroOneConfig(config)
   localStorage.removeItem(SAVE_KEY)
   closeZeroOneSetup()
   initGame(false)
   zeroOneWasComplete = false
   zeroOneBustCount = 0
+  cricketWasComplete = false
   updateUI()
+}
+
+
+// ===============================
+// ===== クリケットの表示 ==========
+// ===============================
+// ヘッダーの設定の表示、今の設定での成績、記入表（20〜15・BULL のマーク）、ゲームが終わったときの結果
+let cricketWasComplete = false
+
+function renderCricketRecord() {
+
+  if (GAME_TYPE !== "cricket") return
+
+  const info = document.getElementById("zeroOneInfo")
+  if (info) info.textContent = formatCricketConfig(cricketConfig)
+
+  const record = getCricketRecord()
+  const set = (id, text) => {
+    const el = document.getElementById(id)
+    if (el) el.textContent = text
+  }
+  set("cricketAvgMpr", record.games ? record.avgMpr.toFixed(2) : "-")
+  set("cricketBestMpr", record.games ? `BEST ${record.bestMpr.toFixed(2)}` : "")
+  set("cricketCloseRate", record.games ? `${record.rate.toFixed(0)}%` : "-")
+  set("cricketCloseRateSub", record.games ? `${record.finished} / ${record.games}` : "")
+}
+
+// 全部クローズした瞬間・ラウンドの上限で終わった瞬間に、画面の中央に出す
+function showCricketResultIfDone() {
+
+  if (GAME_TYPE !== "cricket") return
+
+  const complete = isGameComplete()
+  if (complete && !cricketWasComplete) {
+    const state = computeCricket()
+    showUndoToast(
+      state.finished ? `CLOSED · ${state.finishDarts} DARTS` : `MPR ${getCricketMpr(state).toFixed(2)}`,
+      state.finished ? "out" : ""
+    )
+  }
+  cricketWasComplete = complete
+}
+
+// マークの記号（1：/ 2：X 3：丸に X）。古い iOS でも同じに見えるよう SVG で描く
+function getCricketMarkSvg(count) {
+  if (!count) return ""
+  const slash = '<line x1="5" y1="19" x2="19" y2="5"/>'
+  const back = '<line x1="5" y1="5" x2="19" y2="19"/>'
+  const circle = '<circle cx="12" cy="12" r="10.5"/>'
+  const body = count >= 3 ? slash + back + circle : count === 2 ? slash + back : slash
+  return `<svg class="cricket-mark-icon" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`
+}
+
+// 記入表：20〜15・BULL の横並び（数字・マーク・クローズのあとの点）
+function createCricketBoardHtml(state = computeCricket()) {
+  return CRICKET_TARGETS
+    .map(target => {
+      const count = state.targets[target]
+      const points = state.targetPoints[target]
+      return `
+        <div class="cricket-cell${count >= 3 ? " closed" : ""}" aria-label="${target === 25 ? "BULL" : target} ${Math.min(count, 3)} マーク">
+          <span class="cricket-target">${target === 25 ? "B" : target}</span>
+          <span class="cricket-mark">${getCricketMarkSvg(Math.min(count, 3))}</span>
+          <span class="cricket-points">${points ? points : ""}</span>
+        </div>
+      `
+    })
+    .join("")
+}
+
+function renderCricketBoard() {
+
+  if (GAME_TYPE !== "cricket") return
+
+  const state = computeCricket()
+  const box = document.getElementById("cricketBoard")
+  if (box) box.innerHTML = createCricketBoardHtml(state)
+
+  // ボード入力：クリケットの数字以外は暗く、クローズした数字はさらに暗くする（board_input.js の data-num）
+  document.querySelectorAll(".board-svg [data-num]").forEach(el => {
+    const num = Number(el.dataset.num)
+    const isTarget = CRICKET_TARGETS.includes(num)
+    el.classList.toggle("cricket-off", !isTarget)
+    el.classList.toggle("cricket-closed", isTarget && state.targets[num] >= 3)
+  })
 }
 
 
@@ -179,6 +287,12 @@ function renderDart(dart) {
   if (!dart) {
     return `<span class="dart">-</span>`
   }
+
+  // クリケット：入った場所（T20 / BULL など）。クリケットの数字以外は薄く
+  if (GAME_TYPE === "cricket") {
+    const off = getCricketMark(dart) ? "" : " cricket-off"
+    return `<span class="dart${getDartClass(dart)}${off}">${formatCricketDart(dart)}</span>`
+  }
   
   return `<span class="dart${getDartClass(dart)}">
     ${dart.score}
@@ -198,6 +312,8 @@ function renderRounds() {
   
   // 01：ラウンドの点の代わりに、そのラウンドのあとの残り点数を出す（バストは BUST、上がりは OUT）
   const zeroOne = GAME_TYPE === "01" ? computeZeroOne() : null
+  // クリケット：そのラウンドのマーク数（全部クローズしたラウンドは CLOSE）
+  const cricket = GAME_TYPE === "cricket" ? computeCricket() : null
 
   game.rounds.forEach((round, index) => {
     
@@ -221,6 +337,11 @@ function renderRounds() {
       } else {
         scoreHtml = `<span class="round-score">${info.thrown ? info.remaining : ""}</span>`
       }
+    }
+    if (cricket) {
+      const info = cricket.rounds[index]
+      if (info.finished) row.classList.add("finished")
+      scoreHtml = `<span class="round-score${info.finished ? " round-out" : ""}">${info.thrown ? `${info.marks}<small>M</small>` : ""}</span>`
     }
     
     row.innerHTML = `
@@ -266,20 +387,28 @@ function renderHeaderRound() {
   const deletable = index > lockedRound
 
   // 合計スコアと同じ光る数字で出す（まだ投げていない分は薄い「-」）
+  // クリケットは入った場所（T20 など）を出す
+  const label = dart => GAME_TYPE === "cricket" ? formatCricketDart(dart) : dart.score
   const darts = round
     .map(dart => dart
-      ? `<span class="header-dart${getDartClass(dart)}"${deletable ? ` role="button" aria-label="${dart.score} を消す"` : ""}>${dart.score}</span>`
+      ? `<span class="header-dart${getDartClass(dart)}${GAME_TYPE === "cricket" && !getCricketMark(dart) ? " miss" : ""}"${deletable ? ` role="button" aria-label="${label(dart)} を消す"` : ""}>${label(dart)}</span>`
       : `<span class="header-dart empty">-</span>`)
     .join("")
 
   // 01：表示しているラウンドがバスト・上がりなら、ラウンドの番号の横に出す
-  const info = GAME_TYPE === "01" ? computeZeroOne().rounds[index] : null
+  // クリケット：そのラウンドのマーク数と、全部クローズしたら CLOSED
+  const info = hasRoundState() ? computeRoundState().rounds[index] : null
   const status = info && info.bust ? "bust" : info && info.finished ? "out" : ""
   el.classList.toggle("bust", status === "bust")
   el.classList.toggle("out", status === "out")
+  el.classList.toggle("cricket", GAME_TYPE === "cricket")
+
+  const statusText = GAME_TYPE === "cricket"
+    ? [info && info.thrown ? `${info.marks} MARKS` : "", status === "out" ? "CLOSED" : ""].filter(Boolean).join(" · ")
+    : status.toUpperCase()
 
   el.innerHTML = `
-    <span class="header-round-label">R${index + 1}${status ? ` · ${status.toUpperCase()}` : ""}</span>
+    <span class="header-round-label">R${index + 1}${statusText ? ` · ${statusText}` : ""}</span>
     <span class="header-round-darts">${darts}</span>
   `
 
@@ -317,6 +446,14 @@ function createNumberTable() {
     return;
   }
   
+  // クリケット：使う数字（20〜15）だけ。ブル・インブル・ミスは上のボタン
+  if (GAME_TYPE === "cricket") {
+    for (let i = 20; i >= 15; i--) {
+      table.appendChild(createNumberRow(i));
+    }
+    return;
+  }
+
   const isPhoneLandscape =
     document.body.classList.contains("phone") &&
     document.body.classList.contains("landscape");
@@ -575,7 +712,8 @@ function renderGameHeatmap(size) {
   if (count) {
     // RANGE の目安（中心のまわりのまとまりの直径。heatmap.js の getRangeStats()）も出す。
     // 01 はブルを狙う場面（最初の点数の 80% を減らすまで）の投だけで出す
-    const rangePoints = GAME_TYPE === "01" ? getZeroOneBullPhasePoints() : points
+    // クリケットはいろいろな数字を狙うので出さない
+    const rangePoints = GAME_TYPE === "01" ? getZeroOneBullPhasePoints() : GAME_TYPE === "cricket" ? [] : points
     const range = typeof getRangeStats === "function" ? getRangeStats(rangePoints) : null
     count.textContent = `${points.length} HIT${points.length === 1 ? "" : "S"}` +
       (range ? ` · RANGE ${range.rangeMm.toFixed(0)}mm` : "")
@@ -624,6 +762,20 @@ function renderGameSideStats() {
   const box = document.getElementById("gameSideStatsGrid")
   if (!box) return
 
+  if (GAME_TYPE === "cricket") {
+    const cricket = calculateCricketStats()
+    const record = getCricketRecord()
+    renderGameSideStatItems(box, [
+      ["MPR", cricket.mpr.toFixed(2), record.games ? `AVG ${record.avgMpr.toFixed(2)}` : ""],
+      ["MARKS", cricket.marks, `MAX ${cricket.maxMarks}`],
+      ["CLOSE", `${cricket.closedTargets}/7`, cricket.state.finished ? `${cricket.darts} DARTS` : ""],
+      ["POINTS", cricket.points, ""],
+      ["BULL", cricket.bulls, `${cricket.bullRate.toFixed(1)}%`],
+      ["TRIPLE", cricket.triples, `${cricket.tripleRate.toFixed(1)}%`]
+    ])
+    return
+  }
+
   const stats = calculateStats()
 
   if (GAME_TYPE === "01") {
@@ -667,6 +819,15 @@ function renderGameSideAwards() {
 
   const box = document.getElementById("gameSideAwardsGrid")
   if (!box) return
+
+  // クリケット：左上は記入表（マーク）にする
+  const title = document.querySelector("#gameSideAwards .game-heatmap-title span")
+  if (GAME_TYPE === "cricket") {
+    if (title) title.textContent = "Marks"
+    box.classList.add("cricket-board", "cricket-board-side")
+    box.innerHTML = createCricketBoardHtml()
+    return
+  }
 
   const stats = calculateStats()
 

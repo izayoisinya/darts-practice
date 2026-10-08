@@ -1,5 +1,7 @@
-// 進行中のゲーム（カウントアップと 01 は別々に持つ）
-const SAVE_KEY = typeof GAME_TYPE !== "undefined" && GAME_TYPE === "01" ? "dartsPractice01" : "dartsPractice"
+// 進行中のゲーム（カウントアップ・01・クリケットは別々に持つ）
+const SAVE_KEY = typeof GAME_TYPE === "undefined" || GAME_TYPE === "countup"
+  ? "dartsPractice"
+  : GAME_TYPE === "01" ? "dartsPractice01" : "dartsPracticeCricket"
 const SESSIONS_KEY = "dartsSessionsV2"
 const LEGACY_SESSIONS_KEY = "dartsSessions"
 const SESSION_DB_NAME = "dartsPracticeDB"
@@ -13,7 +15,13 @@ const AWARD_KEYS = [
   "ton80",
   "threeInTheBlack",
   "threeInTheBed",
-  "whiteHorse"
+  "whiteHorse",
+  // クリケットのアワード（2026.10.8 から。それより前の記録の配列は短いので 0 になる）
+  "marks5",
+  "marks6",
+  "marks7",
+  "marks8",
+  "marks9"
 ]
 
 let sessionsCache = null
@@ -184,6 +192,44 @@ function normalizeSessionBullMode(value, darts) {
   return darts.some(dart => dart && dart.hit === "OB" && dart.score === 25) ? "double" : "fat"
 }
 
+// クリケットのゲームの結果（カウントアップ・01 は null）
+//   アプリ内：{ rounds, finished, finishDarts, marks, points, mpr }
+//   保存時：[rounds, 全部クローズしたか（1/0）, finishDarts, marks, points, mpr]
+function normalizeCricketRecord(value) {
+  if (!value || typeof value !== "object") return null
+
+  const source = Array.isArray(value)
+    ? {
+        rounds: value[0],
+        finished: value[1] === 1,
+        finishDarts: value[2],
+        marks: value[3],
+        points: value[4],
+        mpr: value[5]
+      }
+    : value
+
+  return {
+    rounds: toFiniteNumber(source.rounds, 15),
+    finished: source.finished === true,
+    finishDarts: toFiniteNumber(source.finishDarts, 0),
+    marks: toFiniteNumber(source.marks, 0),
+    points: toFiniteNumber(source.points, 0),
+    mpr: toFiniteNumber(source.mpr, 0)
+  }
+}
+
+function serializeCricketRecord(record) {
+  return [
+    record.rounds,
+    record.finished ? 1 : 0,
+    record.finishDarts,
+    record.marks,
+    record.points,
+    record.mpr
+  ]
+}
+
 function normalizeSessionForApp(session) {
   if (!session || typeof session !== "object") return null
 
@@ -214,7 +260,8 @@ function normalizeSessionForApp(session) {
     darts,
     bullMode: normalizeSessionBullMode(session.bullMode, darts),
     gameType: String(session.gameType || "countup"),
-    zeroOne: normalizeZeroOneRecord(session.zeroOne)
+    zeroOne: normalizeZeroOneRecord(session.zeroOne),
+    cricket: normalizeCricketRecord(session.cricket)
   }
 }
 
@@ -238,7 +285,8 @@ function serializeSessionForStorage(session) {
     g: normalized.gameType,
     ...(normalized.darts.length ? { dt: serializeDartRecords(normalized.darts) } : {}),
     ...(normalized.bullMode === "double" ? { bm: 1 } : {}),
-    ...(normalized.zeroOne ? { z: serializeZeroOneRecord(normalized.zeroOne) } : {})
+    ...(normalized.zeroOne ? { z: serializeZeroOneRecord(normalized.zeroOne) } : {}),
+    ...(normalized.cricket ? { c: serializeCricketRecord(normalized.cricket) } : {})
   }
 }
 
@@ -261,7 +309,8 @@ function deserializeSessionFromStorage(session) {
     darts: session.dt,
     bullMode: session.bm === 1 ? "double" : undefined,
     gameType: session.g,
-    zeroOne: session.z
+    zeroOne: session.z,
+    cricket: session.c
   })
 }
 
@@ -509,6 +558,7 @@ function saveGame() {
   const data = {
     gameType: GAME_TYPE,
     ...(GAME_TYPE === "01" ? { zeroOne: zeroOneConfig } : {}),
+    ...(GAME_TYPE === "cricket" ? { cricket: cricketConfig } : {}),
     rounds: game.rounds,
     currentRound: game.currentRound,
     currentDart: game.currentDart,
@@ -531,6 +581,11 @@ function loadGame() {
     zeroOneConfig = normalizeZeroOneConfig(saved.zeroOne)
     TOTAL_ROUNDS = zeroOneConfig.rounds
   }
+
+  if (GAME_TYPE === "cricket" && typeof normalizeCricketConfig === "function") {
+    cricketConfig = normalizeCricketConfig(saved.cricket)
+    TOTAL_ROUNDS = cricketConfig.rounds
+  }
   
   game.rounds = saved.rounds
   game.currentRound = saved.currentRound
@@ -544,6 +599,13 @@ function loadGame() {
 function saveSession() {
   
   const sessions = readSessions()
+
+  // クリケットは形が違うので、game_cricket.js の createCricketSession() で作る
+  if (GAME_TYPE === "cricket" && typeof createCricketSession === "function") {
+    sessions.push({ ...createCricketSession(), darts: game.rounds.flat().map(toDartRecord), bullMode })
+    writeSessions(sessions)
+    return
+  }
 
   const calculated = typeof calculateStats === "function" ?
     calculateStats() :

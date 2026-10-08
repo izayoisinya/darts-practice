@@ -174,12 +174,12 @@ function createBoardSvgHtml() {
     const tone = i % 2 === 0 ? "a" : "b"
 
     rings.forEach(ring => {
-      segments += `<path class="seg seg-${ring.kind} seg-${tone}" ` +
+      segments += `<path class="seg seg-${ring.kind} seg-${tone}" data-num="${num}" ` +
         `d="${ringSegmentPath(ring.from, ring.to, a1, a2)}"/>`
     })
 
     const p = polarPoint(BOARD_NUMBER_RADIUS, i * 18)
-    numbers += `<text class="board-number" x="${p.x}" y="${p.y}">${num}</text>`
+    numbers += `<text class="board-number" data-num="${num}" x="${p.x}" y="${p.y}">${num}</text>`
   })
 
   return `
@@ -188,8 +188,8 @@ function createBoardSvgHtml() {
       xmlns="${SVG_NS}" role="img" aria-label="ダーツボード">
       <circle class="board-back" r="${BOARD_VIEW}"/>
       ${segments}
-      <circle class="seg seg-outer-bull" r="${BOARD_RADIUS.outerBull}"/>
-      <circle class="seg seg-inner-bull" r="${BOARD_RADIUS.innerBull}"/>
+      <circle class="seg seg-outer-bull" data-num="25" r="${BOARD_RADIUS.outerBull}"/>
+      <circle class="seg seg-inner-bull" data-num="25" r="${BOARD_RADIUS.innerBull}"/>
       ${numbers}
       <g class="board-markers"></g>
     </svg>

@@ -1,6 +1,11 @@
 // ===============================
 // ===== グラフ ==================
 // ===============================
+// グラフの縦軸の上限（カウントアップ・01 は 1 ラウンドの点で 180、クリケットはマーク数で 9）
+function getChartMax() {
+  return GAME_TYPE === "cricket" ? 9 : MAX_SCORE
+}
+
 function drawScoreChart() {
   
   const canvas = document.getElementById("scoreChart");
@@ -52,14 +57,14 @@ const maxRoundScore = validScores.length ?
   ctx.strokeStyle = "rgba(255,255,255,0.08)";
   ctx.lineWidth = 1;
   
-  const gridSteps = 6;
+  const gridSteps = GAME_TYPE === "cricket" ? 3 : 6;
   
   for (let i = 0; i <= gridSteps; i++) {
     
-    const value = (MAX_SCORE / gridSteps) * i;
+    const value = (getChartMax() / gridSteps) * i;
     const y =
       height - padding -
-      (value / MAX_SCORE) * graphHeight;
+      (value / getChartMax()) * graphHeight;
     
     ctx.beginPath();
     ctx.moveTo(padding, y);
@@ -90,7 +95,7 @@ const maxRoundScore = validScores.length ?
     const x = padding + stepX * i;
     const y =
       height - padding -
-      (score / MAX_SCORE) * graphHeight;
+      (score / getChartMax()) * graphHeight;
     
     if (!started) {
       ctx.moveTo(x, y);
@@ -110,7 +115,7 @@ const maxRoundScore = validScores.length ?
     const x = padding + stepX * i;
     const y =
       height - padding -
-      (score / MAX_SCORE) * graphHeight;
+      (score / getChartMax()) * graphHeight;
     
     ctx.beginPath();
     
@@ -167,15 +172,16 @@ function paintRoundScoreChart(ctx, width, height, rgb = "0, 255, 200") {
   const stepX = TOTAL_ROUNDS > 1 ? graphWidth / (TOTAL_ROUNDS - 1) : 0
 
   const xAt = i => left + stepX * i
-  const yAt = score => top + graphHeight - (Math.min(score, MAX_SCORE) / MAX_SCORE) * graphHeight
+  const max = getChartMax()
+  const yAt = score => top + graphHeight - (Math.min(score, max) / max) * graphHeight
 
   ctx.clearRect(0, 0, width, height)
 
-  // 横の目盛り（0・60・120・180）
+  // 横の目盛り（0・60・120・180。クリケットは 0・3・6・9 マーク）
   ctx.font = `600 9px ${font}`
   ctx.textAlign = "right"
   ctx.textBaseline = "middle"
-  ;[0, 60, 120, 180].forEach(value => {
+  ;(GAME_TYPE === "cricket" ? [0, 3, 6, 9] : [0, 60, 120, 180]).forEach(value => {
     const y = yAt(value)
     ctx.strokeStyle = color(value === 0 ? 0.3 : 0.1)
     ctx.lineWidth = 1

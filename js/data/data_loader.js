@@ -3,7 +3,8 @@ function readDataSessions() {
   return readSessions().filter(session => (session.gameType || "countup") === "countup")
 }
 
-function createRoundChartHtml(roundSource) {
+// maxScore：縦軸の上限（カウントアップ・01 は 180。クリケットはマーク数なので 9）
+function createRoundChartHtml(roundSource, maxScore = 180) {
   const scores = Array.isArray(roundSource)
     ? (roundSource.length > 0 && typeof roundSource[0] === "number"
       ? roundSource.map(score => Number(score) || 0)
@@ -18,7 +19,6 @@ function createRoundChartHtml(roundSource) {
   const mTop = 10, mRight = 8, mBottom = 14, mLeft = 8
   const chartW = svgW - mLeft - mRight
   const chartH = svgH - mTop - mBottom
-  const maxScore = 180
   const xStep = n > 1 ? chartW / (n - 1) : 0
 
   const pts = scores.map((s, i) => ({
@@ -34,7 +34,7 @@ function createRoundChartHtml(roundSource) {
     pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ') +
     ` ${pts[n - 1].x.toFixed(1)},${baseY}`
 
-  const gridLines = [60, 120, 180].map(v => {
+  const gridLines = [maxScore / 3, maxScore / 3 * 2, maxScore].map(v => {
     const y = (mTop + (1 - v / maxScore) * chartH).toFixed(1)
     return `<line x1="${mLeft}" y1="${y}" x2="${svgW - mRight}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`
   }).join('')
@@ -100,9 +100,10 @@ const AWARD_LABELS = [
   ["whiteHorse", "White Horse"]
 ]
 
-function createAwardsHtml(session) {
+// labels：出すアワード（クリケットは data_cricket.js の DATA_CRICKET_AWARD_LABELS）
+function createAwardsHtml(session, labels = AWARD_LABELS) {
   const awards = getSessionAwards(session)
-  const awardDefs = AWARD_LABELS.map(([key, label]) => [label, awards[key]])
+  const awardDefs = labels.map(([key, label]) => [label, awards[key] || 0])
 
   const activeAwards = awardDefs.filter(([, count]) => count > 0)
   if (!activeAwards.length) {

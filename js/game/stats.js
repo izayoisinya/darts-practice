@@ -180,6 +180,12 @@ function calculateStats() {
 const $ = id => document.getElementById(id)
 
 function updateStats() {
+
+  // クリケットは別の集計（game_cricket.js）。ヘッダーの大きな数字は MPR
+  if (GAME_TYPE === "cricket") {
+    updateCricketStats()
+    return
+  }
   
   const stats = calculateStats()
   
@@ -248,4 +254,71 @@ function showAward(id, value) {
     el.style.display = "none"
   }
   
+}
+
+// ===============================
+// ===== クリケットの Stats 更新 ===
+// ===============================
+const CRICKET_AWARD_LABELS = [
+  ["threeInTheBlack", "3 in the Black"],
+  ["hatTrick", "Hat Trick"],
+  ["threeInTheBed", "3 in the Bed"],
+  ["whiteHorse", "White Horse"],
+  ["marks9", "9 Marks"],
+  ["marks8", "8 Marks"],
+  ["marks7", "7 Marks"],
+  ["marks6", "6 Marks"],
+  ["marks5", "5 Marks"]
+]
+
+function updateCricketStats() {
+
+  const stats = calculateCricketStats()
+  const set = (id, text) => {
+    const el = $(id)
+    if (el) el.textContent = text
+  }
+
+  set("totalScore", stats.mpr.toFixed(2))
+
+  set("cricketMpr", stats.mpr.toFixed(2))
+  set("cricketMarks", stats.marks)
+  set("cricketPoints", stats.points)
+  set("cricketMaxMarks", stats.maxMarks)
+  set("cricketClosed", `${stats.closedTargets}/7`)
+
+  set("cricketMprCompact", stats.mpr.toFixed(2))
+  set("cricketMarksCompact", stats.marks)
+  set("cricketClosedCompact", `${stats.closedTargets}/7`)
+
+  // ブル・インブル・トリプル（カウントアップと同じ欄）
+  set("bullCount", stats.bulls)
+  set("innerBulls", stats.innerBulls)
+  set("cricketTriples", stats.triples)
+  set("bullPercent", `${stats.bullRate.toFixed(1)}%`)
+  set("innerBullPercent", `${stats.innerBullRate.toFixed(1)}%`)
+  set("cricketTriplePercent", `${stats.tripleRate.toFixed(1)}%`)
+  $("bullRateBar").style.width = `${stats.bullRate}%`
+  $("innerBullRateBar").style.width = `${stats.innerBullRate}%`
+  const tripleBar = $("cricketTripleBar")
+  if (tripleBar) tripleBar.style.width = `${stats.tripleRate}%`
+
+  set("bullCountCompact", stats.bulls)
+  set("bullPercentCompact", `${stats.bullRate.toFixed(1)}%`)
+  set("innerBullsCompact", stats.innerBulls)
+  set("innerBullPercentCompact", `${stats.innerBullRate.toFixed(1)}%`)
+
+  // アワード（取ったものだけ出す）
+  const awards = $("cricketAwards")
+  if (awards) {
+    awards.innerHTML = CRICKET_AWARD_LABELS
+      .filter(([key]) => stats[key] > 0)
+      .map(([key, label]) => `
+        <div class="award-card" style="display:flex">
+          <div class="award-title">${label}</div>
+          <div class="award-value">${stats[key]}</div>
+        </div>
+      `)
+      .join("")
+  }
 }

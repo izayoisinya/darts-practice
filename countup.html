@@ -39,6 +39,7 @@
     <link rel="stylesheet" href="css/layout/lay_input.css" />
     <link rel="stylesheet" href="css/layout/lay_stats.css" />
     <link rel="stylesheet" href="css/layout/lay_menu.css" />
+    <link rel="stylesheet" href="css/layout/lay_cricket.css" />
 
     <link rel="stylesheet" href="css/responsive/phone.css" />
     <link rel="stylesheet" href="css/responsive/tablet.css" />
@@ -51,8 +52,8 @@
       <div class="score-panel">
         <div class="score-block">
           <div class="score-value" id="totalScore">0</div>
-          <!-- 01 の設定（点数・上がり方・ラウンドの上限）。押すと設定を変えられる（cu_ui.js の openZeroOneSetup()） -->
-          <button type="button" id="zeroOneInfo" class="zeroone-info zeroone-only"></button>
+          <!-- 01・クリケットの設定（点数・上がり方・ラウンドの上限）。押すと設定を変えられる（cu_ui.js の openZeroOneSetup()） -->
+          <button type="button" id="zeroOneInfo" class="zeroone-info config-only"></button>
         </div>
 
         <!-- 今のラウンドの各ダーツの得点（cu_ui.js の renderHeaderRound()） -->
@@ -65,7 +66,7 @@
     </header>
 
     <!-- ================= 01 の設定 ================= -->
-    <!-- 01 を始めるときに、点数・上がり方・ラウンドの上限を選ぶ（cu_ui.js の openZeroOneSetup()） -->
+    <!-- 01 を始めるときに、点数・上がり方・ラウンドの上限を選ぶ（cu_ui.js の openZeroOneSetup()）。クリケットはラウンドの上限だけ -->
     <div id="zeroOneSetup" class="zeroone-setup" hidden>
       <div class="zeroone-setup-panel" role="dialog" aria-modal="true" aria-labelledby="zeroOneSetupTitle">
         <h2 id="zeroOneSetupTitle" class="zeroone-setup-title">01 Settings</h2>
@@ -97,6 +98,8 @@
       <!-- ===== ROUNDS ===== -->
       <section class="round-area">
         <h2>Rounds</h2>
+        <!-- クリケットの記入表（20〜15・BULL のマーク。cu_ui.js の renderCricketBoard()） -->
+        <div id="cricketBoard" class="cricket-board cricket-only"></div>
         <div class="round-list">
           <div id="roundContainer"></div>
         </div>
@@ -106,7 +109,7 @@
       <section class="input-area">
         <h2>Input</h2>
 
-        <button type="button" class="bull-setting">
+        <button type="button" class="bull-setting no-cricket">
           <span class="label">Bull Mode</span>
           <span class="value">FAT</span>
         </button>
@@ -172,19 +175,35 @@
             <div class="compact-sub" id="innerBullPercentCompact">0.0%</div>
           </div>
 
-          <div class="compact-block">
+          <div class="compact-block no-cricket">
             <div class="compact-label">PPD</div>
             <div class="compact-value" id="ppdCompact">0.00</div>
           </div>
 
-          <div class="compact-block">
+          <div class="compact-block no-cricket">
             <div class="compact-label">Avg</div>
             <div class="compact-value" id="roundAvgCompact">0.00</div>
           </div>
 
-          <div class="compact-block">
+          <div class="compact-block no-cricket">
             <div class="compact-label">Max</div>
             <div class="compact-value" id="maxRoundCompact">0</div>
+          </div>
+
+          <!-- クリケット -->
+          <div class="compact-block cricket-only">
+            <div class="compact-label">MPR</div>
+            <div class="compact-value" id="cricketMprCompact">0.00</div>
+          </div>
+
+          <div class="compact-block cricket-only">
+            <div class="compact-label">Marks</div>
+            <div class="compact-value" id="cricketMarksCompact">0</div>
+          </div>
+
+          <div class="compact-block cricket-only">
+            <div class="compact-label">Close</div>
+            <div class="compact-value" id="cricketClosedCompact">0/7</div>
           </div>
         </div>
 
@@ -206,8 +225,46 @@
               </div>
             </div>
 
+            <!-- ===== クリケット：今の設定での平均 MPR・クローズ率（cu_ui.js の renderCricketRecord()） ===== -->
+            <div class="stats-kpi cricket-only">
+              <div class="kpi-item">
+                <div class="kpi-label">AVG MPR</div>
+                <div class="kpi-value" id="cricketAvgMpr">-</div>
+                <div class="kpi-sub" id="cricketBestMpr"></div>
+              </div>
+
+              <div class="kpi-item">
+                <div class="kpi-label">CLOSE</div>
+                <div class="kpi-value" id="cricketCloseRate">-</div>
+                <div class="kpi-sub" id="cricketCloseRateSub"></div>
+              </div>
+            </div>
+
+            <!-- ===== クリケットの KPI 行（stats.js の updateCricketStats()） ===== -->
+            <div class="stats-kpi cricket-only">
+              <div class="kpi-item">
+                <div class="kpi-label">MPR</div>
+                <div class="kpi-value" id="cricketMpr">0.00</div>
+              </div>
+
+              <div class="kpi-item">
+                <div class="kpi-label">MARKS</div>
+                <div class="kpi-value" id="cricketMarks">0</div>
+              </div>
+
+              <div class="kpi-item">
+                <div class="kpi-label">CLOSE</div>
+                <div class="kpi-value" id="cricketClosed">0/7</div>
+              </div>
+
+              <div class="kpi-item">
+                <div class="kpi-label">MAX</div>
+                <div class="kpi-value" id="cricketMaxMarks">0</div>
+              </div>
+            </div>
+
             <!-- ===== KPI行 ===== -->
-            <div class="stats-kpi">
+            <div class="stats-kpi no-cricket">
               <div class="kpi-item">
                 <div class="kpi-label">PPD</div>
                 <div class="kpi-value" id="ppd">0</div>
@@ -254,11 +311,25 @@
 
                 <span class="percent" id="innerBullPercent">0.0%</span>
               </div>
+
+              <div class="stat-row cricket-only">
+                <span class="label">Triple</span>
+                <span class="count" id="cricketTriples">0</span>
+
+                <div class="bar-bg">
+                  <div class="bar-fill triple" id="cricketTripleBar"></div>
+                </div>
+
+                <span class="percent" id="cricketTriplePercent">0.0%</span>
+              </div>
             </div>
 
             <hr class="stats-divider" />
 
-            <div class="awards">
+            <!-- クリケットのアワード（取ったものだけ。stats.js の updateCricketStats()） -->
+            <div id="cricketAwards" class="awards cricket-only"></div>
+
+            <div class="awards no-cricket">
               <div class="award-card" id="award-hattrick">
                 <div class="award-title">Hat Trick</div>
                 <div class="award-value" id="hatTrick">0</div>
@@ -322,6 +393,7 @@
     <script src="js/game/stats.js" defer></script>
     <script src="js/game/game_core.js" defer></script>
     <script src="js/game/game_01.js" defer></script>
+    <script src="js/game/game_cricket.js" defer></script>
     <script src="js/game/game_countup.js" defer></script>
     <script src="js/game/board_input.js" defer></script>
     <script src="js/data/heatmap.js" defer></script>

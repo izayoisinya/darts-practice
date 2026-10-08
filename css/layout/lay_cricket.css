@@ -1,0 +1,239 @@
+/* ================================= */
+/* ============ CRICKET ============ */
+/* ================================= */
+/* クリケット（countup.html?game=cricket。body に game-cricket）だけで使うもの */
+
+/* クリケットのときだけ出すもの / クリケットのときは隠すもの */
+body:not(.game-cricket) .cricket-only {
+  display: none !important;
+}
+
+body.game-cricket .no-cricket {
+  display: none !important;
+}
+
+/* 01・クリケットのときだけ出すもの（ヘッダーの設定） */
+body:not(.game-01):not(.game-cricket) .config-only {
+  display: none !important;
+}
+
+
+/* ===== 記入表（20〜15・BULL）===== */
+/* Rounds エリアの上と、ボードの左上のパネルで使う（cu_ui.js の createCricketBoardHtml()） */
+.cricket-board {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+
+  margin-bottom: 10px;
+}
+
+.cricket-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  min-width: 0;
+  padding: 6px 0 4px;
+
+  border-radius: 8px;
+  background: #1c212c;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .05),
+    0 2px 4px rgba(0, 0, 0, .4);
+}
+
+.cricket-target {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+
+  color: #e6edf3;
+  font-variant-numeric: tabular-nums;
+}
+
+/* マスが狭いとき（スマホ縦など）は記号もマスの幅に合わせて縮める */
+.cricket-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  max-width: 26px;
+  min-height: 12px;
+  padding: 0 2px;
+  box-sizing: border-box;
+}
+
+.cricket-mark-icon {
+  display: block;
+  width: 100%;
+  height: auto;
+
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+
+  filter: drop-shadow(0 0 3px rgb(var(--accent-rgb) / 0.6));
+}
+
+.cricket-points {
+  min-height: 12px;
+
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+
+  color: #ffd54f;
+  font-variant-numeric: tabular-nums;
+}
+
+/* クローズした数字 */
+.cricket-cell.closed {
+  background: rgb(var(--accent-rgb) / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(var(--accent-rgb) / 0.45);
+}
+
+.cricket-cell.closed .cricket-target {
+  color: var(--accent);
+}
+
+/* ボードの左上のパネル（狭いので小さく） */
+.cricket-board-side {
+  gap: 3px;
+  margin-bottom: 0;
+}
+
+.cricket-board-side .cricket-cell {
+  padding: 4px 0 3px;
+  border-radius: 6px;
+}
+
+.cricket-board-side .cricket-target {
+  font-size: 12px;
+}
+
+.cricket-board-side .cricket-mark {
+  max-width: 24px;
+}
+
+/* スマホ縦：Rounds の列が狭いので小さく */
+body.phone.portrait .cricket-board {
+  gap: 2px;
+}
+
+body.phone.portrait .cricket-cell {
+  padding: 4px 0 3px;
+  border-radius: 6px;
+}
+
+body.phone.portrait .cricket-target {
+  font-size: 11px;
+}
+
+body.phone.portrait .cricket-points {
+  min-height: 9px;
+  font-size: 9px;
+}
+
+.cricket-board-side .cricket-points {
+  min-height: 9px;
+  font-size: 9px;
+}
+
+
+/* ===== Rounds ===== */
+/* 入った場所（T20 など）を出すので、文字を少し小さく */
+body.game-cricket .dart {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dart.cricket-off {
+  color: rgb(255 255 255 / 0.3);
+}
+
+body.game-cricket .round-score small {
+  margin-left: 1px;
+  font-size: 0.6em;
+  opacity: 0.7;
+}
+
+/* ヘッダー：入った場所は文字数が多いので小さく */
+body.game-cricket .header-dart {
+  font-size: 0.8em;
+}
+
+
+/* ===== ボード ===== */
+/* クリケットの数字以外は暗く、クローズした数字もうっすら暗くする（cu_ui.js の renderCricketBoard()） */
+body.game-cricket .board-svg .seg.cricket-off {
+  opacity: 0.28;
+}
+
+body.game-cricket .board-svg .seg.cricket-closed {
+  opacity: 0.55;
+}
+
+body.game-cricket .board-number.cricket-off {
+  opacity: 0.35;
+}
+
+body.game-cricket .board-number.cricket-closed {
+  fill: var(--accent);
+  text-decoration: line-through;
+}
+
+
+/* ===== Stats ===== */
+.bar-fill.triple {
+  background: #4da3ff;
+}
+
+body.game-cricket .bar-fill.inner {
+  background: #ffd54f;
+}
+
+
+/* ===== ボタン入力 ===== */
+/* 使う数字は 20〜15 の 6 行だけなので、1 列で入力エリアの高さいっぱいに大きく並べる（端末ごとの 2 列の指定より優先） */
+body.game-cricket .number-table:not(.board-mode) {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+body.game-cricket .number-table:not(.board-mode) .number-row {
+  flex: 1 1 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: stretch;
+  gap: 8px;
+
+  min-height: 34px;
+  max-height: 84px;
+}
+
+body.game-cricket .number-table:not(.board-mode) .number-row button {
+  padding: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* スマホ横：高さが足りないので行の間と最小の高さを詰める */
+body.game-cricket.phone.landscape .number-table:not(.board-mode) {
+  gap: 4px;
+}
+
+body.game-cricket.phone.landscape .number-table:not(.board-mode) .number-row {
+  min-height: 0;
+  gap: 6px;
+}
+
+body.game-cricket.phone.landscape .number-table:not(.board-mode) .number-row button {
+  font-size: 16px;
+}

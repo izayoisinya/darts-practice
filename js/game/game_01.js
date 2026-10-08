@@ -113,36 +113,9 @@ function computeZeroOne(rounds = game.rounds, config = zeroOneConfig) {
   }
 }
 
-// 記録から、次に入れる場所（game.currentRound / currentDart）を決め直す。
-// バスト・上がりのラウンドは 3 本そろっていなくても終わり。上がったら以降は入れない
+// 記録から、次に入れる場所（game.currentRound / currentDart）を決め直す（game_core.js の syncPositionFromState()）
 function syncZeroOnePosition() {
-
-  const state = computeZeroOne()
-
-  for (let i = 0; i < game.rounds.length; i++) {
-    const info = state.rounds[i]
-
-    // 終わったラウンドの残りの枠は空にしておく（バスト・上がりのあとの投は無効）
-    if (info.closed) {
-      for (let d = info.thrown; d < 3; d++) game.rounds[i][d] = null
-    }
-
-    if (info.finished) {
-      for (let r = i + 1; r < game.rounds.length; r++) game.rounds[r] = [null, null, null]
-      game.currentRound = i + 1
-      game.currentDart = 0
-      return
-    }
-
-    if (!info.closed) {
-      game.currentRound = i
-      game.currentDart = info.thrown
-      return
-    }
-  }
-
-  game.currentRound = game.rounds.length
-  game.currentDart = 0
+  syncPositionFromState(computeZeroOne())
 }
 
 // 今の設定で終えたゲームの記録から、上がり率と上がるまでのダーツ数を集計する
@@ -181,9 +154,21 @@ function getZeroOneResult() {
   }
 }
 
-// ラウンドごとの点（グラフ・Rounds・集計用。カウントアップと 01 で共通の形）
-//   done：終わったラウンドか / score：そのラウンドの点（01 のバストは 0）/ thrown：投げた本数 / bust
+// ラウンドごとの点（グラフ・Rounds・集計用。カウントアップ・01・クリケットで共通の形）
+//   done：終わったラウンドか / score：そのラウンドの点（01 のバストは 0。クリケットはマーク数）/ thrown：投げた本数 / bust
 function getRoundScoreList() {
+
+  // クリケット：そのラウンドのマーク数
+  if (GAME_TYPE === "cricket") {
+    return computeCricket().rounds.map(info => ({
+      done: info.closed,
+      score: info.marks,
+      thrown: info.thrown,
+      bust: false,
+      finished: info.finished,
+      remaining: 0
+    }))
+  }
 
   if (GAME_TYPE === "01") {
     return computeZeroOne().rounds.map(info => ({

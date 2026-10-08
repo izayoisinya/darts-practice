@@ -1,8 +1,9 @@
 // ===============================
 // ===== データ画面の 01 ===========
 // ===============================
-// ヘッダーの COUNT-UP / 01 の切り替えと、01 の記録の表示（設定ごとの上がり率・上がるまでのダーツ数・推移・一覧）。
-// 01 のときは body に data-01 を付け、カウントアップと同じ場所（右の History・左の Stats）に 01 の記録を出す
+// ヘッダーの COUNT-UP / 01 / CRICKET の切り替えと、01 の記録の表示（設定ごとの上がり率・上がるまでのダーツ数・推移・一覧）。
+// 01・クリケットのときは body に data-01 を付け、カウントアップと同じ場所（右の History・左の Stats）に記録を出す
+// （クリケットは data-cricket も付け、中身は data_cricket.js の renderCricketData()）
 
 const DATA_GAME_KEY = "dartsDataGame"
 const DATA_01_OUT_LABELS = { open: "Open Out", double: "Double Out", master: "Master Out" }
@@ -43,13 +44,14 @@ function initDataGameSwitch() {
     btn.addEventListener("click", () => setDataGameType(btn.dataset.game))
   })
 
-  // data.html?game=01 なら 01 から。それ以外は前回見ていた方
+  // data.html?game=01 / ?game=cricket ならそのゲームから。それ以外は前回見ていた方
   let initial = "countup"
-  if (/[?&]game=01(&|$)/.test(location.search)) {
-    initial = "01"
+  const match = /[?&]game=(01|cricket)(&|$)/.exec(location.search)
+  if (match) {
+    initial = match[1]
   } else {
     try {
-      initial = localStorage.getItem(DATA_GAME_KEY) === "01" ? "01" : "countup"
+      initial = localStorage.getItem(DATA_GAME_KEY) || "countup"
     } catch {
       initial = "countup"
     }
@@ -60,7 +62,7 @@ function initDataGameSwitch() {
 
 function setDataGameType(type) {
 
-  dataGameType = type === "01" ? "01" : "countup"
+  dataGameType = type === "01" || type === "cricket" ? type : "countup"
 
   try {
     localStorage.setItem(DATA_GAME_KEY, dataGameType)
@@ -68,15 +70,17 @@ function setDataGameType(type) {
     // 保存できなくても表示はそのまま
   }
 
-  document.body.classList.toggle("data-01", dataGameType === "01")
+  document.body.classList.toggle("data-01", dataGameType !== "countup")
+  document.body.classList.toggle("data-cricket", dataGameType === "cricket")
   document.querySelectorAll("#dataGameSwitch button").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.game === dataGameType)
   })
 
-  if (dataGameType === "01") {
-    // 01 は Game の表示（左に Stats、右に History）だけ。Analysis や Day などを見ていたら Game に戻してから 01 を描く
+  if (dataGameType !== "countup") {
+    // 01・クリケットは Game の表示（左に Stats、右に History）だけ。Analysis や Day などを見ていたら Game に戻してから描く
     if (typeof changeView === "function" && (viewMode !== "game" || detailViewMode)) changeView("game")
-    renderZeroOneData()
+    if (dataGameType === "01") renderZeroOneData()
+    else if (typeof renderCricketData === "function") renderCricketData()
   } else if (typeof changeView === "function" && document.getElementById("zeroOneStatsPanel")?.innerHTML) {
     // 01 で上書きした History をカウントアップの表示に戻す
     changeView(viewMode || "game")
@@ -86,10 +90,11 @@ function setDataGameType(type) {
 // 画面の大きさ・向きが変わったら 01 のグラフも描き直す
 let data01ResizeTimer = null
 window.addEventListener("resize", () => {
-  if (dataGameType !== "01") return
+  if (dataGameType === "countup") return
   clearTimeout(data01ResizeTimer)
   data01ResizeTimer = setTimeout(() => {
-    drawZeroOneChart(getZeroOneFilteredSessions())
+    if (dataGameType === "01") drawZeroOneChart(getZeroOneFilteredSessions())
+    else drawCricketChart(getCricketFilteredSessions())
   }, 150)
 })
 
@@ -432,12 +437,20 @@ window.redrawVisibleCharts = function () {
     drawZeroOneChart(getZeroOneFilteredSessions())
     return
   }
+  if (dataGameType === "cricket") {
+    drawCricketChart(getCricketFilteredSessions())
+    return
+  }
   if (redrawVisibleChartsForCountUp) redrawVisibleChartsForCountUp()
 }
 
 // フッターの Prev / Next は、01 を見ているときは 01 の History のページを送る
 const changePageForCountUp = typeof changePage === "function" ? changePage : null
 window.changePage = function (direction) {
+  if (dataGameType === "cricket") {
+    changeCricketPage(direction)
+    return
+  }
   if (dataGameType !== "01") {
     if (changePageForCountUp) changePageForCountUp(direction)
     return

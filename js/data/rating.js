@@ -58,6 +58,36 @@ const PHOENIX_RATING_TABLE = [
   [ 0.0,  1],
 ]
 
+// DARTSLIVE のクリケット（MPR）の目安。RT 2 が 1.30 で、0.20 ごとに 1 つ上がる（RT 18 が 4.50）
+const DARTSLIVE_MPR_TABLE = [
+  [4.50, 18],
+  [4.30, 17],
+  [4.10, 16],
+  [3.90, 15],
+  [3.70, 14],
+  [3.50, 13],
+  [3.30, 12],
+  [3.10, 11],
+  [2.90, 10],
+  [2.70,  9],
+  [2.50,  8],
+  [2.30,  7],
+  [2.10,  6],
+  [1.90,  5],
+  [1.70,  4],
+  [1.50,  3],
+  [1.30,  2],
+  [0.0,  1],
+]
+
+// MPR からダーツライブ風 RT（クリケットだけで見た目安）
+function calcDartsLiveRTFromMpr(mpr) {
+  for (const [threshold, rt] of DARTSLIVE_MPR_TABLE) {
+    if (mpr >= threshold) return rt
+  }
+  return 1
+}
+
 function getDartsLiveRatingReference() {
   return DARTSLIVE_RATING_TABLE.map(([ppd, rating]) => ({ ppd, rating }))
 }

@@ -20,9 +20,15 @@ function initGame(load = true) {
     TOTAL_ROUNDS = zeroOneConfig.rounds
   }
 
+  // クリケット：設定（ラウンドの上限）を読み込む。進行中のゲームがあれば、そのゲームの設定を使う（loadGame()）
+  if (GAME_TYPE === "cricket") {
+    cricketConfig = readCricketConfig()
+    TOTAL_ROUNDS = cricketConfig.rounds
+  }
+
   if (load && loadGame()) {
     // セーブデータ読み込み成功
-    if (GAME_TYPE === "01") syncZeroOnePosition()
+    if (hasRoundState()) syncGamePosition()
   } else {
 
     game.currentRound = 0
@@ -57,7 +63,7 @@ function initGame(load = true) {
 function addDart(value, multiplier, special = null, boardTap = null, pos = null) {
   
   if (game.currentRound >= TOTAL_ROUNDS) return
-  if (GAME_TYPE === "01" && isGameComplete()) return
+  if (hasRoundState() && isGameComplete()) return
   
   if (game.currentDart === 0 && game.currentRound > lockedRound + 1) {
     lockedRound = game.currentRound - 1
@@ -82,9 +88,9 @@ function addDart(value, multiplier, special = null, boardTap = null, pos = null)
 
   game.rounds[game.currentRound][game.currentDart] = dart
   
-  if (GAME_TYPE === "01") {
-    // バスト・上がりのときは 3 本そろわなくてもラウンドが終わる
-    syncZeroOnePosition()
+  if (hasRoundState()) {
+    // バスト・上がり・全部クローズのときは 3 本そろわなくてもラウンドが終わる
+    syncGamePosition()
   } else {
     game.currentDart++
     

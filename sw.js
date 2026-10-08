@@ -1,5 +1,5 @@
-const APP_CACHE = "darts-app-v69"
-const RUNTIME_CACHE = "darts-runtime-v69"
+const APP_CACHE = "darts-app-v70"
+const RUNTIME_CACHE = "darts-runtime-v70"
 
 const PRECACHE_URLS = [
   "./",
@@ -21,6 +21,7 @@ const PRECACHE_URLS = [
   "./css/layout/lay_header.css",
   "./css/layout/lay_input.css",
   "./css/layout/lay_menu.css",
+  "./css/layout/lay_cricket.css",
   "./css/layout/lay_round.css",
   "./css/layout/lay_stats.css",
   "./css/responsive/desktop.css",
@@ -37,10 +38,12 @@ const PRECACHE_URLS = [
   "./js/data/data.js",
   "./js/data/heatmap.js",
   "./js/data/data_01.js",
+  "./js/data/data_cricket.js",
   "./js/game/board_input.js",
   "./js/game/cu_ui.js",
   "./js/game/game_core.js",
   "./js/game/game_01.js",
+  "./js/game/game_cricket.js",
   "./js/game/game_countup.js",
   "./js/game/stats.js",
   "./js/init/main.js",

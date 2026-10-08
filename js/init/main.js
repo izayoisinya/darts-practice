@@ -35,8 +35,10 @@ async function initApp() {
     const hasSavedGame = !!localStorage.getItem(SAVE_KEY)
     initGame(true)
     setupZeroOneScreen()
-    if (GAME_TYPE === "01") {
+    if (GAME_TYPE === "01" || GAME_TYPE === "cricket") {
       renderZeroOneRecord()
+      renderCricketRecord()
+      renderCricketBoard()
       if (!hasSavedGame) openZeroOneSetup()
     }
   }

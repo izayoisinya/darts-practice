@@ -278,15 +278,26 @@
         min-width: 0;
       }
 
-      /* 横向き：左の列で Game・Display の 2 段分を受け持ち、右の欄をスクロールしている間も上に止めて見せる */
+      /*
+        横向き：左の列は Layout Preview の下に Game、右の列は Display（プレビューが変わる Game Panels）の下に
+        データ保存状況・バックアップ。プレビューと Display を横に並べ、設定を変えながら図を見られるようにする
+      */
       .landscape .layout-preview-panel,
       .desktop .layout-preview-panel {
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .landscape .display-panel,
+      .desktop .display-panel {
+        grid-column: 2;
         grid-row: 1 / span 2;
-        align-self: start;
-        position: -webkit-sticky;
-        position: sticky;
-        top: 0;
-        z-index: 1;
+      }
+
+      .landscape .game-panel,
+      .desktop .game-panel {
+        grid-column: 1;
+        grid-row: 2 / span 3;
       }
 
       .layout-preview {
@@ -515,7 +526,76 @@
         <p id="layoutPreviewNote" class="setting-help"></p>
       </section>
 
-      <section class="settings-panel">
+      <section class="settings-panel display-panel">
+        <h2 class="panel-title">Display</h2>
+
+        <div class="setting-group">
+          <label for="orientationSetting">Screen Orientation</label>
+
+          <select id="orientationSetting">
+            <option value="auto">Free</option>
+            <option value="portrait">Portrait Lock</option>
+            <option value="landscape">Landscape Lock</option>
+          </select>
+
+          <p class="setting-help">
+            一部端末ではブラウザ仕様上、画面回転ロックが適用されない場合があります。
+          </p>
+          <p id="orientationStatus" class="orientation-status"></p>
+        </div>
+
+        <div class="setting-group">
+          <label>Game Panels</label>
+
+          <div class="tab-toggle-grid">
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="gamePanelRound" checked />
+              <label for="gamePanelRound">Rounds</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="gamePanelStats" checked />
+              <label for="gamePanelStats">Stats</label>
+            </div>
+          </div>
+
+          <p class="setting-help">
+            カウントアップ画面に表示するエリアを選べます。Input は常に表示します。
+          </p>
+        </div>
+
+        <div class="setting-group">
+          <label>Data Tabs</label>
+
+          <div class="tab-toggle-grid">
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="tabToggleAnalysis" checked />
+              <label for="tabToggleAnalysis">Analysis</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="tabToggleDay" checked />
+              <label for="tabToggleDay">Day</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="tabToggleWeek" checked />
+              <label for="tabToggleWeek">Week</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="tabToggleMonth" checked />
+              <label for="tabToggleMonth">Month</label>
+            </div>
+            <div class="tab-toggle-item">
+              <input type="checkbox" id="tabToggleYear" checked />
+              <label for="tabToggleYear">Year</label>
+            </div>
+          </div>
+
+          <p class="setting-help">
+            データ画面の下に表示するタブを選べます。Game タブは常に表示します。
+          </p>
+        </div>
+      </section>
+
+      <section class="settings-panel game-panel">
         <h2 class="panel-title">Game</h2>
 
         <div class="setting-group">
@@ -602,75 +682,6 @@
             <option value="10">10</option>
             <option value="15">15</option>
           </select>
-        </div>
-      </section>
-
-      <section class="settings-panel">
-        <h2 class="panel-title">Display</h2>
-
-        <div class="setting-group">
-          <label for="orientationSetting">Screen Orientation</label>
-
-          <select id="orientationSetting">
-            <option value="auto">Free</option>
-            <option value="portrait">Portrait Lock</option>
-            <option value="landscape">Landscape Lock</option>
-          </select>
-
-          <p class="setting-help">
-            一部端末ではブラウザ仕様上、画面回転ロックが適用されない場合があります。
-          </p>
-          <p id="orientationStatus" class="orientation-status"></p>
-        </div>
-
-        <div class="setting-group">
-          <label>Game Panels</label>
-
-          <div class="tab-toggle-grid">
-            <div class="tab-toggle-item">
-              <input type="checkbox" id="gamePanelRound" checked />
-              <label for="gamePanelRound">Rounds</label>
-            </div>
-            <div class="tab-toggle-item">
-              <input type="checkbox" id="gamePanelStats" checked />
-              <label for="gamePanelStats">Stats</label>
-            </div>
-          </div>
-
-          <p class="setting-help">
-            カウントアップ画面に表示するエリアを選べます。Input は常に表示します。
-          </p>
-        </div>
-
-        <div class="setting-group">
-          <label>Data Tabs</label>
-
-          <div class="tab-toggle-grid">
-            <div class="tab-toggle-item">
-              <input type="checkbox" id="tabToggleAnalysis" checked />
-              <label for="tabToggleAnalysis">Analysis</label>
-            </div>
-            <div class="tab-toggle-item">
-              <input type="checkbox" id="tabToggleDay" checked />
-              <label for="tabToggleDay">Day</label>
-            </div>
-            <div class="tab-toggle-item">
-              <input type="checkbox" id="tabToggleWeek" checked />
-              <label for="tabToggleWeek">Week</label>
-            </div>
-            <div class="tab-toggle-item">
-              <input type="checkbox" id="tabToggleMonth" checked />
-              <label for="tabToggleMonth">Month</label>
-            </div>
-            <div class="tab-toggle-item">
-              <input type="checkbox" id="tabToggleYear" checked />
-              <label for="tabToggleYear">Year</label>
-            </div>
-          </div>
-
-          <p class="setting-help">
-            データ画面の下に表示するタブを選べます。Game タブは常に表示します。
-          </p>
         </div>
       </section>
 

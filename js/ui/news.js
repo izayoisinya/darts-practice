@@ -249,6 +249,11 @@ const INFO_CONTENT = {
       date: "2026/10/08",
       badge: "UI",
       text: "データ画面にトップを追加しました。開くと成績のまとめと、見る画面（Games / Analysis / Day / Week / Month / Year）を選ぶカード、最近のゲームが出ます。各画面からは左上の「‹ Top」で戻れます。"
+    },
+    {
+      date: "2026/10/08",
+      badge: "UI",
+      text: "設定画面の Layout Preview を半分の幅にし、設定をスクロールしている間も見えるようにしました。データ画面のタブの図は外しました。"
     }
   ],
   notice: [

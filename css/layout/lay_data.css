@@ -2739,3 +2739,25 @@ body.data-01 .bar-fill.inner,
 body.data-01 .detail-bull-rate-bar-fill.inner {
   background: #ffd54f;
 }
+
+/* 履歴カードを開いたときの、そのゲームのヒートマップ（heatmap.js の drawSessionHeatmaps()） */
+.session-heatmap-block {
+  flex: none;
+}
+
+.session-heatmap {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.session-heatmap-empty {
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* 閉じているカードでは出さない */
+#sessionsContainer .session-card:not(.is-expanded) .session-heatmap-block {
+  display: none;
+}

@@ -164,11 +164,6 @@ body.game-cricket .round-score small {
   opacity: 0.7;
 }
 
-/* ヘッダー：入った場所は文字数が多いので小さく */
-body.game-cricket .header-dart {
-  font-size: 0.8em;
-}
-
 
 /* ===== ボード ===== */
 /* クリケットの数字以外は暗く、狙う数字（まだクローズしていない）は縁を光らせて数字を大きく明るく、

@@ -2173,18 +2173,21 @@ body.page-data.phone.portrait main.data-container {
   タップで .is-expanded が付き、ブル率・トリプル・ラウンドスコア・アワードをすべて表示する。
   端末別の指定より優先させるため #sessionsContainer から指定する。
 */
-#sessionsContainer .session-card {
+#sessionsContainer .session-card,
+#dataHubDayList .session-card {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-#sessionsContainer .session-card:focus-visible {
+#sessionsContainer .session-card:focus-visible,
+#dataHubDayList .session-card:focus-visible {
   outline: 2px solid rgb(var(--accent-rgb) / 0.7);
   outline-offset: 2px;
 }
 
-#sessionsContainer .session-card.is-expanded {
+#sessionsContainer .session-card.is-expanded,
+#dataHubDayList .session-card.is-expanded {
   border-color: rgb(var(--accent-rgb) / 0.45);
 }
 
@@ -2204,7 +2207,8 @@ body.page-data.phone.portrait main.data-container {
   transition: transform 0.2s ease;
 }
 
-#sessionsContainer .session-card.is-expanded .session-toggle-icon {
+#sessionsContainer .session-card.is-expanded .session-toggle-icon,
+#dataHubDayList .session-card.is-expanded .session-toggle-icon {
   transform: translateY(2px) rotate(-135deg);
 }
 
@@ -2216,33 +2220,42 @@ body.page-data.phone.portrait main.data-container {
 
 /* 縮小表示：KPI と要約だけ
    （縦向きではカード全体をグリッドで割り付けているため、縮小時は通常の縦並びに戻す） */
-#sessionsContainer .session-card:not(.is-expanded) {
+#sessionsContainer .session-card:not(.is-expanded),
+#dataHubDayList .session-card:not(.is-expanded) {
   display: block;
 }
 
-#sessionsContainer .session-card:not(.is-expanded) .session-card-header {
+#sessionsContainer .session-card:not(.is-expanded) .session-card-header,
+#dataHubDayList .session-card:not(.is-expanded) .session-card-header {
   margin-bottom: 10px;
 }
 
-#sessionsContainer .session-card:not(.is-expanded) .session-card-body {
+#sessionsContainer .session-card:not(.is-expanded) .session-card-body,
+#dataHubDayList .session-card:not(.is-expanded) .session-card-body {
   display: block;
 }
 
-#sessionsContainer .session-card:not(.is-expanded) .session-main-block {
+#sessionsContainer .session-card:not(.is-expanded) .session-main-block,
+#dataHubDayList .session-card:not(.is-expanded) .session-main-block {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
 #sessionsContainer .session-card:not(.is-expanded) .session-rate-group,
+#dataHubDayList .session-card:not(.is-expanded) .session-rate-group,
 #sessionsContainer .session-card:not(.is-expanded) .session-triple-block,
+#dataHubDayList .session-card:not(.is-expanded) .session-triple-block,
 #sessionsContainer .session-card:not(.is-expanded) .session-side-block,
-#sessionsContainer .session-card:not(.is-expanded) .session-awards-block {
+#dataHubDayList .session-card:not(.is-expanded) .session-side-block,
+#sessionsContainer .session-card:not(.is-expanded) .session-awards-block,
+#dataHubDayList .session-card:not(.is-expanded) .session-awards-block {
   display: none;
 }
 
 /* 全項目表示：要約は不要 */
-#sessionsContainer .session-card.is-expanded .session-compact-summary {
+#sessionsContainer .session-card.is-expanded .session-compact-summary,
+#dataHubDayList .session-card.is-expanded .session-compact-summary {
   display: none;
 }
 
@@ -2259,7 +2272,9 @@ body.page-data.phone.portrait main.data-container {
 }
 
 #sessionsContainer .session-card.is-expanded .session-card-body,
-#sessionsContainer .session-card.is-expanded .session-awards-block {
+#dataHubDayList .session-card.is-expanded .session-card-body,
+#sessionsContainer .session-card.is-expanded .session-awards-block,
+#dataHubDayList .session-card.is-expanded .session-awards-block {
   animation: sessionCardExpand 0.2s ease both;
 }
 
@@ -2782,7 +2797,8 @@ body.data-01 .detail-bull-rate-bar-fill.inner {
 }
 
 /* 閉じているカードでは出さない */
-#sessionsContainer .session-card:not(.is-expanded) .session-heatmap-block {
+#sessionsContainer .session-card:not(.is-expanded) .session-heatmap-block,
+#dataHubDayList .session-card:not(.is-expanded) .session-heatmap-block {
   display: none;
 }
 
@@ -3074,6 +3090,50 @@ body.page-data.data-hub-open main.data-container {
   line-height: 1;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
+}
+
+/* 練習した日は押せる（その日のゲームを出す） */
+button.data-hub-cal-day {
+  width: 100%;
+  padding: 0;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.data-hub-cal-day.selected {
+  background: rgb(var(--accent-rgb) / 0.55);
+  box-shadow: inset 0 0 0 2px var(--accent), 0 0 10px rgb(var(--accent-rgb) / 0.45);
+}
+
+.data-hub-cal-day.selected .data-hub-cal-count {
+  color: #effffb;
+}
+
+/* 選んだ日のゲーム */
+.data-hub-day-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.data-hub-day-top .data-hub-section-title {
+  margin: 0;
+}
+
+.data-hub-day-close {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.data-hub-day-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .data-hub-cal-day.today {

@@ -269,6 +269,11 @@ const INFO_CONTENT = {
       date: "2026/10/08",
       badge: "UI",
       text: "データ画面を Games と Analysis の 2 つに絞りました。Day / Week / Month / Year は一旦お休みにし、トップに練習した日のカレンダーを表示します。"
+    },
+    {
+      date: "2026/10/08",
+      badge: "機能追加",
+      text: "データ画面のカレンダーで、練習した日を押すとその日のゲームが見られるようになりました。データ画面の見出しを Data に変えました。"
     }
   ],
   notice: [

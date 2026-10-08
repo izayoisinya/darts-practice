@@ -573,13 +573,35 @@ function renderGameHeatmap(size) {
 
   const count = document.getElementById("gameHeatmapCount")
   if (count) {
-    // カウントアップ（ブルを狙う）のときは、RANGE の目安（中心のまわりのまとまりの直径。heatmap.js の getRangeStats()）も出す
-    const range = GAME_TYPE === "countup" && typeof getRangeStats === "function" ? getRangeStats(points) : null
+    // RANGE の目安（中心のまわりのまとまりの直径。heatmap.js の getRangeStats()）も出す。
+    // 01 はブルを狙う場面（最初の点数の 80% を減らすまで）の投だけで出す
+    const rangePoints = GAME_TYPE === "01" ? getZeroOneBullPhasePoints() : points
+    const range = typeof getRangeStats === "function" ? getRangeStats(rangePoints) : null
     count.textContent = `${points.length} HIT${points.length === 1 ? "" : "S"}` +
       (range ? ` · RANGE ${range.rangeMm.toFixed(0)}mm` : "")
   }
 
   paintRadarHeatmap(ctx, size, size, points, highlight, getAccentRgb())
+}
+
+// 01：最初の点数の 80% を減らしたラウンドまでの投の位置（データ画面の getZeroOne80Darts() と同じ範囲）
+function getZeroOneBullPhasePoints() {
+
+  const state = computeZeroOne()
+  const goal = zeroOneConfig.start * 0.8
+  const points = []
+  let scored = 0
+
+  for (let i = 0; i < game.rounds.length; i++) {
+    if (!state.rounds[i].thrown) break
+    game.rounds[i].forEach(dart => {
+      if (dart && dart.pos) points.push(dart.pos)
+    })
+    scored += state.rounds[i].score
+    if (scored >= goal) break
+  }
+
+  return points
 }
 
 function renderGameSideChart(width, height) {

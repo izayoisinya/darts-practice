@@ -602,19 +602,27 @@ function drawRangeCircles(ctx, width, height, range) {
 // ===============================
 // 履歴カード（カウントアップ・01）を開いたときに、そのゲームの刺さった位置を出す。
 // カードを作るときは位置だけを canvas に持たせ（閉じている間は大きさが測れないため）、開いたときに描く（data_loader.js の toggleSessionCard()）
-function createSessionHeatmapHtml(session, showRange = false) {
+//   showRange：RANGE（中心のまわりのまとまり）も出すか / rangePoints：RANGE に使う位置（01 はブルを狙う場面の投だけ。省くと全部の投）
+function createSessionHeatmapHtml(session, showRange = false, rangePoints = null) {
 
   const points = (Array.isArray(session.darts) ? session.darts : [])
     .filter(dart => dart && dart.pos)
     .map(dart => [+dart.pos.x.toFixed(3), +dart.pos.y.toFixed(3)])
 
+  const forRange = rangePoints
+    ? rangePoints.map(p => [+p.x.toFixed(3), +p.y.toFixed(3)])
+    : points
+  const range = showRange && forRange.length >= 3
+    ? getRangeStats(forRange.map(([x, y]) => ({ x, y })))
+    : null
+
   const body = points.length
-    ? `<canvas class="session-heatmap" data-points='${JSON.stringify(points)}' data-range="${showRange ? 1 : 0}"></canvas>`
+    ? `<canvas class="session-heatmap" data-points='${JSON.stringify(points)}'${range ? ` data-range-points='${JSON.stringify(forRange)}'` : ""}></canvas>`
     : '<div class="session-heatmap-empty">位置の記録がありません（ボード入力のゲームだけ）</div>'
 
   return `
     <div class="session-meta-block session-heatmap-block">
-      <div class="session-meta-title">Heatmap${points.length ? `（${points.length} 投${showRange && points.length >= 3 ? ` · RANGE ${getRangeStats(points.map(([x, y]) => ({ x, y }))).rangeMm.toFixed(1)}mm` : ""}）` : ""}</div>
+      <div class="session-meta-title">Heatmap${points.length ? `（${points.length} 投${range ? ` · RANGE ${range.rangeMm.toFixed(1)}mm` : ""}）` : ""}</div>
       ${body}
     </div>
   `
@@ -645,8 +653,16 @@ function drawSessionHeatmaps(card) {
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
 
     paintHeatmap(ctx, size, size, points)
-    // ブルを狙うカウントアップは、中心からの距離（50%・80% の円）も重ねる
-    if (canvas.dataset.range === "1") drawRangeCircles(ctx, size, size, getRangeStats(points))
+
+    // RANGE の円（実線）と 8 割の円（点線）も重ねる
+    if (canvas.dataset.rangePoints) {
+      try {
+        const rangePoints = JSON.parse(canvas.dataset.rangePoints).map(([x, y]) => ({ x, y }))
+        drawRangeCircles(ctx, size, size, getRangeStats(rangePoints))
+      } catch {
+        // 読めないときは円を描かない
+      }
+    }
   })
 }
 

@@ -162,6 +162,7 @@ function renderZeroOneData() {
       <div class="z1-award-cards">${renderZeroOneAwardCards(list)}</div>
     </section>
     ${renderZeroOneHitRates(list)}
+    ${renderZeroOneRange(list)}
     <section class="data-summary-section">
       <h3 class="data-section-title">Darts to Finish (Last ${DATA_01_CHART_GAMES} Games)</h3>
       <canvas id="z1Chart" class="z1-chart"></canvas>
@@ -389,7 +390,7 @@ function createZeroOneCardHtml(session, gameNumber) {
           <div class="session-meta-title">Round Scores</div>
           <div class="round-chart">${createRoundChartHtml(session.roundScores || [])}</div>
         </div>
-        ${typeof createSessionHeatmapHtml === "function" ? createSessionHeatmapHtml(session) : ""}
+        ${typeof createSessionHeatmapHtml === "function" ? createSessionHeatmapHtml(session, true, getZeroOne80Points(session)) : ""}
       </div>
     </div>
 
@@ -633,6 +634,60 @@ function getZeroOneStats80(session) {
   }
 
   return rounds ? sum / rounds : null
+}
+
+// 80% スタッツと同じ範囲（最初の点数の 80% を減らしたラウンドまで）の 1 投ごとの記録。
+// 01 はこの間はブルを狙い、そのあと上がりのためにダブルなどを狙うので、RANGE はこの範囲の投だけで出す
+function getZeroOne80Darts(session) {
+
+  const z = session.zeroOne
+  const scores = Array.isArray(session.roundScores) ? session.roundScores : []
+  const darts = Array.isArray(session.darts) ? session.darts : []
+  const goal = z.start * 0.8
+  const result = []
+
+  let sum = 0
+  for (let i = 0; i < scores.length; i++) {
+    const round = darts.slice(i * 3, i * 3 + 3).filter(dart => dart)
+    if (!round.length) break
+    result.push(...round)
+    sum += Number(scores[i]) || 0
+    if (sum >= goal) break
+  }
+
+  return result
+}
+
+function getZeroOne80Points(session) {
+  return getZeroOne80Darts(session).filter(dart => dart.pos).map(dart => dart.pos)
+}
+
+// RANGE の目安（データ画面の Analysis と同じ出し方。heatmap.js の getRangeStats() / getRangeFromBullRate()）
+function renderZeroOneRange(list) {
+
+  if (typeof getRangeStats !== "function") return ""
+
+  const darts = list.flatMap(getZeroOne80Darts)
+  if (!darts.length) return ""
+
+  const points = darts.filter(dart => dart.pos).map(dart => dart.pos)
+  const range = getRangeStats(points)
+  const bulls = darts.filter(dart => dart.hit === "OB" || dart.hit === "IB").length
+  const fromBull = bulls ? getRangeFromBullRate(bulls / darts.length) : 0
+
+  return `
+    <section class="data-summary-section">
+      <h3 class="data-section-title">RANGE（目安）</h3>
+      <div class="heatmap-range">
+        <div class="heatmap-range-values">
+          <span class="main"><b>${range ? range.rangeMm.toFixed(1) : "-"}</b> mm<small>刺さった位置から</small></span>
+          <span><b>${fromBull ? fromBull.toFixed(1) : "-"}</b> mm<small>ブル率 ${(bulls / darts.length * 100).toFixed(1)}% から</small></span>
+          <span><b>${range ? range.d80Mm.toFixed(0) : "-"}</b> mm<small>8 割が入る円</small></span>
+        </div>
+        <p class="heatmap-range-note">最初の点数の 80% を減らすまで（ブルを狙う場面）の ${darts.length} 投から出した、DARTSLIVE の RANGE（ブルのまわりのまとまりの直径）に近い目安です。上がりのためにダブルなどを狙った投は入れていません。</p>
+      </div>
+    </section>
+  `
 }
 
 function renderZeroOneRating(list) {

@@ -171,21 +171,40 @@ body.game-cricket .header-dart {
 
 
 /* ===== ボード ===== */
-/* クリケットの数字以外は暗く、クローズした数字もうっすら暗くする（cu_ui.js の renderCricketBoard()） */
+/* クリケットの数字以外は暗く、狙う数字（まだクローズしていない）は縁を光らせて数字を大きく明るく、
+   クローズした数字はうっすら暗くして数字に線を引く（cu_ui.js の renderCricketBoard() が data-num ごとにクラスを付ける） */
 body.game-cricket .board-svg .seg.cricket-off {
-  opacity: 0.28;
+  opacity: 0.2;
+}
+
+body.game-cricket .board-svg .seg.cricket-open {
+  stroke: rgb(var(--accent-rgb) / 0.55);
+  stroke-width: 1.5px;
+}
+
+/* インブルはいつもの光る縁のまま */
+body.game-cricket .board-svg .seg-inner-bull.cricket-open {
+  stroke: var(--accent);
+  stroke-width: 2.5px;
 }
 
 body.game-cricket .board-svg .seg.cricket-closed {
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 body.game-cricket .board-number.cricket-off {
-  opacity: 0.35;
+  opacity: 0.25;
+}
+
+body.game-cricket .board-number.cricket-open {
+  fill: var(--accent);
+  font-size: .125px;
+  font-weight: 800;
 }
 
 body.game-cricket .board-number.cricket-closed {
-  fill: var(--accent);
+  fill: var(--text-muted);
+  opacity: 0.7;
   text-decoration: line-through;
 }
 

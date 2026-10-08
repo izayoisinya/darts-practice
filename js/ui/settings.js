@@ -354,14 +354,13 @@ function initBackupControls() {
 // ===============================
 // ===== 画面の配置のプレビュー ====
 // ===============================
-// カウントアップ画面（横向き・縦向き）とデータ画面のタブの並びを、今のフォームの値で簡単な図にする。
+// カウントアップ画面（横向き・縦向き）の並びを、今のフォームの値で簡単な図にする。
 // 実際の画面の目安（端末の大きさで細かな配置は変わる）
 function getPreviewSettingsFromForm() {
   return {
     inputMode: document.getElementById("inputModeSetting")?.value || "board",
     boardUndoButton: !!document.getElementById("boardUndoButtonSetting")?.checked,
-    gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES),
-    dataTabs: readTogglesFromForm(DATA_TAB_TOGGLES)
+    gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES)
   }
 }
 
@@ -440,12 +439,6 @@ function renderLayoutPreview(flashTarget = null) {
 
   const settings = getPreviewSettingsFromForm()
 
-  const tabNames = { analysis: "Analysis", day: "Day", week: "Week", month: "Month", year: "Year" }
-  const tabs = `<span class="pv-tab active">Game</span>` +
-    Object.keys(tabNames)
-      .map(key => `<span class="pv-tab${settings.dataTabs[key] ? "" : " off"}">${tabNames[key]}</span>`)
-      .join("")
-
   box.innerHTML = `
     <figure class="pv-figure" data-preview="game">
       <figcaption class="pv-caption">COUNT-UP（横）</figcaption>
@@ -455,10 +448,6 @@ function renderLayoutPreview(flashTarget = null) {
       <figcaption class="pv-caption">（縦）</figcaption>
       ${renderPreviewScreen(settings, false)}
     </figure>
-    <figure class="pv-figure" data-preview="data">
-      <figcaption class="pv-caption">DATA のタブ</figcaption>
-      <div class="pv-tabs">${tabs}</div>
-    </figure>
   `
 
   const note = document.getElementById("layoutPreviewNote")
@@ -466,7 +455,7 @@ function renderLayoutPreview(flashTarget = null) {
 
   // 変えた設定に関係するプレビューを少し光らせる
   if (flashTarget) {
-    box.querySelectorAll(`[data-preview="${flashTarget}"] .pv-screen, [data-preview="${flashTarget}"] .pv-tabs`)
+    box.querySelectorAll(`[data-preview="${flashTarget}"] .pv-screen`)
       .forEach(el => el.classList.add("pv-flash"))
   }
 }
@@ -493,7 +482,6 @@ function setupLayoutPreview() {
     ["boardUndoButtonSetting", "game"]
   ]
     .concat(Object.values(GAME_PANEL_TOGGLES).map(id => [id, "game"]))
-    .concat(Object.values(DATA_TAB_TOGGLES).map(id => [id, "data"]))
 
   watch.forEach(([id, target]) => {
     const input = document.getElementById(id)

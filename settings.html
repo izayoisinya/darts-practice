@@ -273,8 +273,20 @@
       }
 
       /* ===== Layout Preview（画面の配置の目安） ===== */
+      /* ほかの設定の欄と同じ 1 列分の幅（横幅いっぱいにはしない） */
       .layout-preview-panel {
-        grid-column: 1 / -1;
+        min-width: 0;
+      }
+
+      /* 横向き：左の列で Game・Display の 2 段分を受け持ち、右の欄をスクロールしている間も上に止めて見せる */
+      .landscape .layout-preview-panel,
+      .desktop .layout-preview-panel {
+        grid-row: 1 / span 2;
+        align-self: start;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 1;
       }
 
       .layout-preview {
@@ -487,37 +499,6 @@
       .pv-corner.tr { top: 10%; right: 0; }
       .pv-corner.br { bottom: 0; right: 0; }
 
-      .pv-tabs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-        max-width: 300px;
-        padding: 6px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: #0d1016;
-        transition: box-shadow 0.2s ease;
-      }
-
-      .pv-tab {
-        padding: 3px 8px;
-        border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        color: #cbd5e1;
-        font-size: 10px;
-        font-weight: 700;
-      }
-
-      .pv-tab.active {
-        border-color: var(--accent);
-        color: var(--accent);
-      }
-
-      .pv-tab.off {
-        border-style: dashed;
-        color: rgba(255, 255, 255, 0.25);
-        text-decoration: line-through;
-      }
     </style>
   </head>
 

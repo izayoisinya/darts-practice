@@ -218,9 +218,24 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 ### 4.3 data.html（データ表示画面）
 
+![データ表示画面 トップ（タブレット横）](images/data_hub_tablet.jpg)
+
+保存されたスコア記録データを表示する画面。
+
+**トップ**（`data_hub.js`）：画面を開くと最初にトップを出す（`body` に `data-hub-open`。この間はふつうの表示 `main.data-container` を隠す）。
+
+- 上に、ヘッダーで選んでいるゲーム（Count-Up / 01 / Cricket）の成績のまとめ（5 つ）
+  - Count-Up：Games・Avg Score・Avg PPD・Best Score・Last Played
+  - 01：Games・Finish Rate・Avg Darts・Best Darts・Last Played
+  - Cricket：Games・Avg MPR・Best MPR・Close Rate・Last Played
+- その下に、見る画面のカード（Games・Analysis・Day・Week・Month・Year。何が見られるかの説明と件数）。Count-Up は設定画面の Data Tabs で隠した画面のカードは出さない。01・クリケットは Games だけ（Analysis などは今は Count-Up だけを集計している）
+- Recent Games：最近の 5 ゲーム（日時・説明・主な数字）。押すと Games の画面を開く
+- カードを押すとその画面を開き（`openDataView()`）、ヘッダーの左に「‹ Top」を出してトップに戻れるようにする（`backToDataHub()`）。画面を開くときに履歴を 1 つ足すので、端末・ブラウザの「戻る」でもトップに戻る（Day の詳細ビューを開いているときは、まず詳細を閉じる）
+- ヘッダーでゲームを切り替えると、トップの中身を描き直す（`setDataGameType()` を包む）
+
 ![データ表示画面 Game ビュー（タブレット横）](images/data_tablet.jpg)
 
-保存されたスコア記録データを表示する画面。現段階ではカウントアップのデータのみを扱う。画面下部のタブで表示形式を切り替える。
+各画面では、画面下部のタブでも表示形式を切り替えられる。
 
 | ビュー | 左（History） | 右（Stats） |
 | --- | --- | --- |
@@ -315,7 +330,7 @@ darts-practice/
 │   ├── core/            state.js / core.js / storage.js
 │   ├── init/            main.js
 │   ├── game/            game_core.js / game_countup.js / game_01.js / game_cricket.js / cu_ui.js / board_input.js / stats.js
-│   ├── data/            data_loader.js / data.js / data_grouped.js / data_detail.js / rating.js / heatmap.js / data_01.js / data_cricket.js
+│   ├── data/            data_loader.js / data.js / data_grouped.js / data_detail.js / rating.js / heatmap.js / data_01.js / data_cricket.js / data_hub.js
 │   └── ui/              chart.js / settings.js / news.js
 └── docs/                本設計書と画面画像
 ```
@@ -357,7 +372,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | --- | --- |
 | index.html | ui/news.js |
 | countup.html | game/*（stats → game_core → game_01 → game_cricket → game_countup → board_input）、data/heatmap.js、game/cu_ui.js、ui/chart.js、ui/settings.js |
-| data.html | game/stats.js（アワード判定）、data/*（data_loader → data_grouped → data_detail → rating → data → heatmap → data_01 → data_cricket） |
+| data.html | game/stats.js（アワード判定）、data/*（data_loader → data_grouped → data_detail → rating → data → heatmap → data_01 → data_cricket → data_hub） |
 | settings.html | core/backup.js、game/*、ui/settings.js |
 | news.html | ui/news.js |
 
@@ -1004,3 +1019,4 @@ graph LR
 | 2026.10.8 | クリケットで、ボードとレーダー（This Game）のクリケットの数字を分かりやすくした（狙う数字は区画の縁を光らせて数字を大きく明るく、クローズした数字は灰色で線、それ以外は暗く） |
 | 2026.10.8 | メイン画面のレイアウトを更新。MAIN GAME（CountUp）と NEXT（01・Cricket）の分け方をやめ、GAMES に 3 つのゲームを同じ大きさのカードで並べ、それぞれの記録のまとめ（01 は上がり率など、Cricket は平均 MPR など）を出すようにした。UTILITY は横並び。画面画像（`menu_tablet.jpg` / `menu_phone.jpg`）を撮り直した |
 | 2026.10.8 | クリケットのヘッダーの今のラウンドの文字が小さすぎた（`0.8em` が親の文字の大きさの基準になっていた）のを、カウントアップ・01 と同じ大きさにした |
+| 2026.10.8 | データ画面にトップを追加（`data_hub.js`）。開いたときに、選んでいるゲームの成績のまとめ・見る画面（Games / Analysis / Day / Week / Month / Year）のカード・最近のゲームを出し、選んだ画面を開く。各画面からはヘッダーの「‹ Top」か端末の戻るでトップに戻る |

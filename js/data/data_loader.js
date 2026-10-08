@@ -526,5 +526,8 @@ async function initDataPage() {
   updatePaginationUI(totalPages)
 
   if (typeof initDataGameSwitch === "function") initDataGameSwitch()
+
+  // 最初はトップ（まとめと、見る画面の選択）を出す
+  if (typeof initDataHub === "function") initDataHub()
 }
 

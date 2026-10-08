@@ -62,11 +62,23 @@ body.page-info .header h1 {
   padding: 14px;
 }
 
+/* タブはスクロールしても上に残す（下を流れる一覧が透けないよう、欄と同じ色の背景を付ける） */
 .info-tabs {
+  position: -webkit-sticky;
+  position: sticky;
+  top: -18px;
+  z-index: 2;
+
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  margin-bottom: 12px;
+
+  margin: -14px -14px 12px;
+  padding: 14px;
+
+  border-radius: 18px 18px 0 0;
+  background: #141821;
+  box-shadow: 0 8px 12px -8px rgba(0, 0, 0, 0.6);
 }
 
 .info-tabs button {
@@ -140,8 +152,16 @@ body.page-info .header h1 {
 }
 
 @media (max-width: 720px) {
+  /* 狭い画面も横 1 列（縦に積むと、上に残したときに一覧が見える高さが減る） */
   .info-tabs {
-    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .info-tabs button {
+    min-height: 40px;
+    padding: 0 4px;
+    font-size: 12px;
+    letter-spacing: 0;
   }
 
   .info-head {

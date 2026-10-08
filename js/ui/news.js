@@ -259,6 +259,11 @@ const INFO_CONTENT = {
       date: "2026/10/08",
       badge: "UI",
       text: "設定画面の並びを変えました。Layout Preview の右に Display（表示エリアの切り替え）、下に Game を置き、プレビューを見ながら切り替えられます。"
+    },
+    {
+      date: "2026/10/08",
+      badge: "UI",
+      text: "Info 画面のタブ（すべて / 更新情報 / お知らせ / 更新予定）を、スクロールしても上に残るようにしました。"
     }
   ],
   notice: [

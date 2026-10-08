@@ -232,7 +232,8 @@ function queueInitialGameChartRefresh() {
 // ===== タブの表示・非表示 =======
 // ===============================
 // 設定画面の Data Tabs（dartsSettings.dataTabs）で選んだタブだけを出す。Game は常に表示
-const DATA_VIEW_TABS = ["analysis", "day", "week", "month", "year"]
+// Day / Week / Month / Year は一旦お休み（2026.10.8。日付はトップのカレンダーで見る）。コード（data_grouped.js / data_detail.js）は残してあり、ここに足せば戻せる
+const DATA_VIEW_TABS = ["analysis"]
 
 function readDataTabSettings() {
   try {

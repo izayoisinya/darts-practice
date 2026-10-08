@@ -59,12 +59,12 @@ manifest.json   PWA マニフェスト
 | game/ | stats.js | スタッツ・アワード計算。**UI 表示・DOM 操作は含まない**（再利用できる形にする） |
 | data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()` |
 | data/ | data.js | データ画面の統括（ビュー切替、タブの表示/非表示、Stats/Awards 表示、グラフ、Analysis：タグ別散布図・期間比較） |
-| data/ | data_grouped.js | Day/Week/Month/Year のグループビュー、日別メモ・タグ |
+| data/ | data_grouped.js | Day/Week/Month/Year のグループビュー、日別メモ・タグ（今は一旦お休み。データ画面は Games と Analysis だけで、`data.js` の `DATA_VIEW_TABS` に足せば戻せる） |
 | data/ | data_detail.js | グループ内のゲーム一覧（詳細ビュー）、カレンダー、比較 |
 | data/ | heatmap.js | Analysis タブのヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
 | data/ | data_01.js | データ画面の Count-Up / 01 / Cricket の切り替えと、01 の記録の表示（設定ごとの上がり率・上がるまでのダーツ数・推移・一覧） |
 | data/ | data_cricket.js | データ画面のクリケットの記録の表示（MPR・クローズ率・推移・数字ごとのマーク・一覧） |
-| data/ | data_hub.js | データ画面のトップ（開いたときに最初に出す。成績のまとめ・見る画面の選択・最近のゲーム。各画面から「‹ Top」・端末の戻るで戻る） |
+| data/ | data_hub.js | データ画面のトップ（開いたときに最初に出す。成績のまとめ・見る画面（Games / Analysis）の選択・練習した日のカレンダー・最近のゲーム。各画面から「‹ Top」・端末の戻るで戻る） |
 | data/ | rating.js | PPD から DARTSLIVE / PHOENIX のレーティング目安を算出 |
 | ui/ | chart.js | ゲーム画面のグラフ描画のみ（計算は stats.js 側） |
 | ui/ | settings.js | 設定画面のロジック |

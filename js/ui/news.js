@@ -264,6 +264,11 @@ const INFO_CONTENT = {
       date: "2026/10/08",
       badge: "UI",
       text: "Info 画面のタブ（すべて / 更新情報 / お知らせ / 更新予定）を、スクロールしても上に残るようにしました。"
+    },
+    {
+      date: "2026/10/08",
+      badge: "UI",
+      text: "データ画面を Games と Analysis の 2 つに絞りました。Day / Week / Month / Year は一旦お休みにし、トップに練習した日のカレンダーを表示します。"
     }
   ],
   notice: [

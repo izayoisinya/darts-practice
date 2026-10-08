@@ -223,7 +223,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 レイアウトとデザインはカウントアップの Game の表示とそろえ、同じ場所に同じ部品で出す。
 
-- **右（History）**：カウントアップと同じ `#sessionsContainer` に、同じ形のカード（Game n・日時・3 つの数字・押すと開いて Round Scores と Awards）を新しい順に出す。数字は Out Darts（上がったダーツ数。金）か Left（上がれなかった残り。赤）、PPD、80% Stats。下の要約に設定・上がりナンバー（`OUT D16` / `NO OUT`）・ブルとトリプルの本数と割合。開くと Bull / In / T の割合のバーと、20〜15 のトリプルの本数（Triple。カウントアップのカードと同じ）も出す。ページ送りもフッターの Prev / Next（01 のときは `changePage()` を 01 用に切り替える）
+- **右（History）**：カウントアップと同じ `#sessionsContainer` に、同じ形のカード（Game n・日時・3 つの数字・押すと開いて Round Scores と Awards）を新しい順に出す。数字は Out Darts（上がったダーツ数。金）か Left（上がれなかった残り。赤）、PPD、80% Stats。下の要約に設定・上がりナンバー（`OUT D16` / `NO OUT`）・ブルとトリプルの本数と割合。開くと Bull / In / T の割合のバーと、20〜15 のトリプルの本数（Triple。カウントアップのカードと同じ）、そのゲームのヒートマップも出す。ページ送りもフッターの Prev / Next（01 のときは `changePage()` を 01 用に切り替える）
 - **左（Stats）**：`#zeroOneStatsPanel` に出し、カウントアップの左の欄は隠す
   - 上の選択で設定（点数・上がり方・ラウンド）ごとに絞る（初めは最後に遊んだ設定。All Settings で全部。History も同じ絞り込み）
   - Stats（`.data-card`）：Games Played・Finish Rate（上がり率）・Avg Darts（上がったゲームの平均ダーツ数）・Best Darts・Average PPD・Finish Rate (Last 10)（直近 10 ゲームの上がり率）
@@ -545,6 +545,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `collectHeatmapData(sessions)` | 位置のある投の位置の一覧、刺さった場所ごとの本数、投数・ゲーム数を集める |
 | `drawHeatmap(points)` / `paintHeatmap(ctx, width, height, points, highlight)` / `drawHeatmapBoard()` | ボードの図（本物の比率）を描き、その上に色を重ね、1 投ずつの位置を小さな点で描く（`highlight` の位置は白い縁取りの点） |
 | `paintRadarHeatmap(ctx, width, height, points, highlight, rgb)` | ゲーム画面用のレーダー風の描画。暗い緑の円に、ボードの輪・区画の線・外周の目盛り・数字を描き、刺さった位置をぼかした光（`lighter` で重ねる）で表す。回る走査線は CSS の `.game-radar-sweep`（`conic-gradient` を回転。動きを減らす設定では止める） |
+| `createSessionHeatmapHtml(session, showRange)` / `drawSessionHeatmaps(card)` | 履歴カード（カウントアップ・01）を開いたときの、そのゲームのヒートマップ。カードを作るときは位置だけを canvas の `data-points` に持たせ、開いたとき（`toggleSessionCard()`）と画面の大きさが変わったときに描く。カウントアップは 50%・80% の円も重ねる。位置の記録がないゲームは「位置の記録がありません」 |
 | `getRangeStats(points)` / `renderHeatmapRange()` / `drawRangeCircles()` | レンジ（中心からの距離）：位置の中心からの距離の 50%・80% の円の半径と平均を mm（ダブルの外側 = 170mm）で出し、ヒートマップに点線の円で重ねる。ゲーム画面のレーダーの投数の横にも、カウントアップのときだけ R50 を出す。タップした位置からのざっくりした目安 |
 | `createHeatLayer()` / `getHeatmapPalette()` | 1 投ずつぼかした円を足し合わせ（`lighter`）、いちばん多い場所を最大にした相対値で 青→水色→緑→黄→赤 に色付けした画像を作る |
 
@@ -925,3 +926,4 @@ graph LR
 | 2026.10.8 | データ画面の 01 を、カウントアップと同じレイアウト（右に History、左に Stats）・同じ部品（履歴カード・`.data-card`・レーティングのカード・グラフの枠）で出すようにした。スマホ縦の History / Stats の切り替え、フッターの Prev / Next も共通 |
 | 2026.10.8 | データ画面の 01 に、ブル・インナーブル・トリプルの本数と割合を追加（全体と各ゲーム）。Finish Numbers のバーを全体に対する割合で描くようにした（同じ回数だと全部いっぱいに見えていた）。Recent 10 を Finish Rate (Last 10) に改名。スマホ縦で Stats を開いたときに 01 のグラフが描かれないのを直した |
 | 2026.10.8 | データ画面の 01 の履歴カードに、カウントアップと同じ 20〜15 のトリプルの本数（Triple）を追加 |
+| 2026.10.8 | データ画面の履歴カード（カウントアップ・01）を開くと、そのゲームのヒートマップを出すようにした（カウントアップは 50%・80% の円も） |

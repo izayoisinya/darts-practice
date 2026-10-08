@@ -561,3 +561,66 @@ function drawRangeCircles(ctx, width, height, range) {
 
   ctx.restore()
 }
+
+
+// ===============================
+// ===== 1 ゲームのヒートマップ ===
+// ===============================
+// 履歴カード（カウントアップ・01）を開いたときに、そのゲームの刺さった位置を出す。
+// カードを作るときは位置だけを canvas に持たせ（閉じている間は大きさが測れないため）、開いたときに描く（data_loader.js の toggleSessionCard()）
+function createSessionHeatmapHtml(session, showRange = false) {
+
+  const points = (Array.isArray(session.darts) ? session.darts : [])
+    .filter(dart => dart && dart.pos)
+    .map(dart => [+dart.pos.x.toFixed(3), +dart.pos.y.toFixed(3)])
+
+  const body = points.length
+    ? `<canvas class="session-heatmap" data-points='${JSON.stringify(points)}' data-range="${showRange ? 1 : 0}"></canvas>`
+    : '<div class="session-heatmap-empty">位置の記録がありません（ボード入力のゲームだけ）</div>'
+
+  return `
+    <div class="session-meta-block session-heatmap-block">
+      <div class="session-meta-title">Heatmap${points.length ? `（${points.length} 投）` : ""}</div>
+      ${body}
+    </div>
+  `
+}
+
+function drawSessionHeatmaps(card) {
+
+  if (!card || typeof paintHeatmap !== "function") return
+
+  card.querySelectorAll("canvas.session-heatmap").forEach(canvas => {
+    const size = canvas.clientWidth
+    if (!size) return
+
+    let points = []
+    try {
+      points = JSON.parse(canvas.dataset.points || "[]").map(([x, y]) => ({ x, y }))
+    } catch {
+      points = []
+    }
+
+    const ratio = Math.min(window.devicePixelRatio || 1, 3)
+    canvas.style.height = `${size}px`
+    canvas.width = Math.round(size * ratio)
+    canvas.height = Math.round(size * ratio)
+
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+
+    paintHeatmap(ctx, size, size, points)
+    // ブルを狙うカウントアップは、中心からの距離（50%・80% の円）も重ねる
+    if (canvas.dataset.range === "1") drawRangeCircles(ctx, size, size, getRangeStats(points))
+  })
+}
+
+// 画面の向き・大きさが変わったら、開いているカードのヒートマップを描き直す
+let sessionHeatmapResizeTimer = null
+window.addEventListener("resize", () => {
+  clearTimeout(sessionHeatmapResizeTimer)
+  sessionHeatmapResizeTimer = setTimeout(() => {
+    document.querySelectorAll(".session-card.is-expanded").forEach(drawSessionHeatmaps)
+  }, 150)
+})

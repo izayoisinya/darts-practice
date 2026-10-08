@@ -219,6 +219,7 @@ function createSessionCardHtml(session, gameNumber) {
           <div class="session-meta-title">Round Scores</div>
           <div class="round-chart">${roundChartHtml}</div>
         </div>
+        ${typeof createSessionHeatmapHtml === "function" ? createSessionHeatmapHtml(session, true) : ""}
       </div>
     </div>
 
@@ -463,6 +464,11 @@ let sessionCardToggleBound = false
 function toggleSessionCard(card) {
   const expanded = card.classList.toggle("is-expanded")
   card.setAttribute("aria-expanded", expanded ? "true" : "false")
+
+  // 開いたらそのゲームのヒートマップを描く（heatmap.js）
+  if (expanded && typeof drawSessionHeatmaps === "function") {
+    requestAnimationFrame(() => drawSessionHeatmaps(card))
+  }
 }
 
 function setupSessionCardToggle() {

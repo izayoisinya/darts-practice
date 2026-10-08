@@ -383,6 +383,7 @@ function createZeroOneCardHtml(session, gameNumber) {
           <div class="session-meta-title">Round Scores</div>
           <div class="round-chart">${createRoundChartHtml(session.roundScores || [])}</div>
         </div>
+        ${typeof createSessionHeatmapHtml === "function" ? createSessionHeatmapHtml(session) : ""}
       </div>
     </div>
 

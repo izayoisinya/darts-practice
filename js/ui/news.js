@@ -254,6 +254,11 @@ const INFO_CONTENT = {
       date: "2026/10/08",
       badge: "UI",
       text: "設定画面の Layout Preview を半分の幅にし、設定をスクロールしている間も見えるようにしました。データ画面のタブの図は外しました。"
+    },
+    {
+      date: "2026/10/08",
+      badge: "UI",
+      text: "設定画面の並びを変えました。Layout Preview の右に Display（表示エリアの切り替え）、下に Game を置き、プレビューを見ながら切り替えられます。"
     }
   ],
   notice: [

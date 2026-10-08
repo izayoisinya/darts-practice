@@ -501,6 +501,36 @@ function paintRadarHeatmap(ctx, width, height, points, highlight = [], rgb = "0,
 //   ブルの中心を狙ったときの縦横のばらつき（標準偏差 σ。σ² = 中心からの距離の 2 乗の平均 ÷ 2）を求め、直径 2σ の円とする。
 //   この円には約 4 割の投が入る。プロの RANGE（30mm 台）とブル率の関係とおおむね合う
 //   r50 / r80：半分・8 割の投が入る円の半径（位置の単位。ダブルの外側 = 1）
+// 1 ゲームの RANGE（位置の記録が 3 投以上あるときだけ。01 はブルを狙う場面の投だけ）
+function getSessionRange(session) {
+
+  if (!session) return null
+
+  const points = session.gameType === "01"
+    ? (typeof getZeroOne80Points === "function" ? getZeroOne80Points(session) : [])
+    : (session.darts || []).filter(dart => dart && dart.pos).map(dart => dart.pos)
+
+  return getRangeStats(points)
+}
+
+// ゲームごとの RANGE（mm）の平均。ブルモードがセパレートのゲームは含めない
+//   { avg, games }（数えたゲームがなければ null）
+function getAverageRange(list) {
+
+  const values = (list || [])
+    .filter(session => session && session.bullMode !== "double")
+    .map(getSessionRange)
+    .filter(Boolean)
+    .map(range => range.rangeMm)
+
+  if (!values.length) return null
+
+  return {
+    avg: values.reduce((a, b) => a + b, 0) / values.length,
+    games: values.length
+  }
+}
+
 function getRangeStats(points) {
 
   if (!points || points.length < 3) return null

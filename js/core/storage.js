@@ -177,6 +177,13 @@ function serializeZeroOneRecord(record) {
   ]
 }
 
+// ブルモード（"fat" / "double" セパレート）。2026.10.8 より前の記録は持っていないので、
+// アウターブルが 25 点の投があればセパレート、なければ FAT とみなす
+function normalizeSessionBullMode(value, darts) {
+  if (value === "fat" || value === "double") return value
+  return darts.some(dart => dart && dart.hit === "OB" && dart.score === 25) ? "double" : "fat"
+}
+
 function normalizeSessionForApp(session) {
   if (!session || typeof session !== "object") return null
 
@@ -185,6 +192,7 @@ function normalizeSessionForApp(session) {
     : toRoundScores(session.rounds)
 
   const awards = fromAwardsArray(session.awards)
+  const darts = normalizeDartRecords(session.darts)
 
   return {
     date: toFiniteNumber(session.date, Date.now()),
@@ -203,7 +211,8 @@ function normalizeSessionForApp(session) {
     ),
     roundScores,
     // 1 投ごとの記録（2026.10.7 から。それより前の記録は空）
-    darts: normalizeDartRecords(session.darts),
+    darts,
+    bullMode: normalizeSessionBullMode(session.bullMode, darts),
     gameType: String(session.gameType || "countup"),
     zeroOne: normalizeZeroOneRecord(session.zeroOne)
   }
@@ -228,6 +237,7 @@ function serializeSessionForStorage(session) {
     r: normalized.roundScores,
     g: normalized.gameType,
     ...(normalized.darts.length ? { dt: serializeDartRecords(normalized.darts) } : {}),
+    ...(normalized.bullMode === "double" ? { bm: 1 } : {}),
     ...(normalized.zeroOne ? { z: serializeZeroOneRecord(normalized.zeroOne) } : {})
   }
 }
@@ -249,6 +259,7 @@ function deserializeSessionFromStorage(session) {
     totalAwards: session.ta,
     roundScores: session.r,
     darts: session.dt,
+    bullMode: session.bm === 1 ? "double" : undefined,
     gameType: session.g,
     zeroOne: session.z
   })
@@ -634,6 +645,9 @@ function saveSession() {
 
   // 1 投ごとの記録（刺さった場所。ボード入力なら位置も）
   darts: game.rounds.flat().map(toDartRecord),
+
+  // ブルモード（セパレートのゲームは RANGE の平均に含めない）
+  bullMode,
 
   gameType: GAME_TYPE,
   ...(GAME_TYPE === "01" && typeof computeZeroOne === "function" ? { zeroOne: getZeroOneResult() } : {})

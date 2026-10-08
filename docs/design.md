@@ -549,6 +549,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `paintRadarHeatmap(ctx, width, height, points, highlight, rgb)` | ゲーム画面用のレーダー風の描画。暗い緑の円に、ボードの輪・区画の線・外周の目盛り・数字を描き、刺さった位置をぼかした光（`lighter` で重ねる）で表す。回る走査線は CSS の `.game-radar-sweep`（`conic-gradient` を回転。動きを減らす設定では止める） |
 | `createSessionHeatmapHtml(session, showRange)` / `drawSessionHeatmaps(card)` | 履歴カード（カウントアップ・01）を開いたときの、そのゲームのヒートマップ。カードを作るときは位置だけを canvas の `data-points` に持たせ、開いたとき（`toggleSessionCard()`）と画面の大きさが変わったときに描く。カウントアップは 50%・80% の円も重ねる。位置の記録がないゲームは「位置の記録がありません」 |
 | `getRangeStats(points)` / `getRangeFromBullRate(rate)` / `renderHeatmapRange()` / `drawRangeCircles()` / `getBoardRadiusMm()` | **RANGE の目安**：DARTSLIVE の RANGE（ブルの中心のまわりのまとまりを円の直径 mm で表したもの。算出方法は非公開）に近い値として、ブルの中心を狙ったときの縦横のばらつき σ（中心からの距離の 2 乗の平均 ÷ 2 の平方根）を求め、直径 2σ を RANGE とする（約 4 割の投が入る円。プロの RANGE 30mm 台とブル率の関係とおおむね合う）。位置の記録がないゲームでも、ブル率 = 1 − exp(−R² ÷ 2σ²)（R：アウターブルの半径）から σ を逆算して出す（ブル 0 本なら出さない）。8 割の投が入る円の直径も出す。mm はボードの大きさ（設定の Board Size：Soft 15.5 インチ = ダブルの外側の半径 197mm / Steel 13.2 インチ = 170mm）で直す。ヒートマップに RANGE の円（実線）と 8 割の円（点線）を重ね、ゲーム画面のレーダーと履歴カードのヒートマップの見出しにも RANGE を出す（01 はブルを狙う場面の投だけ。`createSessionHeatmapHtml()` の第 3 引数 `rangePoints`） |
+| `getSessionRange(session)` / `getAverageRange(list)` | 1 ゲームの RANGE（位置の記録が 3 投以上のときだけ。01 はブルを狙う場面の投だけ）と、ゲームごとの RANGE の平均（グループビューの Avg Range）。ブルモードがセパレートのゲームは平均に含めない |
 | `createHeatLayer()` / `getHeatmapPalette()` | 1 投ずつぼかした円を足し合わせ（`lighter`）、いちばん多い場所を最大にした相対値で 青→水色→緑→黄→赤 に色付けした画像を作る |
 
 - 位置があるのはボード入力で入れた投だけ。「よく刺さった場所」はボタン入力の投も含めて数える
@@ -560,7 +561,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 
 | 関数 | 内容 |
 | --- | --- |
-| `displayGroupView()` / `renderGroupedPaginated()` / `displayGroupedPage()` | グループごとのカードをページ単位で表示する |
+| `displayGroupView()` / `renderGroupedPaginated()` / `displayGroupedPage()` | グループごとのカードをページ単位で表示する（Avg Score / Avg PPD / Bulls / Avg Range。Avg Range は `getAverageRange()`：位置の記録があるゲームごとの RANGE の平均で、ブルモードがセパレートのゲームは除く） |
 | `renderGroupedPagination()` / `changeGroupedPage()` | グループビューのページ送り |
 | `updateGroupedLeftCalendar()` | カレンダーを表示する |
 | `jumpToCalendarDay()` | カレンダーの日付から詳細ビューへ移動する |
@@ -650,6 +651,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 | `gameType` | `g` | ゲームの種類（`"countup"` / `"01"`） |
 | `zeroOne` | `z` | 01 の結果（カウントアップは `null`。保存時は省く）。`{ start, out, rounds, finished, finishDarts, remaining }`、保存時は `[start, 上がり方（0 open / 1 double / 2 master）, rounds, 上がったか 1/0, finishDarts, remaining]` |
 | `darts` | `dt` | 1 投ごとの記録（2026.10.7 から。下記）。それより前の記録は空の配列（保存時は `dt` 自体を省く） |
+| `bullMode` | `bm` | ブルモード（2026.10.8 から）。セパレート（`"double"`）のときだけ `bm: 1` を保存する。持っていない記録は、アウターブルが 25 点の投があればセパレート、なければ FAT とみなす（`normalizeSessionBullMode()`） |
 
 **1 投ごとの記録（`darts`）**
 
@@ -933,3 +935,4 @@ graph LR
 | 2026.10.8 | データ画面の履歴カード（カウントアップ・01）で、Awards を横幅いっぱいの段からトリプルの下（左の列）に移した（右の列はグラフとヒートマップ） |
 | 2026.10.8 | レンジを DARTSLIVE の RANGE（直径 mm）に近い目安に変更（ばらつき σ の 2 倍の直径。ブル率からの推定も）。設定に Board Size（Soft 15.5 インチ / Steel 13.2 インチ）を追加し、mm の換算に使う |
 | 2026.10.8 | 01 にも RANGE の目安を追加（データ画面の Stats・履歴カードのヒートマップ・ゲーム画面のレーダー）。上がりのダブル狙いを除くため、最初の点数の 80% を減らすまでの投だけで出す |
+| 2026.10.8 | データ画面のグループビュー（Day / Week / Month / Year）のカードに Avg Range（ゲームごとの RANGE の平均）を追加。ブルモードがセパレートのゲームは含めない。そのためゲームの記録にブルモード（`bm`）を保存するようにした |

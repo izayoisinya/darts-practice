@@ -89,6 +89,8 @@ function displayGroupedPage(mode, sortedEntries) {
   pageData.forEach(([key, list]) => {
     
     const summary = calcSummary(list)
+    // ゲームごとの RANGE の平均（位置の記録があるゲームだけ。セパレートのゲームは除く）
+    const range = typeof getAverageRange === "function" ? getAverageRange(list) : null
     
     let label = key
     
@@ -138,6 +140,10 @@ function displayGroupedPage(mode, sortedEntries) {
         <div class="group-kpi-item">
           <span class="group-kpi-label">Bulls</span>
           <span class="group-kpi-value">${summary.totalBulls}</span>
+        </div>
+        <div class="group-kpi-item" title="${range ? `RANGE を出せた ${range.games} ゲームの平均（ブルモードがセパレートのゲームは除く）` : "位置の記録があるゲームがありません"}">
+          <span class="group-kpi-label">Avg Range</span>
+          <span class="group-kpi-value">${range ? range.avg.toFixed(1) : "-"}${range ? '<small class="group-kpi-unit">mm</small>' : ""}</span>
         </div>
       </div>
       ${commentPreview || tagChips ? `<div class="group-note-preview"><div class="group-note-preview-text">${commentPreview}</div><div class="group-note-chip-row">${tagChips}</div></div>` : ""}

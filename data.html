@@ -38,6 +38,8 @@
 
   <body class="page-data" onload="initDataPage()">
     <header class="header">
+      <!-- 各画面からトップ（data_hub.js）に戻る -->
+      <button type="button" id="dataHubBack" class="data-hub-back" hidden>‹ Top</button>
       <h1>Statistics</h1>
       <!-- 表示するゲームの切り替え（data_01.js の initDataGameSwitch()） -->
       <div id="dataGameSwitch" class="data-game-switch" role="tablist" aria-label="ゲームの種類">
@@ -46,6 +48,9 @@
         <button type="button" data-game="cricket">Cricket</button>
       </div>
     </header>
+
+<!-- データ画面のトップ：まとめと、見る画面の選択（data_hub.js の renderDataHub()） -->
+<div id="dataHub" class="data-hub"></div>
 
 <main class="data-container">
   <div class="data-panel-top" id="dataPanelTop">
@@ -212,6 +217,7 @@
     <script src="js/data/heatmap.js" defer></script>
     <script src="js/data/data_01.js" defer></script>
     <script src="js/data/data_cricket.js" defer></script>
+    <script src="js/data/data_hub.js" defer></script>
 
     <!-- 初期化（最後に読み込む） -->
     <script src="js/init/main.js" defer></script>

@@ -87,7 +87,7 @@ manifest.json   PWA マニフェスト
 | `dartsDayNotesV2` | LocalStorage | 日別メモ（コメント・タグ・画像） |
 | `dartsDataGame` | LocalStorage | データ画面で最後に見ていたゲーム（`"countup"` / `"01"`） |
 
-- セッションは保存時に短縮キーへシリアライズされる（`serializeSessionForStorage()`：`d` date, `s` score, `p` ppd, `r` roundScores, `a` awards 配列, `dt` 1 投ごとの記録（刺さった場所・ボード入力の位置）など）。アプリ内では `normalizeSessionForApp()` の形で扱う
+- セッションは保存時に短縮キーへシリアライズされる（`serializeSessionForStorage()`：`d` date, `s` score, `p` ppd, `r` roundScores, `a` awards 配列, `dt` 1 投ごとの記録（刺さった場所・ボード入力の位置）, `bm` ブルモード（セパレートのときだけ 1）など）。アプリ内では `normalizeSessionForApp()` の形で扱う
 - フィールドを追加するときは serialize / deserialize / normalize の 3 箇所を揃え、**既存ユーザーの保存データを壊さない**（欠損時のデフォルト値を用意する）
 - `gameType` は `"countup"` / `"01"`。01 の結果は `zeroOne`（保存時 `z`）。データ画面のカウントアップの表示は `readDataSessions()`（カウントアップだけ）、01 は `data_01.js` が別の画面で出す
 - 保存するデータを増やしたら、バックアップ（`backup.js` の書き出し・読み込み）にも含めるか検討する。ファイル形式を変えるときは `BACKUP_VERSION` を上げ、古い形式も読めるようにする

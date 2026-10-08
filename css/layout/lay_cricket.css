@@ -101,23 +101,29 @@ body:not(.game-01):not(.game-cricket) .config-only {
   color: var(--accent);
 }
 
-/* ボードの左上のパネル（狭いので小さく） */
+/* ボードの左上のパネル（幅が狭いので 2 段：20〜17 / 16・15・BULL にして大きく出す） */
 .cricket-board-side {
-  gap: 3px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
   margin-bottom: 0;
 }
 
 .cricket-board-side .cricket-cell {
-  padding: 4px 0 3px;
-  border-radius: 6px;
+  padding: 6px 0 4px;
+  border-radius: 8px;
 }
 
 .cricket-board-side .cricket-target {
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .cricket-board-side .cricket-mark {
-  max-width: 24px;
+  max-width: 34px;
+}
+
+.cricket-board-side .cricket-points {
+  min-height: 11px;
+  font-size: 11px;
 }
 
 /* スマホ縦：Rounds の列が狭いので小さく */
@@ -139,10 +145,6 @@ body.phone.portrait .cricket-points {
   font-size: 9px;
 }
 
-.cricket-board-side .cricket-points {
-  min-height: 9px;
-  font-size: 9px;
-}
 
 
 /* ===== Rounds ===== */

@@ -747,6 +747,10 @@ function renderGameSideChart(width, height) {
   const canvas = document.getElementById("gameSideChartCanvas")
   if (!canvas || typeof paintRoundScoreChart !== "function") return
 
+  // クリケットはラウンドごとのマーク数
+  const label = document.querySelector("#gameSideChart .game-heatmap-title span")
+  if (label) label.textContent = GAME_TYPE === "cricket" ? "Round Marks" : "Round Score"
+
   // タイトルの行の分を引いた高さをグラフにする
   const title = document.querySelector("#gameSideChart .game-heatmap-title")
   const chartHeight = Math.max(60, height - (title ? title.offsetHeight + 6 : 0))
@@ -769,7 +773,7 @@ function renderGameSideStats() {
       ["MPR", cricket.mpr.toFixed(2), record.games ? `AVG ${record.avgMpr.toFixed(2)}` : ""],
       ["MARKS", cricket.marks, `MAX ${cricket.maxMarks}`],
       ["CLOSE", `${cricket.closedTargets}/7`, cricket.state.finished ? `${cricket.darts} DARTS` : ""],
-      ["POINTS", cricket.points, ""],
+      ["IN-BULL", cricket.innerBulls, `${cricket.innerBullRate.toFixed(1)}%`],
       ["BULL", cricket.bulls, `${cricket.bullRate.toFixed(1)}%`],
       ["TRIPLE", cricket.triples, `${cricket.tripleRate.toFixed(1)}%`]
     ])

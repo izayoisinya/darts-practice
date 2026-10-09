@@ -238,6 +238,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 - **並べ方**：横向き（タブレット・スマホ）とパソコンは左右 2 列（`.data-hub-layout`）。左（`#dataHubSide`）に History / Stats のカードとカレンダー、右（`#dataHubMain`）に選んだ日のメモとゲームを置き、それぞれの中でスクロールする（右をスクロールしても左は動かない。描き直してもスクロール位置は保ち、日付を変えたときだけ右を上に戻す）。縦向きは上から順に並べて画面ごとスクロールし、日付を押すとその日のゲームまで送る（`isDataHubStacked()`）。スマホ横はカードの説明を出さない
 - 見る画面のカード（History・Stats の 2 つ）。History は全体のゲーム数とゲームの種類ごとの数、Stats は開いたときに出すゲーム（前回見ていたもの）を出す
 - Calendar：全ゲームを練習した日に印を付け、その日のゲーム数を小さく出す（5 ゲーム以上は濃く。今日は白い枠）。練習した日を押すと、その日のメモとゲームを横（縦向きは下）に出す。最初は最後に練習した日を選んでおく（`renderDataHubDay()` / `fillDataHubDay()`。ゲームは History と同じ履歴カードで、見出しはゲームの種類の印だけ。押すと開く。新しい順。選んだ日は濃く光らせる。履歴カードの開閉の見た目は `#sessionsContainer` と同じ指定を `#dataHubDayList` にも当てる）。‹ › で月を切り替え、最初は最後に遊んだ月。下にその月の日数・ゲーム数（`renderDataHubCalendar()`）
+- Summary（カレンダーの下。`renderDataHubPeriod()`）：選んだ日を含む週（月曜はじまり）・月・年のまとめ。Week / Month / Year のボタンで切り替える（最後に選んだものを LocalStorage `dartsDataHubPeriod` に残す）。期間・練習した日数・ゲーム数と、ゲームの種類ごとの数字（Count-Up：平均スコア・平均 PPD・ベスト、01：上がり率・平均ダーツ数、Cricket：平均 MPR・クローズ率）を種類の色で出し、前の期間との差（Count-Up は PPD、01 はダーツ数〔少ない方が良いので減ったら緑〕、Cricket は MPR。良くなったら緑・悪くなったら赤）も出す。もとの Week / Month / Year のビューの代わり
 - 日別メモ：選んだ日のゲームの上に、その日のメモ（コメント・タグ・画像の有無）と「Memo」ボタン（メモが無ければ「+ Memo」）を出す（`renderDataHubDayNote()`）。ボタンで Day 一覧のときと同じ編集画面（`data_grouped.js` の `openDayNoteEditor()`）を開き、保存するとトップを描き直す（保存後の描き直しは、トップを開いていれば `renderDataHub()`、Day などの一覧なら `displayGroupedPage()`）。メモ・タグのある日はカレンダーの右上に黄色の小さな印（`.has-note`）。タグは Count-Up の Stats のタグ別散布図の色分けに使う
 - **Day / Week / Month / Year は一旦お休み**（2026.10.8。日付はトップのカレンダーで見る）。コード（`data_grouped.js` / `data_detail.js`）は残してあり、`changeView("day")` などで開ける
 - カードを押すとその画面を開き（`openDataView("history" | "stats")`）、ヘッダーの左上のボタンを「‹ Top」にしてトップに戻れるようにする（`backToDataHub()`。トップでは同じボタンが「‹ Menu」でメインメニューへ）。画面を開くときに履歴を 1 つ足すので、端末・ブラウザの「戻る」でもトップに戻る（Day の詳細ビューを開いているときは、まず詳細を閉じる）
@@ -249,7 +250,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 - 右の `#rightPanel` だけを 1 列で出す（Stats の `#leftPanel` と縦向きの History / Stats の切り替えは出さない）。横向き（タブレット・スマホ）とパソコンでは履歴カードを 2 列に並べる
 - 上のボタン（`#historyFilter`）でゲームの種類を絞り込む（`setHistoryFilter()`。All / Count-Up / 01 / Cricket。絞り込んでもゲームの番号は変わらない）。ヘッダーのゲームの切り替えは出さない
 - 下のフッターはページ送りだけ（10 ゲームずつ。`renderHistory()` / `changePage()`）
-- **履歴カード**は普段は縮小表示（ゲームの種類の印・Game 番号・日時、主な数字 3 つ、ブル数とアワードの要約 1 行）。タップすると全項目（ブル率・トリプル・ラウンドスコアのグラフ・アワード）を表示し、もう一度タップで縮小に戻る。トップの「その日のゲーム」と Day の詳細ビューでも共通
+- **履歴カード**はゲームの種類の色（Count-Up 緑・01 青・Cricket 金。`.history-countup` などの `--badge-rgb`）で縁取り、左端に色の線を引き、左上をうっすら染める。普段は縮小表示（ゲームの種類の印・Game 番号・日時、主な数字 3 つ、ブル数とアワードの要約 1 行）。タップすると全項目（ブル率・トリプル・ラウンドスコアのグラフ・アワード）を表示し、もう一度タップで縮小に戻る。トップの「その日のゲーム」と Day の詳細ビューでも共通
 
 **Stats**（分析。`viewMode = "stats"`、`main` に `analysis-mode`、`body` に `data-stats-view`）
 
@@ -721,6 +722,8 @@ Count-Up の Stats のヒートマップ（もとの Analysis タブ）。ゲー
 | `dartsCricket` | LocalStorage | クリケットの設定（`{ rounds }`） |
 | `dartsSettings` | LocalStorage | 設定 |
 | `dartsDayNotesV2` | LocalStorage | 日別メモ |
+| `dartsDataGame` | LocalStorage | データ画面の Stats で最後に見ていたゲーム |
+| `dartsDataHubPeriod` | LocalStorage | データのトップの Summary で最後に選んだ期間（week / month / year） |
 
 ### 6.2 ゲーム履歴（1 件）
 
@@ -1051,3 +1054,4 @@ graph LR
 | 2026.10.10 | 履歴カードの見出しを「Game n」からゲームの種類の印だけに変更（番号は種類ごとの通し番号で、全ゲームの一覧では分かりにくかったため） |
 | 2026.10.10 | データのトップのまとめ（Games・Days・This Month・Last Played）を、カードの上からヘッダーの右に移した |
 | 2026.10.10 | データのトップを、横向きでは左（History / Stats のカード・カレンダー）と右（選んだ日のメモとゲーム）の 2 列にし、それぞれの中でスクロールするようにした |
+| 2026.10.10 | 履歴カードをゲームの種類の色で色分け。データのトップのカレンダーの下に、選んだ日を含む週・月・年のまとめ（Summary。ゲームの種類ごとの数字と前の期間との差）を追加 |

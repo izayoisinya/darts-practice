@@ -3423,8 +3423,160 @@ button.data-hub-cal-day {
   margin-right: 0;
 }
 
-.history-zeroone .history-game-badge { --badge-rgb: 77 171 255; }
-.history-cricket .history-game-badge { --badge-rgb: 255 196 64; }
+/* ゲームの種類の色（印・カード・週月年のまとめで使う） */
+.history-countup { --badge-rgb: var(--accent-rgb); }
+.history-zeroone { --badge-rgb: 77 171 255; }
+.history-cricket { --badge-rgb: 255 196 64; }
+
+/* 履歴カードもゲームの種類の色で縁取り、左上をうっすら染める（左端に色の線） */
+#sessionsContainer .session-card.history-countup,
+#sessionsContainer .session-card.history-zeroone,
+#sessionsContainer .session-card.history-cricket,
+#dataHubDayList .session-card.history-countup,
+#dataHubDayList .session-card.history-zeroone,
+#dataHubDayList .session-card.history-cricket {
+  border-color: rgb(var(--badge-rgb) / 0.3);
+  background: linear-gradient(160deg, rgb(var(--badge-rgb) / 0.09) 0%, #11151c 45%);
+  box-shadow: inset 3px 0 0 rgb(var(--badge-rgb) / 0.75);
+}
+
+#sessionsContainer .session-card.history-countup.is-expanded,
+#sessionsContainer .session-card.history-zeroone.is-expanded,
+#sessionsContainer .session-card.history-cricket.is-expanded,
+#dataHubDayList .session-card.history-countup.is-expanded,
+#dataHubDayList .session-card.history-zeroone.is-expanded,
+#dataHubDayList .session-card.history-cricket.is-expanded {
+  border-color: rgb(var(--badge-rgb) / 0.6);
+}
+
+
+/* ===================================================== */
+/* データのトップ：週・月・年のまとめ（カレンダーの下）      */
+/* ===================================================== */
+.data-hub-period {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(165deg, #151922 0%, #10141d 100%);
+}
+
+.data-hub-period-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.data-hub-period-top .data-hub-section-title {
+  margin: 0;
+}
+
+.data-hub-period-tabs {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.data-hub-period-tabs button {
+  min-width: 56px;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.data-hub-period-tabs button.active {
+  background: rgb(var(--accent-rgb) / 0.18);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgb(var(--accent-rgb) / 0.6);
+}
+
+.data-hub-period-range {
+  margin: 8px 0 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.data-hub-period-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgb(var(--badge-rgb) / 0.06);
+  box-shadow: inset 3px 0 0 rgb(var(--badge-rgb) / 0.7);
+}
+
+.data-hub-period-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.data-hub-period-type .history-game-badge {
+  margin-right: 0;
+  font-size: 11px;
+}
+
+.data-hub-period-games {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.data-hub-period-diff {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-hub-period-diff.up { color: #4ade80; }
+.data-hub-period-diff.down { color: #f87171; }
+.data-hub-period-diff.even { color: var(--text-muted); }
+
+.data-hub-period-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+
+.data-hub-period-item {
+  display: flex;
+  flex-direction: column;
+  font-size: 18px;
+  font-weight: 800;
+  color: rgb(var(--badge-rgb));
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.data-hub-period-item small {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.data-hub-period-empty,
+.data-hub-period-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.data-hub-period-empty {
+  font-size: 13px;
+}
 
 
 /* フッターはページ送り（History）だけなので中央に置く（Game / Analysis のタブは 2026.10.10 になくした） */

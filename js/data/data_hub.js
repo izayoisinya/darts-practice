@@ -119,6 +119,7 @@ function renderDataHub() {
     </section>
 
     ${renderDataHubCalendar(sessions)}
+    ${renderDataHubPeriod(sessions)}
 
     ${sessions.length ? "" : '<p class="data-hub-note">まだ記録がありません。ゲームを終えると、ここに練習の記録が出ます。</p>'}
     </div>
@@ -151,6 +152,14 @@ function renderDataHub() {
 
   const memo = hub.querySelector("[data-hub-day-memo]")
   if (memo) memo.addEventListener("click", () => openDayNoteEditor(dataHubSelectedDay, memo.dataset.label))
+
+  hub.querySelectorAll("[data-hub-period]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      dataHubPeriodMode = btn.dataset.hubPeriod
+      try { localStorage.setItem(DATA_HUB_PERIOD_KEY, dataHubPeriodMode) } catch {}
+      renderDataHub()
+    })
+  })
 
   hub.querySelectorAll("[data-hub-month]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -389,3 +398,159 @@ function initDataHub() {
   bindDataHubPopstate()
   showDataHub()
 }
+
+
+// ===============================
+// ===== 週・月・年のまとめ ========
+// ===============================
+// カレンダーの下に、選んだ日を含む週（月曜はじまり）・月・年のまとめを出す（もとの Week / Month / Year の代わり）。
+// ゲームの種類ごとに主な数字を出し、前の期間との差も出す（Count-Up は平均 PPD、01 は平均ダーツ数〔少ないほど良い〕、クリケットは平均 MPR）
+const DATA_HUB_PERIOD_KEY = "dartsDataHubPeriod"
+const DATA_HUB_PERIODS = { week: "Week", month: "Month", year: "Year" }
+
+let dataHubPeriodMode = (() => {
+  try {
+    const saved = localStorage.getItem(DATA_HUB_PERIOD_KEY)
+    return DATA_HUB_PERIODS[saved] ? saved : "week"
+  } catch {
+    return "week"
+  }
+})()
+
+// 期間の始まりと終わり（終わりは次の期間の始まり）。offset で前後の期間
+function getDataHubPeriodRange(base, mode, offset = 0) {
+  if (mode === "year") {
+    const y = base.getFullYear() + offset
+    return { start: new Date(y, 0, 1), end: new Date(y + 1, 0, 1) }
+  }
+  if (mode === "month") {
+    const start = new Date(base.getFullYear(), base.getMonth() + offset, 1)
+    return { start, end: new Date(start.getFullYear(), start.getMonth() + 1, 1) }
+  }
+  const monday = getWeekRange(base).start
+  const start = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + offset * 7)
+  return { start, end: new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7) }
+}
+
+function formatDataHubPeriodLabel(range, mode) {
+  const s = range.start
+  if (mode === "year") return `${s.getFullYear()}`
+  if (mode === "month") return `${s.getFullYear()}/${s.getMonth() + 1}`
+  const last = new Date(range.end.getFullYear(), range.end.getMonth(), range.end.getDate() - 1)
+  return `${s.getMonth() + 1}/${s.getDate()} – ${last.getMonth() + 1}/${last.getDate()}`
+}
+
+// ゲームの種類ごとの主な数字（main は前の期間と比べる数字。better は大きい方が良いか）
+function getDataHubPeriodTypeStats(list, type) {
+  const avg = values => values.length ? values.reduce((a, b) => a + b, 0) / values.length : null
+  const games = list.filter(s => getHistoryGameType(s) === type)
+  if (!games.length) return null
+
+  if (type === "01") {
+    const finished = games.filter(s => s.zeroOne.finished)
+    const darts = avg(finished.map(s => s.zeroOne.finishDarts).filter(n => n > 0))
+    return {
+      games: games.length,
+      main: darts,
+      better: "lower",
+      items: [
+        ["Finish", `${Math.round(finished.length / games.length * 100)}%`],
+        ["Avg Darts", darts === null ? "-" : darts.toFixed(1)]
+      ]
+    }
+  }
+
+  if (type === "cricket") {
+    const mpr = avg(games.map(s => Number(s.cricket.mpr) || 0))
+    return {
+      games: games.length,
+      main: mpr,
+      better: "higher",
+      items: [
+        ["Avg MPR", mpr.toFixed(2)],
+        ["Close", `${Math.round(games.filter(s => s.cricket.finished).length / games.length * 100)}%`]
+      ]
+    }
+  }
+
+  const ppd = avg(games.map(s => Number(s.ppd) || 0))
+  const scores = games.map(s => Number(s.score) || 0)
+  return {
+    games: games.length,
+    main: ppd,
+    better: "higher",
+    items: [
+      ["Avg Score", avg(scores).toFixed(1)],
+      ["Avg PPD", ppd.toFixed(2)],
+      ["Best", Math.max(...scores)]
+    ]
+  }
+}
+
+// 前の期間との差（Count-Up は PPD、01 はダーツ数、クリケットは MPR）
+function formatDataHubPeriodDiff(now, prev, type) {
+  if (!now || !prev || now.main === null || prev.main === null) return ""
+  const diff = now.main - prev.main
+  const digits = type === "countup" || type === "cricket" ? 2 : 1
+  if (Math.abs(diff) < Math.pow(10, -digits) / 2) return '<span class="data-hub-period-diff even">±0</span>'
+  const good = now.better === "lower" ? diff < 0 : diff > 0
+  return `<span class="data-hub-period-diff ${good ? "up" : "down"}">${diff > 0 ? "+" : "−"}${Math.abs(diff).toFixed(digits)}</span>`
+}
+
+function renderDataHubPeriod(sessions) {
+
+  if (!sessions.length) return ""
+
+  const mode = dataHubPeriodMode
+  const [y, m, d] = (dataHubSelectedDay || getDataHubDayKey(Date.now())).split("-").map(Number)
+  const base = new Date(y, m - 1, d)
+  const range = getDataHubPeriodRange(base, mode)
+  const prevRange = getDataHubPeriodRange(base, mode, -1)
+  const inRange = (r) => sessions.filter(s => s.date >= r.start.getTime() && s.date < r.end.getTime())
+  const list = inRange(range)
+  const prevList = inRange(prevRange)
+  const days = new Set(list.map(s => getDataHubDayKey(s.date))).size
+  const prevLabel = { week: "先週", month: "先月", year: "去年" }[mode]
+
+  let hasDiff = false
+  const rows = ["countup", "01", "cricket"]
+    .map(type => {
+      const now = getDataHubPeriodTypeStats(list, type)
+      if (!now) return ""
+      const prev = getDataHubPeriodTypeStats(prevList, type)
+      const diff = formatDataHubPeriodDiff(now, prev, type)
+      if (diff) hasDiff = true
+      return `
+        <div class="data-hub-period-row history-${type === "01" ? "zeroone" : type}">
+          <div class="data-hub-period-type">
+            <span class="history-game-badge">${HISTORY_GAME_LABELS[type]}</span>
+            <span class="data-hub-period-games">${now.games} games</span>
+            ${diff}
+          </div>
+          <div class="data-hub-period-items">
+            ${now.items.map(([label, value]) => `
+              <span class="data-hub-period-item"><small>${label}</small>${value}</span>
+            `).join("")}
+          </div>
+        </div>
+      `
+    })
+    .join("")
+
+  return `
+    <section class="data-hub-period">
+      <div class="data-hub-period-top">
+        <h3 class="data-hub-section-title">Summary</h3>
+        <span class="data-hub-period-tabs" role="group" aria-label="期間">
+          ${Object.keys(DATA_HUB_PERIODS).map(key => `
+            <button type="button" data-hub-period="${key}" class="${key === mode ? "active" : ""}" aria-pressed="${key === mode}">${DATA_HUB_PERIODS[key]}</button>
+          `).join("")}
+        </span>
+      </div>
+      <p class="data-hub-period-range">${formatDataHubPeriodLabel(range, mode)} · ${days} days · ${list.length} games</p>
+      ${rows || '<p class="data-hub-period-empty">この期間のゲームはありません</p>'}
+      ${hasDiff ? `<p class="data-hub-period-note">差は${prevLabel}と比べて（Count-Up は PPD、01 はダーツ数、Cricket は MPR）</p>` : ""}
+    </section>
+  `
+}
+

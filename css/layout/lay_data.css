@@ -2603,6 +2603,21 @@ main.data-container.analysis-mode .pagination {
   min-width: 48px;
   padding: 4px 10px;
   font-size: 12px;
+  white-space: nowrap;
+}
+
+/* 幅の狭いスマホ（iPhone SE など）：左上の「‹ Menu」と並んでも 1 行に収まるよう詰める */
+@media (max-width: 360px) {
+  .phone .data-game-switch {
+    gap: 2px;
+  }
+
+  .phone .data-game-switch button {
+    min-width: 0;
+    padding: 4px 7px;
+    font-size: 11px;
+    letter-spacing: 0;
+  }
 }
 
 /* 01 を選んでいるときは、左の欄をカウントアップの Stats から 01 の Stats（#zeroOneStatsPanel）に入れ替える。
@@ -2838,28 +2853,6 @@ body.page-data.data-hub-open .data-hub {
 }
 
 body.page-data.data-hub-open main.data-container {
-  display: none;
-}
-
-/* ヘッダーの「‹ Top」 */
-.data-hub-back {
-  flex: none;
-  margin-right: 12px;
-  padding: 6px 12px;
-
-  border: 1px solid rgb(var(--accent-rgb) / 0.4);
-  border-radius: 999px;
-  background: rgb(var(--accent-rgb) / 0.08);
-
-  color: var(--accent);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-
-  cursor: pointer;
-}
-
-.data-hub-back[hidden] {
   display: none;
 }
 
@@ -3278,11 +3271,6 @@ button.data-hub-cal-day {
   font-size: 11px;
 }
 
-.phone .data-hub-back {
-  margin-right: 8px;
-  padding: 4px 10px;
-  font-size: 12px;
-}
 
 /* スマホ横：まとめは 5 列、カードは 3 列 */
 .phone.landscape .data-hub {

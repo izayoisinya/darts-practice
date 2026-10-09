@@ -96,3 +96,32 @@ h2 {
     }
   }
 }
+
+/* ヘッダーの左上の戻るボタン（「‹ Menu」でメインメニューへ。データ画面の各画面では「‹ Top」） */
+.header-back {
+  flex: none;
+  margin-right: 12px;
+  padding: 6px 12px;
+
+  border: 1px solid rgb(var(--accent-rgb) / 0.4);
+  border-radius: 999px;
+  background: rgb(var(--accent-rgb) / 0.08);
+
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.header-back[hidden] {
+  display: none;
+}
+
+.phone .header-back {
+  margin-right: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+}

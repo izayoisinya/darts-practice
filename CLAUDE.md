@@ -64,7 +64,7 @@ manifest.json   PWA マニフェスト
 | data/ | heatmap.js | Analysis タブのヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
 | data/ | data_01.js | データ画面の Count-Up / 01 / Cricket の切り替えと、01 の記録の表示（設定ごとの上がり率・上がるまでのダーツ数・推移・一覧） |
 | data/ | data_cricket.js | データ画面のクリケットの記録の表示（MPR・クローズ率・推移・数字ごとのマーク・一覧） |
-| data/ | data_hub.js | データ画面のトップ（開いたときに最初に出す。成績のまとめ・見る画面（Games / Analysis）の選択・練習した日のカレンダー・最近のゲーム。各画面から「‹ Top」・端末の戻るで戻る） |
+| data/ | data_hub.js | データ画面のトップ（開いたときに最初に出す。成績のまとめ・見る画面（Games / Analysis）の選択・練習した日のカレンダー・最近のゲーム。各画面から「‹ Top」・端末の戻るで戻る。トップでは左上が「‹ Menu」） |
 | data/ | rating.js | PPD から DARTSLIVE / PHOENIX のレーティング目安を算出 |
 | ui/ | chart.js | ゲーム画面のグラフ描画のみ（計算は stats.js 側） |
 | ui/ | settings.js | 設定画面のロジック |

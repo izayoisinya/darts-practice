@@ -274,9 +274,9 @@ function getHistoryTotalPages() {
 }
 
 // ===============================
-// ===== タグの絞り込み（History とトップのカレンダーで共通） =====
+// ===== タグの絞り込み（History と Stats の Tag Search で共通） =====
 // ===============================
-// 日別メモのタグ（data_grouped.js の getDayNote()）で絞る。選んだタグは History とトップのカレンダーの両方に効く。
+// 日別メモのタグ（data_grouped.js の getDayNote()）で絞る。選んだタグは History と Stats（Count-Up）の Tag Search の両方に効く。
 // 2 つ以上選んだら、どれかが付いた日（OR）か、全部付いた日（AND）かを選べる
 let dataTagFilter = []
 let dataTagMode = "or"
@@ -345,11 +345,11 @@ function renderDataTagFilterHtml() {
   `
 }
 
-// 絞り込みを変えたら、今出している画面（トップか History）を描き直す
+// 絞り込みを変えたら、今出している画面（History か Stats の Tag Search）を描き直す
 function refreshDataTagFilterViews() {
   currentPage = 1
-  if (typeof dataHubOpen !== "undefined" && dataHubOpen) {
-    renderDataHub()
+  if (typeof viewMode !== "undefined" && viewMode === "stats") {
+    if (typeof renderTagSearch === "function") renderTagSearch()
   } else if (typeof viewMode !== "undefined" && viewMode === "history") {
     renderHistory()
     const container = document.getElementById("sessionsContainer")

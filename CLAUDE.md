@@ -57,8 +57,8 @@ manifest.json   PWA マニフェスト
 | game/ | cu_ui.js | COUNT-UP の UI 生成・DOM 操作 |
 | game/ | board_input.js | ボード形式の入力（ダーツボードの SVG 生成・タップ位置の判定）。設定 `inputMode` が `"board"` のとき `createNumberTable()` から使う |
 | game/ | stats.js | スタッツ・アワード計算。**UI 表示・DOM 操作は含まない**（再利用できる形にする） |
-| data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()`。History は全ゲームを 1 つの一覧で出す（`renderHistory()`。種類の絞り込みは `setHistoryFilter()`、タグの絞り込みは `dayMatchesTagFilter()` でトップのカレンダーと共通） |
-| data/ | data.js | データ画面の統括（History / Stats の切替 `changeView()`、Stats の描画 `renderStatsView()`、Count-Up の Stats/Awards・グラフ・タグ別散布図・期間比較） |
+| data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()`。History は全ゲームを 1 つの一覧で出す（`renderHistory()`。種類の絞り込みは `setHistoryFilter()`、タグの絞り込みは `dayMatchesTagFilter()` で Stats の Tag Search と共通） |
+| data/ | data.js | データ画面の統括（History / Stats の切替 `changeView()`、Stats の描画 `renderStatsView()`、Count-Up の Stats/Awards・グラフ・Tag Search〔タグ検索用のカレンダー〕・タグ別散布図・期間比較） |
 | data/ | data_grouped.js | Day/Week/Month/Year のグループビュー、日別メモ・タグ（グループビューは今は一旦お休み。メモの編集画面 `openDayNoteEditor()` はデータのトップのカレンダーから使う。`changeView("day")` などで開ける） |
 | data/ | data_detail.js | グループ内のゲーム一覧（詳細ビュー）、カレンダー、比較 |
 | data/ | heatmap.js | Count-Up の Stats のヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |

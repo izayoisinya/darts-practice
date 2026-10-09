@@ -235,7 +235,8 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 **トップ**（`data_hub.js`）：画面を開くと最初にトップを出す（`body` に `data-hub-open`。この間はふつうの表示 `main.data-container` を隠す）。
 
 - ヘッダーの右に、全ゲームの練習のまとめ（4 つ）：Games・Days（練習した日数）・This Month（今月のゲーム数）・Last Played（`getDataHubSummary()`。`#dataHubHeaderStats`。トップのときだけ出す。スマホは Month・Last の短いラベル）
-- その下に、見る画面のカード（History・Stats の 2 つ）。History は全体のゲーム数とゲームの種類ごとの数、Stats は開いたときに出すゲーム（前回見ていたもの）を出す
+- **並べ方**：横向き（タブレット・スマホ）とパソコンは左右 2 列（`.data-hub-layout`）。左（`#dataHubSide`）に History / Stats のカードとカレンダー、右（`#dataHubMain`）に選んだ日のメモとゲームを置き、それぞれの中でスクロールする（右をスクロールしても左は動かない。描き直してもスクロール位置は保ち、日付を変えたときだけ右を上に戻す）。縦向きは上から順に並べて画面ごとスクロールし、日付を押すとその日のゲームまで送る（`isDataHubStacked()`）。スマホ横はカードの説明を出さない
+- 見る画面のカード（History・Stats の 2 つ）。History は全体のゲーム数とゲームの種類ごとの数、Stats は開いたときに出すゲーム（前回見ていたもの）を出す
 - Calendar：全ゲームを練習した日に印を付け、その日のゲーム数を小さく出す（5 ゲーム以上は濃く。今日は白い枠）。練習した日を押すと、その日のメモとゲームを横（縦向きは下）に出す。最初は最後に練習した日を選んでおく（`renderDataHubDay()` / `fillDataHubDay()`。ゲームは History と同じ履歴カードで、見出しはゲームの種類の印だけ。押すと開く。新しい順。選んだ日は濃く光らせる。履歴カードの開閉の見た目は `#sessionsContainer` と同じ指定を `#dataHubDayList` にも当てる）。‹ › で月を切り替え、最初は最後に遊んだ月。下にその月の日数・ゲーム数（`renderDataHubCalendar()`）
 - 日別メモ：選んだ日のゲームの上に、その日のメモ（コメント・タグ・画像の有無）と「Memo」ボタン（メモが無ければ「+ Memo」）を出す（`renderDataHubDayNote()`）。ボタンで Day 一覧のときと同じ編集画面（`data_grouped.js` の `openDayNoteEditor()`）を開き、保存するとトップを描き直す（保存後の描き直しは、トップを開いていれば `renderDataHub()`、Day などの一覧なら `displayGroupedPage()`）。メモ・タグのある日はカレンダーの右上に黄色の小さな印（`.has-note`）。タグは Count-Up の Stats のタグ別散布図の色分けに使う
 - **Day / Week / Month / Year は一旦お休み**（2026.10.8。日付はトップのカレンダーで見る）。コード（`data_grouped.js` / `data_detail.js`）は残してあり、`changeView("day")` などで開ける
@@ -1049,3 +1050,4 @@ graph LR
 | 2026.10.10 | データ画面を「記録」と「分析」に分けた。トップ（全ゲームのまとめ・History / Stats のカード・カレンダーと選んだ日のメモとゲーム。Recent Games はなくし、最後に練習した日を選んでおく）、History（全ゲームの一覧を 1 列〔広い画面は 2 列〕で。ゲームの種類で絞り込み）、Stats（ヘッダーで選んだゲームの成績。Count-Up はもとの Analysis も続けて出す）。ゲームの種類の切り替えは Stats だけに出す。設定画面の Data Tabs はなくした |
 | 2026.10.10 | 履歴カードの見出しを「Game n」からゲームの種類の印だけに変更（番号は種類ごとの通し番号で、全ゲームの一覧では分かりにくかったため） |
 | 2026.10.10 | データのトップのまとめ（Games・Days・This Month・Last Played）を、カードの上からヘッダーの右に移した |
+| 2026.10.10 | データのトップを、横向きでは左（History / Stats のカード・カレンダー）と右（選んだ日のメモとゲーム）の 2 列にし、それぞれの中でスクロールするようにした |

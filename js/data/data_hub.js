@@ -92,7 +92,18 @@ function renderDataHub() {
     `).join("")
   }
 
+  // 描き直しても左右のスクロール位置は保つ（日付を変えたときは右を上に戻す：dataHubResetMainScroll）
+  const prevSide = document.getElementById("dataHubSide")
+  const prevMain = document.getElementById("dataHubMain")
+  const sideScroll = prevSide ? prevSide.scrollTop : 0
+  const mainScroll = prevMain && !dataHubResetMainScroll ? prevMain.scrollTop : 0
+  dataHubResetMainScroll = false
+
+  // 横向き（とパソコン）は左右 2 列：左に History / Stats のカードとカレンダー（右とは別にスクロール）、
+  // 右に選んだ日のメモとゲーム（ここだけスクロール）。縦向きは上から順に並べて画面ごとスクロール
   hub.innerHTML = `
+    <div class="data-hub-layout">
+    <div class="data-hub-side" id="dataHubSide">
     <section class="data-hub-views">
       ${cards.map(card => `
         <button type="button" class="data-hub-card${card.mode === "history" ? " primary" : ""}" data-hub-view="${card.mode}">
@@ -107,13 +118,18 @@ function renderDataHub() {
       `).join("")}
     </section>
 
-    <div class="data-hub-bottom">
-      ${renderDataHubCalendar(sessions)}
-      ${dataHubSelectedDay ? renderDataHubDay(sessions) : ""}
-    </div>
+    ${renderDataHubCalendar(sessions)}
 
     ${sessions.length ? "" : '<p class="data-hub-note">まだ記録がありません。ゲームを終えると、ここに練習の記録が出ます。</p>'}
+    </div>
+    <div class="data-hub-main" id="dataHubMain">
+      ${dataHubSelectedDay ? renderDataHubDay(sessions) : ""}
+    </div>
+    </div>
   `
+
+  document.getElementById("dataHubSide").scrollTop = sideScroll
+  document.getElementById("dataHubMain").scrollTop = mainScroll
 
   hub.querySelectorAll("[data-hub-view]").forEach(btn => {
     btn.addEventListener("click", () => openDataView(btn.dataset.hubView))
@@ -124,11 +140,12 @@ function renderDataHub() {
 
   hub.querySelectorAll("[data-hub-day]").forEach(btn => {
     btn.addEventListener("click", () => {
+      dataHubResetMainScroll = true
       dataHubSelectedDay = btn.dataset.hubDay
       renderDataHub()
       // 縦に並んでいるとき（スマホ縦など）は、出したゲームの一覧が見えるところまで送る
       const list = document.getElementById("dataHubDay")
-      if (list && !document.body.classList.contains("landscape")) list.scrollIntoView({ block: "start", behavior: "smooth" })
+      if (list && isDataHubStacked()) list.scrollIntoView({ block: "start", behavior: "smooth" })
     })
   })
 
@@ -153,6 +170,14 @@ function renderDataHub() {
 let dataHubCalendarMonth = null
 // カレンダーで選んだ日（"YYYY-MM-DD"）
 let dataHubSelectedDay = null
+// 次に描くとき、右（選んだ日のメモとゲーム）のスクロールを上に戻す
+let dataHubResetMainScroll = false
+
+// 縦に 1 列で並べているか（縦向きのタブレット・スマホ。lay_data.css の .data-hub-layout）
+function isDataHubStacked() {
+  const cls = document.body.classList
+  return !cls.contains("landscape") && !cls.contains("desktop")
+}
 
 function getDataHubDayKey(time) {
   const d = new Date(time)

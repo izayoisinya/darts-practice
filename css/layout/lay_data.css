@@ -2938,9 +2938,6 @@ body.page-data.data-hub-open .data-hub-header-stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-
-  max-width: 1100px;
-  margin: 0 auto;
 }
 
 .data-hub-card {
@@ -3008,20 +3005,52 @@ body.page-data.data-hub-open .data-hub-header-stats {
   color: rgb(230 237 243 / 0.72);
 }
 
-/* カレンダーと最近のゲーム（横向きは左右に並べる） */
-.data-hub-bottom {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 18px;
-
+/* 左（History / Stats のカード・カレンダー）と右（選んだ日のメモとゲーム）。
+   縦向きは上から順に並べて画面ごとスクロール、横向き・パソコンは左右 2 列にして、それぞれの中でスクロールする */
+.data-hub-layout {
   max-width: 1100px;
-  margin: 22px auto 0;
+  margin: 0 auto;
 }
 
-.landscape .data-hub-bottom,
-.desktop .data-hub-bottom {
+.data-hub-side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.data-hub-main {
+  margin-top: 22px;
+}
+
+body.page-data.data-hub-open.landscape .data-hub,
+body.page-data.data-hub-open.desktop .data-hub {
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+.landscape .data-hub-layout,
+.desktop .data-hub-layout {
+  display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
+  gap: 18px;
+  height: 100%;
+}
+
+.landscape .data-hub-side,
+.landscape .data-hub-main,
+.desktop .data-hub-side,
+.desktop .data-hub-main {
+  min-height: 0;
+  margin-top: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+
+/* カードの外側の光（box-shadow）がスクロールの枠で切れないよう、少し内側に置く */
+.landscape .data-hub-side,
+.desktop .data-hub-side {
+  padding-top: 2px;
 }
 
 .data-hub-calendar {
@@ -3315,8 +3344,7 @@ button.data-hub-cal-day {
 }
 
 .data-hub-note {
-  max-width: 1100px;
-  margin: 16px auto 0;
+  margin: 0;
   font-size: 13px;
   color: var(--text-muted);
 }
@@ -3363,7 +3391,13 @@ button.data-hub-cal-day {
 }
 
 .phone.landscape .data-hub-card {
-  min-height: 100px;
+  min-height: 0;
+  padding: 10px 12px;
+}
+
+/* スマホ横は左右 2 列で左が狭いので、カードの説明は出さない */
+.phone.landscape .data-hub-card-desc {
+  display: none;
 }
 
 

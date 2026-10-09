@@ -19,7 +19,7 @@ function readDayNotesForBackup() {
   try {
     const notes = JSON.parse(localStorage.getItem(BACKUP_DAY_NOTES_KEY) || "{}")
 
-    // 旧形式（mode 別）は day だけ読む（data_grouped.js の getAllDayNotes() と同じ扱い）
+    // 旧形式（mode 別）は day だけ読む（data_notes.js の getAllDayNotes() と同じ扱い）
     if (notes && notes.day && typeof notes.day === "object") {
       return notes.day
     }

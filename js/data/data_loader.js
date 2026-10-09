@@ -266,10 +266,120 @@ function getHistoryItems() {
       return { session, type, number: counters[type] }
     })
     .filter(item => historyFilter === "all" || item.type === historyFilter)
+    .filter(item => dayMatchesTagFilter(getLocalDateKey(new Date(item.session.date))))
 }
 
 function getHistoryTotalPages() {
   return Math.max(1, Math.ceil(getHistoryItems().length / PAGE_SIZE))
+}
+
+// ===============================
+// ===== タグの絞り込み（History とトップのカレンダーで共通） =====
+// ===============================
+// 日別メモのタグ（data_grouped.js の getDayNote()）で絞る。選んだタグは History とトップのカレンダーの両方に効く。
+// 2 つ以上選んだら、どれかが付いた日（OR）か、全部付いた日（AND）かを選べる
+let dataTagFilter = []
+let dataTagMode = "or"
+
+function normalizeDataTag(tag) {
+  return String(tag || "").trim().replace(/^#/, "")
+}
+
+function getDayTags(dayKey) {
+  if (typeof getDayNote !== "function") return []
+  const tags = getDayNote(dayKey).tags
+  return Array.isArray(tags) ? tags.map(normalizeDataTag).filter(Boolean) : []
+}
+
+// 使われているタグと、そのタグの付いた日数（多い順）
+function getDataTagList() {
+  if (typeof getAllDayNotes !== "function") return []
+  const counts = {}
+  Object.keys(getAllDayNotes() || {}).forEach(dayKey => {
+    new Set(getDayTags(dayKey)).forEach(tag => {
+      counts[tag] = (counts[tag] || 0) + 1
+    })
+  })
+  return Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "ja"))
+}
+
+function isDataTagFilterActive() {
+  return dataTagFilter.length > 0
+}
+
+function dayMatchesTagFilter(dayKey) {
+  if (!dataTagFilter.length) return true
+  const tags = getDayTags(dayKey)
+  return dataTagMode === "and"
+    ? dataTagFilter.every(tag => tags.includes(tag))
+    : dataTagFilter.some(tag => tags.includes(tag))
+}
+
+// 絞り込みのボタン（タグがなければ何も出さない）
+function renderDataTagFilterHtml() {
+  const list = getDataTagList()
+  if (!list.length) return ""
+
+  // 選んだタグがメモから消えていたら外す
+  dataTagFilter = dataTagFilter.filter(tag => list.some(([name]) => name === tag))
+
+  const chips = list.map(([tag, days]) => {
+    const active = dataTagFilter.includes(tag)
+    return `<button type="button" class="tag-filter-chip${active ? " active" : ""}" data-tag-filter="${encodeURIComponent(tag)}" aria-pressed="${active}">#${escapeHtml(tag)}<small>${days}</small></button>`
+  }).join("")
+
+  const mode = dataTagFilter.length >= 2
+    ? `<span class="tag-filter-mode" role="group" aria-label="タグの組み合わせ">
+        <button type="button" data-tag-mode="or" class="${dataTagMode === "or" ? "active" : ""}">OR</button>
+        <button type="button" data-tag-mode="and" class="${dataTagMode === "and" ? "active" : ""}">AND</button>
+      </span>`
+    : ""
+  const clear = dataTagFilter.length ? '<button type="button" class="tag-filter-clear" data-tag-clear>Clear</button>' : ""
+
+  return `
+    <div class="tag-filter${dataTagFilter.length ? " is-active" : ""}">
+      <span class="tag-filter-label">Tags</span>
+      <div class="tag-filter-chips">${chips}</div>
+      ${mode}${clear}
+    </div>
+  `
+}
+
+// 絞り込みを変えたら、今出している画面（トップか History）を描き直す
+function refreshDataTagFilterViews() {
+  currentPage = 1
+  if (typeof dataHubOpen !== "undefined" && dataHubOpen) {
+    renderDataHub()
+  } else if (typeof viewMode !== "undefined" && viewMode === "history") {
+    renderHistory()
+    const container = document.getElementById("sessionsContainer")
+    if (container) container.scrollTop = 0
+  }
+}
+
+let dataTagFilterBound = false
+
+function setupDataTagFilter() {
+  if (dataTagFilterBound) return
+  dataTagFilterBound = true
+  document.addEventListener("click", e => {
+    const target = e.target instanceof Element ? e.target : null
+    if (!target) return
+    const chip = target.closest("[data-tag-filter]")
+    const mode = target.closest("[data-tag-mode]")
+    const clear = target.closest("[data-tag-clear]")
+    if (chip) {
+      const tag = decodeURIComponent(chip.dataset.tagFilter)
+      dataTagFilter = dataTagFilter.includes(tag) ? dataTagFilter.filter(t => t !== tag) : dataTagFilter.concat(tag)
+    } else if (mode) {
+      dataTagMode = mode.dataset.tagMode === "and" ? "and" : "or"
+    } else if (clear) {
+      dataTagFilter = []
+    } else {
+      return
+    }
+    refreshDataTagFilterViews()
+  })
 }
 
 function setHistoryFilter(filter) {
@@ -303,8 +413,13 @@ function loadSessions() {
   container.innerHTML = ""
   updateHistoryFilterButtons()
 
+  const tagBox = document.getElementById("historyTagFilter")
+  if (tagBox) tagBox.innerHTML = renderDataTagFilterHtml()
+
   if (!items.length) {
-    container.innerHTML = '<p class="history-empty">No data</p>'
+    container.innerHTML = isDataTagFilterActive()
+      ? '<p class="history-empty">選んだタグの日のゲームはありません</p>'
+      : '<p class="history-empty">No data</p>'
     return
   }
 
@@ -589,6 +704,7 @@ function createSessionCardElement(innerHtml) {
 
 async function initDataPage() {
   setupSessionCardToggle()
+  setupDataTagFilter()
 
   if (typeof initSessionsStorage === "function") {
     await initSessionsStorage()

@@ -69,6 +69,8 @@
       <button type="button" data-filter="01" onclick="setHistoryFilter('01')">01</button>
       <button type="button" data-filter="cricket" onclick="setHistoryFilter('cricket')">Cricket</button>
     </div>
+    <!-- 日別メモのタグで絞り込む（data_loader.js の renderDataTagFilterHtml()。トップのカレンダーと共通） -->
+    <div id="historyTagFilter" class="history-tag-filter"></div>
     <section id="sessionsContainer"></section>
   </div>
   <!-- Stats（分析）：ヘッダーで選んだゲームの成績。Count-Up はヒートマップ・タグ別の散布図・期間の比較も続けて出す（data.js の renderStatsView()） -->

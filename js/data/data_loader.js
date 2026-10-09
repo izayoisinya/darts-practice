@@ -276,7 +276,7 @@ function getHistoryTotalPages() {
 // ===============================
 // ===== タグの絞り込み（History と Stats の Tag Search で共通） =====
 // ===============================
-// 日別メモのタグ（data_grouped.js の getDayNote()）で絞る。選んだタグは History と Stats（Count-Up）の Tag Search の両方に効く。
+// 日別メモのタグ（data_notes.js の getDayNote()）で絞る。選んだタグは History と Stats（Count-Up）の Tag Search の両方に効く。
 // 2 つ以上選んだら、どれかが付いた日（OR）か、全部付いた日（AND）かを選べる
 let dataTagFilter = []
 let dataTagMode = "or"
@@ -452,86 +452,6 @@ function renderHistory() {
   updatePaginationUI(getHistoryTotalPages())
 }
 
-function groupSessions(sessions, mode) {
-  
-  const groups = {}
-  
-  sessions.forEach(s => {
-    
-    const date = new Date(s.date)
-    
-    let key
-    
-    if (mode === "day") {
-      key = getLocalDateKey(date)
-    }
-    
-    if (mode === "week") {
-      const day = date.getDay()
-      const diff = (day === 0 ? -6 : 1 - day)
-      
-      const first = new Date(date)
-      first.setDate(date.getDate() + diff)
-      
-      key = getLocalDateKey(first)
-    }
-    
-    if (mode === "month") {
-      key = `${date.getFullYear()}-${date.getMonth()+1}`
-    }
-    
-    if (mode === "year") {
-      key = `${date.getFullYear()}`
-    }
-    
-    if (!groups[key]) groups[key] = []
-    groups[key].push(s)
-    
-  })
-  
-  return groups
-}
-
-function calcSummary(list) {
-  
-  const games = list.length
-  
-  const totalScore = list.reduce((sum, s) => sum + s.score, 0)
-  
-  const avgScore = totalScore / games
-  
-  const avgPPD = list.reduce((sum, s) => sum + s.ppd, 0) / games
-  
-  const totalBulls = list.reduce((sum, s) => sum + (s.bulls || 0), 0)
-  const awardCounts = list.reduce((acc, s) => {
-    const awards = getSessionAwards(s)
-    acc.hatTrick += awards.hatTrick || 0
-    acc.threeInTheBlack += awards.threeInTheBlack || 0
-    acc.ton80 += awards.ton80 || 0
-    acc.highTon += awards.highTon || 0
-    acc.lowTon += awards.lowTon || 0
-    acc.threeInTheBed += awards.threeInTheBed || 0
-    acc.whiteHorse += awards.whiteHorse || 0
-    return acc
-  }, {
-    hatTrick: 0,
-    threeInTheBlack: 0,
-    ton80: 0,
-    highTon: 0,
-    lowTon: 0,
-    threeInTheBed: 0,
-    whiteHorse: 0
-  })
-  
-  return {
-    games,
-    avgPPD: avgPPD.toFixed(2),
-    totalBulls,
-    avgScore: avgScore.toFixed(1),
-    awardCounts
-  }
-}
-
 function getLocalDateKey(date) {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, "0")
@@ -539,92 +459,15 @@ function getLocalDateKey(date) {
   return `${y}-${m}-${d}`
 }
 
-function getWeekRange(date) {
-  
-  const d = new Date(date)
-  
-  const day = d.getDay()
-  
-  const diffToMonday = (day === 0 ? -6 : 1 - day)
-  
-  const start = new Date(d)
-  start.setDate(d.getDate() + diffToMonday)
-  
-  const end = new Date(start)
-  end.setDate(start.getDate() + 6)
-  
-  return { start, end }
-}
-
-function formatShort(date, withYear = true) {
-  const m = date.getMonth() + 1
-  const d = date.getDate()
-  return withYear ?
-    `${date.getFullYear()}/${m}/${d}` :
-    `${m}/${d}`
-}
-
-function renderPagination(total) {
-  const totalPages = Math.ceil(total / PAGE_SIZE)
-  
-  let html = `
-    <button onclick="changePage(${currentPage - 1})"
-      ${currentPage === 1 ? "disabled" : ""}>
-      Prev
-    </button>
-    <span>${currentPage} / ${totalPages}</span>
-    <button onclick="changePage(${currentPage + 1})"
-      ${currentPage === totalPages ? "disabled" : ""}>
-      Next
-    </button>
-  `
-  
-  // footer に入れる
-  document.getElementById("paginationContainer").innerHTML = html
-}
-
+// フッターの Prev / Next（History の全ゲームの一覧）
 function changePage(direction) {
-  if (detailViewMode && selectedDayData && selectedDayData.gamesList) {
-    const totalPages = Math.max(
-      1,
-      Math.ceil(selectedDayData.gamesList.length / PAGE_SIZE)
-    )
-    let newPage = detailPageNumber
+  const totalPages = getHistoryTotalPages()
+  if (direction === "Prev" && currentPage > 1) currentPage--
+  if (direction === "Next" && currentPage < totalPages) currentPage++
 
-    if (direction === 'Prev') newPage--
-    if (direction === 'Next') newPage++
-
-    if (newPage >= 1 && newPage <= totalPages) {
-      changeDetailPage(newPage)
-    }
-    return
-  }
-
-  // Analysis はページ送りなし
-  if (groupedPageMode === "analysis") return
-
-  if (groupedPageMode === 'game') {
-    // Game ビュー（全ゲームの History）
-    const totalPages = getHistoryTotalPages()
-    
-    if (direction === 'Prev' && currentPage > 1) currentPage--
-    if (direction === 'Next' && currentPage < totalPages) currentPage++
-    
-    renderHistory()
-    const container = document.getElementById("sessionsContainer")
-    if (container) container.scrollTop = 0
-  } else {
-    // Group ビュー
-    if (!groupedPageData || groupedPageData.length === 0) return
-    
-    const totalPages = Math.ceil(groupedPageData.length / PAGE_SIZE)
-    let newPage = groupedPageNumber
-    
-    if (direction === 'Prev') newPage--
-    if (direction === 'Next') newPage++
-    
-    changeGroupedPage(newPage)
-  }
+  renderHistory()
+  const container = document.getElementById("sessionsContainer")
+  if (container) container.scrollTop = 0
 }
 
 function updatePaginationUI(totalPages) {
@@ -639,17 +482,9 @@ function updatePaginationUI(totalPages) {
   document.getElementById('nextBtn').disabled = currentPage === totalPages
 }
 
-// グローバル変数の初期化
-// ❌ これらを削除（既に定義されている）
-// let groupedPageNumber = 1
-// let PAGE_SIZE = 10
-
-// ✅ 1回だけ定義する場合はここで
+// History のページ（10 ゲームずつ）
 let currentPage = 1
-let groupedPageNumber = 1
-let groupedPageMode = 'game'
-let groupedPageData = []
-const PAGE_SIZE = 10 // let ではなく const で1回だけ定義
+const PAGE_SIZE = 10
 
 // ページロード時の初期化
 window.addEventListener('DOMContentLoaded', () => {
@@ -711,9 +546,7 @@ async function initDataPage() {
   }
 
   currentPage = 1
-  groupedPageMode = 'game'
-  groupedPageData = []
-  
+
   renderHistory()
 
   if (typeof initDataGameSwitch === "function") initDataGameSwitch()

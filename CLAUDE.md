@@ -58,14 +58,13 @@ manifest.json   PWA マニフェスト
 | game/ | board_input.js | ボード形式の入力（ダーツボードの SVG 生成・タップ位置の判定）。設定 `inputMode` が `"board"` のとき `createNumberTable()` から使う |
 | game/ | stats.js | スタッツ・アワード計算。**UI 表示・DOM 操作は含まない**（再利用できる形にする） |
 | data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()`。History は全ゲームを 1 つの一覧で出す（`renderHistory()`。種類の絞り込みは `setHistoryFilter()`、タグの絞り込みは `dayMatchesTagFilter()` で Stats の Tag Search と共通） |
-| data/ | data.js | データ画面の統括（History / Stats の切替 `changeView()`、Stats の描画 `renderStatsView()`、Count-Up の Stats/Awards・グラフ・Tag Search〔タグ検索用のカレンダー〕・タグ別散布図・期間比較） |
-| data/ | data_grouped.js | Day/Week/Month/Year のグループビュー、日別メモ・タグ（グループビューは今は一旦お休み。メモの編集画面 `openDayNoteEditor()` はデータのトップのカレンダーから使う。`changeView("day")` などで開ける） |
-| data/ | data_detail.js | グループ内のゲーム一覧（詳細ビュー）、カレンダー、比較 |
+| data/ | data.js | データ画面の統括（History / Stats の切替 `changeView()`、Stats の描画 `renderStatsView()`、Count-Up の Stats/Awards・グラフ・Tag Search〔タグ検索用のカレンダー〕・タグ別散布図・期間比較・Day Compare〔2 つの日の比較〕） |
+| data/ | data_notes.js | 日別メモ（コメント・タグ・写真）の読み書きと編集画面 `openDayNoteEditor()`（データのトップのカレンダーで選んだ日の Memo から開く） |
 | data/ | heatmap.js | Count-Up の Stats のヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
 | data/ | data_01.js | Stats の画面の Count-Up / 01 / Cricket の切り替え（`setDataGameType()`）と、01 の成績の表示（設定ごとの上がり率・上がるまでのダーツ数・推移）・01 の履歴カード |
 | data/ | data_cricket.js | Stats の画面のクリケットの成績の表示（MPR・クローズ率・推移・数字ごとのマーク）・クリケットの履歴カード |
 | data/ | data_period.js | 週・月・年の期間の計算（`getPeriodRange()`）と、Stats の Period（ゲームの種類ごとの期間ごとの平均の推移・前の期間との比較。`renderStatsPeriod()`） |
-| data/ | data_hub.js | データ画面のトップ（開いたときに最初に出す。全ゲームのまとめ・見る画面（History / Stats）の選択・練習した日のカレンダー・今週／今月／今年の練習量（Practice）と選んだ日のメモ・ゲーム。各画面から「‹ Top」・端末の戻るで戻る。トップでは左上が「‹ Menu」） |
+| data/ | data_hub.js | データ画面のトップ（開いたときに最初に出す。全ゲームのまとめ・見る画面（History / Stats）の選択・練習した日のカレンダー・今週／今月／今年の練習量（Practice）と選んだ日のメモ（写真）・Bull / Triple の割合・ゲーム。各画面から「‹ Top」・端末の戻るで戻る。トップでは左上が「‹ Menu」） |
 | data/ | rating.js | PPD から DARTSLIVE / PHOENIX のレーティング目安を算出 |
 | ui/ | chart.js | ゲーム画面のグラフ描画のみ（計算は stats.js 側） |
 | ui/ | settings.js | 設定画面のロジック |

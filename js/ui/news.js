@@ -354,6 +354,16 @@ const INFO_CONTENT = {
       date: "2026/10/10",
       badge: "機能追加",
       text: "Stats に「Period」を追加しました。週・月・年ごとの平均（Count-Up は PPD、01 はダーツ数、Cricket は MPR）の推移を棒グラフで見られ、今の期間と前の期間の差も出ます。データのトップのまとめは練習量（Practice：今週・今月・今年の練習日数とゲーム数）だけにしました。"
+    },
+    {
+      date: "2026/10/10",
+      badge: "機能追加",
+      text: "データのトップでカレンダーの日付を選ぶと、その日の Bull / In-Bull / Triple の割合と、メモの写真（押すと大きく表示）が出るようになりました。Stats（Count-Up）には 2 つの日を比べる「Day Compare」を追加しました。"
+    },
+    {
+      date: "2026/10/10",
+      badge: "UI",
+      text: "使われなくなっていた Day / Week / Month / Year の画面とタグ集計を削除しました（日付・期間・タグは、データのトップ・Stats の Period・Tag Search で見られます）。"
     }
   ],
   notice: [

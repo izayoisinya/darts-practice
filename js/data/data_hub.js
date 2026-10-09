@@ -150,6 +150,9 @@ function renderDataHub() {
     })
   })
 
+  const photo = hub.querySelector("[data-hub-image] img")
+  if (photo) photo.parentElement.addEventListener("click", () => openDataHubImage(photo.src))
+
   const memo = hub.querySelector("[data-hub-day-memo]")
   if (memo) memo.addEventListener("click", () => openDayNoteEditor(dataHubSelectedDay, memo.dataset.label))
 
@@ -203,12 +206,13 @@ function renderDataHubDay(all) {
         <h3 class="data-hub-section-title">${m}/${d} Games（${sessions.length}）</h3>
       </div>
       ${renderDataHubDayNote(m, d)}
+      ${renderDataHubDayRates(sessions)}
       <div id="dataHubDayList" class="data-hub-day-list"></div>
     </section>
   `
 }
 
-// 選んだ日のメモ（コメント・タグ・画像の有無）と、編集画面を開く Memo ボタン（編集画面は data_grouped.js の openDayNoteEditor()）
+// 選んだ日のメモ（コメント・タグ・画像の有無）と、編集画面を開く Memo ボタン（編集画面は data_notes.js の openDayNoteEditor()）
 function renderDataHubDayNote(m, d) {
   const note = getDayNote(dataHubSelectedDay)
   const tags = note.tags || []
@@ -216,18 +220,82 @@ function renderDataHubDayNote(m, d) {
   const body = has
     ? `
       ${note.comment ? `<p class="data-hub-note-text">${escapeHtml(note.comment)}</p>` : ""}
-      ${tags.length || note.imageData ? `<div class="group-note-chip-row">
+      ${tags.length ? `<div class="group-note-chip-row">
         ${tags.map(tag => `<span class="group-note-chip">#${escapeHtml(tag)}</span>`).join("")}
-        ${note.imageData ? '<span class="group-note-image-badge">IMG</span>' : ""}
       </div>` : ""}
     `
     : '<p class="data-hub-note-empty">メモ・タグはまだありません</p>'
+  // セッティングの写真は小さく出し、押すと大きく見せる（openDataHubImage()）
+  const image = note.imageData
+    ? `<button type="button" class="data-hub-note-image" data-hub-image aria-label="写真を大きく見る"><img src="${note.imageData}" alt="${m}/${d} のセッティングの写真"></button>`
+    : ""
   return `
     <div class="data-hub-day-note">
+      ${image}
       <div class="data-hub-day-note-body">${body}</div>
       <button type="button" class="group-note-edit-btn" data-hub-day-memo data-label="${m}/${d}">${has ? "Memo" : "+ Memo"}</button>
     </div>
   `
+}
+
+// その日の Bull / In-Bull / Triple の割合（全ゲームの投数に対して）。
+// 1 投ごとの記録（darts）があればそこから数え、ない古い記録はゲームのブル数・トリプル数と投数（ラウンド数 × 3）で数える
+function getDataHubDayHitCounts(session) {
+  if (Array.isArray(session.darts) && session.darts.length && typeof getZeroOneHitCounts === "function") {
+    return getZeroOneHitCounts(session)
+  }
+  const rounds = Array.isArray(session.roundScores) ? session.roundScores.length : 0
+  const triples = session.tripleHits ? Object.values(session.tripleHits).reduce((a, b) => a + (Number(b) || 0), 0) : 0
+  return {
+    darts: rounds * 3,
+    bulls: Number(session.bulls) || 0,
+    inner: Number(session.innerBulls) || 0,
+    triples
+  }
+}
+
+function renderDataHubDayRates(daySessions) {
+  const total = daySessions.reduce((sum, session) => {
+    const c = getDataHubDayHitCounts(session)
+    Object.keys(sum).forEach(key => { sum[key] += c[key] || 0 })
+    return sum
+  }, { darts: 0, bulls: 0, inner: 0, triples: 0 })
+  if (!total.darts) return ""
+
+  const item = (label, count, cls) => {
+    const rate = count / total.darts * 100
+    return `
+      <div class="data-hub-rate ${cls}">
+        <span class="data-hub-rate-head"><span>${label}</span><strong>${rate.toFixed(1)}%</strong></span>
+        <span class="data-hub-rate-bar"><i style="width:${Math.min(100, rate).toFixed(1)}%"></i></span>
+        <small>${count} / ${total.darts}</small>
+      </div>
+    `
+  }
+  return `
+    <div class="data-hub-rates">
+      ${item("Bull", total.bulls, "bull")}
+      ${item("In-Bull", total.inner, "inner")}
+      ${item("Triple", total.triples, "triple")}
+    </div>
+  `
+}
+
+// 写真を画面いっぱいに出す（押すか Esc で閉じる）
+function openDataHubImage(src) {
+  const viewer = document.createElement("div")
+  viewer.className = "image-viewer"
+  viewer.setAttribute("role", "dialog")
+  viewer.setAttribute("aria-label", "写真")
+  viewer.innerHTML = `<img src="${src}" alt="">`
+  const close = () => {
+    viewer.remove()
+    document.removeEventListener("keydown", onKey)
+  }
+  const onKey = e => { if (e.key === "Escape") close() }
+  viewer.addEventListener("click", close)
+  document.addEventListener("keydown", onKey)
+  document.body.appendChild(viewer)
 }
 
 // 選んだ日のゲームを、History と同じ履歴カードで出す（見出しにゲームの種類の印。番号はゲームごとの通し番号。新しい順）
@@ -324,7 +392,6 @@ function setDataHubOpen(open) {
 }
 
 // 各画面を開くと履歴を 1 つ足し、端末・ブラウザの「戻る」でトップに戻れるようにする
-// （Day の詳細ビューは data_detail.js が同じ履歴の上にもう 1 つ足して、戻るで詳細を閉じる）
 let dataHubPopstateBound = false
 
 function isDataViewHistoryState() {
@@ -339,10 +406,10 @@ function bindDataHubPopstate() {
   })
 }
 
-// ヘッダーの「‹ Top」：開いた画面の履歴があれば戻る（popstate でトップを出す）。詳細ビューを開いているときなどは直接トップを出す
+// ヘッダーの「‹ Top」：開いた画面の履歴があれば戻る（popstate でトップを出す）。なければ直接トップを出す
 function backToDataHub() {
   const state = window.history && window.history.state
-  if (state && state.dataView && !state.dataDetailOpen) {
+  if (state && state.dataView) {
     window.history.back()
     return
   }

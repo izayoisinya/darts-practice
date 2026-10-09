@@ -219,10 +219,19 @@ body .number-table.board-mode {
 .board-svg .seg-outer-bull { fill: #b8404c; }
 .board-svg .seg-inner-bull { fill: #12161d; stroke: var(--accent); stroke-width: 2.5px; }
 
-/* 押したところが分かるよう、触れている間だけ明るくする */
-.board-svg .seg:active {
-  filter: brightness(1.35);
-}
+/* 押したところが分かるよう、触れている間だけ明るくする。
+   filter: brightness() は iPad の Safari で、離したあとに区画の端（ブルの左端など）が線になって残るので使わず、色を直接変える */
+.board-svg .seg-single.seg-a:active { fill: #262d3a; }
+.board-svg .seg-single.seg-b:active { fill: #3d4657; }
+
+.board-svg .seg-triple.seg-a:active,
+.board-svg .seg-double.seg-a:active,
+.board-svg .seg-outer-bull:active { fill: #d85866; }
+
+.board-svg .seg-triple.seg-b:active,
+.board-svg .seg-double.seg-b:active { fill: #4389d6; }
+
+.board-svg .seg-inner-bull:active { fill: #1f2733; }
 
 .board-number {
   fill: var(--text-muted);

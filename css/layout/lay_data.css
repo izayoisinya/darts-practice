@@ -2300,10 +2300,15 @@ main.data-container.analysis-mode #leftPanel {
   display: flex;
 }
 
-/* ページ送りはないので押せないようにする */
-main.data-container.analysis-mode .pagination {
-  opacity: 0.25;
-  pointer-events: none;
+/* Analysis はカウントアップだけを集計するので、ヘッダーのゲームの切り替えとフッター（ページ送り・タブ）は出さない。
+   Games へはヘッダーの「‹ Top」から戻る。フッターの分の下の余白も小さくする */
+body.page-data.data-analysis-view .data-game-switch,
+body.page-data.data-analysis-view .footer-bar {
+  display: none;
+}
+
+body.page-data.data-analysis-view {
+  --data-footer-spacer: calc(24px + env(safe-area-inset-bottom));
 }
 
 .analysis-section {

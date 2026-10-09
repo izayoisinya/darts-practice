@@ -284,6 +284,11 @@ const INFO_CONTENT = {
       date: "2026/10/09",
       badge: "UI",
       text: "データ画面の Games の History を、Count-Up・01・Cricket の全ゲームを新しい順に並べた 1 つの一覧にしました。カードの見出しの印でゲームの種類が分かります。"
+    },
+    {
+      date: "2026/10/09",
+      badge: "UI",
+      text: "データ画面の Analysis では、右上のゲームの切り替えと下のフッターを出さないようにしました（左上の「‹ Top」で戻れます）。"
     }
   ],
   notice: [

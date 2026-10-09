@@ -289,6 +289,11 @@ const INFO_CONTENT = {
       date: "2026/10/09",
       badge: "UI",
       text: "データ画面の Analysis では、右上のゲームの切り替えと下のフッターを出さないようにしました（左上の「‹ Top」で戻れます）。"
+    },
+    {
+      date: "2026/10/09",
+      badge: "UI",
+      text: "データ画面の下にあった Game / Analysis のタブをなくしました。見る画面はデータのトップで選びます。"
     }
   ],
   notice: [

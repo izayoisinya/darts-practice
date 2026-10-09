@@ -3314,3 +3314,14 @@ button.data-hub-cal-day {
 
 .history-zeroone .history-game-badge { --badge-rgb: 77 171 255; }
 .history-cricket .history-game-badge { --badge-rgb: 255 196 64; }
+
+
+/* フッターの Game / Analysis のタブは出さない（見る画面はデータのトップで選ぶ。2026.10.9）。
+   フッターはページ送りだけにして中央に置く */
+body.page-data .tabs-container {
+  display: none !important;
+}
+
+body.page-data .footer-bar {
+  justify-content: center;
+}

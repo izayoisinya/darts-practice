@@ -349,6 +349,11 @@ const INFO_CONTENT = {
       date: "2026/10/10",
       badge: "UI",
       text: "Stats の Tag Search のカレンダーで日付を押しても、データのトップに移らないようにしました。"
+    },
+    {
+      date: "2026/10/10",
+      badge: "機能追加",
+      text: "Stats に「Period」を追加しました。週・月・年ごとの平均（Count-Up は PPD、01 はダーツ数、Cricket は MPR）の推移を棒グラフで見られ、今の期間と前の期間の差も出ます。データのトップのまとめは練習量（Practice：今週・今月・今年の練習日数とゲーム数）だけにしました。"
     }
   ],
   notice: [

@@ -64,7 +64,8 @@ manifest.json   PWA マニフェスト
 | data/ | heatmap.js | Count-Up の Stats のヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
 | data/ | data_01.js | Stats の画面の Count-Up / 01 / Cricket の切り替え（`setDataGameType()`）と、01 の成績の表示（設定ごとの上がり率・上がるまでのダーツ数・推移）・01 の履歴カード |
 | data/ | data_cricket.js | Stats の画面のクリケットの成績の表示（MPR・クローズ率・推移・数字ごとのマーク）・クリケットの履歴カード |
-| data/ | data_hub.js | データ画面のトップ（開いたときに最初に出す。全ゲームのまとめ・見る画面（History / Stats）の選択・練習した日のカレンダー・週月年のまとめ（Summary）と選んだ日のメモ・ゲーム。各画面から「‹ Top」・端末の戻るで戻る。トップでは左上が「‹ Menu」） |
+| data/ | data_period.js | 週・月・年の期間の計算（`getPeriodRange()`）と、Stats の Period（ゲームの種類ごとの期間ごとの平均の推移・前の期間との比較。`renderStatsPeriod()`） |
+| data/ | data_hub.js | データ画面のトップ（開いたときに最初に出す。全ゲームのまとめ・見る画面（History / Stats）の選択・練習した日のカレンダー・今週／今月／今年の練習量（Practice）と選んだ日のメモ・ゲーム。各画面から「‹ Top」・端末の戻るで戻る。トップでは左上が「‹ Menu」） |
 | data/ | rating.js | PPD から DARTSLIVE / PHOENIX のレーティング目安を算出 |
 | ui/ | chart.js | ゲーム画面のグラフ描画のみ（計算は stats.js 側） |
 | ui/ | settings.js | 設定画面のロジック |
@@ -90,7 +91,8 @@ manifest.json   PWA マニフェスト
 | `dartsSettings` | LocalStorage | 設定 |
 | `dartsDayNotesV2` | LocalStorage | 日別メモ（コメント・タグ・画像） |
 | `dartsDataGame` | LocalStorage | データ画面で最後に見ていたゲーム（`"countup"` / `"01"` / `"cricket"`） |
-| `dartsDataHubPeriod` | LocalStorage | データのトップの Summary で最後に選んだ期間（`"week"` / `"month"` / `"year"`） |
+| `dartsDataHubPeriod` | LocalStorage | データのトップの Practice で最後に選んだ期間（`"week"` / `"month"` / `"year"`） |
+| `dartsStatsPeriod` | LocalStorage | Stats の Period で最後に選んだ期間（`"week"` / `"month"` / `"year"`） |
 
 - セッションは保存時に短縮キーへシリアライズされる（`serializeSessionForStorage()`：`d` date, `s` score, `p` ppd, `r` roundScores, `a` awards 配列, `dt` 1 投ごとの記録（刺さった場所・ボード入力の位置）, `bm` ブルモード（セパレートのときだけ 1）など）。アプリ内では `normalizeSessionForApp()` の形で扱う
 - フィールドを追加するときは serialize / deserialize / normalize の 3 箇所を揃え、**既存ユーザーの保存データを壊さない**（欠損時のデフォルト値を用意する）

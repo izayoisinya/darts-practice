@@ -1,5 +1,5 @@
-const APP_CACHE = "darts-app-v97"
-const RUNTIME_CACHE = "darts-runtime-v97"
+const APP_CACHE = "darts-app-v98"
+const RUNTIME_CACHE = "darts-runtime-v98"
 
 const PRECACHE_URLS = [
   "./",
@@ -39,6 +39,7 @@ const PRECACHE_URLS = [
   "./js/data/heatmap.js",
   "./js/data/data_01.js",
   "./js/data/data_cricket.js",
+  "./js/data/data_period.js",
   "./js/data/data_hub.js",
   "./js/game/board_input.js",
   "./js/game/cu_ui.js",

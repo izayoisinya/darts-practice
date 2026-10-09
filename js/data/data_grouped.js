@@ -598,7 +598,9 @@ function ensureGroupNoteModalWired() {
     })
 
     closeGroupNoteEditor()
-    displayGroupedPage(groupedPageMode, groupedPageData)
+    // データのトップ（カレンダーで選んだ日）から開いたときはトップを、Day などの一覧から開いたときは一覧を描き直す
+    if (typeof dataHubOpen !== "undefined" && dataHubOpen) renderDataHub()
+    else if (["day", "week", "month", "year"].includes(groupedPageMode)) displayGroupedPage(groupedPageMode, groupedPageData)
   }
 
   modal.dataset.wired = "1"

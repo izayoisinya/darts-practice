@@ -2860,46 +2860,80 @@ body.page-data.data-hub-open main.data-container {
   display: none;
 }
 
-/* まとめ */
-.data-hub-summary {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-
-  max-width: 1100px;
-  margin: 0 auto 18px;
+/* まとめ（トップのときだけヘッダーの右に出す。data_hub.js） */
+.data-hub-header-stats {
+  display: none;
 }
 
-.data-hub-stat {
+body.page-data.data-hub-open .data-hub-header-stats {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+}
+
+.data-hub-head-stat {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-
-  padding: 14px 8px;
-
-  border-radius: 14px;
-  background: linear-gradient(165deg, #151922 0%, #10141d 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 1px;
+  line-height: 1.1;
 }
 
-.data-hub-stat-label {
-  font-size: 11px;
-  letter-spacing: 0.1em;
+.data-hub-head-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-.data-hub-stat-value {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
+.data-hub-head-label .short {
+  display: none;
 }
 
-/* 見る画面のカード */
+.data-hub-head-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* スマホ：短いラベルで詰める */
+.phone.page-data.data-hub-open .data-hub-header-stats {
+  gap: 12px;
+}
+
+.phone .data-hub-head-label {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.phone .data-hub-head-label .long {
+  display: none;
+}
+
+.phone .data-hub-head-label .short {
+  display: inline;
+}
+
+.phone .data-hub-head-value {
+  font-size: 16px;
+}
+
+/* 幅の狭いスマホ（iPhone SE など） */
+@media (max-width: 360px) {
+  .phone.page-data.data-hub-open .data-hub-header-stats {
+    gap: 8px;
+  }
+
+  .phone .data-hub-head-value {
+    font-size: 14px;
+  }
+}
+
 .data-hub-views {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3287,26 +3321,7 @@ button.data-hub-cal-day {
   color: var(--text-muted);
 }
 
-/* スマホ：まとめは 4 列、カードは 2 列で小さく */
-.phone .data-hub-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.phone .data-hub-stat {
-  padding: 10px 4px;
-}
-
-.phone .data-hub-stat-label {
-  font-size: 9px;
-  letter-spacing: 0.06em;
-}
-
-.phone .data-hub-stat-value {
-  font-size: 20px;
-}
-
+/* スマホ：カードは 2 列で小さく */
 .phone .data-hub-views {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
@@ -3338,13 +3353,9 @@ button.data-hub-cal-day {
 }
 
 
-/* スマホ横：まとめは 4 列、カードは 2 列 */
+/* スマホ横：カードは 2 列 */
 .phone.landscape .data-hub {
   padding-top: 10px;
-}
-
-.phone.landscape .data-hub-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .phone.landscape .data-hub-views {

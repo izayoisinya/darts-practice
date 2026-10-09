@@ -256,6 +256,7 @@ function showViewSections(mode) {
   show("gameChartSection", isStats ? "flex" : "none")
   show("analysisContainer", isStats ? "flex" : "none")
   setRangeChartSectionVisible(isStats)
+  show("periodTrendSection", isStats ? "flex" : "none")
 
   const main = document.querySelector("main.data-container")
   if (main) {
@@ -283,6 +284,8 @@ function normalizeViewMode(mode) {
 // Stats：ヘッダーで選んだゲームの成績を描く
 function renderStatsView() {
   groupedPageMode = "analysis"
+  // Period（週・月・年ごとの推移）はどのゲームでも出す（data_period.js）
+  if (typeof renderStatsPeriod === "function") renderStatsPeriod()
   if (typeof dataGameType !== "undefined" && dataGameType === "01") {
     renderZeroOneData()
     return

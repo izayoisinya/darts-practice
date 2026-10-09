@@ -92,21 +92,6 @@ function refreshLayout() {
 }
 
 
-function setupLinks() {
-  
-  document.querySelectorAll("[data-link]").forEach(btn => {
-    
-    btn.addEventListener("click", () => {
-      
-      location.href = btn.dataset.link
-      
-    })
-    
-  })
-  
-}
-
-
 // ==========================
 // サイドメニュー（全画面共通）
 // ==========================

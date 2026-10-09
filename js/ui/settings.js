@@ -8,14 +8,11 @@ const DEFAULT_SETTINGS = {
   boardUndoButton: false,
   undoSwipeDirection: "left",
   orientationMode: "auto",
-  gamePanels: { round: true, stats: true },
-  dataTabs: { analysis: true, day: true, week: true, month: true, year: true }
+  gamePanels: { round: true, stats: true }
 }
 
 // 設定画面のチェックボックスと、保存する設定のキーの対応
 const GAME_PANEL_TOGGLES = { round: "gamePanelRound", stats: "gamePanelStats" }
-// データ画面のタブ（Analysis）の表示・非表示は 2026.10.10 になくした（データ画面は History と Stats をトップで選ぶ）
-const DATA_TAB_TOGGLES = {}
 
 // 保存されていない項目は表示（true）として扱う
 function normalizeToggleSettings(source, keys) {
@@ -89,10 +86,6 @@ function loadSettings() {
     GAME_PANEL_TOGGLES,
     normalizeToggleSettings(settings.gamePanels, Object.keys(GAME_PANEL_TOGGLES))
   )
-  applyTogglesToForm(
-    DATA_TAB_TOGGLES,
-    normalizeToggleSettings(settings.dataTabs, Object.keys(DATA_TAB_TOGGLES))
-  )
 }
 
 function saveSettings() {
@@ -106,8 +99,7 @@ function saveSettings() {
     boardUndoButton: !!document.getElementById("boardUndoButtonSetting")?.checked,
     undoSwipeDirection: document.getElementById("undoSwipeSetting")?.value || "left",
     orientationMode: document.getElementById("orientationSetting")?.value || "auto",
-    gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES),
-    dataTabs: readTogglesFromForm(DATA_TAB_TOGGLES)
+    gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES)
   }
 
   writeSettings(settings)
@@ -507,7 +499,6 @@ async function initSettingsPage() {
     if (input) input.addEventListener("change", saveSettings)
   })
   Object.values(GAME_PANEL_TOGGLES)
-    .concat(Object.values(DATA_TAB_TOGGLES))
     .forEach(id => {
       const input = document.getElementById(id)
       if (input) input.addEventListener("change", saveSettings)

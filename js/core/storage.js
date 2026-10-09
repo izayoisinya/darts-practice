@@ -388,33 +388,6 @@ function writeCompactSessionsToDb(compactSessions) {
   )
 }
 
-function clearSessionsFromDb() {
-  if (!supportsIndexedDb()) return Promise.resolve()
-
-  return openSessionDb().then(db =>
-    new Promise((resolve, reject) => {
-      const tx = db.transaction(SESSION_STORE_NAME, "readwrite")
-      const store = tx.objectStore(SESSION_STORE_NAME)
-      store.delete(SESSION_RECORD_KEY)
-
-      tx.oncomplete = () => {
-        db.close()
-        resolve()
-      }
-      tx.onerror = () => {
-        const err = tx.error || new Error("Failed to clear sessions from IndexedDB")
-        db.close()
-        reject(err)
-      }
-      tx.onabort = () => {
-        const err = tx.error || new Error("IndexedDB clear transaction aborted")
-        db.close()
-        reject(err)
-      }
-    })
-  )
-}
-
 function readSessionsFromLocalStorage() {
   try {
     const raw = localStorage.getItem(SESSIONS_KEY)
@@ -540,13 +513,6 @@ function readSessions() {
   }
 
   return sessionsCache
-}
-
-function clearSessionsStorage() {
-  sessionsCache = []
-  sessionsBackend = supportsIndexedDb() ? "indexedDB" : "localStorage"
-  clearLocalSessionKeys()
-  clearSessionsFromDb().catch(() => {})
 }
 
 function getSessionsStorageBackend() {

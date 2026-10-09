@@ -155,38 +155,3 @@ button[data-display="Miss"] {
   background: #2a2a3a;
   color: #9aa8ff;
 }
-
-
-/* ================================= */
-/* ============ IPHONE MODE ======== */
-/* ================================= */
-
-body.iphone-mode .stats-toggle {
-  border-radius: 50%;
-  
-  background: var(--accent);
-  color: #000;
-  
-  border: none;
-  
-  font-size: 18px;
-  font-weight: bold;
-  
-  z-index: 999;
-}
-
-body.iphone-mode .score-value {
-  font-size: 38px;
-}
-
-body.iphone-mode .sub-value {
-  font-size: 20px;
-}
-
-body.iphone-mode .stats-area {
-  border: none;
-}
-
-body.iphone-mode.iphone-stats-open .stats-area {
-  border: 1px solid #222733;
-}

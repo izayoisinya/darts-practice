@@ -269,14 +269,6 @@ function formatCricketDart(dart) {
   return `${prefix}${dart.value}`
 }
 
-// マーク数の記号（0：なし / 1：/ / 2：X / 3 以上：Ⓧ）
-function getCricketMarkSymbol(count) {
-  if (count >= 3) return "Ⓧ"
-  if (count === 2) return "X"
-  if (count === 1) return "/"
-  return ""
-}
-
 // 終えたゲームの履歴（storage.js の saveSession() が 1 投ごとの記録・ブルモードを足して保存する）
 //   score：点 / roundAvg：MPR / roundScores：ラウンドごとのマーク数（投げたラウンドまで）/ awards：クリケットのアワード
 function createCricketSession() {

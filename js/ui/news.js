@@ -364,6 +364,11 @@ const INFO_CONTENT = {
       date: "2026/10/10",
       badge: "UI",
       text: "使われなくなっていた Day / Week / Month / Year の画面とタグ集計を削除しました（日付・期間・タグは、データのトップ・Stats の Period・Tag Search で見られます）。"
+    },
+    {
+      date: "2026/10/10",
+      badge: "UI",
+      text: "アプリ全体で使われていなかったプログラムと見た目の指定を整理しました（動きは変わりません）。"
     }
   ],
   notice: [

@@ -25,8 +25,6 @@ canvas.height = Math.round(height * dpr)
 ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
 const padding = 45
-const paddingTop = 5
-const paddingBottom = 0
 
 const graphWidth = width - padding * 2
 const graphHeight = height - padding * 2

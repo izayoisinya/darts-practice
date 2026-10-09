@@ -415,7 +415,6 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `refreshLayout()` | 画面回転やリサイズ時にレイアウトを再設定する |
 | `renderSideMenu()` / `SIDE_MENU_GROUPS` / `getCurrentPageName()` | サイドメニューの中身を作る（全画面共通）。今いる画面のボタンに `.current` を付け、`page` を指定したグループ（This Game）はその画面だけに出す。操作のボタン（Reset Game）は `data-action` の関数を呼ぶ |
 | `fitViewportHeight()` / `refitViewportHeightSoon()` | Android だけ、`html` の高さを `window.innerHeight` に合わせる（端末の「戻る」でキャッシュから表示したときなどに、`height: 100%` が古い高さのまま残って画面の下に空白ができることがあるため）。`refreshLayout()`・`visualViewport` の resize で合わせ、`pageshow` と画面に戻ったときは 0.1 / 0.4 / 1 秒後にも合わせ直す |
-| `setupLinks()` | 画面間ナビゲーションをセットアップする |
 
 #### core/storage.js
 
@@ -425,7 +424,6 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | --- | --- |
 | `initSessionsStorage()` | 保存先（IndexedDB / LocalStorage）を決め、履歴をメモリに読み込む。旧形式からの移行も行う |
 | `readSessions()` / `writeSessions()` | ゲーム履歴の読み込み・保存（書き込みはキューで順番に実行） |
-| `clearSessionsStorage()` | ゲーム履歴を全削除する |
 | `getSessionsStorageBackend()` | 現在の保存先を返す |
 | `saveGame()` / `loadGame()` | 進行中のゲーム状態の保存・読み込み |
 | `saveSession()` | 終了したゲームを履歴に追加する |
@@ -659,6 +657,10 @@ Count-Up の Stats のヒートマップ（もとの Analysis タブ）。ゲー
 | `calcPhoenixRating(ppd)` | PPD から PHOENIX のレーティング目安を求める |
 | `calculateRatings(sessions, window)` | 直近のゲーム（既定 20 件）からレーティング目安を求める |
 
+PHOENIX の換算の元にした表（Rt16 / Rt30。01 の PPD とクリケットの MPR の範囲）：
+
+<img src="images/rating_table.gif" alt="PHOENIX のレーティング表" width="360">
+
 #### ui/chart.js
 
 | 関数 | 内容 |
@@ -773,8 +775,7 @@ Count-Up の Stats のヒートマップ（もとの Analysis タブ）。ゲー
   boardUndoButton: boolean,                                           // ボード入力で戻るボタンを出すか（ないときは出さない）
   undoSwipeDirection: "left" | "right",                               // 3 本指スワイプで戻る向き
   orientationMode: "auto" | "portrait" | "landscape",
-  gamePanels: { round: boolean, stats: boolean },                     // false で隠す。ない項目は表示
-  dataTabs: { ... }                                                   // 古い設定（データ画面のタブ。2026.10.10 から使わない）
+  gamePanels: { round: boolean, stats: boolean }                      // false で隠す。ない項目は表示
 }
 ```
 
@@ -1040,3 +1041,4 @@ graph LR
 | 2026.10.10 | Tag Search のカレンダーの日付を押しても、データのトップに移らないようにした（日付は見るだけ） |
 | 2026.10.10 | データのトップの Summary を練習量だけの Practice（今週・今月・今年。今日が基準）に変更し、成績の推移は Stats の Period（`data_period.js`。ゲームの種類ごとに、直近 12 期間の平均の棒グラフと今の期間・前の期間の比較）に移した |
 | 2026.10.10 | お休みしていた Day / Week / Month / Year のビュー（`data_grouped.js` / `data_detail.js`）・タグ集計・テストデータ削除の処理・使わなくなった CSS を削除し、日別メモは `data_notes.js` にまとめた。もとの機能から、その日の Bull / In-Bull / Triple の割合（トップの選んだ日）、メモの写真の表示（トップ。押すと大きく）、2 つの日の比較（Stats の Day Compare）を作り直した |
+| 2026.10.10 | 全体の使われていないものを整理：どこからも呼ばれていない関数（`setupLinks()`〔`main.js` の `[data-link]` の処理と重複〕・`clearSessionsStorage()` / `clearSessionsFromDb()`・`getCricketMarkSymbol()`・`getSessionTotalAwards()`）、使われていない CSS（`.darts-block`・`.sub-value`・`.total-label`・`.divider`・`.stat-item`・`.award-row`・`.round-separator`・`iphone-mode` など）、設定の `dataTabs` を削除。ルートにあった `rating0907.gif`（PHOENIX のレーティング表）は `docs/images/rating_table.gif` に移して設計書から参照する |

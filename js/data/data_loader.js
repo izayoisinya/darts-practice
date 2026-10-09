@@ -80,15 +80,6 @@ function getSessionAwards(session) {
   return { ...base, ...countRoundAwards(session?.rounds || []) }
 }
 
-function getSessionTotalAwards(session) {
-  if (typeof session?.totalAwards === "number") {
-    return session.totalAwards
-  }
-
-  return Object.values(getSessionAwards(session))
-    .reduce((sum, count) => sum + count, 0)
-}
-
 // アワードの表示名（表示順）
 const AWARD_LABELS = [
   ["hatTrick", "Hat Trick"],

@@ -1317,7 +1317,7 @@ function drawScatterChart(sessions, tags) {
 // ===============================
 // Count-Up の Stats の、タグ別の散布図の上に出す。日別メモのタグを選ぶと（History と同じ選択。data_loader.js の dataTagFilter）、
 // 合う日をカレンダーで光らせ、合う日の一覧と、合う日・それ以外の日の成績の比較（ゲームの種類ごと）を出す。
-// カレンダーの練習した日を押すと、データのトップでその日のメモとゲームを開く（data_hub.js の openDataHubDay()）
+// カレンダーの日付は見るだけで押せない（Stats の画面のまま）
 let tagSearchMonth = null
 let tagSearchBound = false
 
@@ -1380,9 +1380,8 @@ function renderTagSearch() {
     if (count) cls.push("played")
     if (count && active) cls.push(dayMatchesTagFilter(key) ? "tag-match" : "tag-dim")
     const inner = `<span class="data-hub-cal-num">${d}</span>${count ? `<span class="data-hub-cal-count">${count}</span>` : ""}`
-    cells += count
-      ? `<button type="button" class="${cls.join(" ")}" data-tag-day="${key}" aria-label="${month + 1}/${d} ${count} games">${inner}</button>`
-      : `<span class="${cls.join(" ")}">${inner}</span>`
+    // 日付は押せない（見るだけ。データのトップには移らない）
+    cells += `<span class="${cls.join(" ")}">${inner}</span>`
   }
 
   const list = matchDays.slice(0, 20).map(key => {
@@ -1433,7 +1432,6 @@ function renderTagSearch() {
       if (!target) return
       const nav = target.closest("[data-tag-cal]")
       const jump = target.closest("[data-tag-month]")
-      const day = target.closest("[data-tag-day]")
       if (nav) {
         tagSearchMonth = new Date(tagSearchMonth.getFullYear(), tagSearchMonth.getMonth() + Number(nav.dataset.tagCal), 1)
         renderTagSearch()
@@ -1441,8 +1439,6 @@ function renderTagSearch() {
         const [y, m] = jump.dataset.tagMonth.split("-").map(Number)
         tagSearchMonth = new Date(y, m - 1, 1)
         renderTagSearch()
-      } else if (day && typeof openDataHubDay === "function") {
-        openDataHubDay(day.dataset.tagDay)
       }
     })
   }

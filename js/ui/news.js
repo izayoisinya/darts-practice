@@ -344,6 +344,11 @@ const INFO_CONTENT = {
       date: "2026/10/10",
       badge: "UI",
       text: "Stats の Tag Search のカレンダーを、タグをまだ付けていなくても最初から表示するようにしました。"
+    },
+    {
+      date: "2026/10/10",
+      badge: "UI",
+      text: "Stats の Tag Search のカレンダーで日付を押しても、データのトップに移らないようにしました。"
     }
   ],
   notice: [

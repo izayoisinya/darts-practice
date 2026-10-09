@@ -553,14 +553,3 @@ function renderDataHubPeriod(sessions) {
     </section>
   `
 }
-
-
-// ほかの画面から、データのトップのある日を開く（Stats の Tag Search のカレンダーから）
-function openDataHubDay(dayKey) {
-  const [y, m] = dayKey.split("-").map(Number)
-  dataHubCalendarMonth = new Date(y, m - 1, 1)
-  dataHubSelectedDay = dayKey
-  dataHubResetMainScroll = true
-  backToDataHub()
-}
-

@@ -238,6 +238,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 - **並べ方**：横向き（タブレット・スマホ）とパソコンは左右 2 列（`.data-hub-layout`）。左（`#dataHubSide`）に History / Stats のカードとカレンダー、右（`#dataHubMain`）に選んだ日のメモとゲームを置き、それぞれの中でスクロールする（右をスクロールしても左は動かない。描き直してもスクロール位置は保ち、日付を変えたときだけ右を上に戻す）。縦向きは上から順に並べて画面ごとスクロールし、日付を押すとその日のゲームまで送る（`isDataHubStacked()`）。スマホ横はカードの説明を出さない
 - 見る画面のカード（History・Stats の 2 つ）。History は全体のゲーム数とゲームの種類ごとの数、Stats は開いたときに出すゲーム（前回見ていたもの）を出す
 - Calendar：全ゲームを練習した日に印を付け、その日のゲーム数を小さく出す（5 ゲーム以上は濃く。今日は白い枠）。練習した日を押すと、その日のメモとゲームを横（縦向きは下）に出す。最初は最後に練習した日を選んでおく（`renderDataHubDay()` / `fillDataHubDay()`。ゲームは History と同じ履歴カードで、見出しはゲームの種類の印だけ。押すと開く。新しい順。選んだ日は濃く光らせる。履歴カードの開閉の見た目は `#sessionsContainer` と同じ指定を `#dataHubDayList` にも当てる）。‹ › で月を切り替え、最初は最後に遊んだ月。下にその月の日数・ゲーム数（`renderDataHubCalendar()`）
+- **タグの絞り込み**（History と共通。`data_loader.js` の `renderDataTagFilterHtml()` / `dayMatchesTagFilter()`）：カレンダーの上に、日別メモで使ったタグ（付いた日数の多い順。横にスクロール）を並べ、押して選ぶ。2 つ以上選ぶと OR（どれかが付いた日）/ AND（全部付いた日）を選べる。選んでいる間は、合う日を金色の縁で光らせ、合わない日を薄くし、カレンダーの下に合う日の一覧（新しい順に 20 日まで。押すとその月に移ってその日を選ぶ。`renderDataHubTagMatches()`）を出す。選んだタグは History にもそのまま効く（`dataTagFilter` / `dataTagMode`。保存はしない）
 - Summary（カレンダーの下。`renderDataHubPeriod()`）：選んだ日を含む週（月曜はじまり）・月・年のまとめ。Week / Month / Year のボタンで切り替える（最後に選んだものを LocalStorage `dartsDataHubPeriod` に残す）。期間・練習した日数・ゲーム数と、ゲームの種類ごとの数字（Count-Up：平均スコア・平均 PPD・ベスト、01：上がり率・平均ダーツ数、Cricket：平均 MPR・クローズ率）を種類の色で出し、前の期間との差（Count-Up は PPD、01 はダーツ数〔少ない方が良いので減ったら緑〕、Cricket は MPR。良くなったら緑・悪くなったら赤）も出す。もとの Week / Month / Year のビューの代わり
 - 日別メモ：選んだ日のゲームの上に、その日のメモ（コメント・タグ・画像の有無）と「Memo」ボタン（メモが無ければ「+ Memo」）を出す（`renderDataHubDayNote()`）。ボタンで Day 一覧のときと同じ編集画面（`data_grouped.js` の `openDayNoteEditor()`）を開き、保存するとトップを描き直す（保存後の描き直しは、トップを開いていれば `renderDataHub()`、Day などの一覧なら `displayGroupedPage()`）。メモ・タグのある日はカレンダーの右上に黄色の小さな印（`.has-note`）。タグは Count-Up の Stats のタグ別散布図の色分けに使う
 - **Day / Week / Month / Year は一旦お休み**（2026.10.8。日付はトップのカレンダーで見る）。コード（`data_grouped.js` / `data_detail.js`）は残してあり、`changeView("day")` などで開ける
@@ -248,7 +249,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 **History**（記録。`viewMode = "history"`、`main` に `history-mode`、`body` に `data-history-view`）
 
 - 右の `#rightPanel` だけを 1 列で出す（Stats の `#leftPanel` と縦向きの History / Stats の切り替えは出さない）。横向き（タブレット・スマホ）とパソコンでは履歴カードを 2 列に並べる
-- 上のボタン（`#historyFilter`）でゲームの種類を絞り込む（`setHistoryFilter()`。All / Count-Up / 01 / Cricket。絞り込んでもゲームの番号は変わらない）。ヘッダーのゲームの切り替えは出さない
+- 上のボタン（`#historyFilter`）でゲームの種類を絞り込む（`setHistoryFilter()`。All / Count-Up / 01 / Cricket）。その下（`#historyTagFilter`）で日別メモのタグでも絞り込める（トップのカレンダーと共通。種類の絞り込みと組み合わせる）。ヘッダーのゲームの切り替えは出さない
 - 下のフッターはページ送りだけ（10 ゲームずつ。`renderHistory()` / `changePage()`）
 - **履歴カード**はゲームの種類の色（Count-Up 緑・01 青・Cricket 金。`.history-countup` などの `--badge-rgb`）で縁取り、左端に色の線を引き、左上をうっすら染める。普段は縮小表示（ゲームの種類の印・Game 番号・日時、主な数字 3 つ、ブル数とアワードの要約 1 行）。タップすると全項目（ブル率・トリプル・ラウンドスコアのグラフ・アワード）を表示し、もう一度タップで縮小に戻る。トップの「その日のゲーム」と Day の詳細ビューでも共通
 
@@ -591,7 +592,8 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | --- | --- |
 | `initDataPage()` | データ表示画面を初期化する |
 | `loadSessions()` / `renderHistory()` | History の履歴カード（全ゲーム・絞り込み・10 件ずつ）を表示する / ページ送りの表示も合わせる |
-| `getHistoryItems()` / `setHistoryFilter(filter)` | 絞り込んだ履歴を返す / History の絞り込みを変えて描き直す |
+| `getHistoryItems()` / `setHistoryFilter(filter)` | 絞り込んだ履歴を返す（種類とタグ） / History の種類の絞り込みを変えて描き直す |
+| `renderDataTagFilterHtml()` / `dayMatchesTagFilter(dayKey)` / `setupDataTagFilter()` | タグの絞り込みのボタン（History とトップのカレンダーで共通） / その日が選んだタグ（OR / AND）に合うか / ボタンの押下をまとめて受けて、今の画面を描き直す（`refreshDataTagFilterViews()`） |
 | `createHistoryCardElement(session, type, number)` | ゲームの種類の印を付けた履歴カードを作る（トップの「その日のゲーム」でも使う） |
 | `createSessionCardHtml()` | 1 ゲーム分のカードの中身を生成する（縮小表示用の要約 1 行を含む） |
 | `createSessionCardElement()` | カードの外枠を作る（縮小表示・タップで開閉できる状態で作る） |
@@ -909,7 +911,7 @@ graph LR
 | 設定画面の Rounds | 8 / 10 / 15 の選択肢はあるが保存されず、ゲームにも反映されない（8 固定） |
 | スマホ横向きのカウントアップ画面 | ラウンド合計の数字が右端で切れて見える場合がある（iPhone 13 相当の画面で確認） |
 | スマホ横向きのカウントアップ画面の Score Graph | Stats を開いたとき、画面の高さが足りないと横軸ラベル（R1〜R8）が下端で切れる（750×342px の画面で確認。実機では未確認） |
-| develop ブランチの未移植分 | 2026.4.11〜4.29 に develop ブランチで作り、main に入っていない機能のうち、次は未移植：タグ絞り込みを Week / Month / Year でも使えるようにする・複数タグの AND / OR 絞り込み、Input エリアの拡張、タブレット縦・横 2 カラムのレイアウト調整（ボード入力で変わる見込みのため保留）。バックアップとカウントアップのグラフ修正は main で別に作り直し済み |
+| develop ブランチの未移植分 | 2026.4.11〜4.29 に develop ブランチで作り、main に入っていない機能のうち、次は未移植（タグの絞り込みと複数タグの AND / OR は 2026.10.10 に History とトップのカレンダーで作り直した）：Input エリアの拡張、タブレット縦・横 2 カラムのレイアウト調整（ボード入力で変わる見込みのため保留）。バックアップとカウントアップのグラフ修正は main で別に作り直し済み |
 | `core.js` の `detectDevice()`（端末判定） | Android は幅 1500px 未満だとスマホ判定になり、iPad と同じ大きさの 10〜11 インチ Android タブレット（例：Galaxy Tab S4 横 1138px）もスマホ用レイアウトになる。iPad は幅に関係なくタブレット判定で、基準がそろっていない。RedMagic Astra（約 9 インチ）は現状のスマホ用レイアウトで不自由なし。**一般公開前に**「画面の短い辺が一定以上ならタブレット」など iPad / Android 共通の基準に見直し、Astra をどちらに寄せるかは実機で見比べて決める |
 
 ## 11. 今後の拡張予定
@@ -1055,3 +1057,4 @@ graph LR
 | 2026.10.10 | データのトップのまとめ（Games・Days・This Month・Last Played）を、カードの上からヘッダーの右に移した |
 | 2026.10.10 | データのトップを、横向きでは左（History / Stats のカード・カレンダー）と右（選んだ日のメモとゲーム）の 2 列にし、それぞれの中でスクロールするようにした |
 | 2026.10.10 | 履歴カードをゲームの種類の色で色分け。データのトップのカレンダーの下に、選んだ日を含む週・月・年のまとめ（Summary。ゲームの種類ごとの数字と前の期間との差）を追加 |
+| 2026.10.10 | タグの絞り込みを追加（History とデータのトップのカレンダーで共通。複数タグの OR / AND。カレンダーでは合う日を光らせ、合う日の一覧から移動できる） |

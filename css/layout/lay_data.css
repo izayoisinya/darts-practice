@@ -3869,7 +3869,7 @@ main.data-container.history-mode .history-tag-filter {
 }
 
 .tag-search-empty {
-  margin: 0;
+  margin: 0 0 10px;
   font-size: 13px;
   color: var(--text-muted);
 }

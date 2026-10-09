@@ -1349,11 +1349,9 @@ function renderTagSearch() {
   if (!box) return
 
   const sessions = typeof readHistorySessions === "function" ? readHistorySessions() : []
-  const filterHtml = typeof renderDataTagFilterHtml === "function" ? renderDataTagFilterHtml() : ""
-  if (!filterHtml) {
-    box.innerHTML = '<p class="tag-search-empty">日別メモにタグを付けると、タグの付いた日を探して成績を比べられます（データのトップのカレンダーで日付を選び、Memo から付けます）</p>'
-    return
-  }
+  // タグがまだなくても、カレンダー（練習した日の印）は最初から出す
+  const filterHtml = (typeof renderDataTagFilterHtml === "function" ? renderDataTagFilterHtml() : "") ||
+    '<p class="tag-search-empty">日別メモにタグを付けると、タグの付いた日を探して成績を比べられます（データのトップのカレンダーで日付を選び、Memo から付けます）</p>'
 
   const active = isDataTagFilterActive()
   const playedDays = {}
@@ -1414,7 +1412,7 @@ function renderTagSearch() {
     <div class="tag-search-body">
       <div class="data-hub-calendar tag-search-calendar">
         <div class="data-hub-cal-top">
-          <span class="tag-search-hint">${active ? `${matchDays.length} days` : "タグを選ぶと、付いた日が光ります"}</span>
+          <span class="tag-search-hint">${active ? `${matchDays.length} days` : getDataTagList().length ? "タグを選ぶと、付いた日が光ります" : `${Object.keys(playedDays).length} days played`}</span>
           <span class="data-hub-cal-nav">
             <button type="button" data-tag-cal="-1" aria-label="前の月">‹</button>
             <span class="data-hub-cal-title">${year}/${month + 1}</span>

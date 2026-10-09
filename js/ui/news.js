@@ -339,6 +339,11 @@ const INFO_CONTENT = {
       date: "2026/10/10",
       badge: "UI",
       text: "タグの絞り込みは、データのトップから Stats（Count-Up）の「Tag Search」に移しました。タグ検索用のカレンダーで付いた日を探せて、タグの付いた日とそれ以外の日の成績も比べられます。History の絞り込みはそのまま使えます。"
+    },
+    {
+      date: "2026/10/10",
+      badge: "UI",
+      text: "Stats の Tag Search のカレンダーを、タグをまだ付けていなくても最初から表示するようにしました。"
     }
   ],
   notice: [

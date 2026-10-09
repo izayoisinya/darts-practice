@@ -153,18 +153,6 @@ function renderDataHub() {
   const memo = hub.querySelector("[data-hub-day-memo]")
   if (memo) memo.addEventListener("click", () => openDayNoteEditor(dataHubSelectedDay, memo.dataset.label))
 
-  hub.querySelectorAll("[data-hub-jump]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const [y, m] = btn.dataset.hubJump.split("-").map(Number)
-      dataHubCalendarMonth = new Date(y, m - 1, 1)
-      dataHubResetMainScroll = true
-      dataHubSelectedDay = btn.dataset.hubJump
-      renderDataHub()
-      const list = document.getElementById("dataHubDay")
-      if (list && isDataHubStacked()) list.scrollIntoView({ block: "start", behavior: "smooth" })
-    })
-  })
-
   hub.querySelectorAll("[data-hub-period]").forEach(btn => {
     btn.addEventListener("click", () => {
       dataHubPeriodMode = btn.dataset.hubPeriod
@@ -260,24 +248,6 @@ function fillDataHubDay(all) {
     .forEach(item => box.appendChild(createHistoryCardElement(item.session, item.type, item.number)))
 }
 
-// タグに合う日の一覧（ほかの月の日もあるので、新しい順に日付のボタンで出す。押すとその月に移ってその日を選ぶ）
-const DATA_HUB_TAG_MATCH_LIMIT = 20
-
-function renderDataHubTagMatches(sessions) {
-  const days = [...new Set(sessions.map(s => getDataHubDayKey(s.date)))]
-    .filter(dayMatchesTagFilter)
-    .sort()
-    .reverse()
-  if (!days.length) return '<p class="data-hub-tag-matches empty">選んだタグの日はありません</p>'
-  const buttons = days.slice(0, DATA_HUB_TAG_MATCH_LIMIT).map(key => {
-    const [y, m, d] = key.split("-").map(Number)
-    const label = y === new Date().getFullYear() ? `${m}/${d}` : `${y}/${m}/${d}`
-    return `<button type="button" class="${key === dataHubSelectedDay ? "active" : ""}" data-hub-jump="${key}">${label}</button>`
-  }).join("")
-  const more = days.length > DATA_HUB_TAG_MATCH_LIMIT ? `<span>+${days.length - DATA_HUB_TAG_MATCH_LIMIT}</span>` : ""
-  return `<div class="data-hub-tag-matches"><span class="data-hub-tag-matches-label">${days.length} days</span>${buttons}${more}</div>`
-}
-
 function renderDataHubCalendar(sessions) {
 
   // 最初は最後に遊んだ月（記録がなければ今月）
@@ -297,7 +267,6 @@ function renderDataHubCalendar(sessions) {
     counts[d.getDate()] = (counts[d.getDate()] || 0) + 1
   })
   const days = Object.keys(counts).length
-  const tagActive = typeof isDataTagFilterActive === "function" && isDataTagFilterActive()
   const games = Object.values(counts).reduce((a, b) => a + b, 0)
 
   const today = new Date()
@@ -317,8 +286,6 @@ function renderDataHubCalendar(sessions) {
     if (isThisMonth && today.getDate() === d) cls.push("today")
     const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
     if (key === dataHubSelectedDay) cls.push("selected")
-    // タグで絞っているときは、合う日を光らせ、合わない日を薄くする（data_loader.js の dayMatchesTagFilter()）
-    if (count && tagActive) cls.push(dayMatchesTagFilter(key) ? "tag-match" : "tag-dim")
     // メモ・タグのある日は右上に小さな印
     const note = notes[key]
     if (note && (note.comment || (note.tags || []).length || note.imageData)) cls.push("has-note")
@@ -340,9 +307,7 @@ function renderDataHubCalendar(sessions) {
           <button type="button" data-hub-month="1" aria-label="次の月">›</button>
         </span>
       </div>
-      ${typeof renderDataTagFilterHtml === "function" ? renderDataTagFilterHtml() : ""}
       <div class="data-hub-cal-grid">${cells}</div>
-      ${tagActive ? renderDataHubTagMatches(sessions) : ""}
       <p class="data-hub-cal-sum">${days} days · ${games} games</p>
     </section>
   `
@@ -587,5 +552,15 @@ function renderDataHubPeriod(sessions) {
       ${hasDiff ? `<p class="data-hub-period-note">差は${prevLabel}と比べて（Count-Up は PPD、01 はダーツ数、Cricket は MPR）</p>` : ""}
     </section>
   `
+}
+
+
+// ほかの画面から、データのトップのある日を開く（Stats の Tag Search のカレンダーから）
+function openDataHubDay(dayKey) {
+  const [y, m] = dayKey.split("-").map(Number)
+  dataHubCalendarMonth = new Date(y, m - 1, 1)
+  dataHubSelectedDay = dayKey
+  dataHubResetMainScroll = true
+  backToDataHub()
 }
 

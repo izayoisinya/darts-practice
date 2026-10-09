@@ -1100,6 +1100,7 @@ const SCATTER_NO_TAG_COLOR = "rgba(154,164,178,0.35)"
 function drawAnalysisCharts() {
   if (viewMode !== "stats") return
   if (typeof renderAnalysisHeatmap === "function") renderAnalysisHeatmap()
+  renderTagSearch()
   renderAnalysisScatter()
   drawSelectedRangeChart()
 }
@@ -1309,3 +1310,143 @@ function drawScatterChart(sessions, tags) {
     ctx.fill()
   })
 }
+
+
+// ===============================
+// ===== Tag Search（タグ検索用のカレンダー） =====
+// ===============================
+// Count-Up の Stats の、タグ別の散布図の上に出す。日別メモのタグを選ぶと（History と同じ選択。data_loader.js の dataTagFilter）、
+// 合う日をカレンダーで光らせ、合う日の一覧と、合う日・それ以外の日の成績の比較（ゲームの種類ごと）を出す。
+// カレンダーの練習した日を押すと、データのトップでその日のメモとゲームを開く（data_hub.js の openDataHubDay()）
+let tagSearchMonth = null
+let tagSearchBound = false
+
+function getTagSearchDayKey(time) {
+  return getLocalDateKey(new Date(time))
+}
+
+// 合う日・それ以外の日の、ゲームの種類ごとの主な数字（Count-Up は平均 PPD、01 は平均ダーツ数、Cricket は平均 MPR）
+function getTagSearchCompareRows(sessions) {
+  const avg = values => values.length ? values.reduce((a, b) => a + b, 0) / values.length : null
+  const defs = [
+    { type: "countup", label: "Avg PPD", digits: 2, better: "higher", value: s => Number(s.ppd) || 0 },
+    { type: "01", label: "Avg Darts", digits: 1, better: "lower", value: s => s.zeroOne.finished && s.zeroOne.finishDarts > 0 ? s.zeroOne.finishDarts : null },
+    { type: "cricket", label: "Avg MPR", digits: 2, better: "higher", value: s => Number(s.cricket.mpr) || 0 }
+  ]
+  return defs.map(def => {
+    const list = sessions.filter(s => getHistoryGameType(s) === def.type)
+    const match = list.filter(s => dayMatchesTagFilter(getTagSearchDayKey(s.date)))
+    const other = list.filter(s => !dayMatchesTagFilter(getTagSearchDayKey(s.date)))
+    const mv = avg(match.map(def.value).filter(v => v !== null))
+    const ov = avg(other.map(def.value).filter(v => v !== null))
+    return { ...def, matchGames: match.length, otherGames: other.length, mv, ov }
+  }).filter(row => row.matchGames)
+}
+
+function renderTagSearch() {
+
+  const box = document.getElementById("tagSearchSection")
+  if (!box) return
+
+  const sessions = typeof readHistorySessions === "function" ? readHistorySessions() : []
+  const filterHtml = typeof renderDataTagFilterHtml === "function" ? renderDataTagFilterHtml() : ""
+  if (!filterHtml) {
+    box.innerHTML = '<p class="tag-search-empty">日別メモにタグを付けると、タグの付いた日を探して成績を比べられます（データのトップのカレンダーで日付を選び、Memo から付けます）</p>'
+    return
+  }
+
+  const active = isDataTagFilterActive()
+  const playedDays = {}
+  sessions.forEach(s => {
+    const key = getTagSearchDayKey(s.date)
+    playedDays[key] = (playedDays[key] || 0) + 1
+  })
+  const matchDays = active ? Object.keys(playedDays).filter(dayMatchesTagFilter).sort().reverse() : []
+
+  // 最初は合う日の最新の月（なければ最後に遊んだ月）
+  if (!tagSearchMonth) {
+    const last = sessions.length ? new Date(sessions[sessions.length - 1].date) : new Date()
+    tagSearchMonth = new Date(last.getFullYear(), last.getMonth(), 1)
+  }
+  const year = tagSearchMonth.getFullYear()
+  const month = tagSearchMonth.getMonth()
+  const offset = (new Date(year, month, 1).getDay() + 6) % 7
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+
+  let cells = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(d => `<span class="data-hub-cal-head">${d}</span>`).join("")
+  cells += '<span class="data-hub-cal-day empty"></span>'.repeat(offset)
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
+    const count = playedDays[key] || 0
+    const cls = ["data-hub-cal-day"]
+    if (count) cls.push("played")
+    if (count && active) cls.push(dayMatchesTagFilter(key) ? "tag-match" : "tag-dim")
+    const inner = `<span class="data-hub-cal-num">${d}</span>${count ? `<span class="data-hub-cal-count">${count}</span>` : ""}`
+    cells += count
+      ? `<button type="button" class="${cls.join(" ")}" data-tag-day="${key}" aria-label="${month + 1}/${d} ${count} games">${inner}</button>`
+      : `<span class="${cls.join(" ")}">${inner}</span>`
+  }
+
+  const list = matchDays.slice(0, 20).map(key => {
+    const [y, m, d] = key.split("-").map(Number)
+    return `<button type="button" data-tag-month="${y}-${m}">${y === new Date().getFullYear() ? "" : `${y}/`}${m}/${d}</button>`
+  }).join("")
+
+  const rows = active ? getTagSearchCompareRows(sessions) : []
+  const compare = rows.length
+    ? `<div class="tag-search-compare">
+        <div class="tag-search-compare-head"><span></span><span>Tag Days</span><span>Other Days</span><span>Diff</span></div>
+        ${rows.map(row => {
+          const diff = row.mv !== null && row.ov !== null ? row.mv - row.ov : null
+          const good = diff === null ? "" : (row.better === "lower" ? diff < 0 : diff > 0) ? "up" : diff === 0 ? "even" : "down"
+          return `<div class="tag-search-compare-row history-${row.type === "01" ? "zeroone" : row.type}">
+            <span><span class="history-game-badge">${HISTORY_GAME_LABELS[row.type]}</span><small>${row.label}</small></span>
+            <span>${row.mv === null ? "-" : row.mv.toFixed(row.digits)}<small>${row.matchGames} games</small></span>
+            <span>${row.ov === null ? "-" : row.ov.toFixed(row.digits)}<small>${row.otherGames} games</small></span>
+            <span class="data-hub-period-diff ${good}">${diff === null ? "-" : `${diff > 0 ? "+" : diff < 0 ? "−" : "±"}${Math.abs(diff).toFixed(row.digits)}`}</span>
+          </div>`
+        }).join("")}
+      </div>`
+    : ""
+
+  box.innerHTML = `
+    ${filterHtml}
+    <div class="tag-search-body">
+      <div class="data-hub-calendar tag-search-calendar">
+        <div class="data-hub-cal-top">
+          <span class="tag-search-hint">${active ? `${matchDays.length} days` : "タグを選ぶと、付いた日が光ります"}</span>
+          <span class="data-hub-cal-nav">
+            <button type="button" data-tag-cal="-1" aria-label="前の月">‹</button>
+            <span class="data-hub-cal-title">${year}/${month + 1}</span>
+            <button type="button" data-tag-cal="1" aria-label="次の月">›</button>
+          </span>
+        </div>
+        <div class="data-hub-cal-grid">${cells}</div>
+        ${active ? (matchDays.length ? `<div class="data-hub-tag-matches">${list}${matchDays.length > 20 ? `<span>+${matchDays.length - 20}</span>` : ""}</div>` : '<p class="data-hub-tag-matches empty">選んだタグの日はありません</p>') : ""}
+      </div>
+      ${compare}
+    </div>
+  `
+
+  if (!tagSearchBound) {
+    tagSearchBound = true
+    box.addEventListener("click", e => {
+      const target = e.target instanceof Element ? e.target : null
+      if (!target) return
+      const nav = target.closest("[data-tag-cal]")
+      const jump = target.closest("[data-tag-month]")
+      const day = target.closest("[data-tag-day]")
+      if (nav) {
+        tagSearchMonth = new Date(tagSearchMonth.getFullYear(), tagSearchMonth.getMonth() + Number(nav.dataset.tagCal), 1)
+        renderTagSearch()
+      } else if (jump) {
+        const [y, m] = jump.dataset.tagMonth.split("-").map(Number)
+        tagSearchMonth = new Date(y, m - 1, 1)
+        renderTagSearch()
+      } else if (day && typeof openDataHubDay === "function") {
+        openDataHubDay(day.dataset.tagDay)
+      }
+    })
+  }
+}
+

@@ -1,9 +1,9 @@
 // ===============================
 // ===== データ画面の 01 ===========
 // ===============================
-// ヘッダーの COUNT-UP / 01 / CRICKET の切り替えと、01 の記録の表示（設定ごとの上がり率・上がるまでのダーツ数・推移・一覧）。
-// 01・クリケットのときは body に data-01 を付け、カウントアップと同じ場所（右の History・左の Stats）に記録を出す
-// （クリケットは data-cricket も付け、中身は data_cricket.js の renderCricketData()）
+// ヘッダーの COUNT-UP / 01 / CRICKET の切り替え（Stats の画面だけに出す）と、01 の成績の表示（設定ごとの上がり率・上がるまでのダーツ数・推移）。
+// 01・クリケットのときは body に data-01 を付け、カウントアップの Stats と同じ場所（#leftPanel）に成績を出す
+// （クリケットは data-cricket も付け、中身は data_cricket.js の renderCricketData()）。History は種類に関係なく全ゲーム（data_loader.js）
 
 const DATA_GAME_KEY = "dartsDataGame"
 const DATA_01_OUT_LABELS = { open: "Open Out", double: "Double Out", master: "Master Out" }
@@ -76,21 +76,17 @@ function setDataGameType(type) {
     btn.classList.toggle("active", btn.dataset.game === dataGameType)
   })
 
-  if (dataGameType !== "countup") {
-    // 01・クリケットは Game の表示（左に Stats、右に History）だけ。Analysis や Day などを見ていたら Game に戻してから描く
-    if (typeof changeView === "function" && (viewMode !== "game" || detailViewMode)) changeView("game")
-    if (dataGameType === "01") renderZeroOneData()
-    else if (typeof renderCricketData === "function") renderCricketData()
-  } else if (typeof changeView === "function" && document.getElementById("zeroOneStatsPanel")?.innerHTML) {
-    // 01 で上書きした History をカウントアップの表示に戻す
-    changeView(viewMode || "game")
+  // Stats を見ているときだけ描き直す（History・トップはゲームの種類に関係ない）
+  const hubOpen = typeof dataHubOpen !== "undefined" && dataHubOpen
+  if (!hubOpen && typeof viewMode !== "undefined" && viewMode === "stats" && typeof renderStatsView === "function") {
+    renderStatsView()
   }
 }
 
 // 画面の大きさ・向きが変わったら 01 のグラフも描き直す
 let data01ResizeTimer = null
 window.addEventListener("resize", () => {
-  if (dataGameType === "countup") return
+  if (dataGameType === "countup" || typeof viewMode === "undefined" || viewMode !== "stats") return
   clearTimeout(data01ResizeTimer)
   data01ResizeTimer = setTimeout(() => {
     if (dataGameType === "01") drawZeroOneChart(getZeroOneFilteredSessions())
@@ -102,8 +98,8 @@ window.addEventListener("resize", () => {
 // ===== 01 の表示 ================
 // ===============================
 // カウントアップと同じ場所・同じ部品で出す（レイアウトとデザインをそろえる）
-//   右（History）：Count-Up・01・Cricket の全ゲームの一覧（data_loader.js の renderHistory()）。01 のカードは createZeroOneCardHtml()
-//   左（Stats）  ：#zeroOneStatsPanel に Stats・Awards・グラフ・Rating・Finish Numbers（カウントアップの左の欄は隠す）
+//   Stats   ：#zeroOneStatsPanel に Stats・Awards・グラフ・Rating・Finish Numbers（カウントアップの欄は隠す）
+//   History ：全ゲームの一覧（data_loader.js の renderHistory()）。01 のカードは createZeroOneCardHtml()
 
 function getZeroOneFilteredSessions() {
   const sessions = readZeroOneSessions()
@@ -115,8 +111,7 @@ function getZeroOneFilteredSessions() {
 function renderZeroOneData() {
 
   const panel = document.getElementById("zeroOneStatsPanel")
-  const history = document.getElementById("sessionsContainer")
-  if (!panel || !history) return
+  if (!panel) return
 
   const sessions = readZeroOneSessions()
 
@@ -128,8 +123,6 @@ function renderZeroOneData() {
         <button type="button" class="z1-play" onclick="location.href = 'countup.html?game=01'">01 を始める</button>
       </section>
     `
-    // History は全ゲームの一覧（data_loader.js）なので、01 の記録がなくてもほかのゲームは出す
-    renderHistory()
     return
   }
 
@@ -187,8 +180,6 @@ function renderZeroOneData() {
     renderZeroOneData()
   })
 
-  // History は全ゲームを 1 か所に出す（data_loader.js の renderHistory()）
-  renderHistory()
   requestAnimationFrame(() => drawZeroOneChart(list))
 }
 

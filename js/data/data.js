@@ -1,4 +1,5 @@
-let viewMode = "game"
+// 見ている画面："history"（記録：全ゲームの一覧）/ "stats"（分析：ゲームの種類ごとの成績）。Day などのお休み中のビューは "day" など
+let viewMode = "history"
 let rangeChartWired = false
 let dataPanelMode = "history"
 let dataPanelSwipeBound = false
@@ -172,7 +173,8 @@ function setupDataPanelSwipe() {
 
   container.addEventListener("touchend", e => {
     if (!isPhonePortraitDataView()) return
-    if (viewMode === "analysis") return
+    // History・Stats は 1 画面ずつなので、左右のスワイプで切り替えない（Day などのお休み中のビュー用）
+    if (viewMode === "history" || viewMode === "stats") return
     if (panelSwipeBlockedByTabs) {
       panelSwipeBlockedByTabs = false
       return
@@ -205,8 +207,10 @@ function setupDataPanelSwipe() {
 
 function refreshGameChartsNow() {
   if (detailViewMode) return
-  if (viewMode === "game") drawGameScoresChart()
-  if (viewMode === "analysis") drawAnalysisCharts()
+  if (viewMode === "stats") {
+    drawGameScoresChart()
+    drawAnalysisCharts()
+  }
 }
 
 function queueInitialGameChartRefresh() {
@@ -228,74 +232,39 @@ function queueInitialGameChartRefresh() {
   }, 520)
 }
 
-// ===============================
-// ===== タブの表示・非表示 =======
-// ===============================
-// 設定画面の Data Tabs（dartsSettings.dataTabs）で選んだタブだけを出す。Game は常に表示
-// Day / Week / Month / Year は一旦お休み（2026.10.8。日付はトップのカレンダーで見る）。コード（data_grouped.js / data_detail.js）は残してあり、ここに足せば戻せる
-const DATA_VIEW_TABS = ["analysis"]
+// Day / Week / Month / Year は一旦お休み（2026.10.8。日付はトップのカレンダーで見る）。コード（data_grouped.js / data_detail.js）は残してあり、
+// changeView("day") などで開ける。フッターのタブと設定画面の Data Tabs は 2026.10.10 になくした（History と Stats はトップで選ぶ）
 
-function readDataTabSettings() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem("dartsSettings") || "{}")
-    return parsed && parsed.dataTabs && typeof parsed.dataTabs === "object"
-      ? parsed.dataTabs
-      : {}
-  } catch {
-    return {}
-  }
-}
-
-function getVisibleViews() {
-  const tabs = readDataTabSettings()
-  return ["game"].concat(DATA_VIEW_TABS.filter(view => tabs[view] !== false))
-}
-
-// 隠したタブが選ばれていたら Game に戻す
-function ensureViewIsVisible(mode) {
-  return getVisibleViews().includes(mode) ? mode : "game"
-}
-
-function applyDataViewTabVisibility() {
-  const visible = getVisibleViews()
-  document.querySelectorAll(".tabs-container button[data-view]").forEach(btn => {
-    btn.style.display = visible.includes(btn.dataset.view) ? "" : "none"
-  })
-}
-
-function updateViewTabs(mode) {
-  applyDataViewTabVisibility()
-  document.querySelectorAll(".tabs-container button").forEach(btn => {
-    const isActive = btn.dataset.view === mode
-    btn.classList.toggle("active", isActive)
-    btn.setAttribute("aria-pressed", isActive ? "true" : "false")
-  })
-}
-
-// ビューごとに、Stats パネルに出す部品を切り替える
-//   game     : Stats・Awards・スコア推移・レーティング目安
-//   analysis : タグ別の散布図・期間 A/B の比較グラフ（History パネルは使わず 1 列で表示）
-//   それ以外 : Day / Week / Month / Year のまとめ（data_grouped.js）
+// 見る画面ごとに出す部品を切り替える（2026.10.10 から「記録」と「分析」で分ける）
+//   history : 全ゲームの一覧（右の #rightPanel だけを 1 列で。上にゲームの種類の絞り込み、下にページ送り）
+//   stats   : ヘッダーで選んだゲームの成績（左の #leftPanel だけを 1 列で）。Count-Up は Stats・Awards・スコア推移・
+//             レーティング目安に続けて、ヒートマップ・タグ別の散布図・期間 A/B の比較（もとの Analysis）も出す。
+//             01・クリケットは #zeroOneStatsPanel（data_01.js / data_cricket.js）
+//   それ以外 : Day / Week / Month / Year のまとめ（data_grouped.js。一旦お休み）
 function showViewSections(mode) {
   const show = (id, display) => {
     const el = document.getElementById(id)
     if (el) el.style.display = display
   }
 
-  const isGame = mode === "game"
-  const isAnalysis = mode === "analysis"
+  const isHistory = mode === "history"
+  const isStats = mode === "stats"
 
-  show("statsSection", isGame ? "flex" : "none")
-  show("awardsSection", isGame ? "flex" : "none")
-  show("chartContainer", isGame || isAnalysis ? "block" : "none")
-  show("gameChartSection", isGame ? "flex" : "none")
-  show("analysisContainer", isAnalysis ? "flex" : "none")
-  setRangeChartSectionVisible(isAnalysis)
+  show("statsSection", isStats ? "flex" : "none")
+  show("awardsSection", isStats ? "flex" : "none")
+  show("chartContainer", isStats ? "block" : "none")
+  show("gameChartSection", isStats ? "flex" : "none")
+  show("analysisContainer", isStats ? "flex" : "none")
+  setRangeChartSectionVisible(isStats)
 
   const main = document.querySelector("main.data-container")
-  if (main) main.classList.toggle("analysis-mode", isAnalysis)
-  // Analysis はカウントアップだけを集計するので、ヘッダーのゲームの切り替えとフッター（ページ送り・タブ）は出さない
-  document.body.classList.toggle("data-analysis-view", isAnalysis)
+  if (main) {
+    main.classList.toggle("history-mode", isHistory)
+    main.classList.toggle("analysis-mode", isStats)
+  }
+  // ヘッダーのゲームの切り替えは Stats だけ、フッター（ページ送り）は History だけに出す
+  document.body.classList.toggle("data-history-view", isHistory)
+  document.body.classList.toggle("data-stats-view", isStats)
 
   const calendarContainer = document.getElementById("calendarContainer")
   if (calendarContainer) {
@@ -304,8 +273,32 @@ function showViewSections(mode) {
   }
 }
 
+// 古い名前（Game / Analysis）で呼ばれても、新しい画面に読み替える
+function normalizeViewMode(mode) {
+  if (mode === "game") return "history"
+  if (mode === "analysis") return "stats"
+  return mode || "history"
+}
+
+// Stats：ヘッダーで選んだゲームの成績を描く
+function renderStatsView() {
+  groupedPageMode = "analysis"
+  if (typeof dataGameType !== "undefined" && dataGameType === "01") {
+    renderZeroOneData()
+    return
+  }
+  if (typeof dataGameType !== "undefined" && dataGameType === "cricket") {
+    renderCricketData()
+    return
+  }
+  loadStats()
+  drawGameScoresChart()
+  drawAnalysisCharts()
+  queueInitialGameChartRefresh()
+}
+
 function changeView(mode) {
-  mode = ensureViewIsVisible(mode)
+  mode = normalizeViewMode(mode)
   setupDataPanelSwipe()
   viewMode = mode
   detailViewMode = false
@@ -315,27 +308,20 @@ function changeView(mode) {
   if (typeof setDataDetailViewClass === "function") {
     setDataDetailViewClass(false)
   }
-  updateViewTabs(mode)
 
   // 縦向き（1 パネル表示）: group表示時はHistoryパネルへ自動切り替え
-  if (mode !== "game" && mode !== "analysis" && isPhonePortraitDataView()) {
+  if (mode !== "history" && mode !== "stats" && isPhonePortraitDataView()) {
     setDataPanel("history")
   }
 
   showViewSections(mode)
 
-  if (mode === 'game') {
-    currentPage = 1
-    groupedPageMode = 'game'
-    
-    loadStats()
-    // History は Count-Up・01・Cricket の全ゲーム（data_loader.js の renderHistory()）
+  if (mode === "history") {
+    groupedPageMode = "game"
+    // Count-Up・01・Cricket の全ゲーム（data_loader.js の renderHistory()）
     renderHistory()
-    drawGameScoresChart()
-  } else if (mode === "analysis") {
-    groupedPageMode = "analysis"
-    updatePaginationUI(1)
-    drawAnalysisCharts()
+  } else if (mode === "stats") {
+    renderStatsView()
   } else {
     // Group ビュー（Day/Week/Month/Year）
     displayGroupView(mode)
@@ -344,28 +330,7 @@ function changeView(mode) {
 }
 
 function renderView() {
-  viewMode = ensureViewIsVisible(viewMode)
-  setupDataPanelSwipe()
-  hideDetailBullRate()
-  if (typeof setDataDetailViewClass === "function") {
-    setDataDetailViewClass(false)
-  }
-  updateViewTabs(viewMode)
-  showViewSections(viewMode)
-  
-  if (viewMode === "game") {
-    loadStats(viewMode)
-    loadSessions()
-    drawGameScoresChart()
-    queueInitialGameChartRefresh()
-  } else if (viewMode === "analysis") {
-    groupedPageMode = "analysis"
-    updatePaginationUI(1)
-    drawAnalysisCharts()
-  } else {
-    renderGroupedPaginated(viewMode)
-  }
-  
+  changeView(viewMode)
 }
 
 function loadStats() {
@@ -1000,7 +965,7 @@ function drawLineSeries(ctx, values, color, padding, verticalPadding, height, gr
 }
 
 function drawSelectedRangeChart() {
-  if (viewMode !== "analysis") return
+  if (viewMode !== "stats") return
 
   wireRangeChartControls()
 
@@ -1133,7 +1098,7 @@ const SCATTER_TAG_COLORS = [
 const SCATTER_NO_TAG_COLOR = "rgba(154,164,178,0.35)"
 
 function drawAnalysisCharts() {
-  if (viewMode !== "analysis") return
+  if (viewMode !== "stats") return
   if (typeof renderAnalysisHeatmap === "function") renderAnalysisHeatmap()
   renderAnalysisScatter()
   drawSelectedRangeChart()

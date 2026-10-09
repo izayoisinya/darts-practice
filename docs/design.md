@@ -88,7 +88,7 @@ GitHub 上のリポジトリ（`izayoisinya/darts-practice`）を iPad 及びタ
 
 メイン画面以外では、画面右端の細い帯（幅 10px）をタップするか、画面の右端から 48px 以内（Android は OS の「戻る」ジェスチャーが端を使うため 96px 以内）で触れて左へスワイプするとサイドメニューが右から横にすべって出てきて、各画面へ遷移できる。メニューを右へスワイプするか、外側をタップすると閉じる。スワイプ中はメニューが指に合わせて動き、離したときに半分以上（または素早く）動かしていれば開閉する（`main.js` の `setupSideMenu()` / `setSideMenuOpen()`、`lay_menu.css`）。メニューの中身は、ステータスバー・ホームバー・横向きの丸い角に重ならないよう安全領域の分だけ内側に寄せる。中身は全画面共通で、`core.js` の `renderSideMenu()` が `SIDE_MENU_GROUPS` から作る（各 HTML には空の `<div id="sideMenu">` だけを置く。`initApp()` の最初に呼ぶ）。ボタンは Main Menu の下にグループ（`.menu-group`）で分ける：Game（CountUp・01・Cricket）、Utility（Data・Settings・Info）、カウントアップ画面だけ This Game（Reset Game。赤系の色）。今いる画面のボタンは色を変え（`.current`）、押すと画面を開き直さずメニューを閉じる。スワイプは document 全体で受けるので、ボードなどの上から始めても開ける。データ画面の History / Stats の切り替えスワイプは、この範囲から始めたときは行わない（`isSideMenuSwipeStart()` / `getSideMenuSwipeZone()`）。
 
-**左上の戻るボタン**：設定・お知らせ・データ画面のヘッダーの左上に「‹ Menu」を置き、メインメニューに戻れるようにした（ホーム画面アプリにはブラウザの戻るがなく、サイドメニューのスワイプは気付きにくいため）。見た目は `base.css` の `.header-back`。データ画面ではトップのとき「‹ Menu」、Games / Analysis を開いているときは同じボタンが「‹ Top」（データのトップへ）になる（`data_hub.js` の `setDataHubOpen()`）。ゲーム画面はヘッダーに点数などが詰まっていて、押し間違えてゲームを離れないよう置かない（サイドメニューから戻る）。
+**左上の戻るボタン**：設定・お知らせ・データ画面のヘッダーの左上に「‹ Menu」を置き、メインメニューに戻れるようにした（ホーム画面アプリにはブラウザの戻るがなく、サイドメニューのスワイプは気付きにくいため）。見た目は `base.css` の `.header-back`。データ画面ではトップのとき「‹ Menu」、History / Stats を開いているときは同じボタンが「‹ Top」（データのトップへ）になる（`data_hub.js` の `setDataHubOpen()`）。ゲーム画面はヘッダーに点数などが詰まっていて、押し間違えてゲームを離れないよう置かない（サイドメニューから戻る）。
 
 **画面の左右の余白**：ゲーム・データ・設定・お知らせの各画面のヘッダーと中身の左右の余白は、`base.css` の `--gutter-left` / `--gutter-right`（`--gutter`：スマホ 12px、それ以外 20px に、その側の安全領域を足したもの）で左右同じにそろえる。以前はサイドメニューの帯の分だけ右を広く空けていたが、帯を余白より細くしたので不要になった。
 
@@ -224,71 +224,77 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 保存されたスコア記録データを表示する画面。
 
+データ画面は「記録」と「分析」をはっきり分ける（2026.10.10）。ゲームの種類（Count-Up / 01 / Cricket）で分けるのは分析（Stats）だけで、記録（トップ・History）は全ゲームをまとめて扱う。
+
+| 画面 | 役割 | ゲームの種類 | 中身 |
+| --- | --- | --- | --- |
+| トップ | 練習の記録の入口 | まとめて扱う（切り替えは出さない） | 全ゲームのまとめ、History / Stats のカード、カレンダー、選んだ日のメモとゲーム |
+| History | 記録 | 上のボタンで絞り込むだけ（All / Count-Up / 01 / Cricket） | 全ゲームの履歴カードを新しい順に（ページ送り） |
+| Stats | 分析 | ヘッダーの切り替えで選ぶ（前回見ていたゲームから） | 選んだゲームの成績。Count-Up はもとの Analysis（ヒートマップ・タグ別の散布図・期間の比較）も続けて出す |
+
 **トップ**（`data_hub.js`）：画面を開くと最初にトップを出す（`body` に `data-hub-open`。この間はふつうの表示 `main.data-container` を隠す）。
 
-- 上に、ヘッダーで選んでいるゲーム（Count-Up / 01 / Cricket）の成績のまとめ（5 つ）
-  - Count-Up：Games・Avg Score・Avg PPD・Best Score・Last Played
-  - 01：Games・Finish Rate・Avg Darts・Best Darts・Last Played
-  - Cricket：Games・Avg MPR・Best MPR・Close Rate・Last Played
-- その下に、見る画面のカード（Games・Analysis の 2 つ。何が見られるかの説明と件数）。Count-Up は設定画面の Data Tabs で Analysis を隠したらカードも出さない。01・クリケットは Games だけ（Analysis は今は Count-Up だけを集計している）
-- Calendar：選んでいるゲームを練習した日に印を付け、その日のゲーム数を小さく出す（5 ゲーム以上は濃く。今日は白い枠）。練習した日を押すと、Recent Games の代わりにその日のゲームを Games 画面と同じ履歴カード（押すと開く。番号は全体の通し番号、新しい順）で出す（`renderDataHubDay()` / `fillDataHubDay()`。選んだ日は濃く光らせ、もう一度押すか「Recent」で戻す。ヘッダーでゲームを切り替えると選んだ日は外す。履歴カードの開閉の見た目は `#sessionsContainer` と同じ指定を `#dataHubDayList` にも当てる）。‹ › で月を切り替え、最初は最後に遊んだ月。下にその月の日数・ゲーム数（`renderDataHubCalendar()`）。横向きは Recent Games と左右に並べる
-- 日別メモ：選んだ日のゲームの上に、その日のメモ（コメント・タグ・画像の有無）と「Memo」ボタン（メモが無ければ「+ Memo」）を出す（`renderDataHubDayNote()`）。ボタンで Day 一覧のときと同じ編集画面（`data_grouped.js` の `openDayNoteEditor()`）を開き、保存するとトップを描き直す（保存後の描き直しは、トップを開いていれば `renderDataHub()`、Day などの一覧なら `displayGroupedPage()`）。メモ・タグのある日はカレンダーの右上に黄色の小さな印（`.has-note`）。タグは Analysis のタグ別散布図の色分けに使う
-- **Day / Week / Month / Year は一旦お休み**（2026.10.8。データ画面を Games と Analysis の 2 つに絞り、日付はトップのカレンダーで見る）。フッターのタブ・トップのカード・設定の Data Tabs から外したが、コード（`data_grouped.js` / `data_detail.js`）は残してあり、`data.js` の `DATA_VIEW_TABS` に足せば戻せる
-- Recent Games：最近の 5 ゲーム（日時・説明・主な数字）。押すと Games の画面を開く
-- カードを押すとその画面を開き（`openDataView()`）、ヘッダーの左上のボタンを「‹ Top」にしてトップに戻れるようにする（`backToDataHub()`。トップでは同じボタンが「‹ Menu」でメインメニューへ）。画面を開くときに履歴を 1 つ足すので、端末・ブラウザの「戻る」でもトップに戻る（Day の詳細ビューを開いているときは、まず詳細を閉じる）
-- ヘッダーでゲームを切り替えると、トップの中身を描き直す（`setDataGameType()` を包む）
+- 上に、全ゲームの練習のまとめ（4 つ）：Games・Days（練習した日数）・This Month（今月のゲーム数）・Last Played（`getDataHubSummary()`）
+- その下に、見る画面のカード（History・Stats の 2 つ）。History は全体のゲーム数とゲームの種類ごとの数、Stats は開いたときに出すゲーム（前回見ていたもの）を出す
+- Calendar：全ゲームを練習した日に印を付け、その日のゲーム数を小さく出す（5 ゲーム以上は濃く。今日は白い枠）。練習した日を押すと、その日のメモとゲームを横（縦向きは下）に出す。最初は最後に練習した日を選んでおく（`renderDataHubDay()` / `fillDataHubDay()`。ゲームは History と同じ履歴カードで、見出しにゲームの種類の印。押すと開く。番号はゲームごとの通し番号、新しい順。選んだ日は濃く光らせる。履歴カードの開閉の見た目は `#sessionsContainer` と同じ指定を `#dataHubDayList` にも当てる）。‹ › で月を切り替え、最初は最後に遊んだ月。下にその月の日数・ゲーム数（`renderDataHubCalendar()`）
+- 日別メモ：選んだ日のゲームの上に、その日のメモ（コメント・タグ・画像の有無）と「Memo」ボタン（メモが無ければ「+ Memo」）を出す（`renderDataHubDayNote()`）。ボタンで Day 一覧のときと同じ編集画面（`data_grouped.js` の `openDayNoteEditor()`）を開き、保存するとトップを描き直す（保存後の描き直しは、トップを開いていれば `renderDataHub()`、Day などの一覧なら `displayGroupedPage()`）。メモ・タグのある日はカレンダーの右上に黄色の小さな印（`.has-note`）。タグは Count-Up の Stats のタグ別散布図の色分けに使う
+- **Day / Week / Month / Year は一旦お休み**（2026.10.8。日付はトップのカレンダーで見る）。コード（`data_grouped.js` / `data_detail.js`）は残してあり、`changeView("day")` などで開ける
+- カードを押すとその画面を開き（`openDataView("history" | "stats")`）、ヘッダーの左上のボタンを「‹ Top」にしてトップに戻れるようにする（`backToDataHub()`。トップでは同じボタンが「‹ Menu」でメインメニューへ）。画面を開くときに履歴を 1 つ足すので、端末・ブラウザの「戻る」でもトップに戻る（Day の詳細ビューを開いているときは、まず詳細を閉じる）
 
-![データ表示画面 Game ビュー（タブレット横）](images/data_tablet.jpg)
+![データ表示画面 History（タブレット横）](images/data_tablet.jpg)
 
-見る画面（Games / Analysis）はトップで選ぶ。画面下部のタブ（`.tabs-container`）は出さない（フッターはページ送りだけを中央に置く）。
+**History**（記録。`viewMode = "history"`、`main` に `history-mode`、`body` に `data-history-view`）
 
-| ビュー | 左（History） | 右（Stats） |
+- 右の `#rightPanel` だけを 1 列で出す（Stats の `#leftPanel` と縦向きの History / Stats の切り替えは出さない）。横向き（タブレット・スマホ）とパソコンでは履歴カードを 2 列に並べる
+- 上のボタン（`#historyFilter`）でゲームの種類を絞り込む（`setHistoryFilter()`。All / Count-Up / 01 / Cricket。絞り込んでもゲームの番号は変わらない）。ヘッダーのゲームの切り替えは出さない
+- 下のフッターはページ送りだけ（10 ゲームずつ。`renderHistory()` / `changePage()`）
+- **履歴カード**は普段は縮小表示（ゲームの種類の印・Game 番号・日時、主な数字 3 つ、ブル数とアワードの要約 1 行）。タップすると全項目（ブル率・トリプル・ラウンドスコアのグラフ・アワード）を表示し、もう一度タップで縮小に戻る。トップの「その日のゲーム」と Day の詳細ビューでも共通
+
+**Stats**（分析。`viewMode = "stats"`、`main` に `analysis-mode`、`body` に `data-stats-view`）
+
+- 左の `#leftPanel` だけを 1 列で画面幅いっぱいに出す。ヘッダーの切り替え（Count-Up / 01 / Cricket。`data_01.js` の `setDataGameType()`。最後に見ていたゲームは `dartsDataGame` に保存）で中身を入れ替える。ページ送りがないのでフッターは出さない
+- Count-Up（`data.js` の `renderStatsView()`）：Stats・Awards、直近 30 ゲームのスコア推移、レーティング目安、続けてヒートマップ（刺さった位置の多いところをボードの図の上に色の濃さで表示。期間 All / 30 Days / 7 Days / Today、よく刺さった場所の上位 8 か所の割合、RANGE）、タグ別の散布図（全ゲームのスコアを日付順に点で描き、その日のメモのタグで色分け。タグのボタンで選んだタグの日だけ色付き）、期間 A/B の比較グラフ
+- 01（`renderZeroOneData()`）・クリケット（`renderCricketData()`）：`#zeroOneStatsPanel` に出し、Count-Up の欄は隠す（`body` に `data-01`）。中身は「4.2.1」「4.2.2」を参照
+- もとの Analysis（2026.4 に develop ブランチで作り、2026.10.6 に main へ移植）は、2026.10.10 に Count-Up の Stats にまとめた。フッターのタブ（Game / Analysis）と設定画面の Data Tabs はなくした
+
+| ビュー（一旦お休み） | 左（History） | 右（Stats） |
 | --- | --- | --- |
-| Game | 1 ゲームずつのカード（スコア・PPD・ラウンド平均・ブル・トリプル数・ラウンドスコアのグラフ・アワード） | 全体の Stats・Awards、直近 30 ゲームのスコア推移、レーティング目安 |
-| Analysis | （使わない。Stats パネルを 1 列で画面幅いっぱいに表示） | ヒートマップ（刺さった位置の多いところをボードの図の上に色の濃さで表示。期間 All / 30 Days / 7 Days / Today、よく刺さった場所の上位 8 か所の割合）、タグ別の散布図（全ゲームのスコアを日付順に点で描き、その日のメモのタグで色分け。タグのボタンで選んだタグの日だけ色付き）、期間 A/B の比較グラフ |
-| Day / Week / Month / Year（一旦お休み） | 期間ごとのまとめ（平均スコア・平均 PPD・ブル数）、メモボタン | カレンダー（練習した日に印）、タグ集計 |
+| Day / Week / Month / Year | 期間ごとのまとめ（平均スコア・平均 PPD・ブル数）、メモボタン | カレンダー（練習した日に印）、タグ集計 |
 
-![データ表示画面 Day ビュー（タブレット横）](images/data_day_tablet.jpg)
-
-- Analysis を開いている間は、ヘッダーのゲームの切り替え（Count-Up / 01 / Cricket）とフッター（ページ送り・タブ）を出さない（Analysis はカウントアップだけを集計するため。`body` に `data-analysis-view`）。Games へはヘッダーの「‹ Top」から戻る
-- 下部のタブ（Game / Analysis）は 2026.10.9 から表示しない（タブの HTML と切り替え処理は残している）。設定画面の Data Tabs で Analysis を隠すと、トップの選択からも外れる。隠したタブが選ばれていたら Game に戻す
-- Analysis タブと Data Tabs の設定は、2026.4 に develop ブランチで作った機能を 2026.10.6 に今の main へ移植した。期間 A/B の比較グラフは Game から Analysis へ移した（develop での配置に合わせた）
 - Day のカードを選ぶと、その日のゲーム一覧（詳細ビュー）を表示する。詳細ビューではその日のブル率や、他の日との比較グラフを表示できる
 - **Memo**：日ごとにコメント・タグ・セッティング画像を保存できる。タグは絞り込みや比較に使う。Day 一覧がお休みの間は、データのトップのカレンダーで日付を選んで編集する
-- **履歴カード**は普段は縮小表示（Game 番号・日時、Score / PPD / Round Avg、ブル数とアワードの要約 1 行）。タップすると全項目（ブル率・トリプル・ラウンドスコアのグラフ・アワード）を表示し、もう一度タップで縮小に戻る。Game ビューと詳細ビューで共通
-- **縦向き（スマートフォン・タブレットとも）**は、上部の History / Stats の切り替え（左右スワイプ対応）で 1 パネルずつ画面幅いっぱいに表示する。横向きは History と Stats を左右 2 列に並べる
+- **Day などの縦向き**は、上部の History / Stats の切り替え（左右スワイプ対応）で 1 パネルずつ画面幅いっぱいに表示する（History・Stats の画面は 1 列なので使わない）
 - 縦方向の割り付け：メイン部分（`main.data-container`）は `position: absolute` で「ヘッダーの下端から画面の下端まで」に置き、History・Stats の各パネルの中でスクロールさせる。ヘッダーの高さは CSS 変数 `--data-header-height`（端末ごとの値）で指定し、メイン部分の位置と一致させる。flex で「残りの高さ」を使う形にすると、iPad の Safari で中のグリッドが中身の高さまで伸びてスクロールできなくなるため使わない。安全領域の余白は、上はヘッダーの中、下はフッター（`.footer-bar`）の中で 1 回だけ取る（`lay_data.css`）
 
 <img src="images/data_phone.jpg" alt="データ表示画面（スマホ縦）" width="240">
 
-**History を 1 か所に**（`data_loader.js` の `loadSessions()` / `renderHistory()`）：Games 画面の右の History は、ヘッダーで選んでいるゲームに関係なく、Count-Up・01・Cricket の全ゲームを新しい順に 1 本の一覧で出す（左の Stats はヘッダーで選んだゲームのもの。01・クリケットの Stats は今のまま）。カードの中身はゲームごとの形で、見出しの「Game n」の左にゲームの種類の印（Count-Up 緑・01 青・Cricket 金。`.history-game-badge`）を付ける。番号はゲームごとの通し番号。ページ送り（フッターの Prev / Next）も 1 つで、Games を開くたびに 1 ページ目から。01 の設定・クリケットのラウンド数での絞り込みは Stats だけにかかる
+**History を 1 か所に**（`data_loader.js` の `loadSessions()` / `renderHistory()`）：History は Count-Up・01・Cricket の全ゲームを新しい順に 1 本の一覧で出す。カードの中身はゲームごとの形で、見出しの「Game n」の左にゲームの種類の印（Count-Up 緑・01 青・Cricket 金。`.history-game-badge`。`createHistoryCardElement()`）を付ける。番号はゲームごとの通し番号（`getHistoryItems()`）。上のボタンで種類を絞り込める（`historyFilter`）。ページ送り（フッターの Prev / Next）は 1 つで、History を開くたびに 1 ページ目から。01 の設定・クリケットのラウンド数での絞り込みは Stats だけにかかる
 
 #### 4.3.1 01 の記録（`data_01.js`）
 
-ヘッダー右の **Count-Up / 01** で切り替える（前回見ていた方を LocalStorage `dartsDataGame` に残す。`data.html?game=01` なら 01 から）。01 のときは `body` に `data-01` を付ける。
+Stats の画面のヘッダー右の **Count-Up / 01 / Cricket** で切り替える（前回見ていた方を LocalStorage `dartsDataGame` に残す。`data.html?game=01` なら 01 から）。01 のときは `body` に `data-01` を付ける。
 
-レイアウトとデザインはカウントアップの Game の表示とそろえ、同じ場所に同じ部品で出す。
+レイアウトとデザインはカウントアップの Stats とそろえ、同じ場所に同じ部品で出す。
 
-- **右（History）**：Count-Up・01・Cricket の全ゲームを 1 つの一覧に出す（下の「History を 1 か所に」）。01 のゲームは同じ形のカード（Game n・日時・3 つの数字・押すと開いて Round Scores と Awards。`createZeroOneCardHtml()`）。数字は Out Darts（上がったダーツ数。金）か Left（上がれなかった残り。赤）、PPD、80% Stats。下の要約に設定・上がりナンバー（`OUT D16` / `NO OUT`）・ブルとトリプルの本数と割合。開くと Bull / In / T の割合のバーと、20〜15 のトリプルの本数（Triple。カウントアップのカードと同じ）、そのゲームのヒートマップも出す
-- **左（Stats）**：`#zeroOneStatsPanel` に出し、カウントアップの左の欄は隠す
-  - 上の選択で設定（点数・上がり方・ラウンド）ごとに絞る（初めは最後に遊んだ設定。All Settings で全部。History も同じ絞り込み）
+- **History**：Count-Up・01・Cricket の全ゲームを 1 つの一覧に出す（上の「History を 1 か所に」）。01 のゲームは同じ形のカード（Game n・日時・3 つの数字・押すと開いて Round Scores と Awards。`createZeroOneCardHtml()`）。数字は Out Darts（上がったダーツ数。金）か Left（上がれなかった残り。赤）、PPD、80% Stats。下の要約に設定・上がりナンバー（`OUT D16` / `NO OUT`）・ブルとトリプルの本数と割合。開くと Bull / In / T の割合のバーと、20〜15 のトリプルの本数（Triple。カウントアップのカードと同じ）、そのゲームのヒートマップも出す
+- **Stats**：`#zeroOneStatsPanel` に出し、カウントアップの欄は隠す
+  - 上の選択で設定（点数・上がり方・ラウンド）ごとに絞る（初めは最後に遊んだ設定。All Settings で全部）
   - Stats（`.data-card`）：Games Played・Finish Rate（上がり率）・Avg Darts（上がったゲームの平均ダーツ数）・Best Darts・Average PPD・Finish Rate (Last 10)（直近 10 ゲームの上がり率）
   - Awards（`.data-card`）
   - Bull / Triple：全投数に対するブル（アウター＋インナー）・インナーブル（金）・トリプル（青）の本数と割合（1 投ごとの記録 `darts` から数える。カウントアップの詳細の Bull Rate と同じ部品。`renderZeroOneHitRates()`）
-  - RANGE（目安）：カウントアップの Analysis と同じ出し方（位置から・ブル率から・8 割の円）。01 は上がりでダブルなどを狙うので、80% スタッツと同じ範囲（最初の点数の 80% を減らしたラウンドまで＝ブルを狙う場面）の投だけで出す（`getZeroOne80Darts()` / `renderZeroOneRange()`）。履歴カードのヒートマップ（`createSessionHeatmapHtml(session, true, getZeroOne80Points(session))`）とゲーム画面のレーダー（cu_ui.js の `getZeroOneBullPhasePoints()`）も同じ範囲で RANGE を出す
+  - RANGE（目安）：カウントアップの Stats のヒートマップと同じ出し方（位置から・ブル率から・8 割の円）。01 は上がりでダブルなどを狙うので、80% スタッツと同じ範囲（最初の点数の 80% を減らしたラウンドまで＝ブルを狙う場面）の投だけで出す（`getZeroOne80Darts()` / `renderZeroOneRange()`）。履歴カードのヒートマップ（`createSessionHeatmapHtml(session, true, getZeroOne80Points(session))`）とゲーム画面のレーダー（cu_ui.js の `getZeroOneBullPhasePoints()`）も同じ範囲で RANGE を出す
   - Daily Range：直近 10 日の、日ごとの RANGE の平均（ゲームごとの RANGE の平均。`getAverageRange()` を使うので、ブルモードがセパレートのゲームと位置の記録がないゲームは含めない）を棒で出す（`renderZeroOneDailyRange()`）
   - Darts to Finish：直近 30 ゲームの上がるまでのダーツ数の推移（最少は金色）。上がれなかったゲームは上の段に赤い ×
   - レーティング参考値（カウントアップと同じカード）：直近 30 ゲームの **80% スタッツ**（1 ゲームごとに、最初の点数の 80% を減らしたラウンドまでの 1 ラウンドの平均点。バストは 0 点）の平均を PPR として出し、PPD（÷ 3）を `rating.js` の換算表で DARTSLIVE / PHOENIX の目安にする（`getZeroOneStats80()` / `renderZeroOneRating()`）
   - Finish Numbers：上がったゲームの最後の 1 投（`darts` の最後の記録）の場所ごとの割合（上位 10 か所。バーの長さは全体に対する割合。`renderZeroOneFinishNumbers()`）
-- フッターのタブ（Analysis・Day など）はカウントアップ用なので 01 のときは隠す。Analysis などを見ていたときに 01 に切り替えると Game の表示に戻してから 01 を出し、カウントアップに戻すと `changeView()` で描き直す
-- スマホ縦は、カウントアップと同じ History / Stats の切り替えで見る
+- Stats を見ているときに切り替えると、`renderStatsView()` で選んだゲームの成績を描き直す（トップ・History はゲームの種類に関係ないので何もしない）
 
 #### 4.3.2 クリケットの記録（`data_cricket.js`）
 
-ヘッダー右の **Cricket** で切り替える（`data.html?game=cricket` ならクリケットから）。01 と同じ仕組みで、`body` に `data-01` と `data-cricket` を付け、同じ場所に同じ部品で出す（切り替えは `data_01.js` の `setDataGameType()`。フッターの Prev / Next・グラフの描き直しもクリケット用に切り替える）。
+ヘッダー右の **Cricket** で切り替える（`data.html?game=cricket` ならクリケットから）。01 と同じ仕組みで、`body` に `data-01` と `data-cricket` を付け、同じ場所に同じ部品で出す（切り替えは `data_01.js` の `setDataGameType()`。グラフの描き直しもクリケット用に切り替える）。
 
-- **右（History）**：全ゲームの一覧の中で、クリケットのゲームは次のカード（`createCricketCardHtml()`）：カード（MPR・Marks・Close Darts〔全部クローズしたダーツ数。金〕か Close〔クローズした数 n/7。赤〕）、要約（ラウンド数・クローズ・点・ブルとトリプル）。開くと Bull / In / T の割合のバー、20〜15 のトリプルの本数、アワード、ラウンドごとのマーク数のグラフ（縦軸 0〜9。`createRoundChartHtml(scores, 9)`）、そのゲームのヒートマップ
-- **左（Stats）**：`#zeroOneStatsPanel` に出す
+- **History**：全ゲームの一覧の中で、クリケットのゲームは次のカード（`createCricketCardHtml()`）：カード（MPR・Marks・Close Darts〔全部クローズしたダーツ数。金〕か Close〔クローズした数 n/7。赤〕）、要約（ラウンド数・クローズ・点・ブルとトリプル）。開くと Bull / In / T の割合のバー、20〜15 のトリプルの本数、アワード、ラウンドごとのマーク数のグラフ（縦軸 0〜9。`createRoundChartHtml(scores, 9)`）、そのゲームのヒートマップ
+- **Stats**：`#zeroOneStatsPanel` に出す
   - 上の選択でラウンドの上限（R10 / R15 / R20）ごとに絞る（All Rounds で全部）
   - Stats：Games Played・Average MPR・Best MPR・Close Rate（全部クローズできた割合）・Avg / Best Darts to Close・MPR (Last 10)
   - Awards：クリケットのアワード（`DATA_CRICKET_AWARD_LABELS`）
@@ -311,7 +317,6 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 | GAME | Rounds | 8 / 10 / 15 を選べるが保存されず、ゲームは 8 ラウンド固定。01・クリケット実装時に調整予定 |
 | DISPLAY | Screen Orientation | 画面の向きの固定（Free / Portrait Lock / Landscape Lock）。ブラウザによっては効かない |
 | DISPLAY | Game Panels | カウントアップ画面に表示するエリア（Rounds / Stats）。Input は常に表示 |
-| DISPLAY | Data Tabs | データ画面に Analysis を表示するか（Day / Week / Month / Year は一旦お休みで外した）。Games は常に表示 |
 | データ保存状況 | — | 保存ゲーム数、保存先（IndexedDB / LocalStorage）、使用容量・上限の概算 |
 | データのバックアップ | 書き出し / 読み込み | ゲームの記録と日別メモを JSON ファイルに書き出す・読み込む（詳細は 6.6） |
 
@@ -578,12 +583,14 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 
 #### data/data_loader.js
 
-履歴の読み込み・加工と、Game ビューの一覧表示。
+履歴の読み込み・加工と、History（全ゲームの一覧）の表示。
 
 | 関数 | 内容 |
 | --- | --- |
 | `initDataPage()` | データ表示画面を初期化する |
-| `loadSessions()` | Game ビューの履歴カードを表示する |
+| `loadSessions()` / `renderHistory()` | History の履歴カード（全ゲーム・絞り込み・10 件ずつ）を表示する / ページ送りの表示も合わせる |
+| `getHistoryItems()` / `setHistoryFilter(filter)` | ゲームごとの通し番号を付けて絞り込んだ履歴を返す / History の絞り込みを変えて描き直す |
+| `createHistoryCardElement(session, type, number)` | ゲームの種類の印を付けた履歴カードを作る（トップの「その日のゲーム」でも使う） |
 | `createSessionCardHtml()` | 1 ゲーム分のカードの中身を生成する（縮小表示用の要約 1 行を含む） |
 | `createSessionCardElement()` | カードの外枠を作る（縮小表示・タップで開閉できる状態で作る） |
 | `setupSessionCardToggle()` | 履歴カードのタップ（クリック・Enter）で、縮小表示と全項目表示を切り替える |
@@ -600,15 +607,15 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 
 | 関数 | 内容 |
 | --- | --- |
-| `changeView(mode)` | Game / Analysis / Day / Week / Month / Year を切り替える |
-| `showViewSections(mode)` | ビューに合わせて Stats パネルの部品（Stats・Awards・スコア推移・Analysis）を出し分ける |
-| `getVisibleViews()` / `ensureViewIsVisible()` / `applyDataViewTabVisibility()` | 設定の Data Tabs に従ってタブを隠す。隠したタブが選ばれていたら Game にする |
-| `drawAnalysisCharts()` / `renderAnalysisScatter()` / `drawScatterChart()` | Analysis タブのタグ別散布図と期間比較グラフを描く。タグの色は使われている数の多い順に割り当てる |
+| `changeView(mode)` | History / Stats / Day / Week / Month / Year を切り替える（古い名前の game / analysis は `normalizeViewMode()` で読み替える） |
+| `renderStatsView()` | Stats：ヘッダーで選んだゲームの成績を描く（Count-Up は Stats・グラフ・ヒートマップ・散布図・期間比較、01・クリケットは `data_01.js` / `data_cricket.js`） |
+| `showViewSections(mode)` | 画面に合わせて部品を出し分ける（History は `#rightPanel`、Stats は `#leftPanel` を 1 列で。`body` に `data-history-view` / `data-stats-view`） |
+| `drawAnalysisCharts()` / `renderAnalysisScatter()` / `drawScatterChart()` | Count-Up の Stats の下のヒートマップ・タグ別散布図・期間比較グラフを描く。タグの色は使われている数の多い順に割り当てる |
 | `renderView()` | 現在のビューを描画する |
 | `setDataPanel()` / `setupDataPanelSwipe()` | スマホ縦での History / Stats パネル切り替え |
 | `loadStats()` / `addStat()` | 全体の Stats・Awards を表示する |
 | `drawGameScoresChart()` | 直近 30 ゲームのスコア推移グラフを描く |
-| `drawSelectedRangeChart()` | 期間 A / B の比較グラフを描く（Analysis タブ） |
+| `drawSelectedRangeChart()` | 期間 A / B の比較グラフを描く（Count-Up の Stats） |
 | `drawDetailGroupChart()` | 詳細ビューのグラフ（比較日との重ね表示）を描く |
 | `renderDetailBullRate()` | 詳細ビューのブル率を表示する |
 | `renderRatingReference()` | レーティング目安を表示する |
@@ -621,7 +628,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 
 #### data/heatmap.js
 
-Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録（6.2 の `darts`）を使う。図の描画（`paintHeatmap()`）はゲーム画面の「このゲームのヒートマップ」でも使うため、`countup.html` でも読み込む（`data.js` の関数には頼らない）。
+Count-Up の Stats のヒートマップ（もとの Analysis タブ）。ゲーム履歴の 1 投ごとの記録（6.2 の `darts`）を使う。図の描画（`paintHeatmap()`）はゲーム画面の「このゲームのヒートマップ」でも使うため、`countup.html` でも読み込む（`data.js` の関数には頼らない）。
 
 | 名前 | 内容 |
 | --- | --- |
@@ -782,7 +789,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
   undoSwipeDirection: "left" | "right",                               // 3 本指スワイプで戻る向き
   orientationMode: "auto" | "portrait" | "landscape",
   gamePanels: { round: boolean, stats: boolean },                     // false で隠す。ない項目は表示
-  dataTabs: { analysis, day, week, month, year: boolean }             // 同上
+  dataTabs: { ... }                                                   // 古い設定（データ画面のタブ。2026.10.10 から使わない）
 }
 ```
 
@@ -830,7 +837,7 @@ Analysis タブのヒートマップ。ゲーム履歴の 1 投ごとの記録�
 
 1. `data_loader.js` の `initDataPage()` が実行される
 2. `storage.js` の `initSessionsStorage()` → `readSessions()` で履歴を取得する
-3. Game ビュー：`loadSessions()` でカード表示、`data.js` で全体の Stats・グラフを描画する
+3. トップ（`data_hub.js` の `renderDataHub()`）を出す。History：`loadSessions()` で全ゲームのカード表示。Stats：`data.js` の `renderStatsView()` でヘッダーで選んだゲームの成績・グラフを描画する
 4. Day / Week / Month / Year ビュー：`groupSessions()` でまとめ、`data_grouped.js` でページ単位に表示する
 5. カードやカレンダーを選ぶと、`data_detail.js` の詳細ビューへ移動する
 
@@ -1039,3 +1046,4 @@ graph LR
 | 2026.10.9 | データ画面のフッターの Game / Analysis のタブを出さないようにした（見る画面はトップで選ぶ。フッターはページ送りだけ） |
 | 2026.10.9 | データのトップのカレンダーで選んだ日に、日別メモ（コメント・タグ・画像）の表示と「Memo」ボタンを追加（Day 一覧がお休みの間もタグを付けられるように）。メモのある日はカレンダーに印 |
 | 2026.10.10 | ボードを押している間に区画を明るくする方法を `filter: brightness()` から色の直接指定に変更（iPad の Safari で、離したあとに区画の端〔ブルの左端など〕が線になって残ることがあったため） |
+| 2026.10.10 | データ画面を「記録」と「分析」に分けた。トップ（全ゲームのまとめ・History / Stats のカード・カレンダーと選んだ日のメモとゲーム。Recent Games はなくし、最後に練習した日を選んでおく）、History（全ゲームの一覧を 1 列〔広い画面は 2 列〕で。ゲームの種類で絞り込み）、Stats（ヘッダーで選んだゲームの成績。Count-Up はもとの Analysis も続けて出す）。ゲームの種類の切り替えは Stats だけに出す。設定画面の Data Tabs はなくした |

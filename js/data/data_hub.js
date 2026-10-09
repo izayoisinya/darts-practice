@@ -35,7 +35,7 @@ function getDataHubSessions() {
   return typeof readHistorySessions === "function" ? readHistorySessions() : readDataSessions()
 }
 
-// 練習のまとめ（[ラベル, 値] の配列。ゲームの種類に関係なく数える）
+// 練習のまとめ（[ラベル, 狭い画面のラベル, 値] の配列。ゲームの種類に関係なく数える。トップのときだけヘッダーの右に出す）
 function getDataHubSummary(sessions) {
   const now = new Date()
   const days = new Set(sessions.map(s => getDataHubDayKey(s.date)))
@@ -44,10 +44,10 @@ function getDataHubSummary(sessions) {
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
   })
   return [
-    ["Games", sessions.length],
-    ["Days", days.size],
-    ["This Month", thisMonth.length],
-    ["Last Played", formatDataHubDate(sessions.length ? sessions[sessions.length - 1].date : 0)]
+    ["Games", "Games", sessions.length],
+    ["Days", "Days", days.size],
+    ["This Month", "Month", thisMonth.length],
+    ["Last Played", "Last", formatDataHubDate(sessions.length ? sessions[sessions.length - 1].date : 0)]
   ]
 }
 
@@ -82,16 +82,17 @@ function renderDataHub() {
     { mode: "stats", ...DATA_HUB_VIEWS.stats, count: HISTORY_GAME_LABELS[statsType] }
   ]
 
-  hub.innerHTML = `
-    <section class="data-hub-summary" aria-label="まとめ">
-      ${getDataHubSummary(sessions).map(([label, value]) => `
-        <div class="data-hub-stat">
-          <span class="data-hub-stat-label">${label}</span>
-          <span class="data-hub-stat-value">${value}</span>
-        </div>
-      `).join("")}
-    </section>
+  const headerStats = document.getElementById("dataHubHeaderStats")
+  if (headerStats) {
+    headerStats.innerHTML = getDataHubSummary(sessions).map(([label, short, value]) => `
+      <div class="data-hub-head-stat" title="${label}">
+        <span class="data-hub-head-label"><span class="long">${label}</span><span class="short">${short}</span></span>
+        <span class="data-hub-head-value">${value}</span>
+      </div>
+    `).join("")
+  }
 
+  hub.innerHTML = `
     <section class="data-hub-views">
       ${cards.map(card => `
         <button type="button" class="data-hub-card${card.mode === "history" ? " primary" : ""}" data-hub-view="${card.mode}">

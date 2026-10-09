@@ -366,8 +366,9 @@ function renderDataHubRecent(type) {
 function setDataHubOpen(open) {
   dataHubOpen = open
   document.body.classList.toggle("data-hub-open", open)
+  // 左上のボタン：トップでは「‹ Menu」（メインメニューへ）、各画面では「‹ Top」（データのトップへ）
   const back = document.getElementById("dataHubBack")
-  if (back) back.hidden = open
+  if (back) back.textContent = open ? "‹ Menu" : "‹ Top"
 }
 
 // 各画面を開くと履歴を 1 つ足し、端末・ブラウザの「戻る」でトップに戻れるようにする
@@ -452,7 +453,10 @@ function initDataHub() {
   const back = document.getElementById("dataHubBack")
   if (back && !back.dataset.ready) {
     back.dataset.ready = "1"
-    back.addEventListener("click", backToDataHub)
+    back.addEventListener("click", () => {
+      if (dataHubOpen) location.href = "index.html"
+      else backToDataHub()
+    })
   }
   bindDataHubPopstate()
   showDataHub()

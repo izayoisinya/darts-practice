@@ -236,10 +236,14 @@ function createSessionCardHtml(session, gameNumber) {
 // ===============================
 // ===== History（全ゲームを 1 か所に） =====
 // ===============================
-// Games 画面の右の History は、Count-Up・01・Cricket の全ゲームを新しい順に 1 本の一覧で出す
-// （左の Stats はヘッダーで選んだゲームのもの）。カードの中身はゲームごとの形（createSessionCardHtml /
-// createZeroOneCardHtml / createCricketCardHtml）で、見出しにゲームの種類の印を付ける。番号はゲームごとの通し番号
+// History（記録）の画面は、Count-Up・01・Cricket の全ゲームを新しい順に 1 本の一覧で出す。
+// 上のボタン（All / Count-Up / 01 / Cricket）でゲームの種類を絞り込める（historyFilter）。
+// カードの中身はゲームごとの形（createSessionCardHtml / createZeroOneCardHtml / createCricketCardHtml）で、
+// 見出しにゲームの種類の印を付ける。番号はゲームごとの通し番号（絞り込んでも変わらない）
 const HISTORY_GAME_LABELS = { countup: "Count-Up", "01": "01", cricket: "Cricket" }
+
+// History の絞り込み（"all" / "countup" / "01" / "cricket"）
+let historyFilter = "all"
 
 function getHistoryGameType(session) {
   const type = session && (session.gameType || "countup")
@@ -252,8 +256,36 @@ function readHistorySessions() {
   return readSessions().filter(session => getHistoryGameType(session))
 }
 
+// ゲームごとの通し番号を付け、絞り込んだもの（古い順。[{ session, type, number }]）
+function getHistoryItems() {
+  const counters = {}
+  return readHistorySessions()
+    .map(session => {
+      const type = getHistoryGameType(session)
+      counters[type] = (counters[type] || 0) + 1
+      return { session, type, number: counters[type] }
+    })
+    .filter(item => historyFilter === "all" || item.type === historyFilter)
+}
+
 function getHistoryTotalPages() {
-  return Math.max(1, Math.ceil(readHistorySessions().length / PAGE_SIZE))
+  return Math.max(1, Math.ceil(getHistoryItems().length / PAGE_SIZE))
+}
+
+function setHistoryFilter(filter) {
+  historyFilter = ["countup", "01", "cricket"].includes(filter) ? filter : "all"
+  currentPage = 1
+  renderHistory()
+  const container = document.getElementById("sessionsContainer")
+  if (container) container.scrollTop = 0
+}
+
+function updateHistoryFilterButtons() {
+  document.querySelectorAll("#historyFilter button").forEach(btn => {
+    const active = btn.dataset.filter === historyFilter
+    btn.classList.toggle("active", active)
+    btn.setAttribute("aria-pressed", active ? "true" : "false")
+  })
 }
 
 function createHistoryCardHtml(session, gameNumber) {
@@ -264,42 +296,38 @@ function createHistoryCardHtml(session, gameNumber) {
 }
 
 function loadSessions() {
-  
-  const sessions = readHistorySessions()
-  
+
+  const items = getHistoryItems()
+
   const container = document.getElementById("sessionsContainer")
   container.innerHTML = ""
-  
-  if (!sessions.length) {
-    container.innerHTML = "<p>No data</p>"
+  updateHistoryFilterButtons()
+
+  if (!items.length) {
+    container.innerHTML = '<p class="history-empty">No data</p>'
     return
   }
 
-  // ゲームごとの通し番号（古い順に 1, 2, ...）
-  const counters = {}
-  const numbers = sessions.map(session => {
-    const type = getHistoryGameType(session)
-    counters[type] = (counters[type] || 0) + 1
-    return counters[type]
-  })
-  
-  const totalPages = Math.max(1, Math.ceil(sessions.length / PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
   currentPage = Math.min(Math.max(1, currentPage), totalPages)
 
   const start = (currentPage - 1) * PAGE_SIZE
 
-  for (let i = sessions.length - 1 - start; i >= 0 && i > sessions.length - 1 - start - PAGE_SIZE; i--) {
-    const session = sessions[i]
-    const type = getHistoryGameType(session)
-    const card = createSessionCardElement(createHistoryCardHtml(session, numbers[i]))
-    card.classList.add(`history-${type === "01" ? "zeroone" : type}`)
+  items.slice().reverse().slice(start, start + PAGE_SIZE).forEach(({ session, type, number }) => {
+    container.appendChild(createHistoryCardElement(session, type, number))
+  })
+}
 
-    const title = card.querySelector(".session-card-header strong")
-    if (title) {
-      title.insertAdjacentHTML("afterbegin", `<span class="history-game-badge">${HISTORY_GAME_LABELS[type]}</span>`)
-    }
-    container.appendChild(card)
+// 履歴カード（見出しにゲームの種類の印）。データのトップの「その日のゲーム」でも使う
+function createHistoryCardElement(session, type, number) {
+  const card = createSessionCardElement(createHistoryCardHtml(session, number))
+  card.classList.add(`history-${type === "01" ? "zeroone" : type}`)
+
+  const title = card.querySelector(".session-card-header strong")
+  if (title) {
+    title.insertAdjacentHTML("afterbegin", `<span class="history-game-badge">${HISTORY_GAME_LABELS[type]}</span>`)
   }
+  return card
 }
 
 // History を描いてページ送りの表示も合わせる

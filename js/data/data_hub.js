@@ -1,32 +1,23 @@
 // ===============================
 // ===== データ画面のトップ =========
 // ===============================
-// データ画面を開いたときに最初に出す画面。選んでいるゲーム（Count-Up / 01 / Cricket）の成績のまとめと、
-// 見る画面（Games・Analysis）のカード・練習した日のカレンダー・最近のゲームを出し、選んだ画面を開く。
+// データ画面を開いたときに最初に出す画面。全ゲーム（Count-Up・01・Cricket をまとめて）の練習のまとめと、
+// 見る画面（History：記録 / Stats：分析）のカード・練習した日のカレンダー・選んだ日のメモとゲームを出す。
+// ゲームの種類はトップでは分けない（Stats の画面のヘッダーで選ぶ）。
 // 各画面ではヘッダーの「‹ Top」でこの画面に戻る。body に data-hub-open を付けている間は、ふつうの表示（main）を隠す
 
 let dataHubOpen = false
 
-// 見る画面のカード（Count-Up。表示・非表示は設定画面の Data Tabs に従う：data.js の getVisibleViews()。
-// 今は Games と Analysis だけ。Day / Week / Month / Year は一旦お休みで、日付はトップのカレンダーで見る）
+// 見る画面のカード（2026.10.10 から「記録」と「分析」の 2 つ。もとの Analysis は Count-Up の Stats にまとめた）
 const DATA_HUB_VIEWS = {
-  game: { title: "Games", desc: "1 ゲームずつの記録・スコアの推移・全体の Stats・レーティング", icon: "list" },
-  analysis: { title: "Analysis", desc: "ヒートマップ・RANGE・タグ別の散布図・期間の比較", icon: "target" },
-  day: { title: "Day", desc: "日ごとのまとめ・メモとタグ・カレンダー", icon: "calendar" },
-  week: { title: "Week", desc: "週ごとのまとめ", icon: "calendar" },
-  month: { title: "Month", desc: "月ごとのまとめ", icon: "calendar" },
-  year: { title: "Year", desc: "年ごとのまとめ", icon: "calendar" }
-}
-
-// 01・クリケットは Games の画面だけ
-const DATA_HUB_GAME_DESC = {
-  "01": "上がり率・上がるまでのダーツ数・RANGE・レーティング・1 ゲームずつの記録",
-  cricket: "MPR・クローズ率・数字ごとのマーク・レーティング・1 ゲームずつの記録"
+  history: { title: "History", desc: "全ゲームの記録を新しい順に。ゲームの種類で絞り込めます", icon: "list" },
+  stats: { title: "Stats", desc: "ゲームの種類ごとの成績・推移・レーティング。Count-Up はヒートマップ・タグ別の散布図・期間の比較も", icon: "chart" }
 }
 
 function getDataHubIcon(name) {
   const icons = {
     list: '<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1.2"/><circle cx="4" cy="12" r="1.2"/><circle cx="4" cy="18" r="1.2"/>',
+    chart: '<path d="M3 20h18"/><path d="M4 16l5-5 4 3 7-8"/><circle cx="9" cy="11" r="1.2"/><circle cx="13" cy="14" r="1.2"/>',
     target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
     calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'
   }
@@ -39,106 +30,37 @@ function formatDataHubDate(time) {
   return `${date.getMonth() + 1}/${date.getDate()}`
 }
 
-// ゲームごとの成績のまとめ（[ラベル, 値] の配列）
-function getDataHubSummary(type) {
-
-  const average = list => list.length ? list.reduce((a, b) => a + b, 0) / list.length : 0
-
-  if (type === "01") {
-    const list = typeof readZeroOneSessions === "function" ? readZeroOneSessions() : []
-    const finished = list.filter(s => s.zeroOne.finished)
-    const darts = finished.map(s => s.zeroOne.finishDarts).filter(n => n > 0)
-    return {
-      count: list.length,
-      items: [
-        ["Games", list.length],
-        ["Finish Rate", list.length ? `${Math.round(finished.length / list.length * 100)}%` : "-"],
-        ["Avg Darts", darts.length ? average(darts).toFixed(1) : "-"],
-        ["Best Darts", darts.length ? Math.min(...darts) : "-"],
-        ["Last Played", formatDataHubDate(list.length ? list[list.length - 1].date : 0)]
-      ]
-    }
-  }
-
-  if (type === "cricket") {
-    const list = typeof readCricketSessions === "function" ? readCricketSessions() : []
-    const mprs = list.map(s => s.cricket.mpr)
-    return {
-      count: list.length,
-      items: [
-        ["Games", list.length],
-        ["Avg MPR", list.length ? average(mprs).toFixed(2) : "-"],
-        ["Best MPR", list.length ? Math.max(...mprs).toFixed(2) : "-"],
-        ["Close Rate", list.length ? `${Math.round(list.filter(s => s.cricket.finished).length / list.length * 100)}%` : "-"],
-        ["Last Played", formatDataHubDate(list.length ? list[list.length - 1].date : 0)]
-      ]
-    }
-  }
-
-  const list = readDataSessions()
-  const scores = list.map(s => Number(s.score) || 0)
-  return {
-    count: list.length,
-    items: [
-      ["Games", list.length],
-      ["Avg Score", list.length ? average(scores).toFixed(1) : "-"],
-      ["Avg PPD", list.length ? average(list.map(s => Number(s.ppd) || 0)).toFixed(2) : "-"],
-      ["Best Score", list.length ? Math.max(...scores) : "-"],
-      ["Last Played", formatDataHubDate(list.length ? list[list.length - 1].date : 0)]
-    ]
-  }
+// 全ゲーム（History と同じもの。古い順）
+function getDataHubSessions() {
+  return typeof readHistorySessions === "function" ? readHistorySessions() : readDataSessions()
 }
 
-// カードの右上に出す件数（ゲーム数・日数など。1 のときは単数）
-function formatDataHubCount(count, unit) {
-  return `${count} ${unit}${count === 1 ? "" : "s"}`
+// 練習のまとめ（[ラベル, 値] の配列。ゲームの種類に関係なく数える）
+function getDataHubSummary(sessions) {
+  const now = new Date()
+  const days = new Set(sessions.map(s => getDataHubDayKey(s.date)))
+  const thisMonth = sessions.filter(s => {
+    const d = new Date(s.date)
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+  })
+  return [
+    ["Games", sessions.length],
+    ["Days", days.size],
+    ["This Month", thisMonth.length],
+    ["Last Played", formatDataHubDate(sessions.length ? sessions[sessions.length - 1].date : 0)]
+  ]
 }
 
-function getDataHubCount(mode, sessions) {
-  if (mode === "game") return formatDataHubCount(sessions.length, "game")
-  if (mode === "analysis") {
-    const hits = sessions.reduce((sum, s) => sum + (s.darts || []).filter(d => d && d.pos).length, 0)
-    return formatDataHubCount(hits, "hit")
-  }
-  return formatDataHubCount(Object.keys(groupSessions(sessions, mode)).length, mode)
-}
-
-// 最近のゲーム（新しい順に 5 つ。[日時, 設定などの説明, 主な数字, 数字の種類]）
-const DATA_HUB_RECENT = 5
-
-function getDataHubRecent(type) {
-
-  const time = value => {
-    const d = new Date(value)
-    const pad = n => String(n).padStart(2, "0")
-    return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
-  }
-
-  if (type === "01") {
-    return (typeof readZeroOneSessions === "function" ? readZeroOneSessions() : [])
-      .slice(-DATA_HUB_RECENT).reverse()
-      .map(s => [
-        time(s.date),
-        typeof formatZeroOneConfigKey === "function" ? formatZeroOneConfigKey(getZeroOneConfigKey(s.zeroOne)) : "",
-        s.zeroOne.finished ? s.zeroOne.finishDarts : s.zeroOne.remaining,
-        s.zeroOne.finished ? "darts" : "left"
-      ])
-  }
-
-  if (type === "cricket") {
-    return (typeof readCricketSessions === "function" ? readCricketSessions() : [])
-      .slice(-DATA_HUB_RECENT).reverse()
-      .map(s => [
-        time(s.date),
-        `R${s.cricket.rounds} · ${s.cricket.finished ? `closed ${s.cricket.finishDarts} darts` : "not closed"}`,
-        s.cricket.mpr.toFixed(2),
-        "MPR"
-      ])
-  }
-
-  return readDataSessions()
-    .slice(-DATA_HUB_RECENT).reverse()
-    .map(s => [time(s.date), `PPD ${Number(s.ppd || 0).toFixed(2)}`, s.score, "score"])
+// ゲームの種類ごとの数（History のカードの下に出す）
+function getDataHubTypeCounts(sessions) {
+  const counts = { countup: 0, "01": 0, cricket: 0 }
+  sessions.forEach(s => {
+    const type = getHistoryGameType(s)
+    if (type) counts[type]++
+  })
+  return Object.keys(counts)
+    .map(type => `${HISTORY_GAME_LABELS[type]} ${counts[type]}`)
+    .join(" · ")
 }
 
 function renderDataHub() {
@@ -146,23 +68,23 @@ function renderDataHub() {
   const hub = document.getElementById("dataHub")
   if (!hub) return
 
-  const type = typeof dataGameType === "string" ? dataGameType : "countup"
-  const summary = getDataHubSummary(type)
+  const sessions = getDataHubSessions()
 
-  let cards
-  if (type === "countup") {
-    const sessions = readDataSessions()
-    const views = typeof getVisibleViews === "function" ? getVisibleViews() : Object.keys(DATA_HUB_VIEWS)
-    cards = views
-      .filter(mode => DATA_HUB_VIEWS[mode])
-      .map(mode => ({ mode, ...DATA_HUB_VIEWS[mode], count: getDataHubCount(mode, sessions) }))
-  } else {
-    cards = [{ mode: "game", ...DATA_HUB_VIEWS.game, desc: DATA_HUB_GAME_DESC[type], count: `${summary.count} games` }]
+  // 日付を選んでいなければ、最後に練習した日を選んでおく（その日のメモとゲームを出す）
+  if (!dataHubSelectedDay && sessions.length) {
+    dataHubSelectedDay = getDataHubDayKey(sessions[sessions.length - 1].date)
   }
+
+  const statsType = typeof dataGameType === "string" ? dataGameType : "countup"
+  const cards = [
+    { mode: "history", ...DATA_HUB_VIEWS.history, count: `${sessions.length} games`, note: getDataHubTypeCounts(sessions) },
+    // Stats は前回見ていたゲームから開く
+    { mode: "stats", ...DATA_HUB_VIEWS.stats, count: HISTORY_GAME_LABELS[statsType] }
+  ]
 
   hub.innerHTML = `
     <section class="data-hub-summary" aria-label="まとめ">
-      ${summary.items.map(([label, value]) => `
+      ${getDataHubSummary(sessions).map(([label, value]) => `
         <div class="data-hub-stat">
           <span class="data-hub-stat-label">${label}</span>
           <span class="data-hub-stat-value">${value}</span>
@@ -172,36 +94,36 @@ function renderDataHub() {
 
     <section class="data-hub-views">
       ${cards.map(card => `
-        <button type="button" class="data-hub-card${card.mode === "game" ? " primary" : ""}" data-hub-view="${card.mode}">
+        <button type="button" class="data-hub-card${card.mode === "history" ? " primary" : ""}" data-hub-view="${card.mode}">
           <span class="data-hub-card-top">
             ${getDataHubIcon(card.icon)}
             <span class="data-hub-card-count">${card.count}</span>
           </span>
           <span class="data-hub-card-title">${card.title}</span>
           <span class="data-hub-card-desc">${card.desc}</span>
+          ${card.note ? `<span class="data-hub-card-note">${card.note}</span>` : ""}
         </button>
       `).join("")}
     </section>
 
     <div class="data-hub-bottom">
-      ${renderDataHubCalendar(type)}
-      ${dataHubSelectedDay ? renderDataHubDay(type) : renderDataHubRecent(type)}
+      ${renderDataHubCalendar(sessions)}
+      ${dataHubSelectedDay ? renderDataHubDay(sessions) : ""}
     </div>
 
-    ${type === "countup" ? "" : '<p class="data-hub-note">Analysis は、今は Count-Up の記録だけを集計しています。</p>'}
-    ${summary.count ? "" : '<p class="data-hub-note">まだ記録がありません。ゲームを終えると、ここに成績が出ます。</p>'}
+    ${sessions.length ? "" : '<p class="data-hub-note">まだ記録がありません。ゲームを終えると、ここに練習の記録が出ます。</p>'}
   `
 
   hub.querySelectorAll("[data-hub-view]").forEach(btn => {
     btn.addEventListener("click", () => openDataView(btn.dataset.hubView))
   })
 
-  // 選んだ日のゲーム（Games 画面と同じ履歴カード。押すと開く）
-  if (dataHubSelectedDay) fillDataHubDay(type)
+  // 選んだ日のゲーム（History と同じ履歴カード。押すと開く）
+  if (dataHubSelectedDay) fillDataHubDay(sessions)
 
   hub.querySelectorAll("[data-hub-day]").forEach(btn => {
     btn.addEventListener("click", () => {
-      dataHubSelectedDay = dataHubSelectedDay === btn.dataset.hubDay ? null : btn.dataset.hubDay
+      dataHubSelectedDay = btn.dataset.hubDay
       renderDataHub()
       // 縦に並んでいるとき（スマホ縦など）は、出したゲームの一覧が見えるところまで送る
       const list = document.getElementById("dataHubDay")
@@ -211,14 +133,6 @@ function renderDataHub() {
 
   const memo = hub.querySelector("[data-hub-day-memo]")
   if (memo) memo.addEventListener("click", () => openDayNoteEditor(dataHubSelectedDay, memo.dataset.label))
-
-  const close = hub.querySelector("[data-hub-day-close]")
-  if (close) {
-    close.addEventListener("click", () => {
-      dataHubSelectedDay = null
-      renderDataHub()
-    })
-  }
 
   hub.querySelectorAll("[data-hub-month]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -232,11 +146,11 @@ function renderDataHub() {
 // ===============================
 // ===== カレンダー ================
 // ===============================
-// 選んでいるゲームを練習した日に印を付ける（その日のゲーム数を小さく出す）。‹ › で月を切り替える。
-// 練習した日を押すと、Recent Games の代わりにその日のゲーム（履歴カード）を出す。もう一度押すか Recent で戻す
-// その日のメモ・タグも出し、Memo ボタンで編集できる（タグは Analysis のタグ別散布図の色分けに使う）。メモのある日はカレンダーに印
+// 練習した日（全ゲーム）に印を付ける（その日のゲーム数を小さく出す）。‹ › で月を切り替える。
+// 練習した日を押すと、その日のメモとゲーム（履歴カード）を横（縦向きは下）に出す。最初は最後に練習した日を選んでおく
+// メモ・タグは Memo ボタンで編集できる（タグは Count-Up の Stats のタグ別散布図の色分けに使う）。メモのある日はカレンダーに印
 let dataHubCalendarMonth = null
-// カレンダーで選んだ日（"YYYY-MM-DD"）。選んでいる間は Recent Games の代わりにその日のゲームを出す
+// カレンダーで選んだ日（"YYYY-MM-DD"）
 let dataHubSelectedDay = null
 
 function getDataHubDayKey(time) {
@@ -245,14 +159,13 @@ function getDataHubDayKey(time) {
 }
 
 // 選んだ日のゲームの一覧（中身は fillDataHubDay() で入れる）
-function renderDataHubDay(type) {
-  const sessions = getDataHubSessions(type).filter(s => getDataHubDayKey(s.date) === dataHubSelectedDay)
+function renderDataHubDay(all) {
+  const sessions = all.filter(s => getDataHubDayKey(s.date) === dataHubSelectedDay)
   const [, m, d] = dataHubSelectedDay.split("-").map(Number)
   return `
     <section class="data-hub-recent data-hub-day" id="dataHubDay">
       <div class="data-hub-day-top">
         <h3 class="data-hub-section-title">${m}/${d} Games（${sessions.length}）</h3>
-        <button type="button" class="data-hub-day-close" data-hub-day-close>Recent</button>
       </div>
       ${renderDataHubDayNote(m, d)}
       <div id="dataHubDayList" class="data-hub-day-list"></div>
@@ -282,33 +195,25 @@ function renderDataHubDayNote(m, d) {
   `
 }
 
-// 選んだ日のゲームを、Games 画面と同じ履歴カードで出す（Game の番号は全体の通し番号。新しい順）
-function fillDataHubDay(type) {
+// 選んだ日のゲームを、History と同じ履歴カードで出す（見出しにゲームの種類の印。番号はゲームごとの通し番号。新しい順）
+function fillDataHubDay(all) {
 
   const box = document.getElementById("dataHubDayList")
   if (!box) return
 
-  const all = getDataHubSessions(type)
-  const createHtml = type === "01"
-    ? createZeroOneCardHtml
-    : type === "cricket" ? createCricketCardHtml : createSessionCardHtml
-
+  const counters = {}
   all
-    .map((session, index) => ({ session, number: index + 1 }))
+    .map(session => {
+      const type = getHistoryGameType(session)
+      counters[type] = (counters[type] || 0) + 1
+      return { session, type, number: counters[type] }
+    })
     .filter(item => getDataHubDayKey(item.session.date) === dataHubSelectedDay)
     .reverse()
-    .forEach(item => box.appendChild(createSessionCardElement(createHtml(item.session, item.number))))
+    .forEach(item => box.appendChild(createHistoryCardElement(item.session, item.type, item.number)))
 }
 
-function getDataHubSessions(type) {
-  if (type === "01") return typeof readZeroOneSessions === "function" ? readZeroOneSessions() : []
-  if (type === "cricket") return typeof readCricketSessions === "function" ? readCricketSessions() : []
-  return readDataSessions()
-}
-
-function renderDataHubCalendar(type) {
-
-  const sessions = getDataHubSessions(type)
+function renderDataHubCalendar(sessions) {
 
   // 最初は最後に遊んだ月（記録がなければ今月）
   if (!dataHubCalendarMonth) {
@@ -373,32 +278,11 @@ function renderDataHubCalendar(type) {
   `
 }
 
-function renderDataHubRecent(type) {
-
-  const rows = getDataHubRecent(type)
-  if (!rows.length) return ""
-
-  return `
-    <section class="data-hub-recent">
-      <h3 class="data-hub-section-title">Recent Games</h3>
-      <div class="data-hub-recent-list">
-        ${rows.map(([when, desc, value, unit]) => `
-          <button type="button" class="data-hub-recent-row" data-hub-view="game">
-            <span class="data-hub-recent-time">${when}</span>
-            <span class="data-hub-recent-desc">${desc}</span>
-            <span class="data-hub-recent-value">${value}<small>${unit}</small></span>
-          </button>
-        `).join("")}
-      </div>
-    </section>
-  `
-}
-
 function setDataHubOpen(open) {
   dataHubOpen = open
   document.body.classList.toggle("data-hub-open", open)
-  // トップではゲームの切り替えを出す（Analysis で隠していたのを戻す）
-  if (open) document.body.classList.remove("data-analysis-view")
+  // トップではゲームの切り替え（Stats 用）もページ送り（History 用）も出さない
+  if (open) document.body.classList.remove("data-history-view", "data-stats-view")
   // 左上のボタン：トップでは「‹ Menu」（メインメニューへ）、各画面では「‹ Top」（データのトップへ）
   const back = document.getElementById("dataHubBack")
   if (back) back.textContent = open ? "‹ Menu" : "‹ Top"
@@ -438,7 +322,7 @@ function showDataHub() {
   if (hub) hub.scrollTop = 0
 }
 
-// 選んだ画面を開く（01・クリケットは Games の画面だけ）
+// 選んだ画面を開く（"history" / "stats"）
 function openDataView(mode) {
 
   setDataHubOpen(false)
@@ -450,29 +334,11 @@ function openDataView(mode) {
     window.history.pushState({ dataView: mode }, "")
   }
 
-  if (dataGameType === "countup") {
-    changeView(mode)
-  } else {
-    // 01・クリケットの表示は隠れている間に描いたグラフの大きさが 0 になっているので描き直す
-    setDataGameType(dataGameType)
-  }
-
-  // 縦向き（1 パネル表示）は、Games は History から、Analysis は Stats（1 列）を出す
-  if (typeof isPhonePortraitDataView === "function" && isPhonePortraitDataView() && typeof setDataPanel === "function") {
-    setDataPanel(mode === "analysis" ? "stats" : "history")
-  }
+  changeView(mode)
 
   requestAnimationFrame(() => {
     if (typeof redrawVisibleCharts === "function") redrawVisibleCharts()
   })
-}
-
-// ヘッダーのゲームの切り替え：トップを出しているときは、トップの中身だけ描き直す
-const setDataGameTypeForViews = typeof setDataGameType === "function" ? setDataGameType : null
-window.setDataGameType = function (type) {
-  if (dataHubOpen && type !== dataGameType) dataHubSelectedDay = null
-  if (setDataGameTypeForViews) setDataGameTypeForViews(type)
-  if (dataHubOpen) renderDataHub()
 }
 
 function initDataHub() {

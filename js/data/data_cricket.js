@@ -2,7 +2,7 @@
 // ===== データ画面のクリケット ====
 // ===============================
 // クリケットの記録の表示（MPR・クローズ率・クローズまでのダーツ数・推移・数字ごとのマーク・一覧）。
-// 01 と同じく、カウントアップと同じ場所（右の History・左の Stats）に出す（切り替えは data_01.js の setDataGameType()）
+// 01 と同じく、カウントアップの Stats と同じ場所（#leftPanel）に成績を出す（切り替えは data_01.js の setDataGameType()）
 
 const DATA_CRICKET_CHART_GAMES = 30
 const DATA_CRICKET_RATING_GAMES = 30
@@ -70,8 +70,7 @@ function formatCricketTarget(target) {
 function renderCricketData() {
 
   const panel = document.getElementById("zeroOneStatsPanel")
-  const history = document.getElementById("sessionsContainer")
-  if (!panel || !history) return
+  if (!panel) return
 
   const sessions = readCricketSessions()
 
@@ -83,8 +82,6 @@ function renderCricketData() {
         <button type="button" class="z1-play" onclick="location.href = 'countup.html?game=cricket'">クリケットを始める</button>
       </section>
     `
-    // History は全ゲームの一覧（data_loader.js）なので、クリケットの記録がなくてもほかのゲームは出す
-    renderHistory()
     return
   }
 
@@ -138,8 +135,6 @@ function renderCricketData() {
     renderCricketData()
   })
 
-  // History は全ゲームを 1 か所に出す（data_loader.js の renderHistory()）
-  renderHistory()
   requestAnimationFrame(() => drawCricketChart(list))
 }
 

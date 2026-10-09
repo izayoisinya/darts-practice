@@ -22,7 +22,6 @@ const DATA_CRICKET_AWARD_LABELS = [
 ]
 
 let dataCricketRounds = "all"
-let dataCricketPage = 1
 
 function readCricketSessions() {
   return readSessions().filter(session => session && session.gameType === "cricket" && session.cricket)
@@ -84,8 +83,8 @@ function renderCricketData() {
         <button type="button" class="z1-play" onclick="location.href = 'countup.html?game=cricket'">クリケットを始める</button>
       </section>
     `
-    history.innerHTML = "<p>No data</p>"
-    updateCricketPagination(0)
+    // History は全ゲームの一覧（data_loader.js）なので、クリケットの記録がなくてもほかのゲームは出す
+    renderHistory()
     return
   }
 
@@ -136,11 +135,11 @@ function renderCricketData() {
   select.value = dataCricketRounds
   select.addEventListener("change", () => {
     dataCricketRounds = select.value
-    dataCricketPage = 1
     renderCricketData()
   })
 
-  renderCricketHistory(list)
+  // History は全ゲームを 1 か所に出す（data_loader.js の renderHistory()）
+  renderHistory()
   requestAnimationFrame(() => drawCricketChart(list))
 }
 
@@ -238,26 +237,9 @@ function renderCricketTargetMarks(list) {
 
 
 // ===============================
-// ===== History ==================
+// ===== History のカード ===========
 // ===============================
-function renderCricketHistory(list) {
-
-  const container = document.getElementById("sessionsContainer")
-  container.innerHTML = ""
-
-  const reversed = list.slice().reverse()
-  const totalPages = Math.max(1, Math.ceil(reversed.length / PAGE_SIZE))
-  dataCricketPage = Math.min(Math.max(1, dataCricketPage), totalPages)
-
-  const start = (dataCricketPage - 1) * PAGE_SIZE
-  reversed.slice(start, start + PAGE_SIZE).forEach((session, index) => {
-    const gameNumber = reversed.length - (start + index)
-    container.appendChild(createSessionCardElement(createCricketCardHtml(session, gameNumber)))
-  })
-
-  updateCricketPagination(totalPages)
-}
-
+// History は全ゲームで 1 つの一覧（data_loader.js の renderHistory()）。クリケットのゲームはこのカードで出す
 function createCricketCardHtml(session, gameNumber) {
 
   const c = session.cricket
@@ -347,21 +329,7 @@ function countCricketClosed(session) {
   return DATA_CRICKET_TARGETS.filter(target => counts[target] >= 3).length
 }
 
-function updateCricketPagination(totalPages) {
-  const info = document.getElementById("pageInfo")
-  const prev = document.getElementById("prevBtn")
-  const next = document.getElementById("nextBtn")
-  if (info) info.textContent = `${totalPages ? dataCricketPage : 0} / ${totalPages}`
-  if (prev) prev.disabled = dataCricketPage <= 1
-  if (next) next.disabled = dataCricketPage >= totalPages
-}
 
-function changeCricketPage(direction) {
-  dataCricketPage += direction === "Prev" ? -1 : 1
-  renderCricketHistory(getCricketFilteredSessions())
-  const container = document.getElementById("sessionsContainer")
-  if (container) container.scrollTop = 0
-}
 
 
 // ===============================

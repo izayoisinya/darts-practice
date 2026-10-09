@@ -279,6 +279,11 @@ const INFO_CONTENT = {
       date: "2026/10/09",
       badge: "UI",
       text: "設定・Info・データ画面の左上に「‹ Menu」ボタンを付け、メインメニューに戻れるようにしました。"
+    },
+    {
+      date: "2026/10/09",
+      badge: "UI",
+      text: "データ画面の Games の History を、Count-Up・01・Cricket の全ゲームを新しい順に並べた 1 つの一覧にしました。カードの見出しの印でゲームの種類が分かります。"
     }
   ],
   notice: [

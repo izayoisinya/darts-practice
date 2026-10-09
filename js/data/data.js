@@ -326,13 +326,9 @@ function changeView(mode) {
     currentPage = 1
     groupedPageMode = 'game'
     
-    const sessions = readDataSessions()
-    
-    const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
-    
     loadStats()
-    loadSessions()
-    updatePaginationUI(totalPages)
+    // History は Count-Up・01・Cricket の全ゲーム（data_loader.js の renderHistory()）
+    renderHistory()
     drawGameScoresChart()
   } else if (mode === "analysis") {
     groupedPageMode = "analysis"

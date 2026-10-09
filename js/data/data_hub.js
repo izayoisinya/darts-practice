@@ -209,6 +209,9 @@ function renderDataHub() {
     })
   })
 
+  const memo = hub.querySelector("[data-hub-day-memo]")
+  if (memo) memo.addEventListener("click", () => openDayNoteEditor(dataHubSelectedDay, memo.dataset.label))
+
   const close = hub.querySelector("[data-hub-day-close]")
   if (close) {
     close.addEventListener("click", () => {
@@ -231,6 +234,7 @@ function renderDataHub() {
 // ===============================
 // 選んでいるゲームを練習した日に印を付ける（その日のゲーム数を小さく出す）。‹ › で月を切り替える。
 // 練習した日を押すと、Recent Games の代わりにその日のゲーム（履歴カード）を出す。もう一度押すか Recent で戻す
+// その日のメモ・タグも出し、Memo ボタンで編集できる（タグは Analysis のタグ別散布図の色分けに使う）。メモのある日はカレンダーに印
 let dataHubCalendarMonth = null
 // カレンダーで選んだ日（"YYYY-MM-DD"）。選んでいる間は Recent Games の代わりにその日のゲームを出す
 let dataHubSelectedDay = null
@@ -250,8 +254,31 @@ function renderDataHubDay(type) {
         <h3 class="data-hub-section-title">${m}/${d} Games（${sessions.length}）</h3>
         <button type="button" class="data-hub-day-close" data-hub-day-close>Recent</button>
       </div>
+      ${renderDataHubDayNote(m, d)}
       <div id="dataHubDayList" class="data-hub-day-list"></div>
     </section>
+  `
+}
+
+// 選んだ日のメモ（コメント・タグ・画像の有無）と、編集画面を開く Memo ボタン（編集画面は data_grouped.js の openDayNoteEditor()）
+function renderDataHubDayNote(m, d) {
+  const note = getDayNote(dataHubSelectedDay)
+  const tags = note.tags || []
+  const has = note.comment || tags.length || note.imageData
+  const body = has
+    ? `
+      ${note.comment ? `<p class="data-hub-note-text">${escapeHtml(note.comment)}</p>` : ""}
+      ${tags.length || note.imageData ? `<div class="group-note-chip-row">
+        ${tags.map(tag => `<span class="group-note-chip">#${escapeHtml(tag)}</span>`).join("")}
+        ${note.imageData ? '<span class="group-note-image-badge">IMG</span>' : ""}
+      </div>` : ""}
+    `
+    : '<p class="data-hub-note-empty">メモ・タグはまだありません</p>'
+  return `
+    <div class="data-hub-day-note">
+      <div class="data-hub-day-note-body">${body}</div>
+      <button type="button" class="group-note-edit-btn" data-hub-day-memo data-label="${m}/${d}">${has ? "Memo" : "+ Memo"}</button>
+    </div>
   `
 }
 
@@ -289,6 +316,7 @@ function renderDataHubCalendar(type) {
     dataHubCalendarMonth = new Date(base.getFullYear(), base.getMonth(), 1)
   }
 
+  const notes = getAllDayNotes()
   const year = dataHubCalendarMonth.getFullYear()
   const month = dataHubCalendarMonth.getMonth()
 
@@ -318,6 +346,9 @@ function renderDataHubCalendar(type) {
     if (isThisMonth && today.getDate() === d) cls.push("today")
     const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
     if (key === dataHubSelectedDay) cls.push("selected")
+    // メモ・タグのある日は右上に小さな印
+    const note = notes[key]
+    if (note && (note.comment || (note.tags || []).length || note.imageData)) cls.push("has-note")
     const inner = `<span class="data-hub-cal-num">${d}</span>` +
       `${count ? `<span class="data-hub-cal-count">${count}</span>` : ""}`
     // 練習した日は押すとその日のゲームを出す

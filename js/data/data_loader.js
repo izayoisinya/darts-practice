@@ -239,7 +239,7 @@ function createSessionCardHtml(session, gameNumber) {
 // History（記録）の画面は、Count-Up・01・Cricket の全ゲームを新しい順に 1 本の一覧で出す。
 // 上のボタン（All / Count-Up / 01 / Cricket）でゲームの種類を絞り込める（historyFilter）。
 // カードの中身はゲームごとの形（createSessionCardHtml / createZeroOneCardHtml / createCricketCardHtml）で、
-// 見出しにゲームの種類の印を付ける。番号はゲームごとの通し番号（絞り込んでも変わらない）
+// 見出しはゲームの種類の印だけ（「Game n」の番号は出さない）
 const HISTORY_GAME_LABELS = { countup: "Count-Up", "01": "01", cricket: "Cricket" }
 
 // History の絞り込み（"all" / "countup" / "01" / "cricket"）
@@ -256,7 +256,7 @@ function readHistorySessions() {
   return readSessions().filter(session => getHistoryGameType(session))
 }
 
-// ゲームごとの通し番号を付け、絞り込んだもの（古い順。[{ session, type, number }]）
+// 絞り込んだ履歴（古い順。[{ session, type, number }]。number はカードを作る関数に渡すだけで、見出しには出さない）
 function getHistoryItems() {
   const counters = {}
   return readHistorySessions()
@@ -323,9 +323,10 @@ function createHistoryCardElement(session, type, number) {
   const card = createSessionCardElement(createHistoryCardHtml(session, number))
   card.classList.add(`history-${type === "01" ? "zeroone" : type}`)
 
+  // 見出しはゲームの種類だけ（「Game n」の番号は種類ごとに数えていて分かりにくいので出さない）
   const title = card.querySelector(".session-card-header strong")
   if (title) {
-    title.insertAdjacentHTML("afterbegin", `<span class="history-game-badge">${HISTORY_GAME_LABELS[type]}</span>`)
+    title.innerHTML = `<span class="history-game-badge">${HISTORY_GAME_LABELS[type]}</span>`
   }
   return card
 }

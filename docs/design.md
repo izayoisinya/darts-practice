@@ -236,7 +236,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 - 上に、全ゲームの練習のまとめ（4 つ）：Games・Days（練習した日数）・This Month（今月のゲーム数）・Last Played（`getDataHubSummary()`）
 - その下に、見る画面のカード（History・Stats の 2 つ）。History は全体のゲーム数とゲームの種類ごとの数、Stats は開いたときに出すゲーム（前回見ていたもの）を出す
-- Calendar：全ゲームを練習した日に印を付け、その日のゲーム数を小さく出す（5 ゲーム以上は濃く。今日は白い枠）。練習した日を押すと、その日のメモとゲームを横（縦向きは下）に出す。最初は最後に練習した日を選んでおく（`renderDataHubDay()` / `fillDataHubDay()`。ゲームは History と同じ履歴カードで、見出しにゲームの種類の印。押すと開く。番号はゲームごとの通し番号、新しい順。選んだ日は濃く光らせる。履歴カードの開閉の見た目は `#sessionsContainer` と同じ指定を `#dataHubDayList` にも当てる）。‹ › で月を切り替え、最初は最後に遊んだ月。下にその月の日数・ゲーム数（`renderDataHubCalendar()`）
+- Calendar：全ゲームを練習した日に印を付け、その日のゲーム数を小さく出す（5 ゲーム以上は濃く。今日は白い枠）。練習した日を押すと、その日のメモとゲームを横（縦向きは下）に出す。最初は最後に練習した日を選んでおく（`renderDataHubDay()` / `fillDataHubDay()`。ゲームは History と同じ履歴カードで、見出しはゲームの種類の印だけ。押すと開く。新しい順。選んだ日は濃く光らせる。履歴カードの開閉の見た目は `#sessionsContainer` と同じ指定を `#dataHubDayList` にも当てる）。‹ › で月を切り替え、最初は最後に遊んだ月。下にその月の日数・ゲーム数（`renderDataHubCalendar()`）
 - 日別メモ：選んだ日のゲームの上に、その日のメモ（コメント・タグ・画像の有無）と「Memo」ボタン（メモが無ければ「+ Memo」）を出す（`renderDataHubDayNote()`）。ボタンで Day 一覧のときと同じ編集画面（`data_grouped.js` の `openDayNoteEditor()`）を開き、保存するとトップを描き直す（保存後の描き直しは、トップを開いていれば `renderDataHub()`、Day などの一覧なら `displayGroupedPage()`）。メモ・タグのある日はカレンダーの右上に黄色の小さな印（`.has-note`）。タグは Count-Up の Stats のタグ別散布図の色分けに使う
 - **Day / Week / Month / Year は一旦お休み**（2026.10.8。日付はトップのカレンダーで見る）。コード（`data_grouped.js` / `data_detail.js`）は残してあり、`changeView("day")` などで開ける
 - カードを押すとその画面を開き（`openDataView("history" | "stats")`）、ヘッダーの左上のボタンを「‹ Top」にしてトップに戻れるようにする（`backToDataHub()`。トップでは同じボタンが「‹ Menu」でメインメニューへ）。画面を開くときに履歴を 1 つ足すので、端末・ブラウザの「戻る」でもトップに戻る（Day の詳細ビューを開いているときは、まず詳細を閉じる）
@@ -268,7 +268,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 <img src="images/data_phone.jpg" alt="データ表示画面（スマホ縦）" width="240">
 
-**History を 1 か所に**（`data_loader.js` の `loadSessions()` / `renderHistory()`）：History は Count-Up・01・Cricket の全ゲームを新しい順に 1 本の一覧で出す。カードの中身はゲームごとの形で、見出しの「Game n」の左にゲームの種類の印（Count-Up 緑・01 青・Cricket 金。`.history-game-badge`。`createHistoryCardElement()`）を付ける。番号はゲームごとの通し番号（`getHistoryItems()`）。上のボタンで種類を絞り込める（`historyFilter`）。ページ送り（フッターの Prev / Next）は 1 つで、History を開くたびに 1 ページ目から。01 の設定・クリケットのラウンド数での絞り込みは Stats だけにかかる
+**History を 1 か所に**（`data_loader.js` の `loadSessions()` / `renderHistory()`）：History は Count-Up・01・Cricket の全ゲームを新しい順に 1 本の一覧で出す。カードの中身はゲームごとの形で、見出しはゲームの種類の印だけにする（Count-Up 緑・01 青・Cricket 金。`.history-game-badge`。`createHistoryCardElement()` が「Game n」を置き換える。番号は種類ごとに数えていて全ゲームの一覧では分かりにくいため、2026.10.10 から出さない）。上のボタンで種類を絞り込める（`historyFilter`）。ページ送り（フッターの Prev / Next）は 1 つで、History を開くたびに 1 ページ目から。01 の設定・クリケットのラウンド数での絞り込みは Stats だけにかかる
 
 #### 4.3.1 01 の記録（`data_01.js`）
 
@@ -276,7 +276,7 @@ Stats の画面のヘッダー右の **Count-Up / 01 / Cricket** で切り替え
 
 レイアウトとデザインはカウントアップの Stats とそろえ、同じ場所に同じ部品で出す。
 
-- **History**：Count-Up・01・Cricket の全ゲームを 1 つの一覧に出す（上の「History を 1 か所に」）。01 のゲームは同じ形のカード（Game n・日時・3 つの数字・押すと開いて Round Scores と Awards。`createZeroOneCardHtml()`）。数字は Out Darts（上がったダーツ数。金）か Left（上がれなかった残り。赤）、PPD、80% Stats。下の要約に設定・上がりナンバー（`OUT D16` / `NO OUT`）・ブルとトリプルの本数と割合。開くと Bull / In / T の割合のバーと、20〜15 のトリプルの本数（Triple。カウントアップのカードと同じ）、そのゲームのヒートマップも出す
+- **History**：Count-Up・01・Cricket の全ゲームを 1 つの一覧に出す（上の「History を 1 か所に」）。01 のゲームは同じ形のカード（見出し・日時・3 つの数字・押すと開いて Round Scores と Awards。`createZeroOneCardHtml()`）。数字は Out Darts（上がったダーツ数。金）か Left（上がれなかった残り。赤）、PPD、80% Stats。下の要約に設定・上がりナンバー（`OUT D16` / `NO OUT`）・ブルとトリプルの本数と割合。開くと Bull / In / T の割合のバーと、20〜15 のトリプルの本数（Triple。カウントアップのカードと同じ）、そのゲームのヒートマップも出す
 - **Stats**：`#zeroOneStatsPanel` に出し、カウントアップの欄は隠す
   - 上の選択で設定（点数・上がり方・ラウンド）ごとに絞る（初めは最後に遊んだ設定。All Settings で全部）
   - Stats（`.data-card`）：Games Played・Finish Rate（上がり率）・Avg Darts（上がったゲームの平均ダーツ数）・Best Darts・Average PPD・Finish Rate (Last 10)（直近 10 ゲームの上がり率）
@@ -589,7 +589,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | --- | --- |
 | `initDataPage()` | データ表示画面を初期化する |
 | `loadSessions()` / `renderHistory()` | History の履歴カード（全ゲーム・絞り込み・10 件ずつ）を表示する / ページ送りの表示も合わせる |
-| `getHistoryItems()` / `setHistoryFilter(filter)` | ゲームごとの通し番号を付けて絞り込んだ履歴を返す / History の絞り込みを変えて描き直す |
+| `getHistoryItems()` / `setHistoryFilter(filter)` | 絞り込んだ履歴を返す / History の絞り込みを変えて描き直す |
 | `createHistoryCardElement(session, type, number)` | ゲームの種類の印を付けた履歴カードを作る（トップの「その日のゲーム」でも使う） |
 | `createSessionCardHtml()` | 1 ゲーム分のカードの中身を生成する（縮小表示用の要約 1 行を含む） |
 | `createSessionCardElement()` | カードの外枠を作る（縮小表示・タップで開閉できる状態で作る） |
@@ -1047,3 +1047,4 @@ graph LR
 | 2026.10.9 | データのトップのカレンダーで選んだ日に、日別メモ（コメント・タグ・画像）の表示と「Memo」ボタンを追加（Day 一覧がお休みの間もタグを付けられるように）。メモのある日はカレンダーに印 |
 | 2026.10.10 | ボードを押している間に区画を明るくする方法を `filter: brightness()` から色の直接指定に変更（iPad の Safari で、離したあとに区画の端〔ブルの左端など〕が線になって残ることがあったため） |
 | 2026.10.10 | データ画面を「記録」と「分析」に分けた。トップ（全ゲームのまとめ・History / Stats のカード・カレンダーと選んだ日のメモとゲーム。Recent Games はなくし、最後に練習した日を選んでおく）、History（全ゲームの一覧を 1 列〔広い画面は 2 列〕で。ゲームの種類で絞り込み）、Stats（ヘッダーで選んだゲームの成績。Count-Up はもとの Analysis も続けて出す）。ゲームの種類の切り替えは Stats だけに出す。設定画面の Data Tabs はなくした |
+| 2026.10.10 | 履歴カードの見出しを「Game n」からゲームの種類の印だけに変更（番号は種類ごとの通し番号で、全ゲームの一覧では分かりにくかったため） |

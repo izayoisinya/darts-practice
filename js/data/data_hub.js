@@ -366,6 +366,8 @@ function renderDataHubRecent(type) {
 function setDataHubOpen(open) {
   dataHubOpen = open
   document.body.classList.toggle("data-hub-open", open)
+  // トップではゲームの切り替えを出す（Analysis で隠していたのを戻す）
+  if (open) document.body.classList.remove("data-analysis-view")
   // 左上のボタン：トップでは「‹ Menu」（メインメニューへ）、各画面では「‹ Top」（データのトップへ）
   const back = document.getElementById("dataHubBack")
   if (back) back.textContent = open ? "‹ Menu" : "‹ Top"

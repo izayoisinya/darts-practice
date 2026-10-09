@@ -294,6 +294,8 @@ function showViewSections(mode) {
 
   const main = document.querySelector("main.data-container")
   if (main) main.classList.toggle("analysis-mode", isAnalysis)
+  // Analysis はカウントアップだけを集計するので、ヘッダーのゲームの切り替えとフッター（ページ送り・タブ）は出さない
+  document.body.classList.toggle("data-analysis-view", isAnalysis)
 
   const calendarContainer = document.getElementById("calendarContainer")
   if (calendarContainer) {

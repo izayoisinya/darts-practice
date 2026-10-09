@@ -410,6 +410,9 @@ function openDataView(mode) {
 
   setDataHubOpen(false)
 
+  // History（全ゲームの一覧）は開くたびに 1 ページ目から
+  if (typeof currentPage !== "undefined") currentPage = 1
+
   if (window.history && typeof window.history.pushState === "function" && !isDataViewHistoryState()) {
     window.history.pushState({ dataView: mode }, "")
   }

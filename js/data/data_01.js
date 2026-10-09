@@ -102,9 +102,8 @@ window.addEventListener("resize", () => {
 // ===== 01 の表示 ================
 // ===============================
 // カウントアップと同じ場所・同じ部品で出す（レイアウトとデザインをそろえる）
-//   右（History）：#sessionsContainer に同じ形のカード（Game n・日時・3 つの数字・開くとラウンドのグラフ）。ページ送りもフッターの Prev / Next
+//   右（History）：Count-Up・01・Cricket の全ゲームの一覧（data_loader.js の renderHistory()）。01 のカードは createZeroOneCardHtml()
 //   左（Stats）  ：#zeroOneStatsPanel に Stats・Awards・グラフ・Rating・Finish Numbers（カウントアップの左の欄は隠す）
-let data01Page = 1
 
 function getZeroOneFilteredSessions() {
   const sessions = readZeroOneSessions()
@@ -129,8 +128,8 @@ function renderZeroOneData() {
         <button type="button" class="z1-play" onclick="location.href = 'countup.html?game=01'">01 を始める</button>
       </section>
     `
-    history.innerHTML = "<p>No data</p>"
-    updateZeroOnePagination(0)
+    // History は全ゲームの一覧（data_loader.js）なので、01 の記録がなくてもほかのゲームは出す
+    renderHistory()
     return
   }
 
@@ -185,11 +184,11 @@ function renderZeroOneData() {
   select.value = data01ConfigKey
   select.addEventListener("change", () => {
     data01ConfigKey = select.value
-    data01Page = 1
     renderZeroOneData()
   })
 
-  renderZeroOneHistory(list)
+  // History は全ゲームを 1 か所に出す（data_loader.js の renderHistory()）
+  renderHistory()
   requestAnimationFrame(() => drawZeroOneChart(list))
 }
 
@@ -294,25 +293,6 @@ function renderZeroOneAwardCards(list) {
       </div>
     `)
     .join("")
-}
-
-// History：カウントアップと同じ形のカード（新しい順、PAGE_SIZE ごとにページ送り）
-function renderZeroOneHistory(list) {
-
-  const container = document.getElementById("sessionsContainer")
-  container.innerHTML = ""
-
-  const reversed = list.slice().reverse()
-  const totalPages = Math.max(1, Math.ceil(reversed.length / PAGE_SIZE))
-  data01Page = Math.min(Math.max(1, data01Page), totalPages)
-
-  const start = (data01Page - 1) * PAGE_SIZE
-  reversed.slice(start, start + PAGE_SIZE).forEach((session, index) => {
-    const gameNumber = reversed.length - (start + index)
-    container.appendChild(createSessionCardElement(createZeroOneCardHtml(session, gameNumber)))
-  })
-
-  updateZeroOnePagination(totalPages)
 }
 
 function createZeroOneCardHtml(session, gameNumber) {
@@ -421,14 +401,6 @@ function createZeroOneTripleHtml(session) {
   `
 }
 
-function updateZeroOnePagination(totalPages) {
-  const info = document.getElementById("pageInfo")
-  const prev = document.getElementById("prevBtn")
-  const next = document.getElementById("nextBtn")
-  if (info) info.textContent = `${totalPages ? data01Page : 0} / ${totalPages}`
-  if (prev) prev.disabled = data01Page <= 1
-  if (next) next.disabled = data01Page >= totalPages
-}
 
 // パネルの切り替え（スマホ縦の History / Stats）・回転のあとのグラフの描き直しは、01 のときは 01 のグラフを描く
 const redrawVisibleChartsForCountUp = typeof redrawVisibleCharts === "function" ? redrawVisibleCharts : null
@@ -444,22 +416,7 @@ window.redrawVisibleCharts = function () {
   if (redrawVisibleChartsForCountUp) redrawVisibleChartsForCountUp()
 }
 
-// フッターの Prev / Next は、01 を見ているときは 01 の History のページを送る
-const changePageForCountUp = typeof changePage === "function" ? changePage : null
-window.changePage = function (direction) {
-  if (dataGameType === "cricket") {
-    changeCricketPage(direction)
-    return
-  }
-  if (dataGameType !== "01") {
-    if (changePageForCountUp) changePageForCountUp(direction)
-    return
-  }
-  data01Page += direction === "Prev" ? -1 : 1
-  renderZeroOneHistory(getZeroOneFilteredSessions())
-  const container = document.getElementById("sessionsContainer")
-  if (container) container.scrollTop = 0
-}
+// フッターの Prev / Next：History は全ゲームで 1 つの一覧なので、どのゲームを選んでいても同じ（data_loader.js の changePage()）
 
 // 上がるまでのダーツ数の推移。上がれなかったゲームは上の段に赤い × で出す
 function drawZeroOneChart(list) {

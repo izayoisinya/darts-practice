@@ -57,7 +57,7 @@ manifest.json   PWA マニフェスト
 | game/ | cu_ui.js | COUNT-UP の UI 生成・DOM 操作 |
 | game/ | board_input.js | ボード形式の入力（ダーツボードの SVG 生成・タップ位置の判定）。設定 `inputMode` が `"board"` のとき `createNumberTable()` から使う |
 | game/ | stats.js | スタッツ・アワード計算。**UI 表示・DOM 操作は含まない**（再利用できる形にする） |
-| data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()` |
+| data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()`。Games の History は全ゲームを 1 つの一覧で出す（`renderHistory()`） |
 | data/ | data.js | データ画面の統括（ビュー切替、タブの表示/非表示、Stats/Awards 表示、グラフ、Analysis：タグ別散布図・期間比較） |
 | data/ | data_grouped.js | Day/Week/Month/Year のグループビュー、日別メモ・タグ（今は一旦お休み。データ画面は Games と Analysis だけで、`data.js` の `DATA_VIEW_TABS` に足せば戻せる） |
 | data/ | data_detail.js | グループ内のゲーム一覧（詳細ビュー）、カレンダー、比較 |

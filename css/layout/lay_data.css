@@ -3288,3 +3288,24 @@ button.data-hub-cal-day {
 .phone.landscape .data-hub-card {
   min-height: 100px;
 }
+
+
+/* History の見出しのゲームの種類（全ゲームを 1 つの一覧に出すため。data_loader.js の loadSessions()） */
+.history-game-badge {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 8px;
+
+  border-radius: 999px;
+  border: 1px solid rgb(var(--badge-rgb, var(--accent-rgb)) / 0.55);
+  background: rgb(var(--badge-rgb, var(--accent-rgb)) / 0.14);
+
+  color: rgb(var(--badge-rgb, var(--accent-rgb)));
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  vertical-align: 2px;
+}
+
+.history-zeroone .history-game-badge { --badge-rgb: 77 171 255; }
+.history-cricket .history-game-badge { --badge-rgb: 255 196 64; }

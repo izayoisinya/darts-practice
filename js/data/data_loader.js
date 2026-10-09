@@ -233,9 +233,39 @@ function createSessionCardHtml(session, gameNumber) {
   `
 }
 
+// ===============================
+// ===== History（全ゲームを 1 か所に） =====
+// ===============================
+// Games 画面の右の History は、Count-Up・01・Cricket の全ゲームを新しい順に 1 本の一覧で出す
+// （左の Stats はヘッダーで選んだゲームのもの）。カードの中身はゲームごとの形（createSessionCardHtml /
+// createZeroOneCardHtml / createCricketCardHtml）で、見出しにゲームの種類の印を付ける。番号はゲームごとの通し番号
+const HISTORY_GAME_LABELS = { countup: "Count-Up", "01": "01", cricket: "Cricket" }
+
+function getHistoryGameType(session) {
+  const type = session && (session.gameType || "countup")
+  if (type === "01") return session.zeroOne ? "01" : null
+  if (type === "cricket") return session.cricket ? "cricket" : null
+  return type === "countup" ? "countup" : null
+}
+
+function readHistorySessions() {
+  return readSessions().filter(session => getHistoryGameType(session))
+}
+
+function getHistoryTotalPages() {
+  return Math.max(1, Math.ceil(readHistorySessions().length / PAGE_SIZE))
+}
+
+function createHistoryCardHtml(session, gameNumber) {
+  const type = getHistoryGameType(session)
+  if (type === "01" && typeof createZeroOneCardHtml === "function") return createZeroOneCardHtml(session, gameNumber)
+  if (type === "cricket" && typeof createCricketCardHtml === "function") return createCricketCardHtml(session, gameNumber)
+  return createSessionCardHtml(session, gameNumber)
+}
+
 function loadSessions() {
   
-  const sessions = readDataSessions()
+  const sessions = readHistorySessions()
   
   const container = document.getElementById("sessionsContainer")
   container.innerHTML = ""
@@ -244,19 +274,38 @@ function loadSessions() {
     container.innerHTML = "<p>No data</p>"
     return
   }
-  
-  const reversed = sessions.slice().reverse()
-  
-  const start = (currentPage - 1) * PAGE_SIZE
-  const end = start + PAGE_SIZE
-  
-  const pageData = reversed.slice(start, end)
-  
-  pageData.forEach((s, index) => {
-    const globalIndex = start + index
-    const gameNumber = sessions.length - globalIndex
-    container.appendChild(createSessionCardElement(createSessionCardHtml(s, gameNumber)))
+
+  // ゲームごとの通し番号（古い順に 1, 2, ...）
+  const counters = {}
+  const numbers = sessions.map(session => {
+    const type = getHistoryGameType(session)
+    counters[type] = (counters[type] || 0) + 1
+    return counters[type]
   })
+  
+  const totalPages = Math.max(1, Math.ceil(sessions.length / PAGE_SIZE))
+  currentPage = Math.min(Math.max(1, currentPage), totalPages)
+
+  const start = (currentPage - 1) * PAGE_SIZE
+
+  for (let i = sessions.length - 1 - start; i >= 0 && i > sessions.length - 1 - start - PAGE_SIZE; i--) {
+    const session = sessions[i]
+    const type = getHistoryGameType(session)
+    const card = createSessionCardElement(createHistoryCardHtml(session, numbers[i]))
+    card.classList.add(`history-${type === "01" ? "zeroone" : type}`)
+
+    const title = card.querySelector(".session-card-header strong")
+    if (title) {
+      title.insertAdjacentHTML("afterbegin", `<span class="history-game-badge">${HISTORY_GAME_LABELS[type]}</span>`)
+    }
+    container.appendChild(card)
+  }
+}
+
+// History を描いてページ送りの表示も合わせる
+function renderHistory() {
+  loadSessions()
+  updatePaginationUI(getHistoryTotalPages())
 }
 
 function groupSessions(sessions, mode) {
@@ -411,15 +460,15 @@ function changePage(direction) {
   if (groupedPageMode === "analysis") return
 
   if (groupedPageMode === 'game') {
-    // Game ビュー
-      const sessions = readDataSessions()
-    const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
+    // Game ビュー（全ゲームの History）
+    const totalPages = getHistoryTotalPages()
     
     if (direction === 'Prev' && currentPage > 1) currentPage--
     if (direction === 'Next' && currentPage < totalPages) currentPage++
     
-    loadSessions()
-    updatePaginationUI(totalPages)
+    renderHistory()
+    const container = document.getElementById("sessionsContainer")
+    if (container) container.scrollTop = 0
   } else {
     // Group ビュー
     if (!groupedPageData || groupedPageData.length === 0) return
@@ -435,6 +484,8 @@ function changePage(direction) {
 }
 
 function updatePaginationUI(totalPages) {
+  totalPages = Math.max(1, totalPages || 0)
+
   // ページ情報を更新
   document.getElementById('pageInfo').textContent =
     `${currentPage} / ${totalPages}`
@@ -514,16 +565,11 @@ async function initDataPage() {
     await initSessionsStorage()
   }
 
-  const sessions = readDataSessions()
-  
-  const totalPages = Math.ceil(sessions.length / PAGE_SIZE)
-  
   currentPage = 1
   groupedPageMode = 'game'
   groupedPageData = []
   
-  loadSessions()
-  updatePaginationUI(totalPages)
+  renderHistory()
 
   if (typeof initDataGameSwitch === "function") initDataGameSwitch()
 

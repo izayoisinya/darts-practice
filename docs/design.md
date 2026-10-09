@@ -259,13 +259,15 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 <img src="images/data_phone.jpg" alt="データ表示画面（スマホ縦）" width="240">
 
+**History を 1 か所に**（`data_loader.js` の `loadSessions()` / `renderHistory()`）：Games 画面の右の History は、ヘッダーで選んでいるゲームに関係なく、Count-Up・01・Cricket の全ゲームを新しい順に 1 本の一覧で出す（左の Stats はヘッダーで選んだゲームのもの。01・クリケットの Stats は今のまま）。カードの中身はゲームごとの形で、見出しの「Game n」の左にゲームの種類の印（Count-Up 緑・01 青・Cricket 金。`.history-game-badge`）を付ける。番号はゲームごとの通し番号。ページ送り（フッターの Prev / Next）も 1 つで、Games を開くたびに 1 ページ目から。01 の設定・クリケットのラウンド数での絞り込みは Stats だけにかかる
+
 #### 4.3.1 01 の記録（`data_01.js`）
 
 ヘッダー右の **Count-Up / 01** で切り替える（前回見ていた方を LocalStorage `dartsDataGame` に残す。`data.html?game=01` なら 01 から）。01 のときは `body` に `data-01` を付ける。
 
 レイアウトとデザインはカウントアップの Game の表示とそろえ、同じ場所に同じ部品で出す。
 
-- **右（History）**：カウントアップと同じ `#sessionsContainer` に、同じ形のカード（Game n・日時・3 つの数字・押すと開いて Round Scores と Awards）を新しい順に出す。数字は Out Darts（上がったダーツ数。金）か Left（上がれなかった残り。赤）、PPD、80% Stats。下の要約に設定・上がりナンバー（`OUT D16` / `NO OUT`）・ブルとトリプルの本数と割合。開くと Bull / In / T の割合のバーと、20〜15 のトリプルの本数（Triple。カウントアップのカードと同じ）、そのゲームのヒートマップも出す。ページ送りもフッターの Prev / Next（01 のときは `changePage()` を 01 用に切り替える）
+- **右（History）**：Count-Up・01・Cricket の全ゲームを 1 つの一覧に出す（下の「History を 1 か所に」）。01 のゲームは同じ形のカード（Game n・日時・3 つの数字・押すと開いて Round Scores と Awards。`createZeroOneCardHtml()`）。数字は Out Darts（上がったダーツ数。金）か Left（上がれなかった残り。赤）、PPD、80% Stats。下の要約に設定・上がりナンバー（`OUT D16` / `NO OUT`）・ブルとトリプルの本数と割合。開くと Bull / In / T の割合のバーと、20〜15 のトリプルの本数（Triple。カウントアップのカードと同じ）、そのゲームのヒートマップも出す
 - **左（Stats）**：`#zeroOneStatsPanel` に出し、カウントアップの左の欄は隠す
   - 上の選択で設定（点数・上がり方・ラウンド）ごとに絞る（初めは最後に遊んだ設定。All Settings で全部。History も同じ絞り込み）
   - Stats（`.data-card`）：Games Played・Finish Rate（上がり率）・Avg Darts（上がったゲームの平均ダーツ数）・Best Darts・Average PPD・Finish Rate (Last 10)（直近 10 ゲームの上がり率）
@@ -283,7 +285,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 ヘッダー右の **Cricket** で切り替える（`data.html?game=cricket` ならクリケットから）。01 と同じ仕組みで、`body` に `data-01` と `data-cricket` を付け、同じ場所に同じ部品で出す（切り替えは `data_01.js` の `setDataGameType()`。フッターの Prev / Next・グラフの描き直しもクリケット用に切り替える）。
 
-- **右（History）**：カード（MPR・Marks・Close Darts〔全部クローズしたダーツ数。金〕か Close〔クローズした数 n/7。赤〕）、要約（ラウンド数・クローズ・点・ブルとトリプル）。開くと Bull / In / T の割合のバー、20〜15 のトリプルの本数、アワード、ラウンドごとのマーク数のグラフ（縦軸 0〜9。`createRoundChartHtml(scores, 9)`）、そのゲームのヒートマップ
+- **右（History）**：全ゲームの一覧の中で、クリケットのゲームは次のカード（`createCricketCardHtml()`）：カード（MPR・Marks・Close Darts〔全部クローズしたダーツ数。金〕か Close〔クローズした数 n/7。赤〕）、要約（ラウンド数・クローズ・点・ブルとトリプル）。開くと Bull / In / T の割合のバー、20〜15 のトリプルの本数、アワード、ラウンドごとのマーク数のグラフ（縦軸 0〜9。`createRoundChartHtml(scores, 9)`）、そのゲームのヒートマップ
 - **左（Stats）**：`#zeroOneStatsPanel` に出す
   - 上の選択でラウンドの上限（R10 / R15 / R20）ごとに絞る（All Rounds で全部）
   - Stats：Games Played・Average MPR・Best MPR・Close Rate（全部クローズできた割合）・Avg / Best Darts to Close・MPR (Last 10)
@@ -1030,3 +1032,4 @@ graph LR
 | 2026.10.8 | データ画面を Games と Analysis の 2 つに絞った。Day / Week / Month / Year は一旦お休み（フッターのタブ・トップのカード・設定の Data Tabs から外す。コードは残す）にし、日付はトップに練習した日のカレンダー（見るだけ。月の切り替えあり）を出すようにした |
 | 2026.10.8 | データ画面のトップのカレンダーで、練習した日を押すとその日のゲーム（履歴カード）を出すようにした。データ画面の見出しを Statistics から Data に変更（メニューの名前に合わせる） |
 | 2026.10.9 | 設定・お知らせ・データ画面のヘッダーの左上に「‹ Menu」（メインメニューへ戻る）を追加。データ画面は各画面では同じボタンが「‹ Top」。幅の狭いスマホでデータ画面のゲームの切り替えが 2 行に折り返すのを直した |
+| 2026.10.9 | データ画面の Games の History を、Count-Up・01・Cricket の全ゲームを 1 本にまとめた一覧に変更（カードの見出しにゲームの種類の印。ページ送りも 1 つ）。01・クリケットの Stats は今のまま |

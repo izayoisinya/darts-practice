@@ -102,7 +102,7 @@ GitHub 上のリポジトリ（`izayoisinya/darts-practice`）を iPad 及びタ
 
 | ブロック | 内容 |
 | --- | --- |
-| バックアップの声かけ | 左列の一番上（`#backupReminder`。`backup_ui.js`）。前回のバックアップから記録が増えたら「前回のバックアップから n ゲーム増えました」と [今すぐ保存]（共有シートかダウンロードでファイルに保存）・[あとで]（1 日経つか 5 ゲーム増えるまで出さない）を出す。記録が 0 件のときは「以前のバックアップファイルがあれば読み込みから戻せます」と [読み込みへ]（`settings.html#backup`。バックアップの欄を光らせる）を出す。それ以外は出さない（詳しくは 6.6） |
+| バックアップの声かけ | 左列の一番上（`#backupReminder`。`backup_ui.js`）。前回のバックアップから日付が変わって記録が増えていたら「前回のバックアップから n ゲーム増えました」と [今すぐ保存]（共有シートかダウンロードでファイルに保存）・[あとで]（その日はもう出さない）を出す。記録が 0 件のときは「以前のバックアップファイルがあれば読み込みから戻せます」と [読み込みへ]（`settings.html#backup`。バックアップの欄を光らせる）を出す。それ以外は出さない（詳しくは 6.6） |
 | GAMES | CountUp・01・Cricket のカードを同じ大きさで縦に並べる（押すとそのゲームを始める）。カードはゲームごとに色を分け（CountUp 緑・01 青・Cricket 金。`--game-rgb`）、そのゲームの記録のまとめを 3 つ出す（`main.js` の `initMenuSummary()`）：CountUp は平均スコア・平均ラウンドスコア・ゲーム数、01 は上がり率・上がったゲームの平均ダーツ数・ゲーム数（設定はまとめて）、Cricket は平均 MPR・全部クローズできた割合・ゲーム数 |
 | UTILITY | Data・Settings・Info への遷移ボタン（横並び） |
 | 更新情報 / お知らせ | `news.js` の `INFO_CONTENT` の内容を表示 |
@@ -322,7 +322,7 @@ Stats の画面のヘッダー右の **Count-Up / 01 / Cricket** で切り替え
 | DISPLAY | Game Panels | カウントアップ画面に表示するエリア（Rounds / Stats）。Input は常に表示 |
 | データ保存状況 | — | 保存ゲーム数、保存先（IndexedDB / LocalStorage）、使用容量・上限の概算 |
 | データのバックアップ | 書き出し / 読み込み | ゲームの記録と日別メモを JSON ファイルに書き出す・読み込む（詳細は 6.6）。下に最後にバックアップした日時とゲーム数、ブラウザによる自動削除から保護されているか（`navigator.storage.persisted()`）を出す |
-| データのバックアップ | Backup Reminder | メニュー画面でバックアップを勧める頻度（`backupReminder`）：10 ゲームか 7 日ごと（`often`。初期値）/ 30 ゲームか 30 日ごと（`rarely`）/ お知らせしない（`off`） |
+| データのバックアップ | Backup Reminder | メニュー画面でバックアップを勧める頻度（`backupReminder`）：1 日ごと（`daily`。初期値）/ 7 日ごと（`weekly`）/ お知らせしない（`off`）。前の版の `often` / `rarely` は `daily` / `weekly` として読む |
 
 - Layout Preview：いちばん上に、カウントアップ画面（横・縦）の簡単な図を出す（`settings.js` の `renderLayoutPreview()`）。Input Style・Board Undo Button・Game Panels を変えるとすぐ描き直し、変わった図を少し光らせる。Input だけ・ボード・戻るボタンなしのときは、横向きの図にボードの四隅のパネルも描く。並び順は Layout Preview → Display（図が変わる Game Panels）→ Game → データ保存状況 → バックアップ。横向きは左の列に Layout Preview と、その下に Game、右の列に Display と、その下にデータ保存状況・バックアップを置き、プレビューと Display を横に並べる（`.display-panel` / `.game-panel` の `grid-row`）。実際の配置の目安（端末の大きさで少し変わる）
 - レイアウト：ヘッダーの下（`main.settings-container`）を画面幅いっぱいのスクロール領域にし、中身は左右の余白で中央に寄せる（`body` は `base.css` でスクロール禁止のため）。横向きは 4 つの欄を 2 列 × 2 段（iPad 横ならスクロールなしで全部見える）、縦向きは 1 列（タブレットは最大 640px、それ以外は最大 560px）。スタイルは `settings.html` 内の `<style>` に書いている
@@ -691,7 +691,7 @@ PHOENIX の換算の元にした表（Rt16 / Rt30。01 の PPD とクリケッ�
 | 関数 | 内容 |
 | --- | --- |
 | `saveBackupFile()` | `createBackupData()` をファイルにする。タブレット・スマホは共有シート、使えなければダウンロード。保存したら `markBackupDone()` で日時とゲーム数を記録する |
-| `getBackupReminder()` | 声をかけるか決める（前回から増えたゲーム数が設定の数以上、または前回〔一度もなければ一番古い記録〕から設定の日数以上経っていて新しい記録がある。「あとで」から 1 日経たず 5 ゲームも増えていなければ出さない） |
+| `getBackupReminder()` | 声をかけるか決める（前回のバックアップ〔一度もなければ一番古い記録〕から日付で設定の日数以上経っていて、新しい記録がある。1 日に何ゲームしても出すのは翌日以降。「あとで」を押した日はもう出さない） |
 | `renderBackupReminder()` / `initBackupReminder()` | メニュー画面のお知らせ（保存を勧める／記録が 0 件のときの読み込みの案内） |
 | `requestPersistentStorage()` | `navigator.storage.persist()` で、ブラウザに自動でデータを消さないよう頼む（全画面の `initApp()` から呼ぶ） |
 | `getBackupLastText()` | 「最終バックアップ：日時（ゲーム数）」の文 |
@@ -724,7 +724,7 @@ PHOENIX の換算の元にした表（Rt16 / Rt30。01 の PPD とクリケッ�
 | `dartsDataGame` | LocalStorage | データ画面の Stats で最後に見ていたゲーム |
 | `dartsDataHubPeriod` | LocalStorage | データのトップの Practice で最後に選んだ期間（week / month / year） |
 | `dartsStatsPeriod` | LocalStorage | Stats の Period で最後に選んだ期間（week / month / year） |
-| `dartsBackupInfo` | LocalStorage | 最後にバックアップした日時とゲーム数、「あとで」を押した日時とゲーム数（`{ lastAt, lastCount, snoozeAt, snoozeCount }`。バックアップの声かけに使う） |
+| `dartsBackupInfo` | LocalStorage | 最後にバックアップした日時とゲーム数、「あとで」を押した日時（`{ lastAt, lastCount, snoozeAt }`。バックアップの声かけに使う） |
 
 ### 6.2 ゲーム履歴（1 件）
 
@@ -794,7 +794,7 @@ PHOENIX の換算の元にした表（Rt16 / Rt30。01 の PPD とクリケッ�
   undoSwipeDirection: "left" | "right",                               // 3 本指スワイプで戻る向き
   orientationMode: "auto" | "portrait" | "landscape",
   gamePanels: { round: boolean, stats: boolean },                     // false で隠す。ない項目は表示
-  backupReminder: "often" | "rarely" | "off"                         // バックアップを勧める頻度（ないときは often）
+  backupReminder: "daily" | "weekly" | "off"                          // バックアップを勧める頻度（ないときは daily）
 }
 ```
 
@@ -1065,3 +1065,4 @@ graph LR
 | 2026.10.10 | 全体の使われていないものを整理：どこからも呼ばれていない関数（`setupLinks()`〔`main.js` の `[data-link]` の処理と重複〕・`clearSessionsStorage()` / `clearSessionsFromDb()`・`getCricketMarkSymbol()`・`getSessionTotalAwards()`）、使われていない CSS（`.darts-block`・`.sub-value`・`.total-label`・`.divider`・`.stat-item`・`.award-row`・`.round-separator`・`iphone-mode` など）、設定の `dataTabs` を削除。ルートにあった `rating0907.gif`（PHOENIX のレーティング表）は `docs/images/rating_table.gif` に移して設計書から参照する |
 | 2026.10.21 | 設定画面の横向きの 2 列を、列ごとに上に詰めて並べるようにした（グリッドの段の高さがそろって、右の列に隙間ができていたため） |
 | 2026.10.21 | バックアップの声かけを追加（`backup_ui.js`）：前回のバックアップから記録が増えたらメニュー画面で保存を勧め、ワンタップで保存。最後にバックアップした日時を設定画面に表示、頻度を設定（Backup Reminder）で選べる。記録が 0 件のときは読み込みへの案内。`navigator.storage.persist()` でブラウザによる自動削除からの保護を頼む |
+| 2026.10.21 | バックアップの声かけを、ゲーム数ではなく日付で出すように変更（1 日ごと〔初期値〕/ 7 日ごと / お知らせしない。練習中に何度も出ないよう、出すのは翌日以降。「あとで」はその日はもう出さない） |

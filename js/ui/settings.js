@@ -9,7 +9,7 @@ const DEFAULT_SETTINGS = {
   undoSwipeDirection: "left",
   orientationMode: "auto",
   gamePanels: { round: true, stats: true },
-  backupReminder: "often"
+  backupReminder: "daily"
 }
 
 // 設定画面のチェックボックスと、保存する設定のキーの対応
@@ -101,7 +101,7 @@ function saveSettings() {
     undoSwipeDirection: document.getElementById("undoSwipeSetting")?.value || "left",
     orientationMode: document.getElementById("orientationSetting")?.value || "auto",
     gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES),
-    backupReminder: document.getElementById("backupReminderSetting")?.value || "often"
+    backupReminder: document.getElementById("backupReminderSetting")?.value || "daily"
   }
 
   writeSettings(settings)
@@ -302,7 +302,7 @@ function initBackupControls() {
 
   const reminder = document.getElementById("backupReminderSetting")
   if (reminder) {
-    reminder.value = readSettings().backupReminder || "often"
+    reminder.value = getBackupReminderMode()
     reminder.addEventListener("change", saveSettings)
   }
 

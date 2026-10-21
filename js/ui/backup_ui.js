@@ -2,7 +2,7 @@
 // ===== バックアップの保存とお知らせ =====
 // ===============================
 // ブラウザのアプリは、操作なしに端末のファイルへ保存できない。そこで、
-//   ・メニュー画面で「そろそろバックアップしませんか」と声をかけ、ワンタップで保存する（共有シート → ファイルに保存 / ダウンロード）
+//   ・メニュー画面で「そろそろバックアップしませんか」と声をかけ（前回から日付が変わって新しい記録があるとき）、ワンタップで保存する（共有シート → ファイルに保存 / ダウンロード）
 //   ・最後にバックアップした日時とゲーム数を覚え、設定画面に出す
 //   ・ブラウザに「このサイトのデータを自動で消さないで」と頼む（navigator.storage.persist()）
 //   ・記録が 0 件のときは、バックアップから戻す方法を案内する
@@ -11,16 +11,16 @@
 const BACKUP_INFO_KEY = "dartsBackupInfo"
 
 // 声をかける頻度（設定画面の Backup Reminder。dartsSettings.backupReminder）
-//   games：前回から何ゲーム増えたら / days：前回から何日経ったら（新しい記録があるときだけ）
+//   days：前回のバックアップから何日（日付で数える）経ったら。新しい記録があるときだけ声をかける。
+//   1 日に何ゲームしても、声をかけるのは翌日以降（練習中に何度も出さない）
 const BACKUP_REMINDER_RULES = {
-  often: { games: 10, days: 7 },
-  rarely: { games: 30, days: 30 },
+  daily: { days: 1 },
+  weekly: { days: 7 },
   off: null
 }
 
-// 「あとで」を押したら、1 日経つか 5 ゲーム増えるまで出さない
-const BACKUP_SNOOZE_MS = 24 * 60 * 60 * 1000
-const BACKUP_SNOOZE_GAMES = 5
+// 前の版の値（10 ゲームか 7 日 / 30 ゲームか 30 日）は、近いものに読み替える
+const BACKUP_REMINDER_OLD = { often: "daily", rarely: "weekly" }
 
 function readBackupInfo() {
   try {
@@ -42,10 +42,20 @@ function writeBackupInfo(info) {
 function getBackupReminderMode() {
   try {
     const settings = JSON.parse(localStorage.getItem("dartsSettings") || "{}") || {}
-    return BACKUP_REMINDER_RULES.hasOwnProperty(settings.backupReminder) ? settings.backupReminder : "often"
+    const mode = BACKUP_REMINDER_OLD[settings.backupReminder] || settings.backupReminder
+    return BACKUP_REMINDER_RULES.hasOwnProperty(mode) ? mode : "daily"
   } catch {
-    return "often"
+    return "daily"
   }
+}
+
+// 2 つの日時が、日付で何日離れているか（時刻は見ない。昨日の 23 時と今日の 0 時でも 1 日）
+function getCalendarDaysBetween(from, to) {
+  const a = new Date(from)
+  const b = new Date(to)
+  const dayA = new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime()
+  const dayB = new Date(b.getFullYear(), b.getMonth(), b.getDate()).getTime()
+  return Math.round((dayB - dayA) / (24 * 60 * 60 * 1000))
 }
 
 function getSavedGameCount() {
@@ -71,26 +81,23 @@ function getBackupReminder(now = Date.now()) {
     const sessions = typeof readSessions === "function" ? readSessions() : []
     since = sessions.length ? Number(sessions[0].date) || now : now
   }
-  const days = (now - since) / (24 * 60 * 60 * 1000)
+  if (getCalendarDaysBetween(since, now) < rule.days) return null
 
-  if (games < rule.games && days < rule.days) return null
-
+  // 「あとで」を押した日は、もう出さない（翌日にまた出す）
   const snoozedAt = Number(info.snoozeAt) || 0
-  if (snoozedAt && now - snoozedAt < BACKUP_SNOOZE_MS && count - (Number(info.snoozeCount) || 0) < BACKUP_SNOOZE_GAMES) {
-    return null
-  }
+  if (snoozedAt && getCalendarDaysBetween(snoozedAt, now) < 1) return null
 
   return { games, lastAt: Number(info.lastAt) || 0 }
 }
 
 function markBackupDone(count) {
   const info = readBackupInfo()
-  writeBackupInfo({ ...info, lastAt: Date.now(), lastCount: count, snoozeAt: 0, snoozeCount: 0 })
+  writeBackupInfo({ ...info, lastAt: Date.now(), lastCount: count, snoozeAt: 0 })
 }
 
 function snoozeBackupReminder() {
   const info = readBackupInfo()
-  writeBackupInfo({ ...info, snoozeAt: Date.now(), snoozeCount: getSavedGameCount() })
+  writeBackupInfo({ ...info, snoozeAt: Date.now() })
 }
 
 function formatBackupDate(time) {

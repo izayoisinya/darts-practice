@@ -35,7 +35,7 @@
 index.html      メインメニュー（ゲーム選択 / Data / Settings / Info）
 countup.html    COUNT-UP ゲーム画面（Rounds / Input / Stats の 3 エリア）。?game=01 で 01、?game=cricket でクリケット（同じ画面を GAME_TYPE で切り替え）
 data.html       スコア記録データの表示（見出しは Data）。トップ → History（記録：全ゲームの一覧）/ Stats（分析：ゲームの種類ごと）
-settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、ボードの大きさ: soft / steel、表示エリアの表示/非表示、画面向き、ストレージ状況）
+settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、ボードの大きさ: soft / steel、表示エリアの表示/非表示、画面向き、ストレージ状況、バックアップと声かけの頻度）
 news.html       お知らせ
 sw.js           Service Worker（プリキャッシュ）
 manifest.json   PWA マニフェスト
@@ -69,6 +69,7 @@ manifest.json   PWA マニフェスト
 | ui/ | chart.js | ゲーム画面のグラフ描画のみ（計算は stats.js 側） |
 | ui/ | settings.js | 設定画面のロジック |
 | ui/ | news.js | お知らせ一覧の表示 |
+| ui/ | backup_ui.js | バックアップの保存（`saveBackupFile()`：共有シート／ダウンロード）と、メニュー画面の声かけ（前回のバックアップから記録が増えたら保存を勧める・記録 0 件なら読み込みを案内）、`navigator.storage.persist()`。index.html と settings.html で読み込む |
 
 設計原則：ゲームロジックと UI 操作を分離する / 永続化は他に依存しない / 統計計算は再利用可能に / 1 モジュール 1 責務。
 
@@ -92,6 +93,7 @@ manifest.json   PWA マニフェスト
 | `dartsDataGame` | LocalStorage | データ画面で最後に見ていたゲーム（`"countup"` / `"01"` / `"cricket"`） |
 | `dartsDataHubPeriod` | LocalStorage | データのトップの Practice で最後に選んだ期間（`"week"` / `"month"` / `"year"`） |
 | `dartsStatsPeriod` | LocalStorage | Stats の Period で最後に選んだ期間（`"week"` / `"month"` / `"year"`） |
+| `dartsBackupInfo` | LocalStorage | 最後にバックアップした日時・ゲーム数と「あとで」の状態（バックアップの声かけ。`backup_ui.js`） |
 
 - セッションは保存時に短縮キーへシリアライズされる（`serializeSessionForStorage()`：`d` date, `s` score, `p` ppd, `r` roundScores, `a` awards 配列, `dt` 1 投ごとの記録（刺さった場所・ボード入力の位置）, `bm` ブルモード（セパレートのときだけ 1）など）。アプリ内では `normalizeSessionForApp()` の形で扱う
 - フィールドを追加するときは serialize / deserialize / normalize の 3 箇所を揃え、**既存ユーザーの保存データを壊さない**（欠損時のデフォルト値を用意する）

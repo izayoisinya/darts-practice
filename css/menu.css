@@ -559,3 +559,85 @@ body.page-menu::before {
     min-height: 0;
   }
 }
+
+
+/* ============================== */
+/* BACKUP REMINDER（backup_ui.js） */
+/* ============================== */
+/* 前回のバックアップから記録が増えたら保存を勧める。記録が 0 件のときは、バックアップから戻す方法を案内する */
+.backup-reminder {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 196, 64, 0.45);
+  background: linear-gradient(150deg, rgba(255, 196, 64, 0.14) 0%, #141820 70%);
+}
+
+.backup-reminder[hidden] {
+  display: none;
+}
+
+.backup-reminder.empty,
+.backup-reminder.done {
+  border-color: rgb(var(--accent-rgb) / 0.4);
+  background: linear-gradient(150deg, rgb(var(--accent-rgb) / 0.12) 0%, #141820 70%);
+}
+
+.backup-reminder-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.backup-reminder-text strong {
+  font-size: 14px;
+  color: #ffd772;
+}
+
+.backup-reminder.empty .backup-reminder-text strong,
+.backup-reminder.done .backup-reminder-text strong {
+  color: var(--accent);
+}
+
+.backup-reminder-text span {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.backup-reminder-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.backup-reminder-actions button {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.backup-reminder-actions button.primary {
+  border-color: #ffc440;
+  background: rgba(255, 196, 64, 0.2);
+  color: #ffd772;
+}
+
+/* スマホ縦：ボタンは文の下に並べる */
+.phone.portrait .backup-reminder {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.phone.portrait .backup-reminder-actions button {
+  flex: 1;
+}
+

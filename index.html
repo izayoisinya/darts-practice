@@ -44,6 +44,8 @@
     <main class="menu-container">
       <!-- 左列：ゲーム（CountUp / 01 / Cricket を同じ大きさで並べる）と操作 -->
       <div class="menu-col menu-col-main">
+      <!-- バックアップの声かけ（backup_ui.js の renderBackupReminder()。保存を勧めるときと、記録が 0 件のときだけ出す） -->
+      <section id="backupReminder" class="backup-reminder" hidden></section>
       <section class="games-panel">
         <p class="section-label">Games</p>
         <!-- 各ゲームのカード。数字はそのゲームの記録のまとめ（main.js の initMenuSummary()） -->
@@ -145,6 +147,8 @@
     <script src="js/core/state.js" defer></script>
     <script src="js/core/core.js" defer></script>
     <script src="js/core/storage.js" defer></script>
+    <script src="js/core/backup.js" defer></script>
+    <script src="js/ui/backup_ui.js" defer></script>
     <script src="js/ui/news.js" defer></script>
 
     <!-- 初期化（最後に読み込む） -->

@@ -24,6 +24,10 @@ async function initApp() {
   applyOrientationPreference()
   refreshLayout()
   initMenuSummary()
+
+  // ブラウザに「このサイトのデータを自動で消さないで」と頼み、メニュー画面ではバックアップの声かけを出す（backup_ui.js）
+  if (typeof requestPersistentStorage === "function") requestPersistentStorage()
+  if (typeof initBackupReminder === "function") initBackupReminder()
   
   // ダーツ入力ボタンのイベント登録
   if (document.getElementById("numberTable")) {

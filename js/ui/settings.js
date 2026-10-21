@@ -8,7 +8,8 @@ const DEFAULT_SETTINGS = {
   boardUndoButton: false,
   undoSwipeDirection: "left",
   orientationMode: "auto",
-  gamePanels: { round: true, stats: true }
+  gamePanels: { round: true, stats: true },
+  backupReminder: "often"
 }
 
 // 設定画面のチェックボックスと、保存する設定のキーの対応
@@ -99,7 +100,8 @@ function saveSettings() {
     boardUndoButton: !!document.getElementById("boardUndoButtonSetting")?.checked,
     undoSwipeDirection: document.getElementById("undoSwipeSetting")?.value || "left",
     orientationMode: document.getElementById("orientationSetting")?.value || "auto",
-    gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES)
+    gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES),
+    backupReminder: document.getElementById("backupReminderSetting")?.value || "often"
   }
 
   writeSettings(settings)
@@ -217,53 +219,30 @@ function setBackupStatus(message) {
   if (el) el.textContent = message
 }
 
-function downloadBackupFile(blob, fileName) {
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement("a")
-  link.href = url
-  link.download = fileName
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
+// 書き出し（ファイルへの保存と、最後にバックアップした日時の記録は backup_ui.js の saveBackupFile()）
+async function exportBackup() {
+  const result = await saveBackupFile()
+  if (result.status === "cancelled") {
+    setBackupStatus("書き出しをキャンセルしました")
+    return
+  }
+  setBackupStatus(`ゲーム ${result.sessions.toLocaleString()} 件と日別メモ ${result.notes} 件を書き出しました`)
+  updateBackupInfo()
 }
 
-async function exportBackup() {
-  if (typeof initSessionsStorage === "function") {
-    await initSessionsStorage()
-  }
+// 最後にバックアップした日時と、自動削除からの保護の状態
+async function updateBackupInfo() {
+  const last = document.getElementById("backupLastInfo")
+  if (last) last.textContent = getBackupLastText()
 
-  const data = createBackupData()
-  const fileName = getBackupFileName()
-  const blob = new Blob([JSON.stringify(data)], { type: "application/json" })
-  const doneMessage = `ゲーム ${data.sessions.length.toLocaleString()} 件と日別メモ ${Object.keys(data.dayNotes).length} 件を書き出しました`
-
-  // タブレット・スマホは共有シート（「ファイルに保存」や AirDrop）を優先する
-  const canShareFile =
-    !document.body.classList.contains("desktop") &&
-    typeof File === "function" &&
-    navigator.canShare &&
-    navigator.canShare({ files: [new File([blob], fileName, { type: "application/json" })] })
-
-  if (canShareFile) {
-    try {
-      await navigator.share({
-        files: [new File([blob], fileName, { type: "application/json" })],
-        title: fileName
-      })
-      setBackupStatus(doneMessage)
-      return
-    } catch (error) {
-      if (error && error.name === "AbortError") {
-        setBackupStatus("書き出しをキャンセルしました")
-        return
-      }
-      // 共有できなかった場合はダウンロードに切り替える
-    }
-  }
-
-  downloadBackupFile(blob, fileName)
-  setBackupStatus(doneMessage)
+  const protect = document.getElementById("backupProtectInfo")
+  if (!protect) return
+  const persisted = await requestPersistentStorage()
+  protect.textContent = persisted === true
+    ? "ブラウザによる自動削除：保護されています（自分でブラウザのデータを消すと消えます）"
+    : persisted === false
+      ? "ブラウザによる自動削除：保護されていません（容量が足りないときなどに消えることがあります）"
+      : "ブラウザによる自動削除：このブラウザでは確認できません"
 }
 
 function readFileAsText(file) {
@@ -305,6 +284,9 @@ async function importBackupFile(file) {
     }
 
     await applyBackupImport(plan)
+    // バックアップから戻した記録は、すでにファイルにあるので「バックアップ済み」として数える（すぐに声をかけない）
+    markBackupDone(readSessions().length)
+    updateBackupInfo()
 
     setBackupStatus(`ゲーム ${newCount.toLocaleString()} 件と日別メモ ${plan.updatedNoteCount} 件を読み込みました`)
     await updateStorageStatus()
@@ -316,6 +298,23 @@ async function importBackupFile(file) {
 }
 
 function initBackupControls() {
+  updateBackupInfo()
+
+  const reminder = document.getElementById("backupReminderSetting")
+  if (reminder) {
+    reminder.value = readSettings().backupReminder || "often"
+    reminder.addEventListener("change", saveSettings)
+  }
+
+  // メニュー画面の「読み込みへ」から来たときは、バックアップの欄を見せる
+  if (location.hash === "#backup") {
+    const panel = document.getElementById("backup")
+    if (panel) {
+      panel.scrollIntoView({ block: "start" })
+      panel.classList.add("is-highlighted")
+    }
+  }
+
   const exportBtn = document.getElementById("exportBackupBtn")
   const importBtn = document.getElementById("importBackupBtn")
   const importInput = document.getElementById("importBackupInput")

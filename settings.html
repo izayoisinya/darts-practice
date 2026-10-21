@@ -261,6 +261,23 @@
         font-weight: 600;
       }
 
+      .backup-last-info {
+        margin: 6px 0 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .backup-reminder-setting {
+        margin-top: 14px;
+      }
+
+      /* メニュー画面の「読み込みへ」から来たとき */
+      .backup-panel.is-highlighted {
+        border-color: rgb(var(--accent-rgb) / 0.6);
+        box-shadow: 0 0 0 1px rgb(var(--accent-rgb) / 0.4), 0 0 24px rgb(var(--accent-rgb) / 0.18);
+      }
+
       #exportBackupBtn {
         color: var(--accent);
         border-color: rgb(var(--accent-rgb) / 0.45);
@@ -691,7 +708,7 @@
             容量はブラウザ全体の概算です。実データのみの正確な容量ではありません。
           </p>
         </section>
-        <section class="settings-panel backup-panel">
+        <section class="settings-panel backup-panel" id="backup">
           <h2 class="panel-title">データのバックアップ</h2>
 
           <p class="setting-help">
@@ -708,6 +725,20 @@
             読み込んでも今の記録は消えず、まだない記録だけが追加されます。
           </p>
           <p id="backupStatus" class="storage-status-note" role="status"></p>
+          <p id="backupLastInfo" class="backup-last-info"></p>
+
+          <div class="setting-group backup-reminder-setting">
+            <label for="backupReminderSetting">Backup Reminder</label>
+            <select id="backupReminderSetting">
+              <option value="often">10 ゲームか 7 日ごと（おすすめ）</option>
+              <option value="rarely">30 ゲームか 30 日ごと</option>
+              <option value="off">お知らせしない</option>
+            </select>
+            <p class="setting-help">
+              前回のバックアップから記録が増えたら、メニュー画面で保存を勧めます。ブラウザのデータを消すと記録も消えるため、こまめな保存がおすすめです。
+            </p>
+          </div>
+          <p id="backupProtectInfo" class="storage-status-note"></p>
         </section>
       </div>
     </main>
@@ -726,6 +757,7 @@
     <script src="js/core/core.js" defer></script>
     <script src="js/core/storage.js" defer></script>
     <script src="js/core/backup.js" defer></script>
+    <script src="js/ui/backup_ui.js" defer></script>
 
     <!-- ゲーム関連 -->
     <script src="js/game/stats.js" defer></script>

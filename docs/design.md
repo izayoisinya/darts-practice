@@ -307,6 +307,8 @@ Stats の画面のヘッダー右の **Count-Up / 01 / Cricket** で切り替え
 
 ![設定画面](images/settings_tablet.jpg)
 
+横向き（タブレット・スマホ）とパソコンは左右 2 列（`.settings-col`）。左に Layout Preview・Game、右に Display・データ保存状況・バックアップを置き、列ごとに上に詰める（片方の列が長くても、もう片方に隙間ができない）。縦向きは列の枠をなくし（`display: contents`）、`order` で Preview → Display → Game → 保存状況 → バックアップの順に 1 列で並べる
+
 | 区分 | 項目 | 内容 |
 | --- | --- | --- |
 | GAME | Input Style | カウントアップの入力形式。Board（ダーツボード、値 `board`。初期値）と Buttons（1〜20 と D / T のボタン、値 `buttons`）の切り替え。進行中のゲームはそのまま |
@@ -1042,3 +1044,4 @@ graph LR
 | 2026.10.10 | データのトップの Summary を練習量だけの Practice（今週・今月・今年。今日が基準）に変更し、成績の推移は Stats の Period（`data_period.js`。ゲームの種類ごとに、直近 12 期間の平均の棒グラフと今の期間・前の期間の比較）に移した |
 | 2026.10.10 | お休みしていた Day / Week / Month / Year のビュー（`data_grouped.js` / `data_detail.js`）・タグ集計・テストデータ削除の処理・使わなくなった CSS を削除し、日別メモは `data_notes.js` にまとめた。もとの機能から、その日の Bull / In-Bull / Triple の割合（トップの選んだ日）、メモの写真の表示（トップ。押すと大きく）、2 つの日の比較（Stats の Day Compare）を作り直した |
 | 2026.10.10 | 全体の使われていないものを整理：どこからも呼ばれていない関数（`setupLinks()`〔`main.js` の `[data-link]` の処理と重複〕・`clearSessionsStorage()` / `clearSessionsFromDb()`・`getCricketMarkSymbol()`・`getSessionTotalAwards()`）、使われていない CSS（`.darts-block`・`.sub-value`・`.total-label`・`.divider`・`.stat-item`・`.award-row`・`.round-separator`・`iphone-mode` など）、設定の `dataTabs` を削除。ルートにあった `rating0907.gif`（PHOENIX のレーティング表）は `docs/images/rating_table.gif` に移して設計書から参照する |
+| 2026.10.21 | 設定画面の横向きの 2 列を、列ごとに上に詰めて並べるようにした（グリッドの段の高さがそろって、右の列に隙間ができていたため） |

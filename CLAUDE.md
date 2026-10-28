@@ -59,7 +59,7 @@ manifest.json   PWA マニフェスト
 | game/ | stats.js | スタッツ・アワード計算。**UI 表示・DOM 操作は含まない**（再利用できる形にする） |
 | data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()`。History は全ゲームを 1 つの一覧で出す（`renderHistory()`。種類の絞り込みは `setHistoryFilter()`、タグの絞り込みは `dayMatchesTagFilter()` で Stats の Tag Search と共通） |
 | data/ | data.js | データ画面の統括（History / Stats の切替 `changeView()`、Stats の描画 `renderStatsView()`、Count-Up の Stats/Awards・グラフ・Tag Search〔タグ検索用のカレンダー〕・タグ別散布図・期間比較・Day Compare〔2 つの日の比較〕） |
-| data/ | data_notes.js | 日別メモ（コメント・タグ・写真）の読み書きと編集画面 `openDayNoteEditor()`（データのトップのカレンダーで選んだ日の Memo から開く） |
+| data/ | data_notes.js | 日別メモ（コメント・タグ・写真）の読み書きと編集画面 `openDayNoteEditor()`（データのトップのカレンダーで選んだ日の Memo から開く）。写真は縮めて保存する（`shrinkImageToDataUrl()`。LocalStorage の容量対策） |
 | data/ | heatmap.js | Count-Up の Stats のヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
 | data/ | data_01.js | Stats の画面の Count-Up / 01 / Cricket の切り替え（`setDataGameType()`）と、01 の成績の表示（設定ごとの上がり率・上がるまでのダーツ数・推移）・01 の履歴カード |
 | data/ | data_cricket.js | Stats の画面のクリケットの成績の表示（MPR・クローズ率・推移・数字ごとのマーク）・クリケットの履歴カード |
@@ -69,7 +69,7 @@ manifest.json   PWA マニフェスト
 | ui/ | chart.js | ゲーム画面のグラフ描画のみ（計算は stats.js 側） |
 | ui/ | settings.js | 設定画面のロジック |
 | ui/ | news.js | お知らせ一覧の表示 |
-| ui/ | backup_ui.js | バックアップの保存（`saveBackupFile()`：共有シート／ダウンロード）と、メニュー画面の声かけ（前回のバックアップから記録が増えたら保存を勧める・記録 0 件なら読み込みを案内）、`navigator.storage.persist()`。index.html と settings.html で読み込む |
+| ui/ | backup_ui.js | バックアップの保存（`saveBackupFile()`：共有シート／ダウンロード）と、メニュー画面の声かけ（前回のバックアップから記録が増えたら保存を勧める・記録 0 件なら読み込みを案内）、`navigator.storage.persist()`、記録を保存できなかったときの警告 `showSaveFailedWarning()`（storage.js が送る `darts:save-failed` を main.js が受ける）。index.html・settings.html・countup.html で読み込む |
 
 設計原則：ゲームロジックと UI 操作を分離する / 永続化は他に依存しない / 統計計算は再利用可能に / 1 モジュール 1 責務。
 

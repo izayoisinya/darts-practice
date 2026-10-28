@@ -423,6 +423,31 @@ function clearLocalSessionKeys() {
   localStorage.removeItem(LEGACY_SESSIONS_KEY)
 }
 
+// LocalStorage に書く（IndexedDB が使えないとき・失敗したとき）。書けなければ false
+function writeCompactSessionsToLocalStorage(compact) {
+  try {
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(compact))
+    localStorage.removeItem(LEGACY_SESSIONS_KEY)
+    sessionsBackend = "localStorage"
+    return true
+  } catch {
+    return false
+  }
+}
+
+// 保存に失敗したことを知らせる（画面の警告は init/main.js が "darts:save-failed" を受けて出す）。
+// 記録は画面の中（sessionsCache）には残っているので、閉じる前にバックアップを書き出せば失われない
+let sessionsSaveFailed = false
+
+function notifySessionsSaveFailed() {
+  sessionsSaveFailed = true
+  try {
+    window.dispatchEvent(new CustomEvent("darts:save-failed"))
+  } catch {
+    // 古いブラウザなど：警告は出せないが、動きは止めない
+  }
+}
+
 function queuePersistSessions(compact) {
   sessionsWriteQueue = sessionsWriteQueue
     .then(() => {
@@ -430,20 +455,19 @@ function queuePersistSessions(compact) {
         return writeCompactSessionsToDb(compact)
           .then(() => {
             sessionsBackend = "indexedDB"
+            sessionsSaveFailed = false
             clearLocalSessionKeys()
           })
       }
 
-      sessionsBackend = "localStorage"
-      localStorage.setItem(SESSIONS_KEY, JSON.stringify(compact))
-      localStorage.removeItem(LEGACY_SESSIONS_KEY)
+      if (writeCompactSessionsToLocalStorage(compact)) sessionsSaveFailed = false
+      else notifySessionsSaveFailed()
       return undefined
     })
     .catch(() => {
-      // IndexedDB write failure fallback.
-      sessionsBackend = "localStorage"
-      localStorage.setItem(SESSIONS_KEY, JSON.stringify(compact))
-      localStorage.removeItem(LEGACY_SESSIONS_KEY)
+      // IndexedDB に書けなかったら LocalStorage に書く。そこも書けなければ警告を出す
+      if (writeCompactSessionsToLocalStorage(compact)) sessionsSaveFailed = false
+      else notifySessionsSaveFailed()
     })
 
   return sessionsWriteQueue

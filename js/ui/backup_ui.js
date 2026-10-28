@@ -267,3 +267,49 @@ function initBackupReminder() {
 
   renderBackupReminder()
 }
+
+
+// ===============================
+// ===== 保存できなかったときの警告 =====
+// ===============================
+// 記録を端末に書けなかったとき（容量不足・ブラウザの制限など。storage.js の "darts:save-failed"）に、
+// 画面の上に警告を出す。記録は画面の中には残っているので、閉じる前にバックアップを書き出せば失われない
+function showSaveFailedWarning() {
+
+  if (document.getElementById("saveFailedWarning")) return
+
+  const box = document.createElement("div")
+  box.id = "saveFailedWarning"
+  box.className = "save-failed-warning"
+  box.setAttribute("role", "alert")
+  box.innerHTML = `
+    <div class="save-failed-text">
+      <strong>記録を保存できませんでした</strong>
+      <span>端末の空き容量が足りないか、ブラウザが保存を止めています。このままアプリを閉じると記録が消えるので、先にバックアップを保存してください。</span>
+    </div>
+    <div class="save-failed-actions">
+      <button type="button" class="primary" data-save-failed-backup>今すぐ保存</button>
+      <button type="button" data-save-failed-close>閉じる</button>
+    </div>
+  `
+  box.addEventListener("click", async e => {
+    const target = e.target instanceof Element ? e.target : null
+    if (!target) return
+    if (target.closest("[data-save-failed-close]")) {
+      box.remove()
+      return
+    }
+    if (target.closest("[data-save-failed-backup]")) {
+      try {
+        const result = await saveBackupFile()
+        if (result.status === "cancelled") return
+        box.querySelector(".save-failed-text span").textContent =
+          `ゲーム ${result.sessions.toLocaleString()} 件をファイルに保存しました。端末の空き容量を確認してから、アプリを開き直してください。`
+      } catch {
+        box.querySelector(".save-failed-text span").textContent = "バックアップも保存できませんでした。端末の空き容量を確認してください。"
+      }
+    }
+  })
+  document.body.appendChild(box)
+}
+

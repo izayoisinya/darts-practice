@@ -8,6 +8,15 @@
 const GROUP_NOTE_KEY = "dartsDayNotesV2"
 let groupNoteEditingImage = null
 
+// メモの写真は縮めて保存する（LocalStorage は全部で 5MB 前後しか入らず、撮ったままの写真だと数枚であふれるため）。
+// 長い辺を NOTE_IMAGE_MAX_SIDE px 以下にし、JPEG にする（1 枚 100〜200KB 程度）
+const NOTE_IMAGE_MAX_SIDE = 1280
+const NOTE_IMAGE_QUALITY = 0.8
+// 細かい写真で大きくなったときは、この大きさに収まるまで画質を下げる（0.8 → 0.65 → 0.5）
+const NOTE_IMAGE_TARGET = 350 * 1024
+// これより大きい写真（保存済みのもの）は、データ画面を開いたときに縮め直す
+const NOTE_IMAGE_SHRINK_OVER = 400 * 1024
+
 function getAllDayNotes() {
   const notes = JSON.parse(localStorage.getItem(GROUP_NOTE_KEY) || "{}")
   // 旧形式(mode別)のうちdayだけは読めるように後方互換
@@ -17,8 +26,14 @@ function getAllDayNotes() {
   return notes || {}
 }
 
+// 保存できたら true。容量がいっぱいなどで保存できなければ false（呼ぶ側で知らせる）
 function saveAllDayNotes(notes) {
-  localStorage.setItem(GROUP_NOTE_KEY, JSON.stringify(notes))
+  try {
+    localStorage.setItem(GROUP_NOTE_KEY, JSON.stringify(notes))
+    return true
+  } catch {
+    return false
+  }
 }
 
 function getDayNote(dayKey) {
@@ -34,7 +49,7 @@ function setDayNote(dayKey, note) {
     imageData: note.imageData || "",
     updatedAt: Date.now()
   }
-  saveAllDayNotes(notes)
+  return saveAllDayNotes(notes)
 }
 
 function parseTags(raw) {
@@ -141,7 +156,7 @@ function ensureGroupNoteModalWired() {
   imageInput.onchange = async ev => {
     const file = ev.target.files && ev.target.files[0]
     if (!file) return
-    groupNoteEditingImage = await fileToDataUrl(file)
+    groupNoteEditingImage = await shrinkImageToDataUrl(await fileToDataUrl(file))
     const preview = document.getElementById("groupNotePreview")
     preview.src = groupNoteEditingImage
     preview.style.display = "block"
@@ -155,11 +170,16 @@ function ensureGroupNoteModalWired() {
     const tagInput = document.getElementById("groupNoteTags").value
     const tags = [...new Set([...parseTags(tagInput), ...extractHashTags(comment)])]
 
-    setDayNote(dayKey, {
+    const saved = setDayNote(dayKey, {
       comment,
       tags,
       imageData: groupNoteEditingImage || ""
     })
+    if (!saved) {
+      // 編集画面は閉じずに残す（書いた内容を失わないように）
+      alert("保存できる容量がいっぱいで、メモを保存できませんでした。\nほかの日のメモの写真を外すと空きができます。")
+      return
+    }
 
     closeGroupNoteEditor()
     // データのトップ（カレンダーで選んだ日）を描き直す
@@ -222,3 +242,61 @@ function escapeHtml(text) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;")
 }
+
+
+// ===============================
+// ===== 写真を縮める ===============
+// ===============================
+// 画像（data URL）を、長い辺 NOTE_IMAGE_MAX_SIDE px 以下の JPEG にする。
+// 読めない形式（ブラウザが表示できない画像）や、縮めても小さくならないときは元のまま返す
+function shrinkImageToDataUrl(dataUrl) {
+  return new Promise(resolve => {
+    if (typeof dataUrl !== "string" || !dataUrl.startsWith("data:image/")) {
+      resolve(dataUrl)
+      return
+    }
+    const img = new Image()
+    img.onload = () => {
+      try {
+        const scale = Math.min(1, NOTE_IMAGE_MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight))
+        const width = Math.max(1, Math.round(img.naturalWidth * scale))
+        const height = Math.max(1, Math.round(img.naturalHeight * scale))
+        const canvas = document.createElement("canvas")
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext("2d")
+        // 透過のある画像（PNG）は JPEG にすると黒くなるので、背景を塗っておく
+        ctx.fillStyle = "#11151c"
+        ctx.fillRect(0, 0, width, height)
+        ctx.drawImage(img, 0, 0, width, height)
+        let shrunk = canvas.toDataURL("image/jpeg", NOTE_IMAGE_QUALITY)
+        for (const quality of [0.65, 0.5]) {
+          if (shrunk.length <= NOTE_IMAGE_TARGET) break
+          shrunk = canvas.toDataURL("image/jpeg", quality)
+        }
+        resolve(shrunk.length < dataUrl.length ? shrunk : dataUrl)
+      } catch {
+        resolve(dataUrl)
+      }
+    }
+    img.onerror = () => resolve(dataUrl)
+    img.src = dataUrl
+  })
+}
+
+// 前の版で撮ったままの大きさで保存した写真を縮め直して、空きを作る（データ画面を開いたときに 1 回）
+async function shrinkStoredNoteImages() {
+  const notes = getAllDayNotes()
+  let changed = false
+  for (const key of Object.keys(notes)) {
+    const image = notes[key] && notes[key].imageData
+    if (typeof image !== "string" || image.length < NOTE_IMAGE_SHRINK_OVER) continue
+    const shrunk = await shrinkImageToDataUrl(image)
+    if (shrunk.length < image.length) {
+      notes[key] = { ...notes[key], imageData: shrunk }
+      changed = true
+    }
+  }
+  if (changed && saveAllDayNotes(notes) && typeof dataHubOpen !== "undefined" && dataHubOpen) renderDataHub()
+}
+

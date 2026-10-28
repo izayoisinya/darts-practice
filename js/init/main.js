@@ -25,6 +25,11 @@ async function initApp() {
   refreshLayout()
   initMenuSummary()
 
+  // 記録を保存できなかったら警告を出す（storage.js が "darts:save-failed" を送る。backup_ui.js）
+  if (typeof showSaveFailedWarning === "function") {
+    window.addEventListener("darts:save-failed", showSaveFailedWarning)
+  }
+
   // ブラウザに「このサイトのデータを自動で消さないで」と頼み、メニュー画面ではバックアップの声かけを出す（backup_ui.js）
   if (typeof requestPersistentStorage === "function") requestPersistentStorage()
   if (typeof initBackupReminder === "function") initBackupReminder()

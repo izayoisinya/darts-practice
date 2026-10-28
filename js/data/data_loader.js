@@ -531,6 +531,8 @@ function createSessionCardElement(innerHtml) {
 async function initDataPage() {
   setupSessionCardToggle()
   setupDataTagFilter()
+  // 大きいまま保存されているメモの写真を縮め直す（data_notes.js）
+  if (typeof shrinkStoredNoteImages === "function") setTimeout(shrinkStoredNoteImages, 1500)
 
   if (typeof initSessionsStorage === "function") {
     await initSessionsStorage()

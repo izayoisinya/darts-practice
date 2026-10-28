@@ -388,6 +388,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | 画面 | 読み込む JS（core / main 以外） |
 | --- | --- |
 | index.html | core/backup.js、ui/backup_ui.js、ui/news.js |
+| countup.html（保存できなかったときの警告とバックアップ） | core/backup.js、ui/backup_ui.js |
 | countup.html | game/*（stats → game_core → game_01 → game_cricket → game_countup → board_input）、data/heatmap.js、game/cu_ui.js、ui/chart.js、ui/settings.js |
 | data.html | game/stats.js（アワード判定）、data/*（data_loader → data_notes → rating → data → heatmap → data_01 → data_cricket → data_period → data_hub） |
 | settings.html | core/backup.js、ui/backup_ui.js、game/*、ui/settings.js |
@@ -427,7 +428,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | 関数 | 内容 |
 | --- | --- |
 | `initSessionsStorage()` | 保存先（IndexedDB / LocalStorage）を決め、履歴をメモリに読み込む。旧形式からの移行も行う |
-| `readSessions()` / `writeSessions()` | ゲーム履歴の読み込み・保存（書き込みはキューで順番に実行） |
+| `readSessions()` / `writeSessions()` | ゲーム履歴の読み込み・保存（書き込みはキューで順番に実行）。IndexedDB に書けなければ LocalStorage に書き（`writeCompactSessionsToLocalStorage()`）、そこも書けなければ `window` に `darts:save-failed` を送る（`notifySessionsSaveFailed()`。画面の警告は `backup_ui.js` の `showSaveFailedWarning()`。storage.js は画面を直接さわらない） |
 | `getSessionsStorageBackend()` | 現在の保存先を返す |
 | `saveGame()` / `loadGame()` | 進行中のゲーム状態の保存・読み込み |
 | `saveSession()` | 終了したゲームを履歴に追加する |
@@ -693,6 +694,7 @@ PHOENIX の換算の元にした表（Rt16 / Rt30。01 の PPD とクリケッ�
 | `saveBackupFile()` | `createBackupData()` をファイルにする。タブレット・スマホは共有シート、使えなければダウンロード。保存したら `markBackupDone()` で日時とゲーム数を記録する |
 | `getBackupReminder()` | 声をかけるか決める（前回のバックアップ〔一度もなければ一番古い記録〕から日付で設定の日数以上経っていて、新しい記録がある。1 日に何ゲームしても出すのは翌日以降。「あとで」を押した日はもう出さない） |
 | `renderBackupReminder()` / `initBackupReminder()` | メニュー画面のお知らせ（保存を勧める／記録が 0 件のときの読み込みの案内） |
+| `showSaveFailedWarning()` | 記録を保存できなかったとき（`darts:save-failed`）に、画面の上に赤い警告と [今すぐ保存]（`saveBackupFile()`。記録は画面の中に残っているので、閉じる前に書き出せば失われない）・[閉じる] を出す。全画面の `initApp()` で受ける（countup.html でも backup.js・backup_ui.js を読み込む） |
 | `requestPersistentStorage()` | `navigator.storage.persist()` で、ブラウザに自動でデータを消さないよう頼む（全画面の `initApp()` から呼ぶ） |
 | `getBackupLastText()` | 「最終バックアップ：日時（ゲーム数）」の文 |
 
@@ -805,6 +807,9 @@ PHOENIX の換算の元にした表（Rt16 / Rt30。01 の PPD とクリケッ�
   "2026-09-29": { comment, tags: [ … ], imageData /* 画像の Data URL */, updatedAt }
 }
 ```
+
+- **写真は縮めて保存する**（`data_notes.js` の `shrinkImageToDataUrl()`）：LocalStorage は全部で 5MB 前後しか入らないため、選んだ写真を長い辺 1280px 以下の JPEG（画質 0.8。350KB を超えたら 0.65 → 0.5）にしてから保存する。縮めても小さくならない・読めない画像は元のまま。前の版で撮ったままの大きさで保存した写真（400KB 超）は、データ画面を開いたときに縮め直す（`shrinkStoredNoteImages()`）
+- **保存できなかったとき**：容量がいっぱいなどで保存できなければ、メモの編集画面を閉じずに「容量がいっぱいでメモを保存できませんでした」と出す（`setDayNote()` / `saveAllDayNotes()` が false を返す）
 
 ### 6.6 バックアップ（書き出し・読み込み）
 
@@ -1066,3 +1071,4 @@ graph LR
 | 2026.10.21 | 設定画面の横向きの 2 列を、列ごとに上に詰めて並べるようにした（グリッドの段の高さがそろって、右の列に隙間ができていたため） |
 | 2026.10.21 | バックアップの声かけを追加（`backup_ui.js`）：前回のバックアップから記録が増えたらメニュー画面で保存を勧め、ワンタップで保存。最後にバックアップした日時を設定画面に表示、頻度を設定（Backup Reminder）で選べる。記録が 0 件のときは読み込みへの案内。`navigator.storage.persist()` でブラウザによる自動削除からの保護を頼む |
 | 2026.10.21 | バックアップの声かけを、ゲーム数ではなく日付で出すように変更（1 日ごと〔初期値〕/ 7 日ごと / お知らせしない。練習中に何度も出ないよう、出すのは翌日以降。「あとで」はその日はもう出さない） |
+| 2026.10.28 | データ保護：日別メモの写真を縮めて保存（長い辺 1280px の JPEG。保存済みの大きい写真も縮め直す）、メモを保存できなかったら知らせる。ゲームの記録を保存できなかったら画面に警告と [今すぐ保存] を出す（`darts:save-failed`） |

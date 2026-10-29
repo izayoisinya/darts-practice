@@ -115,8 +115,7 @@ function renderCricketData() {
       <h3 class="data-section-title">Awards</h3>
       <div class="z1-award-cards">${renderCricketAwardCards(list)}</div>
     </section>
-    ${typeof renderZeroOneHitRates === "function" ? renderZeroOneHitRates(list) : ""}
-    <section class="data-summary-section">
+    <section class="data-summary-section stats-wide">
       <h3 class="data-section-title">MPR Trend (Last ${DATA_CRICKET_CHART_GAMES} Games)</h3>
       <canvas id="cricketChart" class="z1-chart"></canvas>
       <div class="z1-legend">
@@ -124,6 +123,7 @@ function renderCricketData() {
         <span><i class="z1-dot fail"></i>クローズできなかった</span>
       </div>
     </section>
+    ${typeof renderZeroOneHitRates === "function" ? renderZeroOneHitRates(list) : ""}
     ${renderCricketRating(list)}
     ${renderCricketTargetMarks(list)}
   `
@@ -194,7 +194,7 @@ function renderCricketRating(list) {
 
   return `
     <section class="rating-reference">
-      <h3>レーティング参考値</h3>
+      <h3 class="data-section-title">Rating</h3>
       <div class="rating-current-grid">
         <div class="rating-current-card">
           <div class="rating-current-title">DARTSLIVE</div>

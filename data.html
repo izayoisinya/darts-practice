@@ -79,75 +79,74 @@
       <h3 class="data-section-title">Awards</h3>
       <div id="awardsContainer"></div>
     </section>
-    <section id="chartContainer" style="display:none;">
-      <div id="gameChartSection">
-        <h3 id="scoreChartTitle">Score Trend (Last 30 Games)</h3>
-        <canvas id="scoreChart"></canvas>
-
-        <section id="ratingReferenceSection" class="rating-reference" style="display:none;"></section>
-      </div>
-
-      <section id="analysisContainer" class="analysis-section" style="display:none;">
-        <h3>Heatmap</h3>
-        <div class="heatmap-controls">
-          <select id="heatmapPeriod" aria-label="ヒートマップの期間">
-            <option value="all">All</option>
-            <option value="d30">30 Days</option>
-            <option value="d7">7 Days</option>
-            <option value="d1">Today</option>
-          </select>
-          <span id="heatmapCount" class="heatmap-count"></span>
-        </div>
-        <div class="heatmap-body">
-          <div class="heatmap-board">
-            <canvas id="heatmapCanvas"></canvas>
-          </div>
-          <div class="heatmap-side">
-            <!-- 中心からの距離（heatmap.js の renderHeatmapRange()） -->
-            <div id="heatmapRange" class="heatmap-range"></div>
-            <div id="heatmapHits" class="heatmap-hits"></div>
-          </div>
-        </div>
-
-        <!-- タグ検索：タグを選ぶと、合う日をカレンダーで光らせ、合う日とそれ以外の日の成績を比べる（data.js の renderTagSearch()） -->
-        <h3>Tag Search</h3>
-        <div id="tagSearchSection" class="tag-search"></div>
-
-        <h3>Tag Scatter</h3>
-        <div id="scatterTagControls" class="scatter-tag-controls"></div>
-        <canvas id="scatterChart"></canvas>
-        <div id="scatterLegend" class="scatter-legend"></div>
-
-        <div id="rangeChartSection" class="range-chart-section" style="display:none;">
-          <h3>Score Trend (Selected Period)</h3>
-          <div class="range-chart-controls">
-            <div class="range-chart-row">
-              <span class="range-prefix">A</span>
-              <input id="rangeStartDate" type="date" />
-              <span class="range-sep">~</span>
-              <input id="rangeEndDate" type="date" />
-            </div>
-            <div class="range-chart-row">
-              <span class="range-prefix">B</span>
-              <input id="compareStartDate" type="date" />
-              <span class="range-sep">~</span>
-              <input id="compareEndDate" type="date" />
-            </div>
-            <div class="range-apply-row">
-              <button id="rangeApplyBtn" type="button">Apply</button>
-            </div>
-          </div>
-          <div id="rangeChartLegend" class="range-chart-legend" style="display:none;"></div>
-          <canvas id="rangeScoreChart"></canvas>
-        </div>
-
-        <!-- 2 つの日を比べる（data.js の renderDayCompare()。もとの Day の詳細の比較日を作り直したもの） -->
-        <h3>Day Compare</h3>
-        <div id="dayCompareSection" class="day-compare"></div>
-      </section>
+    <!-- Stats の各欄はカード（.data-summary-section）。横に広い画面では 2 列に並べ、グラフなど幅のいるものは .stats-wide で 1 行を使う -->
+    <section id="gameChartSection" class="data-summary-section stats-wide">
+      <h3 id="scoreChartTitle" class="data-section-title">Score Trend (Last 30 Games)</h3>
+      <canvas id="scoreChart"></canvas>
     </section>
+    <section id="ratingReferenceSection" class="rating-reference" style="display:none;"></section>
     <!-- Period：ゲームの種類ごとの、週・月・年ごとの平均の推移と、今の期間・前の期間の比較（data_period.js の renderStatsPeriod()。Count-Up・01・Cricket で出す） -->
     <section id="periodTrendSection" class="data-summary-section period-trend"></section>
+    <section id="heatmapSection" class="data-summary-section stats-wide">
+      <h3 class="data-section-title">Heatmap</h3>
+      <div class="heatmap-controls">
+        <select id="heatmapPeriod" aria-label="ヒートマップの期間">
+          <option value="all">All</option>
+          <option value="d30">30 Days</option>
+          <option value="d7">7 Days</option>
+          <option value="d1">Today</option>
+        </select>
+        <span id="heatmapCount" class="heatmap-count"></span>
+      </div>
+      <div class="heatmap-body">
+        <div class="heatmap-board">
+          <canvas id="heatmapCanvas"></canvas>
+        </div>
+        <div class="heatmap-side">
+          <!-- 中心からの距離（heatmap.js の renderHeatmapRange()） -->
+          <div id="heatmapRange" class="heatmap-range"></div>
+          <div id="heatmapHits" class="heatmap-hits"></div>
+        </div>
+      </div>
+    </section>
+    <!-- タグ検索：タグを選ぶと、合う日をカレンダーで光らせ、合う日とそれ以外の日の成績を比べる（data.js の renderTagSearch()） -->
+    <section class="data-summary-section stats-wide">
+      <h3 class="data-section-title">Tag Search</h3>
+      <div id="tagSearchSection" class="tag-search"></div>
+    </section>
+    <section class="data-summary-section stats-wide">
+      <h3 class="data-section-title">Tag Scatter</h3>
+      <div id="scatterTagControls" class="scatter-tag-controls"></div>
+      <canvas id="scatterChart"></canvas>
+      <div id="scatterLegend" class="scatter-legend"></div>
+    </section>
+    <section id="rangeChartSection" class="data-summary-section stats-wide">
+      <h3 class="data-section-title">Score Trend (Selected Period)</h3>
+      <div class="range-chart-controls">
+        <div class="range-chart-row">
+          <span class="range-prefix">A</span>
+          <input id="rangeStartDate" type="date" />
+          <span class="range-sep">~</span>
+          <input id="rangeEndDate" type="date" />
+        </div>
+        <div class="range-chart-row">
+          <span class="range-prefix">B</span>
+          <input id="compareStartDate" type="date" />
+          <span class="range-sep">~</span>
+          <input id="compareEndDate" type="date" />
+        </div>
+        <div class="range-apply-row">
+          <button id="rangeApplyBtn" type="button">Apply</button>
+        </div>
+      </div>
+      <div id="rangeChartLegend" class="range-chart-legend" style="display:none;"></div>
+      <canvas id="rangeScoreChart"></canvas>
+    </section>
+    <!-- 2 つの日を比べる（data.js の renderDayCompare()。もとの Day の詳細の比較日を作り直したもの） -->
+    <section class="data-summary-section stats-wide">
+      <h3 class="data-section-title">Day Compare</h3>
+      <div id="dayCompareSection" class="day-compare"></div>
+    </section>
   </div>
   <!-- フッター：History のページ送り（Stats では出さない） -->
 <div class="footer-bar">

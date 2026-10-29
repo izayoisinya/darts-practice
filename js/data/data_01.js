@@ -158,10 +158,7 @@ function renderZeroOneData() {
       <h3 class="data-section-title">Awards</h3>
       <div class="z1-award-cards">${renderZeroOneAwardCards(list)}</div>
     </section>
-    ${renderZeroOneHitRates(list)}
-    ${renderZeroOneRange(list)}
-    ${renderZeroOneDailyRange(list)}
-    <section class="data-summary-section">
+    <section class="data-summary-section stats-wide">
       <h3 class="data-section-title">Darts to Finish (Last ${DATA_01_CHART_GAMES} Games)</h3>
       <canvas id="z1Chart" class="z1-chart"></canvas>
       <div class="z1-legend">
@@ -169,6 +166,9 @@ function renderZeroOneData() {
         <span><i class="z1-dot fail"></i>上がれなかった</span>
       </div>
     </section>
+    ${renderZeroOneHitRates(list)}
+    ${renderZeroOneRange(list)}
+    ${renderZeroOneDailyRange(list)}
     ${renderZeroOneRating(list)}
     ${renderZeroOneFinishNumbers(list)}
   `
@@ -709,7 +709,7 @@ function renderZeroOneRating(list) {
 
   return `
     <section class="rating-reference">
-      <h3>レーティング参考値</h3>
+      <h3 class="data-section-title">Rating</h3>
       <div class="rating-current-grid">
         <div class="rating-current-card">
           <div class="rating-current-title">DARTSLIVE</div>

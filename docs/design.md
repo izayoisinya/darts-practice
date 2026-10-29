@@ -258,8 +258,9 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 **Stats**（分析。`viewMode = "stats"`、`main` に `analysis-mode`、`body` に `data-stats-view`）
 
 - 左の `#leftPanel` だけを画面幅いっぱいに出す。各欄（Stats・Awards・グラフ・Rating・Period・Heatmap など）は 1 つずつカード（`.data-summary-section` / `.rating-reference`。データのトップのパネルと同じ枠・背景、見出しは小さい大文字のアクセント色）にし、`#leftPanel` のグリッドに並べる。スマホ縦は 1 列、それ以外は 2 列で、グラフ・ヒートマップ・Tag Search など幅のいるものは `.stats-wide` で 1 行を使う（隠れている欄は場所を取らず、`grid-auto-flow: dense` で後ろの半分の欄が空きを詰める）。01・クリケットの `#zeroOneStatsPanel` は `display: contents` で中のカードを同じグリッドに並べる。ヘッダーの切り替え（Count-Up / 01 / Cricket。`data_01.js` の `setDataGameType()`。最後に見ていたゲームは `dartsDataGame` に保存）で中身を入れ替える。ページ送りがないのでフッターは出さない
-- Count-Up（`data.js` の `renderStatsView()`）：Stats・Awards、直近 30 ゲームのスコア推移、レーティング目安、続けてヒートマップ（刺さった位置の多いところをボードの図の上に色の濃さで表示。期間 All / 30 Days / 7 Days / Today〔ボタンで選ぶ〕、よく刺さった場所の上位 8 か所の割合、RANGE。下に期間の中の推移の折れ線〔`renderHeatmapTrend()`。RANGE / Bull % / 80% Circle を切り替え。Today はゲームごと、7 Days・30 Days は日ごと、All は週ごと〔直近 30 週まで〕。一番良い点は金色〕）、Tag Search（タグ検索用のカレンダー。下記）、タグ別の散布図（全ゲームのスコアを日付順に点で描き、その日のメモのタグで色分け。タグのボタンで選んだタグの日だけ色付き）、期間 A/B の比較グラフ
+- Count-Up（`data.js` の `renderStatsView()`）：Stats・Awards、直近 30 ゲームのスコア推移、レーティング目安、続けてヒートマップ（刺さった位置の多いところをボードの図の上に色の濃さで表示。期間 All / 30 Days / 7 Days / Today〔ボタンで選ぶ〕、よく刺さった場所の上位 8 か所の割合、RANGE。下に期間の中の推移の折れ線〔`renderHeatmapTrend()`。RANGE / Bull % / 80% Circle を切り替え。Today はゲームごと、7 Days・30 Days は日ごと、All は週ごと〔直近 30 週まで〕。一番良い点は金色〕）、Tag Search（タグ検索用のカレンダー。下記）、タグ別の散布図（全ゲームのスコアを日付順に点で描き、その日のメモのタグで色分け。タグのボタンで選んだタグの日だけ色付き）、Period Compare（期間 A と B の比較。下記）
 - **Period**（`data_period.js` の `renderStatsPeriod()`。Count-Up・01・Cricket のどれでも出す。Count-Up は Rating の隣、01・クリケットは最後）：Week / Month / Year（最後に選んだものを LocalStorage `dartsStatsPeriod` に残す）ごとに、今の期間と前の期間の平均と差（Count-Up は平均 PPD、01 は上がったゲームの平均ダーツ数〔少ないほど良い〕、Cricket は平均 MPR。良くなったら緑）と、直近 12 期間の平均の棒グラフ（今の期間は濃く、一番良い期間は金色。棒の上の数字はゲーム数。縦軸は値の範囲に合わせる）を出す
+- **Period Compare**（`data.js` の `drawSelectedRangeChart()`。Count-Up の Stats）：期間 A（緑）と B（青）を日付で選ぶか、ボタン Week（今週と先週）/ Month（今月と先月）/ 30 Days（直近 30 日とその前の 30 日。最初はこれ）で選ぶ。日付を自分で変えるとボタンの選択は外れる。A・B の平均スコア・ゲーム数・練習した日数と A − B の差を並べ、それぞれの期間の 1 日目から数えた日ごとの平均スコアを重ねて描く（練習しなかった日は飛ばしてつなぐ。横軸は上の段が A、下の段が B の日付）
 - **Day Compare**（`data.js` の `renderDayCompare()`。Count-Up の Stats の一番下）：練習した日を 2 つ選び（A は最後に練習した日、B はその前の日から）、Games・平均スコア・平均 PPD・ベスト・ブル率・その日のタグを並べ、A − B の差（大きいほど緑）と、その日のゲームのスコアの並びを重ねたグラフ（A 緑・B オレンジ）を出す。もとの Day の詳細の「比較日」を作り直したもの
 - **Tag Search**（`data.js` の `renderTagSearch()`）：日別メモのタグのボタン（History と同じ選択。2 つ以上で OR / AND）と、タグ検索用のカレンダー（データのトップのカレンダーとは別。全ゲームの練習した日に印。‹ › で月を切り替え。タグがまだ 1 つもなくてもカレンダーは出し、タグの付け方の案内を添える）。タグを選ぶと、合う日を金色の縁で光らせ、合わない日を薄くし、合う日の一覧（新しい順に 20 日まで。押すとその月を出す）を出す。横に、合う日（Tag Days）とそれ以外の日（Other Days）の成績の比較をゲームの種類ごとに出す（Count-Up は平均 PPD、01 は平均ダーツ数、Cricket は平均 MPR と差。良い方なら緑）。カレンダーの日付は見るだけで押せない（押してもデータのトップには移らない）
 - 01（`renderZeroOneData()`）・クリケット（`renderCricketData()`）：`#zeroOneStatsPanel` に出し、Count-Up の欄は隠す（`body` に `data-01`）。中身は「4.2.1」「4.2.2」を参照
@@ -617,7 +618,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `drawAnalysisCharts()` / `renderAnalysisScatter()` / `drawScatterChart()` | Count-Up の Stats の下のヒートマップ・タグ別散布図・期間比較グラフを描く。タグの色は使われている数の多い順に割り当てる |
 | `loadStats()` / `addStat()` | 全体の Stats・Awards を表示する |
 | `drawGameScoresChart()` | 直近 30 ゲームのスコア推移グラフを描く |
-| `drawSelectedRangeChart()` | 期間 A / B の比較グラフを描く（Count-Up の Stats） |
+| `drawSelectedRangeChart()` | Period Compare（期間 A / B の数字と比較グラフ）を描く（Count-Up の Stats）。`applyRangePreset()` でボタンの期間を日付の欄に入れる |
 | `renderStatsPeriod()` / `getPeriodTrend()` / `drawStatsPeriodChart()`（`data_period.js`） | Stats の Period（期間ごとの平均の推移と、今の期間・前の期間の比較）。期間の計算 `getPeriodRange()` / `formatPeriodLabel()` はトップの Practice でも使う |
 | `renderTagSearch()` / `getTagSearchCompareRows()` | Count-Up の Stats の Tag Search（タグ検索用のカレンダーと、合う日・それ以外の日の成績の比較）を描く |
 | `renderDayCompare()` / `drawDayCompareChart()` | Count-Up の Stats の Day Compare（2 つの日の数字と、その日のゲームのスコアの並びの比較） |
@@ -1078,3 +1079,4 @@ graph LR
 | 2026.10.29 | Stats の画面を見やすく：各欄をカードで囲み、スマホ縦以外は 2 列に並べる（グラフ・ヒートマップなどは 1 行）。見出しをデータのトップと同じ小さい大文字にそろえ、「レーティング参考値」は Rating に。01・クリケットはグラフを Awards の下に移した |
 | 2026.10.30 | ヒートマップの期間をプルダウンからボタン（All / 30 Days / 7 Days / Today）に変更し、期間の中の推移の折れ線（RANGE / Bull % / 80% Circle。ゲーム・日・週ごと）を追加 |
 | 2026.10.30 | バックアップの保存で、共有シートにタイトルを渡さないようにした（iOS の「ファイルに保存」で、ファイル名だけのテキストファイルが一緒に保存されていたため） |
+| 2026.10.30 | Stats の期間 A/B の比較を作り直し（Period Compare）：Week / Month / 30 Days のボタン、A・B の平均・ゲーム数・日数と差、練習しなかった日を飛ばしてつなぐ線、横軸に A・B 両方の日付。Apply ボタンはなくした（日付を変えるとすぐ描き直す） |

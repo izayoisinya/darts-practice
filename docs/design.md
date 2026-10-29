@@ -258,7 +258,7 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 **Stats**（分析。`viewMode = "stats"`、`main` に `analysis-mode`、`body` に `data-stats-view`）
 
 - 左の `#leftPanel` だけを画面幅いっぱいに出す。各欄（Stats・Awards・グラフ・Rating・Period・Heatmap など）は 1 つずつカード（`.data-summary-section` / `.rating-reference`。データのトップのパネルと同じ枠・背景、見出しは小さい大文字のアクセント色）にし、`#leftPanel` のグリッドに並べる。スマホ縦は 1 列、それ以外は 2 列で、グラフ・ヒートマップ・Tag Search など幅のいるものは `.stats-wide` で 1 行を使う（隠れている欄は場所を取らず、`grid-auto-flow: dense` で後ろの半分の欄が空きを詰める）。01・クリケットの `#zeroOneStatsPanel` は `display: contents` で中のカードを同じグリッドに並べる。ヘッダーの切り替え（Count-Up / 01 / Cricket。`data_01.js` の `setDataGameType()`。最後に見ていたゲームは `dartsDataGame` に保存）で中身を入れ替える。ページ送りがないのでフッターは出さない
-- Count-Up（`data.js` の `renderStatsView()`）：Stats・Awards、直近 30 ゲームのスコア推移、レーティング目安、続けてヒートマップ（刺さった位置の多いところをボードの図の上に色の濃さで表示。期間 All / 30 Days / 7 Days / Today、よく刺さった場所の上位 8 か所の割合、RANGE）、Tag Search（タグ検索用のカレンダー。下記）、タグ別の散布図（全ゲームのスコアを日付順に点で描き、その日のメモのタグで色分け。タグのボタンで選んだタグの日だけ色付き）、期間 A/B の比較グラフ
+- Count-Up（`data.js` の `renderStatsView()`）：Stats・Awards、直近 30 ゲームのスコア推移、レーティング目安、続けてヒートマップ（刺さった位置の多いところをボードの図の上に色の濃さで表示。期間 All / 30 Days / 7 Days / Today〔ボタンで選ぶ〕、よく刺さった場所の上位 8 か所の割合、RANGE。下に期間の中の推移の折れ線〔`renderHeatmapTrend()`。RANGE / Bull % / 80% Circle を切り替え。Today はゲームごと、7 Days・30 Days は日ごと、All は週ごと〔直近 30 週まで〕。一番良い点は金色〕）、Tag Search（タグ検索用のカレンダー。下記）、タグ別の散布図（全ゲームのスコアを日付順に点で描き、その日のメモのタグで色分け。タグのボタンで選んだタグの日だけ色付き）、期間 A/B の比較グラフ
 - **Period**（`data_period.js` の `renderStatsPeriod()`。Count-Up・01・Cricket のどれでも出す。Count-Up は Rating の隣、01・クリケットは最後）：Week / Month / Year（最後に選んだものを LocalStorage `dartsStatsPeriod` に残す）ごとに、今の期間と前の期間の平均と差（Count-Up は平均 PPD、01 は上がったゲームの平均ダーツ数〔少ないほど良い〕、Cricket は平均 MPR。良くなったら緑）と、直近 12 期間の平均の棒グラフ（今の期間は濃く、一番良い期間は金色。棒の上の数字はゲーム数。縦軸は値の範囲に合わせる）を出す
 - **Day Compare**（`data.js` の `renderDayCompare()`。Count-Up の Stats の一番下）：練習した日を 2 つ選び（A は最後に練習した日、B はその前の日から）、Games・平均スコア・平均 PPD・ベスト・ブル率・その日のタグを並べ、A − B の差（大きいほど緑）と、その日のゲームのスコアの並びを重ねたグラフ（A 緑・B オレンジ）を出す。もとの Day の詳細の「比較日」を作り直したもの
 - **Tag Search**（`data.js` の `renderTagSearch()`）：日別メモのタグのボタン（History と同じ選択。2 つ以上で OR / AND）と、タグ検索用のカレンダー（データのトップのカレンダーとは別。全ゲームの練習した日に印。‹ › で月を切り替え。タグがまだ 1 つもなくてもカレンダーは出し、タグの付け方の案内を添える）。タグを選ぶと、合う日を金色の縁で光らせ、合わない日を薄くし、合う日の一覧（新しい順に 20 日まで。押すとその月を出す）を出す。横に、合う日（Tag Days）とそれ以外の日（Other Days）の成績の比較をゲームの種類ごとに出す（Count-Up は平均 PPD、01 は平均ダーツ数、Cricket は平均 MPR と差。良い方なら緑）。カレンダーの日付は見るだけで押せない（押してもデータのトップには移らない）
@@ -634,7 +634,8 @@ Count-Up の Stats のヒートマップ（もとの Analysis タブ）。ゲー
 
 | 名前 | 内容 |
 | --- | --- |
-| `renderAnalysisHeatmap()` | 期間で絞った記録を集計し、ヒートマップと「よく刺さった場所」を表示する（`drawAnalysisCharts()` から呼ぶ） |
+| `renderAnalysisHeatmap()` | 期間で絞った記録を集計し、ヒートマップと「よく刺さった場所」・RANGE・推移を表示する（`drawAnalysisCharts()` から呼ぶ） |
+| `renderHeatmapTrend(sessions)` / `getHeatmapTrendGroups(sessions)` / `drawHeatmapTrend()` | ヒートマップの期間の中の推移（ゲーム・日・週ごとの RANGE・ブル率・8 割が入る円）を折れ線で描く |
 | `collectHeatmapData(sessions)` | 位置のある投の位置の一覧、刺さった場所ごとの本数、投数・ゲーム数を集める |
 | `drawHeatmap(points)` / `paintHeatmap(ctx, width, height, points, highlight)` / `drawHeatmapBoard()` | ボードの図（本物の比率）を描き、その上に色を重ね、1 投ずつの位置を小さな点で描く（`highlight` の位置は白い縁取りの点） |
 | `paintRadarHeatmap(ctx, width, height, points, highlight, rgb)` | ゲーム画面用のレーダー風の描画。暗い緑の円に、ボードの輪・区画の線・外周の目盛り・数字を描き、刺さった位置をぼかした光（`lighter` で重ねる）で表す。回る走査線は CSS の `.game-radar-sweep`（`conic-gradient` を回転。動きを減らす設定では止める） |
@@ -1075,3 +1076,4 @@ graph LR
 | 2026.10.21 | バックアップの声かけを、ゲーム数ではなく日付で出すように変更（1 日ごと〔初期値〕/ 7 日ごと / お知らせしない。練習中に何度も出ないよう、出すのは翌日以降。「あとで」はその日はもう出さない） |
 | 2026.10.28 | データ保護：日別メモの写真を縮めて保存（長い辺 1280px の JPEG。保存済みの大きい写真も縮め直す）、メモを保存できなかったら知らせる。ゲームの記録を保存できなかったら画面に警告と [今すぐ保存] を出す（`darts:save-failed`） |
 | 2026.10.29 | Stats の画面を見やすく：各欄をカードで囲み、スマホ縦以外は 2 列に並べる（グラフ・ヒートマップなどは 1 行）。見出しをデータのトップと同じ小さい大文字にそろえ、「レーティング参考値」は Rating に。01・クリケットはグラフを Awards の下に移した |
+| 2026.10.30 | ヒートマップの期間をプルダウンからボタン（All / 30 Days / 7 Days / Today）に変更し、期間の中の推移の折れ線（RANGE / Bull % / 80% Circle。ゲーム・日・週ごと）を追加 |

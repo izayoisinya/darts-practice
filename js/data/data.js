@@ -148,21 +148,8 @@ function queueInitialGameChartRefresh() {
 //             レーティング目安に続けて、ヒートマップ・タグ別の散布図・期間 A/B の比較（もとの Analysis）も出す。
 //             01・クリケットは #zeroOneStatsPanel（data_01.js / data_cricket.js）
 function showViewSections(mode) {
-  const show = (id, display) => {
-    const el = document.getElementById(id)
-    if (el) el.style.display = display
-  }
-
   const isHistory = mode === "history"
   const isStats = mode === "stats"
-
-  show("statsSection", isStats ? "flex" : "none")
-  show("awardsSection", isStats ? "flex" : "none")
-  show("chartContainer", isStats ? "block" : "none")
-  show("gameChartSection", isStats ? "flex" : "none")
-  show("analysisContainer", isStats ? "flex" : "none")
-  setRangeChartSectionVisible(isStats)
-  show("periodTrendSection", isStats ? "flex" : "none")
 
   const main = document.querySelector("main.data-container")
   if (main) {
@@ -313,7 +300,7 @@ function renderRatingReference(ratings) {
     : `<div class="rating-current-note">データがないため算出できません</div>`
 
   section.innerHTML = `
-    <h3>レーティング参考値</h3>
+    <h3 class="data-section-title">Rating</h3>
     ${current}
     <details class="rating-reference-details">
       <summary>実数値テーブルを表示</summary>
@@ -454,12 +441,6 @@ function drawGameScoresChart() {
     ctx.fillStyle = "#4CAF50"
     ctx.fill()
   })
-}
-
-function setRangeChartSectionVisible(show) {
-  const section = document.getElementById("rangeChartSection")
-  if (!section) return
-  section.style.display = show ? "block" : "none"
 }
 
 function wireRangeChartControls() {

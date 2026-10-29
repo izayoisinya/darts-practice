@@ -257,9 +257,9 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 
 **Stats**（分析。`viewMode = "stats"`、`main` に `analysis-mode`、`body` に `data-stats-view`）
 
-- 左の `#leftPanel` だけを 1 列で画面幅いっぱいに出す。ヘッダーの切り替え（Count-Up / 01 / Cricket。`data_01.js` の `setDataGameType()`。最後に見ていたゲームは `dartsDataGame` に保存）で中身を入れ替える。ページ送りがないのでフッターは出さない
+- 左の `#leftPanel` だけを画面幅いっぱいに出す。各欄（Stats・Awards・グラフ・Rating・Period・Heatmap など）は 1 つずつカード（`.data-summary-section` / `.rating-reference`。データのトップのパネルと同じ枠・背景、見出しは小さい大文字のアクセント色）にし、`#leftPanel` のグリッドに並べる。スマホ縦は 1 列、それ以外は 2 列で、グラフ・ヒートマップ・Tag Search など幅のいるものは `.stats-wide` で 1 行を使う（隠れている欄は場所を取らず、`grid-auto-flow: dense` で後ろの半分の欄が空きを詰める）。01・クリケットの `#zeroOneStatsPanel` は `display: contents` で中のカードを同じグリッドに並べる。ヘッダーの切り替え（Count-Up / 01 / Cricket。`data_01.js` の `setDataGameType()`。最後に見ていたゲームは `dartsDataGame` に保存）で中身を入れ替える。ページ送りがないのでフッターは出さない
 - Count-Up（`data.js` の `renderStatsView()`）：Stats・Awards、直近 30 ゲームのスコア推移、レーティング目安、続けてヒートマップ（刺さった位置の多いところをボードの図の上に色の濃さで表示。期間 All / 30 Days / 7 Days / Today、よく刺さった場所の上位 8 か所の割合、RANGE）、Tag Search（タグ検索用のカレンダー。下記）、タグ別の散布図（全ゲームのスコアを日付順に点で描き、その日のメモのタグで色分け。タグのボタンで選んだタグの日だけ色付き）、期間 A/B の比較グラフ
-- **Period**（`data_period.js` の `renderStatsPeriod()`。Count-Up・01・Cricket のどれでも Stats の一番下に出す）：Week / Month / Year（最後に選んだものを LocalStorage `dartsStatsPeriod` に残す）ごとに、今の期間と前の期間の平均と差（Count-Up は平均 PPD、01 は上がったゲームの平均ダーツ数〔少ないほど良い〕、Cricket は平均 MPR。良くなったら緑）と、直近 12 期間の平均の棒グラフ（今の期間は濃く、一番良い期間は金色。棒の上の数字はゲーム数。縦軸は値の範囲に合わせる）を出す
+- **Period**（`data_period.js` の `renderStatsPeriod()`。Count-Up・01・Cricket のどれでも出す。Count-Up は Rating の隣、01・クリケットは最後）：Week / Month / Year（最後に選んだものを LocalStorage `dartsStatsPeriod` に残す）ごとに、今の期間と前の期間の平均と差（Count-Up は平均 PPD、01 は上がったゲームの平均ダーツ数〔少ないほど良い〕、Cricket は平均 MPR。良くなったら緑）と、直近 12 期間の平均の棒グラフ（今の期間は濃く、一番良い期間は金色。棒の上の数字はゲーム数。縦軸は値の範囲に合わせる）を出す
 - **Day Compare**（`data.js` の `renderDayCompare()`。Count-Up の Stats の一番下）：練習した日を 2 つ選び（A は最後に練習した日、B はその前の日から）、Games・平均スコア・平均 PPD・ベスト・ブル率・その日のタグを並べ、A − B の差（大きいほど緑）と、その日のゲームのスコアの並びを重ねたグラフ（A 緑・B オレンジ）を出す。もとの Day の詳細の「比較日」を作り直したもの
 - **Tag Search**（`data.js` の `renderTagSearch()`）：日別メモのタグのボタン（History と同じ選択。2 つ以上で OR / AND）と、タグ検索用のカレンダー（データのトップのカレンダーとは別。全ゲームの練習した日に印。‹ › で月を切り替え。タグがまだ 1 つもなくてもカレンダーは出し、タグの付け方の案内を添える）。タグを選ぶと、合う日を金色の縁で光らせ、合わない日を薄くし、合う日の一覧（新しい順に 20 日まで。押すとその月を出す）を出す。横に、合う日（Tag Days）とそれ以外の日（Other Days）の成績の比較をゲームの種類ごとに出す（Count-Up は平均 PPD、01 は平均ダーツ数、Cricket は平均 MPR と差。良い方なら緑）。カレンダーの日付は見るだけで押せない（押してもデータのトップには移らない）
 - 01（`renderZeroOneData()`）・クリケット（`renderCricketData()`）：`#zeroOneStatsPanel` に出し、Count-Up の欄は隠す（`body` に `data-01`）。中身は「4.2.1」「4.2.2」を参照
@@ -268,6 +268,8 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 - 縦方向の割り付け：メイン部分（`main.data-container`）は `position: absolute` で「ヘッダーの下端から画面の下端まで」に置き、History・Stats の各パネルの中でスクロールさせる。ヘッダーの高さは CSS 変数 `--data-header-height`（端末ごとの値）で指定し、メイン部分の位置と一致させる。flex で「残りの高さ」を使う形にすると、iPad の Safari で中のグリッドが中身の高さまで伸びてスクロールできなくなるため使わない。安全領域の余白は、上はヘッダーの中、下はフッター（`.footer-bar`）の中で 1 回だけ取る（`lay_data.css`）
 
 <img src="images/data_phone.jpg" alt="データ表示画面（スマホ縦）" width="240">
+
+![データ表示画面 Stats（タブレット横）](images/data_stats_tablet.jpg)
 
 **History を 1 か所に**（`data_loader.js` の `loadSessions()` / `renderHistory()`）：History は Count-Up・01・Cricket の全ゲームを新しい順に 1 本の一覧で出す。カードの中身はゲームごとの形で、見出しはゲームの種類の印だけにする（Count-Up 緑・01 青・Cricket 金。`.history-game-badge`。`createHistoryCardElement()` が「Game n」を置き換える。番号は種類ごとに数えていて全ゲームの一覧では分かりにくいため、2026.10.10 から出さない）。上のボタンで種類を絞り込める（`historyFilter`）。ページ送り（フッターの Prev / Next）は 1 つで、History を開くたびに 1 ページ目から。01 の設定・クリケットのラウンド数での絞り込みは Stats だけにかかる
 
@@ -611,7 +613,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | --- | --- |
 | `changeView(mode)` | History / Stats を切り替える（古い名前の game / analysis は `normalizeViewMode()` で読み替える） |
 | `renderStatsView()` | Stats：ヘッダーで選んだゲームの成績を描く（Count-Up は Stats・グラフ・ヒートマップ・散布図・期間比較、01・クリケットは `data_01.js` / `data_cricket.js`） |
-| `showViewSections(mode)` | 画面に合わせて部品を出し分ける（History は `#rightPanel`、Stats は `#leftPanel` を 1 列で。`body` に `data-history-view` / `data-stats-view`） |
+| `showViewSections(mode)` | 画面に合わせて部品を出し分ける（History は `#rightPanel`、Stats は `#leftPanel`。`main` に `history-mode` / `analysis-mode`、`body` に `data-history-view` / `data-stats-view`） |
 | `drawAnalysisCharts()` / `renderAnalysisScatter()` / `drawScatterChart()` | Count-Up の Stats の下のヒートマップ・タグ別散布図・期間比較グラフを描く。タグの色は使われている数の多い順に割り当てる |
 | `loadStats()` / `addStat()` | 全体の Stats・Awards を表示する |
 | `drawGameScoresChart()` | 直近 30 ゲームのスコア推移グラフを描く |
@@ -1072,3 +1074,4 @@ graph LR
 | 2026.10.21 | バックアップの声かけを追加（`backup_ui.js`）：前回のバックアップから記録が増えたらメニュー画面で保存を勧め、ワンタップで保存。最後にバックアップした日時を設定画面に表示、頻度を設定（Backup Reminder）で選べる。記録が 0 件のときは読み込みへの案内。`navigator.storage.persist()` でブラウザによる自動削除からの保護を頼む |
 | 2026.10.21 | バックアップの声かけを、ゲーム数ではなく日付で出すように変更（1 日ごと〔初期値〕/ 7 日ごと / お知らせしない。練習中に何度も出ないよう、出すのは翌日以降。「あとで」はその日はもう出さない） |
 | 2026.10.28 | データ保護：日別メモの写真を縮めて保存（長い辺 1280px の JPEG。保存済みの大きい写真も縮め直す）、メモを保存できなかったら知らせる。ゲームの記録を保存できなかったら画面に警告と [今すぐ保存] を出す（`darts:save-failed`） |
+| 2026.10.29 | Stats の画面を見やすく：各欄をカードで囲み、スマホ縦以外は 2 列に並べる（グラフ・ヒートマップなどは 1 行）。見出しをデータのトップと同じ小さい大文字にそろえ、「レーティング参考値」は Rating に。01・クリケットはグラフを Awards の下に移した |

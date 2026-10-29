@@ -150,9 +150,9 @@ async function saveBackupFile() {
 
   if (canShareFile) {
     try {
+      // title は渡さない（iOS の「ファイルに保存」で、タイトルが別のテキストファイルとして一緒に保存されてしまうため）
       await navigator.share({
-        files: [new File([blob], fileName, { type: "application/json" })],
-        title: fileName
+        files: [new File([blob], fileName, { type: "application/json" })]
       })
       markBackupDone(data.sessions.length)
       return result

@@ -1649,16 +1649,6 @@ body.page-data.data-stats-view {
   gap: 10px;
 }
 
-.heatmap-controls select {
-  height: 34px;
-  padding: 0 10px;
-
-  border: 1px solid #3a3f4b;
-  border-radius: 8px;
-  background: #1a1f29;
-  color: var(--text-main);
-}
-
 .heatmap-count {
   color: var(--text-muted);
   font-size: 12px;
@@ -3448,4 +3438,63 @@ body.page-data.phone.landscape #leftPanel {
 /* 期間 A・B の入力は広げすぎない */
 #leftPanel .range-chart-controls {
   max-width: 560px;
+}
+
+/* ===================================================== */
+/* ヒートマップの期間のボタンと推移（heatmap.js の renderHeatmapTrend()） */
+/* ===================================================== */
+/* 期間はプルダウンではなくボタン（押しやすい大きさに） */
+.heatmap-period-tabs button,
+#heatmapTrendMetric button {
+  min-height: 34px;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.heatmap-trend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.heatmap-trend-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.heatmap-trend-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.heatmap-trend-chart {
+  display: block;
+  width: 100%;
+  height: 200px;
+}
+
+.heatmap-trend-note {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* スマホ縦はボタンを横幅いっぱいに等分する */
+.phone.portrait .heatmap-period-tabs,
+.phone.portrait #heatmapTrendMetric {
+  width: 100%;
+}
+
+.phone.portrait .heatmap-period-tabs button,
+.phone.portrait #heatmapTrendMetric button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 4px;
 }

@@ -60,7 +60,7 @@ manifest.json   PWA マニフェスト
 | data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()`。History は全ゲームを 1 つの一覧で出す（`renderHistory()`。種類の絞り込みは `setHistoryFilter()`、タグの絞り込みは `dayMatchesTagFilter()` で Stats の Tag Search と共通） |
 | data/ | data.js | データ画面の統括（History / Stats の切替 `changeView()`、Stats の描画 `renderStatsView()`、Count-Up の Stats/Awards・グラフ・Tag Search〔タグ検索用のカレンダー〕・タグ別散布図・期間比較・Day Compare〔2 つの日の比較〕） |
 | data/ | data_notes.js | 日別メモ（コメント・タグ・写真）の読み書きと編集画面 `openDayNoteEditor()`（データのトップのカレンダーで選んだ日の Memo から開く）。写真は縮めて保存する（`shrinkImageToDataUrl()`。LocalStorage の容量対策） |
-| data/ | heatmap.js | Count-Up の Stats のヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
+| data/ | heatmap.js | Count-Up の Stats のヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合・期間の中の RANGE などの推移 `renderHeatmapTrend()`）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
 | data/ | data_01.js | Stats の画面の Count-Up / 01 / Cricket の切り替え（`setDataGameType()`）と、01 の成績の表示（設定ごとの上がり率・上がるまでのダーツ数・推移）・01 の履歴カード |
 | data/ | data_cricket.js | Stats の画面のクリケットの成績の表示（MPR・クローズ率・推移・数字ごとのマーク）・クリケットの履歴カード |
 | data/ | data_period.js | 週・月・年の期間の計算（`getPeriodRange()`）と、Stats の Period（ゲームの種類ごとの期間ごとの平均の推移・前の期間との比較。`renderStatsPeriod()`） |

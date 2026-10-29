@@ -90,12 +90,13 @@
     <section id="heatmapSection" class="data-summary-section stats-wide">
       <h3 class="data-section-title">Heatmap</h3>
       <div class="heatmap-controls">
-        <select id="heatmapPeriod" aria-label="ヒートマップの期間">
-          <option value="all">All</option>
-          <option value="d30">30 Days</option>
-          <option value="d7">7 Days</option>
-          <option value="d1">Today</option>
-        </select>
+        <!-- 期間（heatmap.js の setupHeatmapControls()。押しやすいようボタンで並べる） -->
+        <span id="heatmapPeriod" class="data-hub-period-tabs heatmap-period-tabs" role="group" aria-label="ヒートマップの期間">
+          <button type="button" data-heatmap-period="all">All</button>
+          <button type="button" data-heatmap-period="d30">30 Days</button>
+          <button type="button" data-heatmap-period="d7">7 Days</button>
+          <button type="button" data-heatmap-period="d1">Today</button>
+        </span>
         <span id="heatmapCount" class="heatmap-count"></span>
       </div>
       <div class="heatmap-body">
@@ -107,6 +108,19 @@
           <div id="heatmapRange" class="heatmap-range"></div>
           <div id="heatmapHits" class="heatmap-hits"></div>
         </div>
+      </div>
+      <!-- 期間の中の推移（heatmap.js の renderHeatmapTrend()。Today はゲームごと、7 Days・30 Days は日ごと、All は週ごと） -->
+      <div class="heatmap-trend">
+        <div class="heatmap-trend-top">
+          <span class="heatmap-trend-title" id="heatmapTrendTitle">Trend</span>
+          <span id="heatmapTrendMetric" class="data-hub-period-tabs" role="group" aria-label="推移の項目">
+            <button type="button" data-heatmap-metric="range">RANGE</button>
+            <button type="button" data-heatmap-metric="bull">Bull %</button>
+            <button type="button" data-heatmap-metric="d80">80% Circle</button>
+          </span>
+        </div>
+        <canvas id="heatmapTrendChart" class="heatmap-trend-chart"></canvas>
+        <p id="heatmapTrendNote" class="heatmap-trend-note"></p>
       </div>
     </section>
     <!-- タグ検索：タグを選ぶと、合う日をカレンダーで光らせ、合う日とそれ以外の日の成績を比べる（data.js の renderTagSearch()） -->

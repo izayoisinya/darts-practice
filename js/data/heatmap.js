@@ -37,6 +37,7 @@ function getBoardRadiusMm() {
 }
 
 let heatmapPeriod = "all"
+let heatmapTrendMetric = "range"
 let heatmapPalette = null
 
 
@@ -87,24 +88,48 @@ function renderAnalysisHeatmap() {
 
   setupHeatmapControls()
 
-  const data = collectHeatmapData(getHeatmapSessions())
+  const sessions = getHeatmapSessions()
+  const data = collectHeatmapData(sessions)
 
   renderHeatmapSummary(data)
-  renderHeatmapRange(data.points, getHeatmapSessions())
+  renderHeatmapRange(data.points, sessions)
   drawHeatmap(data.points)
+  renderHeatmapTrend(sessions)
 }
 
 function setupHeatmapControls() {
 
-  const select = document.getElementById("heatmapPeriod")
-  if (!select || select.dataset.ready) return
+  const group = document.getElementById("heatmapPeriod")
+  if (!group || group.dataset.ready) return
+  group.dataset.ready = "1"
 
-  select.value = heatmapPeriod
-  select.addEventListener("change", () => {
-    heatmapPeriod = select.value
+  group.addEventListener("click", e => {
+    const btn = e.target instanceof Element ? e.target.closest("[data-heatmap-period]") : null
+    if (!btn) return
+    heatmapPeriod = btn.dataset.heatmapPeriod
     renderAnalysisHeatmap()
   })
-  select.dataset.ready = "1"
+
+  const metric = document.getElementById("heatmapTrendMetric")
+  if (metric) {
+    metric.addEventListener("click", e => {
+      const btn = e.target instanceof Element ? e.target.closest("[data-heatmap-metric]") : null
+      if (!btn) return
+      heatmapTrendMetric = btn.dataset.heatmapMetric
+      renderHeatmapTrend(getHeatmapSessions())
+    })
+  }
+}
+
+// ボタンの選ばれている印を付け直す
+function markHeatmapButtons(groupId, attr, value) {
+  const group = document.getElementById(groupId)
+  if (!group) return
+  group.querySelectorAll(`[${attr}]`).forEach(btn => {
+    const active = btn.getAttribute(attr) === value
+    btn.classList.toggle("active", active)
+    btn.setAttribute("aria-pressed", String(active))
+  })
 }
 
 function renderHeatmapSummary(data) {
@@ -748,3 +773,180 @@ window.addEventListener("resize", () => {
     document.querySelectorAll(".session-card.is-expanded").forEach(drawSessionHeatmaps)
   }, 150)
 })
+
+
+// ===============================
+// ===== 期間の中の推移 =============
+// ===============================
+// ヒートマップの期間の中で、RANGE・ブル率・8 割が入る円がどう変わったかを折れ線で出す。
+//   区切り：Today はゲームごと、7 Days・30 Days は日ごと、All は週ごと（月曜はじまり。直近 HEATMAP_TREND_MAX 週）
+//   RANGE・8 割の円はその区切りの位置の記録をまとめて計算（上の数字と同じ方法）。ブル率は 1 ゲーム 24 投として数える
+const HEATMAP_TREND_MAX = 30
+const HEATMAP_TREND_METRICS = {
+  range: { label: "RANGE", unit: "mm", digits: 1, better: "lower", note: "小さいほどまとまっている" },
+  bull: { label: "Bull", unit: "%", digits: 1, better: "higher", note: "多いほど良い" },
+  d80: { label: "80% Circle", unit: "mm", digits: 0, better: "lower", note: "8 割の投が入る円の直径。小さいほど良い" }
+}
+
+function getHeatmapTrendGroups(sessions) {
+
+  const mode = heatmapPeriod === "d1" ? "game" : heatmapPeriod === "all" ? "week" : "day"
+  const groups = []
+  const byKey = {}
+
+  sessions
+    .slice()
+    .sort((a, b) => a.date - b.date)
+    .forEach((session, index) => {
+      const date = new Date(session.date)
+      let key = index
+      let label = `${date.getHours()}:${String(date.getMinutes()).padStart(2, "0")}`
+      if (mode === "day") {
+        key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+        label = `${date.getMonth() + 1}/${date.getDate()}`
+      } else if (mode === "week" && typeof getPeriodRange === "function") {
+        const start = getPeriodRange(date, "week").start
+        key = start.getTime()
+        label = `${start.getMonth() + 1}/${start.getDate()}`
+      }
+      if (!byKey[key]) {
+        byKey[key] = { label, list: [] }
+        groups.push(byKey[key])
+      }
+      byKey[key].list.push(session)
+    })
+
+  return {
+    mode,
+    groups: groups.slice(-HEATMAP_TREND_MAX).map(group => {
+      const points = []
+      group.list.forEach(session => {
+        ;(session.darts || []).forEach(dart => {
+          if (dart && dart.pos) points.push(dart.pos)
+        })
+      })
+      const range = getRangeStats(points)
+      const darts = group.list.length * 24
+      const bulls = group.list.reduce((sum, session) => sum + (session.bulls || 0), 0)
+      return {
+        label: group.label,
+        games: group.list.length,
+        range: range ? range.rangeMm : null,
+        d80: range ? range.d80Mm : null,
+        bull: darts ? bulls / darts * 100 : null
+      }
+    })
+  }
+}
+
+function renderHeatmapTrend(sessions) {
+
+  markHeatmapButtons("heatmapPeriod", "data-heatmap-period", heatmapPeriod)
+  markHeatmapButtons("heatmapTrendMetric", "data-heatmap-metric", heatmapTrendMetric)
+
+  const metric = HEATMAP_TREND_METRICS[heatmapTrendMetric]
+  const trend = getHeatmapTrendGroups(sessions)
+  const unitName = { game: "ゲーム", day: "日", week: "週" }[trend.mode]
+
+  const title = document.getElementById("heatmapTrendTitle")
+  if (title) title.textContent = `Trend（${unitName}ごと）`
+
+  const note = document.getElementById("heatmapTrendNote")
+  if (note) {
+    note.textContent = trend.mode === "week"
+      ? `直近 ${HEATMAP_TREND_MAX} 週までの ${metric.label}（${metric.unit}、${metric.note}）。金色は一番良い${unitName}`
+      : `${metric.label}（${metric.unit}、${metric.note}）。金色は一番良い${unitName}`
+  }
+
+  requestAnimationFrame(() => drawHeatmapTrend(trend.groups, metric, heatmapTrendMetric))
+}
+
+function drawHeatmapTrend(groups, metric, key) {
+
+  const canvas = document.getElementById("heatmapTrendChart")
+  if (!canvas || typeof setupHiDPICanvas !== "function" || !canvas.offsetWidth) return
+  const state = setupHiDPICanvas(canvas, 200)
+  if (!state) return
+
+  const { ctx, width, height } = state
+  const pad = { left: 40, right: 16, top: 22, bottom: 24 }
+  const graphW = width - pad.left - pad.right
+  const graphH = height - pad.top - pad.bottom
+  const items = groups.map((group, i) => ({ i, label: group.label, value: group[key] }))
+  const values = items.filter(item => item.value !== null).map(item => item.value)
+
+  ctx.clearRect(0, 0, width, height)
+  ctx.font = `10px ${HEATMAP_FONT}`
+
+  if (!values.length) {
+    ctx.fillStyle = "rgba(154,164,178,0.8)"
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
+    ctx.fillText(key === "bull" ? "この期間の記録はまだありません" : "位置の記録（ボード入力）がまだありません", width / 2, height / 2)
+    return
+  }
+
+  // 縦軸は値の範囲に少し余白を付ける（差が見えるように）
+  const maxV = Math.max(...values)
+  const minV = Math.min(...values)
+  const span = Math.max(maxV - minV, maxV * 0.1, 1)
+  const top = maxV + span * 0.2
+  const bottom = Math.max(0, minV - span * 0.2)
+  const y = v => pad.top + graphH - (v - bottom) / (top - bottom) * graphH
+  // 区切りごとに同じ幅の枠を取り、その真ん中に点を置く（数が少なくても端に寄らない）
+  const x = i => pad.left + graphW * (i + 0.5) / items.length
+
+  // 横線と目盛り
+  ctx.strokeStyle = "rgba(255,255,255,0.06)"
+  ctx.fillStyle = "rgba(154,164,178,0.8)"
+  ctx.textAlign = "right"
+  ctx.textBaseline = "middle"
+  for (let i = 0; i <= 3; i++) {
+    const v = bottom + (top - bottom) * i / 3
+    ctx.beginPath()
+    ctx.moveTo(pad.left, y(v))
+    ctx.lineTo(width - pad.right, y(v))
+    ctx.stroke()
+    ctx.fillText(v.toFixed(0), pad.left - 6, y(v))
+  }
+
+  // 横軸のラベル（多いときは間引く。最後は必ず出す）
+  const step = Math.ceil(items.length / Math.max(2, Math.floor(graphW / 48)))
+  ctx.textAlign = "center"
+  ctx.textBaseline = "top"
+  items.forEach(item => {
+    if ((items.length - 1 - item.i) % step !== 0) return
+    ctx.fillStyle = item.i === items.length - 1 ? "rgba(230,237,243,0.95)" : "rgba(154,164,178,0.8)"
+    ctx.fillText(item.label, x(item.i), pad.top + graphH + 6)
+  })
+
+  // 線（値のない区切りは飛ばしてつなぐ）
+  const drawn = items.filter(item => item.value !== null)
+  ctx.strokeStyle = "rgba(0, 255, 200, 0.85)"
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  drawn.forEach((item, n) => {
+    if (n === 0) ctx.moveTo(x(item.i), y(item.value))
+    else ctx.lineTo(x(item.i), y(item.value))
+  })
+  ctx.stroke()
+  ctx.lineWidth = 1
+
+  // 点と数字（多いときは一番良い点と最後の点だけ数字を出す）
+  const best = metric.better === "lower" ? minV : maxV
+  const showAll = drawn.length <= 12
+  drawn.forEach((item, n) => {
+    const isBest = item.value === best
+    const isLast = n === drawn.length - 1
+    ctx.fillStyle = isBest ? "#ffd772" : "#00ffc8"
+    ctx.beginPath()
+    ctx.arc(x(item.i), y(item.value), isBest || isLast ? 4 : 3, 0, Math.PI * 2)
+    ctx.fill()
+    if (showAll || isBest || isLast) {
+      ctx.fillStyle = isBest ? "#ffd772" : "rgba(230,237,243,0.85)"
+      ctx.textBaseline = "bottom"
+      ctx.fillText(item.value.toFixed(metric.digits), x(item.i), y(item.value) - 6)
+    }
+  })
+}
+

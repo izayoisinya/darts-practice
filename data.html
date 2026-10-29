@@ -134,27 +134,33 @@
       <canvas id="scatterChart"></canvas>
       <div id="scatterLegend" class="scatter-legend"></div>
     </section>
+    <!-- 期間 A と B の比較（data.js の drawSelectedRangeChart()）。ボタンで今週と先週などをすぐ選べ、日付で自由にも選べる -->
     <section id="rangeChartSection" class="data-summary-section stats-wide">
-      <h3 class="data-section-title">Score Trend (Selected Period)</h3>
+      <div class="range-chart-top">
+        <h3 class="data-section-title">Period Compare</h3>
+        <span id="rangePresets" class="data-hub-period-tabs range-presets" role="group" aria-label="比べる期間">
+          <button type="button" data-range-preset="week">Week</button>
+          <button type="button" data-range-preset="month">Month</button>
+          <button type="button" data-range-preset="d30">30 Days</button>
+        </span>
+      </div>
       <div class="range-chart-controls">
-        <div class="range-chart-row">
+        <div class="range-chart-row a">
           <span class="range-prefix">A</span>
-          <input id="rangeStartDate" type="date" />
-          <span class="range-sep">~</span>
-          <input id="rangeEndDate" type="date" />
+          <input id="rangeStartDate" type="date" aria-label="A の始まり" />
+          <span class="range-sep">〜</span>
+          <input id="rangeEndDate" type="date" aria-label="A の終わり" />
         </div>
-        <div class="range-chart-row">
+        <div class="range-chart-row b">
           <span class="range-prefix">B</span>
-          <input id="compareStartDate" type="date" />
-          <span class="range-sep">~</span>
-          <input id="compareEndDate" type="date" />
-        </div>
-        <div class="range-apply-row">
-          <button id="rangeApplyBtn" type="button">Apply</button>
+          <input id="compareStartDate" type="date" aria-label="B の始まり" />
+          <span class="range-sep">〜</span>
+          <input id="compareEndDate" type="date" aria-label="B の終わり" />
         </div>
       </div>
-      <div id="rangeChartLegend" class="range-chart-legend" style="display:none;"></div>
+      <div id="rangeChartSummary" class="period-trend-compare range-chart-summary"></div>
       <canvas id="rangeScoreChart"></canvas>
+      <p class="range-chart-note">それぞれの期間の 1 日目からの日ごとの平均スコア（練習しなかった日は飛ばしてつなぐ）。下の日付は上が A、下が B</p>
     </section>
     <!-- 2 つの日を比べる（data.js の renderDayCompare()。もとの Day の詳細の比較日を作り直したもの） -->
     <section class="data-summary-section stats-wide">

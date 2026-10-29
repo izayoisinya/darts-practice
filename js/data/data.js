@@ -443,21 +443,46 @@ function drawGameScoresChart() {
   })
 }
 
+function formatDateInput(date) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  return `${y}-${m}-${d}`
+}
+
+// ===============================
+// ===== Period Compare（期間 A と B の比較） =====
+// ===============================
+// 2 つの期間の平均スコア・ゲーム数・練習した日数と差を並べ、それぞれの期間の 1 日目からの日ごとの平均スコアを重ねて描く。
+// プリセット：Week（今週と先週）/ Month（今月と先月）/ 30 Days（直近 30 日とその前の 30 日。最初はこれ）
+let rangePreset = "d30"
+
+const RANGE_COLORS = { a: "#7bc96f", b: "#4da3ff" }
+
 function wireRangeChartControls() {
   if (rangeChartWired) return
 
-  const startInput = document.getElementById("rangeStartDate")
-  const endInput = document.getElementById("rangeEndDate")
-  const compareStartInput = document.getElementById("compareStartDate")
-  const compareEndInput = document.getElementById("compareEndDate")
-  const applyBtn = document.getElementById("rangeApplyBtn")
-  if (!startInput || !endInput || !compareStartInput || !compareEndInput || !applyBtn) return
+  const inputs = ["rangeStartDate", "rangeEndDate", "compareStartDate", "compareEndDate"]
+    .map(id => document.getElementById(id))
+  if (inputs.some(input => !input)) return
 
-  applyBtn.onclick = drawSelectedRangeChart
-  startInput.onchange = drawSelectedRangeChart
-  endInput.onchange = drawSelectedRangeChart
-  compareStartInput.onchange = drawSelectedRangeChart
-  compareEndInput.onchange = drawSelectedRangeChart
+  // 日付を自分で変えたら、プリセットの選択を外す
+  inputs.forEach(input => {
+    input.onchange = () => {
+      rangePreset = ""
+      drawSelectedRangeChart()
+    }
+  })
+
+  const presets = document.getElementById("rangePresets")
+  if (presets) {
+    presets.addEventListener("click", e => {
+      const btn = e.target instanceof Element ? e.target.closest("[data-range-preset]") : null
+      if (!btn) return
+      applyRangePreset(btn.dataset.rangePreset)
+      drawSelectedRangeChart()
+    })
+  }
 
   rangeChartWired = true
 }
@@ -469,32 +494,216 @@ function formatDateInput(date) {
   return `${y}-${m}-${d}`
 }
 
-function ensureRangeDefaults(sessions) {
+// プリセットの期間を日付の欄に入れる（終わりの日は、その期間の最後の日。今の期間は今日まででなく期間の最後まで）
+function applyRangePreset(preset) {
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  let a
+  let b
+
+  if (preset === "week" || preset === "month") {
+    const current = getPeriodRange(now, preset)
+    const prev = getPeriodRange(now, preset, -1)
+    a = { start: current.start, end: addDays(current.end, -1) }
+    b = { start: prev.start, end: addDays(prev.end, -1) }
+  } else {
+    a = { start: addDays(today, -29), end: today }
+    b = { start: addDays(today, -59), end: addDays(today, -30) }
+  }
+
+  rangePreset = preset
+  document.getElementById("rangeStartDate").value = formatDateInput(a.start)
+  document.getElementById("rangeEndDate").value = formatDateInput(a.end)
+  document.getElementById("compareStartDate").value = formatDateInput(b.start)
+  document.getElementById("compareEndDate").value = formatDateInput(b.end)
+}
+
+function ensureRangeDefaults() {
   const startInput = document.getElementById("rangeStartDate")
-  const endInput = document.getElementById("rangeEndDate")
-  const compareStartInput = document.getElementById("compareStartDate")
-  const compareEndInput = document.getElementById("compareEndDate")
-  if (!startInput || !endInput || !compareStartInput || !compareEndInput || !sessions.length) return
+  if (startInput && !startInput.value) applyRangePreset(rangePreset || "d30")
+}
 
-  const sorted = sessions
-    .filter(s => !Number.isNaN(new Date(s.date).getTime()))
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
+// 期間の 1 日目から数えた日ごとの平均スコア（length 日ぶん。練習しなかった日は null）
+function buildRangeDailySeries(startDate, avgMap, length) {
+  const series = []
+  for (let i = 0; i < length; i++) {
+    const key = dayKey(addDays(startDate, i))
+    series.push(Object.prototype.hasOwnProperty.call(avgMap, key) ? avgMap[key] : null)
+  }
+  return series
+}
 
-  if (!sorted.length) return
+function getRangeSummary(list) {
+  const days = new Set(list.map(s => dayKey(new Date(s.date)))).size
+  const avg = list.length ? list.reduce((sum, s) => sum + (Number(s.score) || 0), 0) / list.length : null
+  return { games: list.length, days, avg }
+}
 
-  const last30 = sorted.slice(-30)
-  const defaultStart = new Date(last30[0].date)
-  const defaultEnd = new Date(last30[last30.length - 1].date)
+function renderRangeSummary(a, b, labelA, labelB) {
+  const box = document.getElementById("rangeChartSummary")
+  if (!box) return
+
+  const fmt = v => v === null ? "-" : v.toFixed(1)
+  const diff = a.avg !== null && b.avg !== null ? a.avg - b.avg : null
+  const diffHtml = diff === null
+    ? '<span class="data-hub-period-diff even">-</span>'
+    : Math.abs(diff) < 0.05
+      ? '<span class="data-hub-period-diff even">±0</span>'
+      : `<span class="data-hub-period-diff ${diff > 0 ? "up" : "down"}">${diff > 0 ? "+" : "−"}${Math.abs(diff).toFixed(1)}</span>`
+
+  box.innerHTML = `
+    <div class="period-trend-item" style="--badge-rgb: 123 201 111">
+      <small>A · ${labelA}</small>
+      <strong>${fmt(a.avg)}</strong>
+      <small>Avg Score · ${a.games} games · ${a.days} days</small>
+    </div>
+    <div class="period-trend-item" style="--badge-rgb: 77 163 255">
+      <small>B · ${labelB}</small>
+      <strong>${fmt(b.avg)}</strong>
+      <small>Avg Score · ${b.games} games · ${b.days} days</small>
+    </div>
+    <div class="period-trend-item diff" style="--badge-rgb: 154 164 178">
+      <small>A − B</small>
+      ${diffHtml}
+      <small>多いほど良い</small>
+    </div>
+  `
+}
+
+function formatRangeLabel(start, end) {
+  const f = d => `${d.getMonth() + 1}/${d.getDate()}`
+  return `${f(start)} – ${f(end)}`
+}
+
+function drawSelectedRangeChart() {
+  if (viewMode !== "stats") return
+
+  wireRangeChartControls()
+  ensureRangeDefaults()
+
+  // プリセットのボタンの選ばれている印
+  document.querySelectorAll("[data-range-preset]").forEach(btn => {
+    const active = btn.dataset.rangePreset === rangePreset
+    btn.classList.toggle("active", active)
+    btn.setAttribute("aria-pressed", String(active))
+  })
+
+  const canvas = document.getElementById("rangeScoreChart")
+  if (!canvas) return
+
+  const startDate = parseDateStart(document.getElementById("rangeStartDate").value)
+  const endDate = parseDateEnd(document.getElementById("rangeEndDate").value)
+  const compareStartDate = parseDateStart(document.getElementById("compareStartDate").value)
+  const compareEndDate = parseDateEnd(document.getElementById("compareEndDate").value)
+
+  const canvasState = setupHiDPICanvas(canvas, 220)
+  if (!canvasState) {
+    scheduleChartRetry("selectedRange", () => drawSelectedRangeChart())
+    return
+  }
+  resetChartRetry("selectedRange")
+  const { ctx, width, height } = canvasState
+  ctx.clearRect(0, 0, width, height)
+
+  const message = text => {
+    ctx.fillStyle = "rgba(154,164,178,0.8)"
+    ctx.font = `12px ${chartAxisFontFamily}`
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
+    ctx.fillText(text, width / 2, height / 2)
+  }
+
+  if (!startDate || !endDate || !compareStartDate || !compareEndDate) {
+    renderRangeSummary(getRangeSummary([]), getRangeSummary([]), "-", "-")
+    message("期間を選んでください")
+    return
+  }
+  if (startDate > endDate || compareStartDate > compareEndDate) {
+    renderRangeSummary(getRangeSummary([]), getRangeSummary([]), "-", "-")
+    message("始まりの日が終わりの日より後になっています")
+    return
+  }
+
+  const sessions = readDataSessions()
+  const listA = filterSessionsByDate(sessions, startDate, endDate)
+  const listB = filterSessionsByDate(sessions, compareStartDate, compareEndDate)
+  renderRangeSummary(getRangeSummary(listA), getRangeSummary(listB),
+    formatRangeLabel(startDate, endDate), formatRangeLabel(compareStartDate, compareEndDate))
 
   const dayMs = 24 * 60 * 60 * 1000
-  const durationDays = Math.max(1, Math.floor((defaultEnd - defaultStart) / dayMs) + 1)
-  const compareDefaultEnd = new Date(defaultStart.getTime() - dayMs)
-  const compareDefaultStart = new Date(compareDefaultEnd.getTime() - (durationDays - 1) * dayMs)
+  const lenA = Math.round((dateFromDayKey(dayKey(endDate)) - startDate) / dayMs) + 1
+  const lenB = Math.round((dateFromDayKey(dayKey(compareEndDate)) - compareStartDate) / dayMs) + 1
+  const length = Math.max(lenA, lenB)
+  const seriesA = buildRangeDailySeries(startDate, buildDailyAverageMap(listA), lenA)
+  const seriesB = buildRangeDailySeries(compareStartDate, buildDailyAverageMap(listB), lenB)
 
-  if (!startInput.value) startInput.value = formatDateInput(defaultStart)
-  if (!endInput.value) endInput.value = formatDateInput(defaultEnd)
-  if (!compareStartInput.value) compareStartInput.value = formatDateInput(compareDefaultStart)
-  if (!compareEndInput.value) compareEndInput.value = formatDateInput(compareDefaultEnd)
+  const values = seriesA.concat(seriesB).filter(v => v !== null)
+  if (!values.length) {
+    message("この期間の記録はありません")
+    return
+  }
+
+  const pad = { left: 40, right: 12, top: 14, bottom: 34 }
+  const graphW = width - pad.left - pad.right
+  const graphH = height - pad.top - pad.bottom
+  const maxV = Math.max(...values)
+  const minV = Math.min(...values)
+  const span = Math.max(maxV - minV, 20)
+  const top = maxV + span * 0.15
+  const bottom = Math.max(0, minV - span * 0.15)
+  const y = v => pad.top + graphH - (v - bottom) / (top - bottom) * graphH
+  // 1 日ごとに同じ幅の枠を取り、その真ん中に点を置く
+  const x = i => pad.left + graphW * (i + 0.5) / length
+
+  ctx.font = `600 9px ${chartAxisFontFamily}`
+  ctx.strokeStyle = "rgba(255,255,255,0.06)"
+  ctx.fillStyle = "rgba(154,164,178,0.8)"
+  ctx.textAlign = "right"
+  ctx.textBaseline = "middle"
+  for (let i = 0; i <= 3; i++) {
+    const v = bottom + (top - bottom) * i / 3
+    ctx.beginPath()
+    ctx.moveTo(pad.left, y(v))
+    ctx.lineTo(width - pad.right, y(v))
+    ctx.stroke()
+    ctx.fillText(Math.round(v), pad.left - 6, y(v))
+  }
+
+  // 横軸：上の段が A の日付、下の段が B の日付（多いときは間引く）
+  const step = Math.ceil(length / Math.max(2, Math.floor(graphW / 44)))
+  ctx.textAlign = "center"
+  ctx.textBaseline = "top"
+  for (let i = 0; i < length; i += step) {
+    const label = date => `${date.getMonth() + 1}/${date.getDate()}`
+    if (i < lenA) {
+      ctx.fillStyle = RANGE_COLORS.a
+      ctx.fillText(label(addDays(startDate, i)), x(i), pad.top + graphH + 5)
+    }
+    if (i < lenB) {
+      ctx.fillStyle = RANGE_COLORS.b
+      ctx.fillText(label(addDays(compareStartDate, i)), x(i), pad.top + graphH + 17)
+    }
+  }
+
+  const drawSeries = (series, color) => {
+    const points = series
+      .map((v, i) => v === null ? null : { x: x(i), y: y(v) })
+      .filter(Boolean)
+    ctx.strokeStyle = color
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    points.forEach((p, n) => n ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y))
+    ctx.stroke()
+    ctx.fillStyle = color
+    points.forEach(p => {
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2)
+      ctx.fill()
+    })
+    ctx.lineWidth = 1
+  }
+  drawSeries(seriesB, RANGE_COLORS.b)
+  drawSeries(seriesA, RANGE_COLORS.a)
 }
 
 function parseDateStart(inputValue) {
@@ -549,32 +758,6 @@ function buildDailyAverageMap(sessions) {
   return avgMap
 }
 
-function buildNormalizedDateSeries(startDate, avgMap, length) {
-  if (!startDate || length <= 0) return []
-
-  const series = []
-  const startDay = dateFromDayKey(dayKey(startDate))
-  for (let i = 0; i < length; i++) {
-    const key = dayKey(addDays(startDay, i))
-    const value = Object.prototype.hasOwnProperty.call(avgMap, key) ? avgMap[key] : null
-    series.push(value)
-  }
-  return series
-}
-
-function buildDateLabels(startDate, length) {
-  if (!startDate || length <= 0) return []
-  const labels = []
-  const startDay = dateFromDayKey(dayKey(startDate))
-  for (let i = 0; i < length; i++) {
-    const d = addDays(startDay, i)
-    const m = String(d.getMonth() + 1)
-    const day = String(d.getDate())
-    labels.push(`${m}/${day}`)
-  }
-  return labels
-}
-
 function drawLineSeries(ctx, values, color, padding, verticalPadding, height, graphHeight, minScore, scoreRange, stepX) {
   let started = false
   ctx.beginPath()
@@ -608,118 +791,6 @@ function drawLineSeries(ctx, values, color, padding, verticalPadding, height, gr
     ctx.fill()
   })
 }
-
-function drawSelectedRangeChart() {
-  if (viewMode !== "stats") return
-
-  wireRangeChartControls()
-
-  const canvas = document.getElementById("rangeScoreChart")
-  const startInput = document.getElementById("rangeStartDate")
-  const endInput = document.getElementById("rangeEndDate")
-  const compareStartInput = document.getElementById("compareStartDate")
-  const compareEndInput = document.getElementById("compareEndDate")
-  const legend = document.getElementById("rangeChartLegend")
-  if (!canvas || !startInput || !endInput || !compareStartInput || !compareEndInput) return
-
-  const sessions = readDataSessions()
-  ensureRangeDefaults(sessions)
-
-  const canvasState = setupHiDPICanvas(canvas, 220)
-  if (!canvasState) {
-    scheduleChartRetry("selectedRange", () => drawSelectedRangeChart())
-    return
-  }
-  resetChartRetry("selectedRange")
-  const { ctx, width, height } = canvasState
-  ctx.clearRect(0, 0, width, height)
-
-  const startDate = parseDateStart(startInput.value)
-  const endDate = parseDateEnd(endInput.value)
-  const compareStartDate = parseDateStart(compareStartInput.value)
-  const compareEndDate = parseDateEnd(compareEndInput.value)
-
-  if ((startDate && endDate && startDate > endDate) || (compareStartDate && compareEndDate && compareStartDate > compareEndDate)) {
-    ctx.fillStyle = "rgba(255,255,255,0.4)"
-    ctx.font = "12px sans-serif"
-    ctx.fillText("Invalid date range", 12, 20)
-    if (legend) legend.style.display = "none"
-    return
-  }
-
-  const periodASessions = filterSessionsByDate(sessions, startDate, endDate)
-  const periodBSessions = filterSessionsByDate(sessions, compareStartDate, compareEndDate)
-
-  const avgA = buildDailyAverageMap(periodASessions)
-  const avgB = buildDailyAverageMap(periodBSessions)
-
-  const dayMs = 24 * 60 * 60 * 1000
-  const lenA = startDate && endDate ? Math.max(1, Math.floor((endDate - startDate) / dayMs) + 1) : 0
-  const lenB = compareStartDate && compareEndDate ? Math.max(1, Math.floor((compareEndDate - compareStartDate) / dayMs) + 1) : 0
-  const length = Math.max(lenA, lenB)
-
-  const seriesA = buildNormalizedDateSeries(startDate, avgA, length)
-  const seriesB = buildNormalizedDateSeries(compareStartDate, avgB, length)
-
-  const allScores = [...seriesA, ...seriesB].filter(v => v !== null)
-  if (!allScores.length) {
-    ctx.fillStyle = "rgba(255,255,255,0.4)"
-    ctx.font = "12px sans-serif"
-    ctx.fillText("No data in selected ranges", 12, 20)
-    if (legend) legend.style.display = "none"
-    return
-  }
-
-  const chartPadding = getChartPadding()
-  const padding = chartPadding.left
-  const rightPadding = chartPadding.right
-  const verticalPadding = chartPadding.vertical
-  const graphWidth = width - padding - rightPadding
-  const graphHeight = height - verticalPadding * 2
-  const { minScore, scoreRange } = getScoreAxis(allScores)
-
-  ctx.strokeStyle = "rgba(255,255,255,0.08)"
-  ctx.lineWidth = 1
-  const gridSteps = 4
-  for (let i = 0; i <= gridSteps; i++) {
-    const value = minScore + (scoreRange / gridSteps) * i
-    const y = height - verticalPadding - (value - minScore) / scoreRange * graphHeight
-    ctx.beginPath()
-    ctx.moveTo(padding, y)
-    ctx.lineTo(width - rightPadding, y)
-    ctx.stroke()
-
-    setChartAxisTextStyle(ctx)
-    ctx.fillText(Math.round(value), Math.round(padding - 2), Math.round(y))
-  }
-
-  const stepX = graphWidth / (length - 1 || 1)
-  const startX = getChartStartX(padding, graphWidth, length)
-  const labels = buildDateLabels(startDate || compareStartDate, length)
-  const labelStep = Math.max(1, Math.ceil(length / 6))
-  ctx.fillStyle = "rgba(255,255,255,0.56)"
-  ctx.font = `600 9px ${chartAxisFontFamily}`
-  ctx.textAlign = "center"
-  ctx.textBaseline = "alphabetic"
-  labels.forEach((label, i) => {
-    if (i % labelStep !== 0 && i !== labels.length - 1) return
-    const x = startX + stepX * i
-    ctx.fillText(label, x, height - 8)
-  })
-
-  drawLineSeries(ctx, seriesA, "#7bc96f", startX, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
-  drawLineSeries(ctx, seriesB, "#4da3ff", startX, verticalPadding, height, graphHeight, minScore, scoreRange, stepX)
-
-  if (legend) {
-    legend.innerHTML = `
-      <span class="range-chart-legend-item"><span class="range-chart-legend-swatch a"></span>A: ${startInput.value} - ${endInput.value}</span>
-      <span class="range-chart-legend-item"><span class="range-chart-legend-swatch b"></span>B: ${compareStartInput.value} - ${compareEndInput.value}</span>
-    `
-    legend.style.display = "flex"
-  }
-}
-
-
 
 // ===============================
 // ===== Analysis（タグ別の散布図） =====

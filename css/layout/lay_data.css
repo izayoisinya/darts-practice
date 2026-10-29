@@ -162,23 +162,6 @@ body.page-data main.data-container {
   min-width: 0;
 }
 
-.tablet.landscape .range-chart-row {
-  grid-template-columns: 14px minmax(0, 1fr) 10px minmax(0, 1fr);
-  gap: 6px;
-}
-
-.tablet.landscape .range-chart-controls input {
-  min-width: 0;
-  max-width: 100%;
-  font-size: 12px;
-  padding: 5px 6px;
-}
-
-.tablet.landscape .range-chart-legend {
-  flex-wrap: wrap;
-  gap: 8px 12px;
-}
-
 @media (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) {
   main.data-container {
     overflow-x: hidden;
@@ -198,30 +181,6 @@ body.page-data main.data-container {
   #sessionsContainer > * {
     min-width: 0;
     max-width: 100%;
-  }
-
-  .range-chart-controls input,
-.range-chart-controls button {
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .range-chart-row {
-    grid-template-columns: 12px minmax(0, 0.5fr) 8px minmax(0, 0.5fr);
-    gap: 4px;
-  }
-
-  .range-chart-legend {
-    flex-wrap: wrap;
-    gap: 8px 12px;
-  }
-
-  .range-chart-controls input[type="date"] {
-    width: min(100%, 136px);
-    max-width: 136px;
-    justify-self: center;
-    font-size: 11px;
-    padding: 4px 6px;
   }
 }
 
@@ -332,83 +291,6 @@ body.page-data main.data-container {
 }
 
 .detail-bull-rate-bar-fill.inner {
-  background: #4da3ff;
-}
-
-.range-chart-controls {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.range-chart-row {
-  display: grid;
-  grid-template-columns: 18px minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 8px;
-  align-items: center;
-}
-
-.range-prefix,
-.range-sep {
-  font-size: 12px;
-  opacity: 0.8;
-  text-align: center;
-}
-
-.range-prefix {
-  font-weight: 700;
-}
-
-.range-apply-row {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.range-chart-controls input,
-.range-chart-controls button {
-  background: #1a1f29;
-  border: 1px solid #3a3f4b;
-  color: var(--text-main);
-  border-radius: 8px;
-  padding: 6px 8px;
-}
-
-.range-chart-controls input {
-  width: 100%;
-  min-width: 0;
-}
-
-.range-chart-controls button {
-  cursor: pointer;
-}
-
-.range-chart-legend {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 4px 0 8px;
-  font-size: 12px;
-  opacity: 0.9;
-}
-
-.range-chart-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.range-chart-legend-swatch {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.range-chart-legend-swatch.a {
-  background: #7bc96f;
-}
-
-.range-chart-legend-swatch.b {
   background: #4da3ff;
 }
 
@@ -530,14 +412,6 @@ body.page-data main.data-container {
 }
 
 @media (max-width: 760px) {
-  .range-chart-row {
-    grid-template-columns: auto 1fr;
-  }
-
-  .range-chart-row button {
-    grid-column: 1 / -1;
-  }
-
   .rating-current-grid,
   .rating-reference-grid {
     grid-template-columns: 1fr;
@@ -1308,26 +1182,6 @@ body.page-data main.data-container {
   width: 100%;
   justify-content: center;
   padding: 0;
-}
-
-.phone.portrait .range-chart-row {
-  grid-template-columns: 14px minmax(0, 1fr) 10px minmax(0, 1fr);
-  gap: 4px;
-}
-
-.phone.portrait .range-prefix,
-.phone.portrait .range-sep {
-  font-size: 11px;
-}
-
-.phone.portrait .range-chart-controls input {
-  min-width: 0;
-  padding: 5px 6px;
-  font-size: 12px;
-}
-
-.phone.portrait .range-apply-row {
-  margin-top: 2px;
 }
 
 /* セッションカード: tablet portrait と同じ構成 */
@@ -3435,11 +3289,6 @@ body.page-data.phone.landscape #leftPanel {
 }
 
 
-/* 期間 A・B の入力は広げすぎない */
-#leftPanel .range-chart-controls {
-  max-width: 560px;
-}
-
 /* ===================================================== */
 /* ヒートマップの期間のボタンと推移（heatmap.js の renderHeatmapTrend()） */
 /* ===================================================== */
@@ -3498,3 +3347,94 @@ body.page-data.phone.landscape #leftPanel {
   min-width: 0;
   padding: 6px 4px;
 }
+
+/* ===================================================== */
+/* Period Compare（期間 A と B の比較。data.js の drawSelectedRangeChart()） */
+/* ===================================================== */
+.range-chart-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.range-presets button {
+  min-height: 34px;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.range-chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.range-chart-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.range-prefix {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 22px;
+  text-align: center;
+  color: #0b0e14;
+}
+
+.range-chart-row.a .range-prefix { background: #7bc96f; }
+.range-chart-row.b .range-prefix { background: #4da3ff; }
+
+.range-sep {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.range-chart-controls input {
+  width: 150px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid #3a3f4b;
+  border-radius: 10px;
+  background: #1a1f29;
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.range-chart-row.a input { border-color: rgba(123, 201, 111, 0.45); }
+.range-chart-row.b input { border-color: rgba(77, 163, 255, 0.45); }
+
+.range-chart-note {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* スマホ縦：日付の欄を横幅いっぱいに等分し、プリセットのボタンも等分する */
+.phone.portrait .range-chart-row {
+  width: 100%;
+}
+
+.phone.portrait .range-chart-controls input {
+  flex: 1 1 0;
+  width: auto;
+  font-size: 13px;
+  padding: 6px;
+}
+
+.phone.portrait .range-presets {
+  width: 100%;
+}
+
+.phone.portrait .range-presets button {
+  flex: 1 1 0;
+  min-width: 0;
+}
+

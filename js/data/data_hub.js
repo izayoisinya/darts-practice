@@ -354,9 +354,10 @@ function renderDataHubCalendar(sessions) {
     if (isThisMonth && today.getDate() === d) cls.push("today")
     const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
     if (key === dataHubSelectedDay) cls.push("selected")
-    // メモ・タグのある日は右上に小さな印
+    // メモ・タグのある日は右上に黄色の丸、写真を保存した日はその左に青い四角の印
     const note = notes[key]
-    if (note && (note.comment || (note.tags || []).length || note.imageData)) cls.push("has-note")
+    if (note && (note.comment || (note.tags || []).length)) cls.push("has-note")
+    if (note && note.imageData) cls.push("has-photo")
     const inner = `<span class="data-hub-cal-num">${d}</span>` +
       `${count ? `<span class="data-hub-cal-count">${count}</span>` : ""}`
     // 練習した日は押すとその日のゲームを出す
@@ -376,7 +377,10 @@ function renderDataHubCalendar(sessions) {
         </span>
       </div>
       <div class="data-hub-cal-grid">${cells}</div>
-      <p class="data-hub-cal-sum">${days} days · ${games} games</p>
+      <div class="data-hub-cal-foot">
+        <span class="data-hub-cal-legend"><i class="note"></i>Memo<i class="photo"></i>Photo</span>
+        <p class="data-hub-cal-sum">${days} days · ${games} games</p>
+      </div>
     </section>
   `
 }

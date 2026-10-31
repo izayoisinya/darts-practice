@@ -89,7 +89,10 @@ window.addEventListener("resize", () => {
   if (dataGameType === "countup" || typeof viewMode === "undefined" || viewMode !== "stats") return
   clearTimeout(data01ResizeTimer)
   data01ResizeTimer = setTimeout(() => {
-    if (dataGameType === "01") drawZeroOneChart(getZeroOneFilteredSessions())
+    if (dataGameType === "01") {
+      drawZeroOneChart(getZeroOneFilteredSessions())
+      drawZeroOneHeatmap(getZeroOneFilteredSessions())
+    }
     else drawCricketChart(getCricketFilteredSessions())
   }, 150)
 })
@@ -167,7 +170,7 @@ function renderZeroOneData() {
       </div>
     </section>
     ${renderZeroOneHitRates(list)}
-    ${renderZeroOneRange(list)}
+    ${renderZeroOneHeatmap(list)}
     ${renderZeroOneDailyRange(list)}
     ${renderZeroOneRating(list)}
     ${renderZeroOneFinishNumbers(list)}
@@ -180,7 +183,10 @@ function renderZeroOneData() {
     renderZeroOneData()
   })
 
-  requestAnimationFrame(() => drawZeroOneChart(list))
+  requestAnimationFrame(() => {
+    drawZeroOneChart(list)
+    drawZeroOneHeatmap(list)
+  })
 }
 
 // 1 ゲームの投数・ブル（アウター＋インナー）・インナーブル・トリプルの本数（1 投ごとの記録から）
@@ -624,33 +630,100 @@ function getZeroOne80Points(session) {
   return getZeroOne80Darts(session).filter(dart => dart.pos).map(dart => dart.pos)
 }
 
-// RANGE の目安（データ画面の Analysis と同じ出し方。heatmap.js の getRangeStats() / getRangeFromBullRate()）
-function renderZeroOneRange(list) {
+// ヒートマップと RANGE の目安（カウントアップの Heatmap と同じ部品。heatmap.js の paintHeatmap() / getRangeStats()）
+//   Bull Aim：最初の点数の 80% を減らすまで（ブルを狙う場面）の投だけ。RANGE の円も重ねる
+//   All Darts：上がりのためにダブルなどを狙った投も含めた全部の投
+//   RANGE の数字はどちらを選んでもブルを狙う場面の投から出す
+let data01HeatMode = "bull"
 
-  if (typeof getRangeStats !== "function") return ""
+function renderZeroOneHeatmap(list) {
 
-  const darts = list.flatMap(getZeroOne80Darts)
-  if (!darts.length) return ""
+  if (typeof getRangeStats !== "function" || typeof paintHeatmap !== "function") return ""
 
-  const points = darts.filter(dart => dart.pos).map(dart => dart.pos)
-  const range = getRangeStats(points)
-  const bulls = darts.filter(dart => dart.hit === "OB" || dart.hit === "IB").length
-  const fromBull = bulls ? getRangeFromBullRate(bulls / darts.length) : 0
+  const bullDarts = list.flatMap(getZeroOne80Darts)
+  if (!bullDarts.length) return ""
+
+  const allDarts = list.flatMap(session => (Array.isArray(session.darts) ? session.darts : []).filter(dart => dart))
+  const shown = data01HeatMode === "all" ? allDarts : bullDarts
+  const points = shown.filter(dart => dart.pos).map(dart => dart.pos)
+
+  const range = getRangeStats(bullDarts.filter(dart => dart.pos).map(dart => dart.pos))
+  const bulls = bullDarts.filter(dart => dart.hit === "OB" || dart.hit === "IB").length
+  const fromBull = bulls ? getRangeFromBullRate(bulls / bullDarts.length) : 0
+
+  // よく刺さった場所（上位 8 か所。棒の長さはいちばん多い場所を最大にする）
+  const counts = {}
+  shown.forEach(dart => { counts[dart.hit] = (counts[dart.hit] || 0) + 1 })
+  const hits = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 8)
+  const maxCount = counts[hits[0]] || 1
+  const hitRows = hits.map(hit => `
+    <div class="heatmap-hit">
+      <span class="heatmap-hit-name">${formatHeatmapHit(hit)}</span>
+      <span class="heatmap-hit-bar"><span style="width:${(counts[hit] / maxCount * 100).toFixed(1)}%"></span></span>
+      <span class="heatmap-hit-rate">${(counts[hit] / shown.length * 100).toFixed(1)}%</span>
+    </div>
+  `).join("")
+
+  const modes = { bull: "Bull Aim", all: "All Darts" }
 
   return `
-    <section class="data-summary-section">
-      <h3 class="data-section-title">RANGE（目安）</h3>
-      <div class="heatmap-range">
-        <div class="heatmap-range-values">
-          <span class="main"><b>${range ? range.rangeMm.toFixed(1) : "-"}</b> mm<small>刺さった位置から</small></span>
-          <span><b>${fromBull ? fromBull.toFixed(1) : "-"}</b> mm<small>ブル率 ${(bulls / darts.length * 100).toFixed(1)}% から</small></span>
-          <span><b>${range ? range.d80Mm.toFixed(0) : "-"}</b> mm<small>8 割が入る円</small></span>
+    <section class="data-summary-section stats-wide">
+      <h3 class="data-section-title">Heatmap</h3>
+      <div class="heatmap-controls">
+        <span class="data-hub-period-tabs heatmap-period-tabs" role="group" aria-label="ヒートマップに出す投">
+          ${Object.keys(modes).map(key => `
+            <button type="button" data-z1-heat="${key}" class="${key === data01HeatMode ? "active" : ""}" aria-pressed="${key === data01HeatMode}">${modes[key]}</button>
+          `).join("")}
+        </span>
+        <span class="heatmap-count">${points.length ? `位置あり ${points.length} 投` : "位置の記録（ボード入力）がありません"}</span>
+      </div>
+      <div class="heatmap-body">
+        <div class="heatmap-board">
+          <canvas id="z1HeatmapCanvas" class="heatmap-canvas"></canvas>
         </div>
-        <p class="heatmap-range-note">最初の点数の 80% を減らすまで（ブルを狙う場面）の ${darts.length} 投から出した、DARTSLIVE の RANGE（ブルのまわりのまとまりの直径）に近い目安です。上がりのためにダブルなどを狙った投は入れていません。</p>
+        <div class="heatmap-side">
+          <div class="heatmap-range">
+            <div class="heatmap-range-title">RANGE（目安）</div>
+            <div class="heatmap-range-values">
+              <span class="main"><b>${range ? range.rangeMm.toFixed(1) : "-"}</b> mm<small>刺さった位置から</small></span>
+              <span><b>${fromBull ? fromBull.toFixed(1) : "-"}</b> mm<small>ブル率 ${(bulls / bullDarts.length * 100).toFixed(1)}% から</small></span>
+              <span><b>${range ? range.d80Mm.toFixed(0) : "-"}</b> mm<small>8 割が入る円</small></span>
+            </div>
+            <p class="heatmap-range-note">最初の点数の 80% を減らすまで（ブルを狙う場面）の ${bullDarts.length} 投から出した、DARTSLIVE の RANGE（ブルのまわりのまとまりの直径）に近い目安です。上がりのためにダブルなどを狙った投は入れていません。Bull Aim の図には RANGE（実線）と 8 割の投が入る円（点線）を重ねます。</p>
+          </div>
+          <div class="heatmap-hits">
+            <div class="heatmap-hits-title">よく刺さった場所（${modes[data01HeatMode]} ${shown.length} 投）</div>
+            ${hitRows}
+          </div>
+        </div>
       </div>
     </section>
   `
 }
+
+function drawZeroOneHeatmap(list) {
+
+  const canvas = document.getElementById("z1HeatmapCanvas")
+  if (!canvas || typeof paintHeatmap !== "function") return
+  const state = setupHiDPICanvas(canvas, 320)
+  if (!state) return
+
+  const darts = data01HeatMode === "all"
+    ? list.flatMap(session => (Array.isArray(session.darts) ? session.darts : []).filter(dart => dart))
+    : list.flatMap(getZeroOne80Darts)
+  const points = darts.filter(dart => dart.pos).map(dart => dart.pos)
+
+  paintHeatmap(state.ctx, state.width, state.height, points)
+  if (data01HeatMode === "bull") drawRangeCircles(state.ctx, state.width, state.height, getRangeStats(points))
+}
+
+// Bull Aim / All Darts の切り替え
+document.addEventListener("click", e => {
+  const btn = e.target instanceof Element ? e.target.closest("[data-z1-heat]") : null
+  if (!btn) return
+  data01HeatMode = btn.dataset.z1Heat
+  renderZeroOneData()
+})
 
 // 日ごとの RANGE の平均（ゲームごとの RANGE の平均。heatmap.js の getAverageRange()：ブルモードがセパレートのゲームは除く）
 const DATA_01_RANGE_DAYS = 10

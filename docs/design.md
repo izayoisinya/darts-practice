@@ -286,7 +286,8 @@ Stats の画面のヘッダー右の **Count-Up / 01 / Cricket** で切り替え
   - Stats（`.data-card`）：Games Played・Finish Rate（上がり率）・Avg Darts（上がったゲームの平均ダーツ数）・Best Darts・Average PPD・Finish Rate (Last 10)（直近 10 ゲームの上がり率）
   - Awards（`.data-card`）
   - Bull / Triple：全投数に対するブル（アウター＋インナー）・インナーブル（金）・トリプル（青）の本数と割合（1 投ごとの記録 `darts` から数える。カウントアップの詳細の Bull Rate と同じ部品。`renderZeroOneHitRates()`）
-  - RANGE（目安）：カウントアップの Stats のヒートマップと同じ出し方（位置から・ブル率から・8 割の円）。01 は上がりでダブルなどを狙うので、80% スタッツと同じ範囲（最初の点数の 80% を減らしたラウンドまで＝ブルを狙う場面）の投だけで出す（`getZeroOne80Darts()` / `renderZeroOneRange()`）。履歴カードのヒートマップ（`createSessionHeatmapHtml(session, true, getZeroOne80Points(session))`）とゲーム画面のレーダー（cu_ui.js の `getZeroOneBullPhasePoints()`）も同じ範囲で RANGE を出す
+  - Heatmap（`renderZeroOneHeatmap()` / `drawZeroOneHeatmap()`。カウントアップの Heatmap と同じ部品）：刺さった位置の分布をボードの図に出し、よく刺さった場所の上位 8 か所の割合を並べる。Bull Aim（ブルを狙う場面の投だけ。RANGE の円も重ねる。最初はこれ）/ All Darts（上がりでダブルなどを狙った投も含めた全部）をボタンで切り替える（`data01HeatMode`）。上の設定の絞り込みに合わせる
+  - RANGE（目安。Heatmap のカードの中）：カウントアップの Stats のヒートマップと同じ出し方（位置から・ブル率から・8 割の円）。01 は上がりでダブルなどを狙うので、80% スタッツと同じ範囲（最初の点数の 80% を減らしたラウンドまで＝ブルを狙う場面）の投だけで出す（`getZeroOne80Darts()`。Bull Aim / All Darts の切り替えでは変わらない）。履歴カードのヒートマップ（`createSessionHeatmapHtml(session, true, getZeroOne80Points(session))`）とゲーム画面のレーダー（cu_ui.js の `getZeroOneBullPhasePoints()`）も同じ範囲で RANGE を出す
   - Daily Range：直近 10 日の、日ごとの RANGE の平均（ゲームごとの RANGE の平均。`getAverageRange()` を使うので、ブルモードがセパレートのゲームと位置の記録がないゲームは含めない）を棒で出す（`renderZeroOneDailyRange()`）
   - Darts to Finish：直近 30 ゲームの上がるまでのダーツ数の推移（最少は金色）。上がれなかったゲームは上の段に赤い ×
   - レーティング参考値（カウントアップと同じカード）：直近 30 ゲームの **80% スタッツ**（1 ゲームごとに、最初の点数の 80% を減らしたラウンドまでの 1 ラウンドの平均点。バストは 0 点）の平均を PPR として出し、PPD（÷ 3）を `rating.js` の換算表で DARTSLIVE / PHOENIX の目安にする（`getZeroOneStats80()` / `renderZeroOneRating()`）
@@ -1081,3 +1082,4 @@ graph LR
 | 2026.10.30 | バックアップの保存で、共有シートにタイトルを渡さないようにした（iOS の「ファイルに保存」で、ファイル名だけのテキストファイルが一緒に保存されていたため） |
 | 2026.10.30 | Stats の期間 A/B の比較を作り直し（Period Compare）：Week / Month / 30 Days のボタン、A・B の平均・ゲーム数・日数と差、練習しなかった日を飛ばしてつなぐ線、横軸に A・B 両方の日付。Apply ボタンはなくした（日付を変えるとすぐ描き直す） |
 | 2026.10.31 | データのトップのカレンダーに、写真を保存した日の印（青い四角。`.has-photo`）を追加。メモの印（黄色の丸）はコメント・タグがある日だけにし、カレンダーの下に印の説明を出す |
+| 2026.10.31 | Stats の 01 にヒートマップを追加（Bull Aim / All Darts を切り替え。RANGE の欄をヒートマップのカードにまとめた。`renderZeroOneHeatmap()`） |

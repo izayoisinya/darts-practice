@@ -1530,7 +1530,8 @@ body.page-data.data-stats-view {
   padding-top: 100%;
 }
 
-#heatmapCanvas {
+#heatmapCanvas,
+#z1HeatmapCanvas {
   position: absolute;
   top: 0;
   left: 0;

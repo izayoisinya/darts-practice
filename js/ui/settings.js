@@ -266,7 +266,9 @@ async function importBackupFile(file) {
     const plan = planBackupImport(data)
     const newCount = plan.newSessions.length
 
-    if (newCount === 0 && plan.updatedNoteCount === 0) {
+    const gearCount = plan.updatedGearCount || 0
+
+    if (newCount === 0 && plan.updatedNoteCount === 0 && gearCount === 0) {
       setBackupStatus("追加するデータはありませんでした（すべて取り込み済みです）")
       alert("追加するデータはありませんでした（すべて取り込み済みです）")
       return
@@ -275,7 +277,9 @@ async function importBackupFile(file) {
     const ok = confirm(
       `ファイル内のゲーム ${plan.totalSessions.toLocaleString()} 件のうち、` +
       `まだない ${newCount.toLocaleString()} 件を追加します。\n` +
-      `日別メモは ${plan.updatedNoteCount} 件を追加・更新します。\n\n` +
+      `日別メモは ${plan.updatedNoteCount} 件を追加・更新します。\n` +
+      (gearCount ? `セッティング（パーツと日ごとの記録）は ${gearCount} 件を追加・更新します。\n` : "") +
+      "\n" +
       "今の記録は消えません。読み込みますか？"
     )
     if (!ok) {
@@ -288,7 +292,7 @@ async function importBackupFile(file) {
     markBackupDone(readSessions().length)
     updateBackupInfo()
 
-    setBackupStatus(`ゲーム ${newCount.toLocaleString()} 件と日別メモ ${plan.updatedNoteCount} 件を読み込みました`)
+    setBackupStatus(`ゲーム ${newCount.toLocaleString()} 件と日別メモ ${plan.updatedNoteCount} 件${gearCount ? `、セッティング ${gearCount} 件` : ""}を読み込みました`)
     await updateStorageStatus()
   } catch (error) {
     const message = error && error.message ? error.message : "読み込みに失敗しました"

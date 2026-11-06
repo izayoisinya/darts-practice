@@ -243,6 +243,8 @@ Rounds エリアと Input エリアが横並びになり、その下に Stats �
 - Practice（カレンダーの下。`renderDataHubPeriod()`）：今週（月曜はじまり）・今月・今年の**練習量**だけを出す（練習した日数・ゲーム数・ゲームの種類ごとのゲーム数と、前の期間の日数・ゲーム数）。Week / Month / Year で切り替え（最後に選んだものを LocalStorage `dartsDataHubPeriod` に残す）。期間は今日を基準にする（カレンダーで選んだ日には左右されない）。成績（平均や差）はトップには出さず、Stats の Period に出す（トップは記録、Stats は分析）
 - その日の割合：メモの下に、その日の全ゲームの Bull / In-Bull / Triple の割合（本数 / 投数と棒。`renderDataHubDayRates()`。1 投ごとの記録があればそこから、ない古い記録はゲームのブル数・トリプル数とラウンド数 × 3 で数える）
 - 日別メモ：選んだ日のゲームの上に、その日のメモ（コメント・タグ・セッティングの写真〔小さく出し、押すと画面いっぱいに出す。`openDataHubImage()`〕）と「Memo」ボタン（メモが無ければ「+ Memo」）を出す（`renderDataHubDayNote()`）。ボタンで Day 一覧のときと同じ編集画面（`data_notes.js` の `openDayNoteEditor()`）を開き、保存するとトップを描き直す（`renderDataHub()`）。コメント・タグのある日はカレンダーの右上に黄色の小さな丸（`.has-note`）、写真を保存した日は青い小さな四角（`.has-photo`。メモの印があればその左）。カレンダーの左下に印の説明（Memo / Photo）。タグは Count-Up の Stats のタグ別散布図の色分けに使う
+- **セッティング**：メモの下に、その日のチップ・バレル・シャフト・フライトと「Setting」ボタン（なければ「+ Setting」）を出す（`renderDataHubDayGear()`）。ボタンで編集画面（`gear.js` の `openDayGearEditor()`）を開く。今日はまだ投げていなくてもカレンダーで押せる（練習の前にセッティングやメモを入れられる）。記録がまだないときは今日を選んでおく
+  - 編集画面：上に前に使ったセッティング（4 つの組み合わせ。最後に使った日が新しい順に 6 つ。押すと下の 4 つに入る）、その下にパーツごとの選択（登録済みのパーツ〔最後に使った順〕から選ぶか「＋ New」で名前を入れると、保存のときに新しいパーツとして登録）。「パーツの管理」で名前の変更と、使った日がないパーツの削除
 - **Day / Week / Month / Year のビューは削除した**（2026.10.8 にお休みにし、2026.10.10 に削除。日付はトップのカレンダー、練習量はトップの Practice、成績の推移は Stats の Period、日の比較は Stats の Day Compare、タグは Tag Search で見る）。日別メモの読み書きと編集画面だけ `data_notes.js` に残した
 - カードを押すとその画面を開き（`openDataView("history" | "stats")`）、ヘッダーの左上のボタンを「‹ Top」にしてトップに戻れるようにする（`backToDataHub()`。トップでは同じボタンが「‹ Menu」でメインメニューへ）。画面を開くときに履歴を 1 つ足すので、端末・ブラウザの「戻る」でもトップに戻る
 
@@ -351,7 +353,7 @@ darts-practice/
 │   ├── core/            state.js / core.js / storage.js
 │   ├── init/            main.js
 │   ├── game/            game_core.js / game_countup.js / game_01.js / game_cricket.js / cu_ui.js / board_input.js / stats.js
-│   ├── data/            data_loader.js / data_notes.js / data.js / rating.js / heatmap.js / data_01.js / data_cricket.js / data_period.js / data_hub.js
+│   ├── data/            data_loader.js / data_notes.js / gear.js / data.js / rating.js / heatmap.js / data_01.js / data_cricket.js / data_period.js / data_hub.js
 │   └── ui/              chart.js / settings.js / news.js / backup_ui.js
 └── docs/                本設計書と画面画像
 ```
@@ -649,6 +651,20 @@ Count-Up の Stats のヒートマップ（もとの Analysis タブ）。ゲー
 - 位置があるのはボード入力で入れた投だけ。「よく刺さった場所」はボタン入力の投も含めて数える
 - ボードの寸法は `board_input.js` の `REAL_BOARD_RADIUS` と同じ値を持つ（データ画面ではゲーム画面の JS を読み込まないため）
 
+#### data/gear.js
+
+セッティング（チップ・バレル・シャフト・フライトのパーツと、日ごとに使ったセッティング。LocalStorage `dartsGear`）の読み書きと編集画面（`#gearModal`。JS で作る）。
+
+| 関数 | 内容 |
+| --- | --- |
+| `readGear()` / `writeGear()` | 読み書き（6.7 の形） |
+| `addGearPart(data, type, name)` | パーツを登録（同じ種類・同じ名前〔大文字小文字は区別しない〕があればそれを返す） |
+| `getDayGear(dayKey)` / `setDayGear(dayKey, ids)` | その日のセッティング（パーツの id）。全部未設定で保存すると消す |
+| `getRecentGearSets()` | 前に使ったセッティング（同じ組み合わせはまとめる） |
+| `getGearPartsByType(type)` / `countGearPartDays(id)` | 種類ごとのパーツ（最後に使った順）・パーツを使った日数 |
+| `renameGearPart(id, name)` / `deleteGearPart(id)` | 名前の変更・削除（使った日があるパーツは消せない） |
+| `openDayGearEditor(dayKey, label)` / `saveDayGearEditor()` | 編集画面を開く・保存する（新しいパーツを登録してからその日のセッティングにし、データのトップを描き直す） |
+
 #### data/data_notes.js
 
 日別メモ（コメント・タグ・セッティングの写真。LocalStorage `dartsDayNotesV2`）の読み書きと編集画面。2026.10.10 に Day / Week / Month / Year のビュー（もとの `data_grouped.js` / `data_detail.js`）を削除し、メモの部分だけを残した。
@@ -728,6 +744,7 @@ PHOENIX の換算の元にした表（Rt16 / Rt30。01 の PPD とクリケッ�
 | `dartsCricket` | LocalStorage | クリケットの設定（`{ rounds }`） |
 | `dartsSettings` | LocalStorage | 設定 |
 | `dartsDayNotesV2` | LocalStorage | 日別メモ |
+| `dartsGear` | LocalStorage | セッティング（登録したパーツと日ごとのセッティング。6.7） |
 | `dartsDataGame` | LocalStorage | データ画面の Stats で最後に見ていたゲーム |
 | `dartsDataHubPeriod` | LocalStorage | データのトップの Practice で最後に選んだ期間（week / month / year） |
 | `dartsStatsPeriod` | LocalStorage | Stats の Period で最後に選んだ期間（week / month / year） |
@@ -818,24 +835,37 @@ PHOENIX の換算の元にした表（Rt16 / Rt30。01 の PPD とクリケッ�
 
 ### 6.6 バックアップ（書き出し・読み込み）
 
-設定画面の「データのバックアップ」から、ゲームの記録と日別メモを 1 つの JSON ファイルに書き出し、別の端末で読み込める。進行中のゲームと設定は含めない。
+設定画面の「データのバックアップ」から、ゲームの記録と日別メモとセッティングを 1 つの JSON ファイルに書き出し、別の端末で読み込める。進行中のゲームと設定は含めない。
 
 ```js
 {
   app: "darts-practice",       // このアプリのファイルかの確認用
-  version: 2,                  // ファイル形式のバージョン（1：最初の形式、2：ゲーム履歴に darts が加わった）
+  version: 3,                  // ファイル形式のバージョン（1：最初の形式、2：ゲーム履歴に darts が加わった、3：gear が加わった）
   exportedAt: "2026-09-30T…",  // 書き出した日時
   sessions: [ … ],             // ゲーム履歴（アプリ内の形式。6.2 の左列）
-  dayNotes: { "2026-09-29": { … } }  // 日別メモ（6.5 と同じ形）
+  dayNotes: { "2026-09-29": { … } },  // 日別メモ（6.5 と同じ形）
+  gear: { parts: [ … ], days: { … } }  // セッティング（6.7 と同じ形）
 }
 ```
 
 - **書き出し**：タブレット・スマホでは共有シート（「ファイルに保存」や AirDrop）を開き、PC ではダウンロードする
-- **読み込み**：今の記録は消さずに、まだない記録だけを追加する。同じゲームかどうかは「種類・終了日時・スコア」で判定する。日別メモは、その日のメモがないか、読み込む方が新しい（`updatedAt` が大きい）場合だけ入れ替える
+- **読み込み**：今の記録は消さずに、まだない記録だけを追加する。同じゲームかどうかは「種類・終了日時・スコア」で判定する。日別メモは、その日のメモがないか、読み込む方が新しい（`updatedAt` が大きい）場合だけ入れ替える。セッティングのパーツは id でまとめてない id だけ足し、日ごとのセッティングはメモと同じく、ない日か新しい方を使う
 - 読み込む前に、追加する件数を確認ダイアログで表示する
 - **バックアップの声かけ**（`backup_ui.js`）：ブラウザのアプリは操作なしに端末のファイルへ保存できないため、メニュー画面で保存を勧め、ワンタップで保存する。最後にバックアップした日時とゲーム数は `dartsBackupInfo` に残し、設定画面に出す。ブラウザのデータを消すとこの記録も消えるので、消したあとは「まだ一度もバックアップしていません」から数え直す。記録が 0 件のときはメニュー画面に読み込みへの案内を出す
 - **自動削除からの保護**：起動のたびに `navigator.storage.persist()` を呼び、容量が足りないときなどにブラウザが自動でデータを消さないよう頼む（認められるかはブラウザが決める。自分でブラウザのデータを消すと消える）
-- 形式を変えるときは `BACKUP_VERSION` を上げる。アプリより新しいバージョンのファイルは読み込まない。古いバージョンのファイルはそのまま読める（バージョン 1 のファイルのゲーム履歴は darts なしとして読む）
+- 形式を変えるときは `BACKUP_VERSION` を上げる。アプリより新しいバージョンのファイルは読み込まない。古いバージョンのファイルはそのまま読める（バージョン 1 のファイルのゲーム履歴は darts なしとして読む。バージョン 2 以前のファイルはセッティングなしとして読む）
+
+### 6.7 セッティング
+
+```js
+{
+  parts: [ { id: "g…", type: "tip" | "barrel" | "shaft" | "flight", name: "TIGA SONIC 18g", createdAt } ],
+  days: { "2026-11-05": { tip: "g…", barrel: "g…", shaft: "g…", flight: "g…", updatedAt } }  // 未設定のパーツは ""
+}
+```
+
+- パーツは種類ごとに名前で登録する。日ごとの記録はパーツの id で持つので、名前を直すと前の日の表示も変わる。使った日があるパーツは消せない
+- 今後、パーツごとに成績を絞り込む（そのパーツを使った日のゲームだけを見る）ための記録
 
 ## 7. データフロー
 
@@ -886,6 +916,7 @@ graph LR
   data[data/data.js] --> dl
   data --> rating[data/rating.js]
   notes[data/data_notes.js] --> dl
+  hub[data/data_hub.js] --> gear[data/gear.js]
   hub[data/data_hub.js] --> dl
   settings[ui/settings.js] --> storage
   main --> state[core/state.js]
@@ -1083,3 +1114,4 @@ graph LR
 | 2026.10.30 | Stats の期間 A/B の比較を作り直し（Period Compare）：Week / Month / 30 Days のボタン、A・B の平均・ゲーム数・日数と差、練習しなかった日を飛ばしてつなぐ線、横軸に A・B 両方の日付。Apply ボタンはなくした（日付を変えるとすぐ描き直す） |
 | 2026.10.31 | データのトップのカレンダーに、写真を保存した日の印（青い四角。`.has-photo`）を追加。メモの印（黄色の丸）はコメント・タグがある日だけにし、カレンダーの下に印の説明を出す |
 | 2026.10.31 | Stats の 01 にヒートマップを追加（Bull Aim / All Darts を切り替え。RANGE の欄をヒートマップのカードにまとめた。`renderZeroOneHeatmap()`） |
+| 2026.11.6 | セッティングを追加（`gear.js`）：チップ・バレル・シャフト・フライトのパーツを登録し、データのトップで選んだ日のセッティングとして記録（前に使ったセッティングはワンタップ、新しいパーツはその場で登録）。今日はまだ投げていなくてもカレンダーで選べる。バックアップに含める（`BACKUP_VERSION` 3） |

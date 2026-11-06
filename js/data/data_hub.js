@@ -71,8 +71,9 @@ function renderDataHub() {
   const sessions = getDataHubSessions()
 
   // 日付を選んでいなければ、最後に練習した日を選んでおく（その日のメモとゲームを出す）
-  if (!dataHubSelectedDay && sessions.length) {
-    dataHubSelectedDay = getDataHubDayKey(sessions[sessions.length - 1].date)
+  // （記録がまだなければ今日。練習の前にセッティングやメモを入れられるように）
+  if (!dataHubSelectedDay) {
+    dataHubSelectedDay = getDataHubDayKey(sessions.length ? sessions[sessions.length - 1].date : Date.now())
   }
 
   const statsType = typeof dataGameType === "string" ? dataGameType : "countup"
@@ -156,6 +157,9 @@ function renderDataHub() {
   const memo = hub.querySelector("[data-hub-day-memo]")
   if (memo) memo.addEventListener("click", () => openDayNoteEditor(dataHubSelectedDay, memo.dataset.label))
 
+  const gear = hub.querySelector("[data-hub-day-gear]")
+  if (gear) gear.addEventListener("click", () => openDayGearEditor(dataHubSelectedDay, gear.dataset.label))
+
   hub.querySelectorAll("[data-hub-period]").forEach(btn => {
     btn.addEventListener("click", () => {
       dataHubPeriodMode = btn.dataset.hubPeriod
@@ -206,6 +210,7 @@ function renderDataHubDay(all) {
         <h3 class="data-hub-section-title">${m}/${d} Games（${sessions.length}）</h3>
       </div>
       ${renderDataHubDayNote(m, d)}
+      ${renderDataHubDayGear(m, d)}
       ${renderDataHubDayRates(sessions)}
       <div id="dataHubDayList" class="data-hub-day-list"></div>
     </section>
@@ -234,6 +239,26 @@ function renderDataHubDayNote(m, d) {
       ${image}
       <div class="data-hub-day-note-body">${body}</div>
       <button type="button" class="group-note-edit-btn" data-hub-day-memo data-label="${m}/${d}">${has ? "Memo" : "+ Memo"}</button>
+    </div>
+  `
+}
+
+// 選んだ日のセッティング（チップ・バレル・シャフト・フライト）と、編集画面を開く Setting ボタン（gear.js の openDayGearEditor()）
+function renderDataHubDayGear(m, d) {
+  if (typeof getDayGear !== "function") return ""
+  const data = readGear()
+  const ids = getDayGear(dataHubSelectedDay, data)
+  const body = ids
+    ? `<div class="data-hub-gear-list">
+        ${GEAR_TYPES.map(type => `
+          <span class="data-hub-gear-part"><b>${GEAR_LABELS[type]}</b>${escapeHtml(getGearPartName(ids[type], data) || "—")}</span>
+        `).join("")}
+      </div>`
+    : '<p class="data-hub-note-empty">セッティングはまだありません</p>'
+  return `
+    <div class="data-hub-day-note data-hub-day-gear">
+      <div class="data-hub-day-note-body">${body}</div>
+      <button type="button" class="group-note-edit-btn" data-hub-day-gear data-label="${m}/${d}">${ids ? "Setting" : "+ Setting"}</button>
     </div>
   `
 }
@@ -360,8 +385,9 @@ function renderDataHubCalendar(sessions) {
     if (note && note.imageData) cls.push("has-photo")
     const inner = `<span class="data-hub-cal-num">${d}</span>` +
       `${count ? `<span class="data-hub-cal-count">${count}</span>` : ""}`
-    // 練習した日は押すとその日のゲームを出す
-    cells += count
+    // 練習した日は押すとその日のゲームを出す。今日はまだ投げていなくても押せる（練習の前にセッティングやメモを入れられるように）
+    const isToday = isThisMonth && today.getDate() === d
+    cells += count || isToday
       ? `<button type="button" class="${cls.join(" ")}" data-hub-day="${key}" aria-label="${month + 1}/${d} ${count} games">${inner}</button>`
       : `<span class="${cls.join(" ")}">${inner}</span>`
   }

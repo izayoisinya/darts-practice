@@ -7,8 +7,11 @@
 const BACKUP_APP_ID = "darts-practice"
 // 1：最初の形式
 // 2：ゲームの記録に 1 投ごとの記録（darts）が加わった（1 の形式もそのまま読める）
-const BACKUP_VERSION = 2
+// 3：セッティング（gear：登録したパーツと日ごとのセッティング）が加わった（1・2 の形式もそのまま読める）
+const BACKUP_VERSION = 3
 const BACKUP_DAY_NOTES_KEY = "dartsDayNotesV2"
+const BACKUP_GEAR_KEY = "dartsGear"
+const BACKUP_GEAR_TYPES = ["tip", "barrel", "shaft", "flight"]
 
 
 // ===============================
@@ -52,6 +55,42 @@ function sanitizeDayNote(note) {
 
 
 // ===============================
+// ===== セッティング ==============
+// ===============================
+// data/gear.js と同じ形（{ parts: [...], days: { "YYYY-MM-DD": { tip, barrel, shaft, flight, updatedAt } } }）
+function readGearForBackup(source) {
+
+  let gear = source
+  if (gear === undefined) {
+    try {
+      gear = JSON.parse(localStorage.getItem(BACKUP_GEAR_KEY) || "{}")
+    } catch {
+      gear = {}
+    }
+  }
+
+  const parts = gear && Array.isArray(gear.parts)
+    ? gear.parts.filter(part =>
+      part && typeof part.id === "string" && BACKUP_GEAR_TYPES.includes(part.type) && typeof part.name === "string" && part.name.trim())
+      .map(part => ({ id: part.id, type: part.type, name: part.name, createdAt: Number(part.createdAt) || 0 }))
+    : []
+
+  const days = {}
+  if (gear && gear.days && typeof gear.days === "object") {
+    Object.keys(gear.days).forEach(dayKey => {
+      const day = gear.days[dayKey]
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey) || !day || typeof day !== "object") return
+      const clean = { updatedAt: Number(day.updatedAt) || 0 }
+      BACKUP_GEAR_TYPES.forEach(type => { clean[type] = typeof day[type] === "string" ? day[type] : "" })
+      days[dayKey] = clean
+    })
+  }
+
+  return { parts, days }
+}
+
+
+// ===============================
 // ===== 書き出し =================
 // ===============================
 function createBackupData() {
@@ -61,7 +100,8 @@ function createBackupData() {
     version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
     sessions: readSessions().slice(),
-    dayNotes: readDayNotesForBackup()
+    dayNotes: readDayNotesForBackup(),
+    gear: readGearForBackup()
   }
 }
 
@@ -146,11 +186,35 @@ function planBackupImport(data) {
     }
   })
 
+  // セッティング：パーツは id でまとめる（ない id だけ足す）。日ごとのセッティングはメモと同じく、ない日か新しい方
+  const currentGear = readGearForBackup()
+  const incomingGear = readGearForBackup(data.gear || {})
+  const partIds = new Set(currentGear.parts.map(part => part.id))
+  const mergedGear = { parts: currentGear.parts.slice(), days: { ...currentGear.days } }
+  let updatedGearCount = 0
+
+  incomingGear.parts.forEach(part => {
+    if (partIds.has(part.id)) return
+    partIds.add(part.id)
+    mergedGear.parts.push(part)
+    updatedGearCount++
+  })
+
+  Object.keys(incomingGear.days).forEach(dayKey => {
+    const current = currentGear.days[dayKey]
+    if (!current || incomingGear.days[dayKey].updatedAt > current.updatedAt) {
+      mergedGear.days[dayKey] = incomingGear.days[dayKey]
+      updatedGearCount++
+    }
+  })
+
   return {
     totalSessions: incoming.length,
     newSessions,
     mergedNotes,
-    updatedNoteCount
+    updatedNoteCount,
+    mergedGear,
+    updatedGearCount
   }
 }
 
@@ -162,6 +226,14 @@ function applyBackupImport(plan) {
       localStorage.setItem(BACKUP_DAY_NOTES_KEY, JSON.stringify(plan.mergedNotes))
     } catch {
       throw new Error("日別メモを保存できませんでした（端末の保存容量が不足している可能性があります）")
+    }
+  }
+
+  if (plan.updatedGearCount > 0) {
+    try {
+      localStorage.setItem(BACKUP_GEAR_KEY, JSON.stringify(plan.mergedGear))
+    } catch {
+      throw new Error("セッティングを保存できませんでした（端末の保存容量が不足している可能性があります）")
     }
   }
 

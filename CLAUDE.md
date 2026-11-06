@@ -48,7 +48,7 @@ manifest.json   PWA マニフェスト
 | core/ | state.js | グローバル変数・定数のみ（`TOTAL_ROUNDS`, `game`, `sessions`, `bullMode` など）。**関数は書かない** |
 | core/ | core.js | 全画面共通：`detectDevice()`, `refreshLayout()`, サイドメニューの中身（`renderSideMenu()`。メニューの項目は `SIDE_MENU_GROUPS` だけ直す。各 HTML には空の `#sideMenu` だけ置く） |
 | core/ | storage.js | 永続化のみ。**ビジネスロジックを入れない・他モジュールに依存しない** |
-| core/ | backup.js | バックアップの書き出し・読み込み（ゲーム記録と日別メモの JSON 化・取り込み）。DOM 操作なし（UI は settings.js） |
+| core/ | backup.js | バックアップの書き出し・読み込み（ゲーム記録と日別メモとセッティングの JSON 化・取り込み）。DOM 操作なし（UI は settings.js） |
 | init/ | main.js | 初期化（`initApp()`）、イベント登録（`registerEvents()`）、SW 登録、メニュー画面のサマリー |
 | game/ | game_core.js | ゲーム共通ロジック（次ゲーム、Undo、終了判定、リセット）。UI 生成は含まない |
 | game/ | game_countup.js | COUNT-UP 固有ロジック（`initGame()`, `addDart()`）。UI 生成は含まない。01 もこの流れを使う |
@@ -60,6 +60,7 @@ manifest.json   PWA マニフェスト
 | data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()`。History は全ゲームを 1 つの一覧で出す（`renderHistory()`。種類の絞り込みは `setHistoryFilter()`、タグの絞り込みは `dayMatchesTagFilter()` で Stats の Tag Search と共通） |
 | data/ | data.js | データ画面の統括（History / Stats の切替 `changeView()`、Stats の描画 `renderStatsView()`、Count-Up の Stats/Awards・グラフ・Tag Search〔タグ検索用のカレンダー〕・タグ別散布図・期間比較・Day Compare〔2 つの日の比較〕） |
 | data/ | data_notes.js | 日別メモ（コメント・タグ・写真）の読み書きと編集画面 `openDayNoteEditor()`（データのトップのカレンダーで選んだ日の Memo から開く）。写真は縮めて保存する（`shrinkImageToDataUrl()`。LocalStorage の容量対策） |
+| data/ | gear.js | セッティング（チップ・バレル・シャフト・フライトのパーツの登録と、日ごとのセッティングの記録 `getDayGear()` / `setDayGear()`）と編集画面 `openDayGearEditor()`（データのトップで選んだ日の Setting から開く）。今後パーツごとの絞り込みに使う |
 | data/ | heatmap.js | Count-Up の Stats のヒートマップ（1 投ごとの記録から刺さった位置の分布・よく刺さった場所の割合・期間の中の RANGE などの推移 `renderHeatmapTrend()`）。描画の `paintHeatmap()` はゲーム画面の「このゲームのヒートマップ」でも使う（countup.html でも読み込む） |
 | data/ | data_01.js | Stats の画面の Count-Up / 01 / Cricket の切り替え（`setDataGameType()`）と、01 の成績の表示（設定ごとの上がり率・上がるまでのダーツ数・推移・ヒートマップ）・01 の履歴カード |
 | data/ | data_cricket.js | Stats の画面のクリケットの成績の表示（MPR・クローズ率・推移・数字ごとのマーク）・クリケットの履歴カード |
@@ -90,6 +91,7 @@ manifest.json   PWA マニフェスト
 | `dartsCricket` | LocalStorage | クリケットの設定（ラウンドの上限） |
 | `dartsSettings` | LocalStorage | 設定 |
 | `dartsDayNotesV2` | LocalStorage | 日別メモ（コメント・タグ・画像） |
+| `dartsGear` | LocalStorage | セッティング（登録したパーツ `parts` と日ごとのセッティング `days`。`gear.js`） |
 | `dartsDataGame` | LocalStorage | データ画面で最後に見ていたゲーム（`"countup"` / `"01"` / `"cricket"`） |
 | `dartsDataHubPeriod` | LocalStorage | データのトップの Practice で最後に選んだ期間（`"week"` / `"month"` / `"year"`） |
 | `dartsStatsPeriod` | LocalStorage | Stats の Period で最後に選んだ期間（`"week"` / `"month"` / `"year"`） |

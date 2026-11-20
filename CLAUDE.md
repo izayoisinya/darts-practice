@@ -57,7 +57,7 @@ manifest.json   PWA マニフェスト
 | game/ | cu_ui.js | COUNT-UP の UI 生成・DOM 操作 |
 | game/ | board_input.js | ボード形式の入力（ダーツボードの SVG 生成・タップ位置の判定）。設定 `inputMode` が `"board"` のとき `createNumberTable()` から使う |
 | game/ | stats.js | スタッツ・アワード計算。**UI 表示・DOM 操作は含まない**（再利用できる形にする） |
-| data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()`。History は全ゲームを 1 つの一覧で出す（`renderHistory()`。種類の絞り込みは `setHistoryFilter()`、タグの絞り込みは `dayMatchesTagFilter()` で Stats の Tag Search と共通） |
+| data/ | data_loader.js | セッション読込・グループ化・集計・ページネーション、`initDataPage()`。History は全ゲームを 1 つの一覧で出す（`renderHistory()`。種類の絞り込みは `setHistoryFilter()`、タグの絞り込みは `dayMatchesTagFilter()` で Stats の Tag Search と共通）。履歴カードを開くと Delete ボタン（`confirmDeleteHistorySession()`） |
 | data/ | data.js | データ画面の統括（History / Stats の切替 `changeView()`、Stats の描画 `renderStatsView()`、Count-Up の Stats/Awards・グラフ・Tag Search〔タグ検索用のカレンダー〕・タグ別散布図・期間比較・Day Compare〔2 つの日の比較〕） |
 | data/ | data_notes.js | 日別メモ（コメント・タグ・写真）の読み書きと編集画面 `openDayNoteEditor()`（データのトップのカレンダーで選んだ日の Memo から開く）。写真は縮めて保存する（`shrinkImageToDataUrl()`。LocalStorage の容量対策） |
 | data/ | gear.js | セッティング（チップ・バレル・シャフト・フライトのパーツの登録と、日ごとのセッティングの記録 `getDayGear()` / `setDayGear()`）と編集画面 `openDayGearEditor()`（データのトップで選んだ日の Setting から開く）。今後パーツごとの絞り込みに使う |

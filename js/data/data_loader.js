@@ -434,7 +434,59 @@ function createHistoryCardElement(session, type, number) {
   if (title) {
     title.innerHTML = `<span class="history-game-badge">${HISTORY_GAME_LABELS[type]}</span>`
   }
+
+  // 開いたときだけ、いちばん下に削除ボタンを出す（友達に試してもらったゲームなどを消す）
+  const row = document.createElement("div")
+  row.className = "session-delete-row"
+  row.innerHTML = '<button type="button" class="session-delete-btn">Delete</button>'
+  row.querySelector("button").addEventListener("click", e => {
+    // カードの開け閉めにならないようにする
+    e.stopPropagation()
+    confirmDeleteHistorySession(session, type)
+  })
+  card.appendChild(row)
   return card
+}
+
+// ===============================
+// ===== ゲームの削除 ==============
+// ===============================
+// 記録には ID がないので、種類・終了日時・スコアが同じゲームを消す（バックアップの重複判定と同じ）。
+// 消したゲームは戻せない。前に書き出したバックアップを読み込むと、そのゲームはまた入る
+function isSameHistorySession(a, b) {
+  return getHistoryGameType(a) === getHistoryGameType(b) && a.date === b.date && a.score === b.score
+}
+
+function formatHistorySessionForConfirm(session, type) {
+  const d = new Date(session.date)
+  const time = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
+  let result = `Score ${session.score}`
+  if (type === "01" && session.zeroOne) {
+    result = session.zeroOne.finished ? `${session.zeroOne.finishDarts} ダーツで上がり` : `残り ${session.zeroOne.remaining}`
+  } else if (type === "cricket" && session.cricket) {
+    result = `MPR ${Number(session.cricket.mpr).toFixed(2)}`
+  }
+  return `${HISTORY_GAME_LABELS[type]}・${time}・${result}`
+}
+
+async function confirmDeleteHistorySession(session, type) {
+  if (!confirm(`このゲームの記録を削除しますか？\n\n${formatHistorySessionForConfirm(session, type)}\n\n削除すると元に戻せません。`)) return
+
+  const list = readSessions().filter(item => !isSameHistorySession(item, session))
+  try {
+    await writeSessions(list)
+  } catch {
+    alert("削除できませんでした。もう一度試してください。")
+    return
+  }
+
+  // 開いている画面を描き直す（データのトップ / History）
+  if (typeof dataHubOpen !== "undefined" && dataHubOpen && typeof renderDataHub === "function") {
+    renderDataHub()
+  } else {
+    currentPage = Math.min(currentPage, Math.max(1, getHistoryTotalPages()))
+    renderHistory()
+  }
 }
 
 // History を描いてページ送りの表示も合わせる

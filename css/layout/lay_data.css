@@ -3674,3 +3674,35 @@ body.page-data.phone.landscape #leftPanel {
   border-color: rgb(var(--accent-rgb) / 0.55);
   color: var(--accent);
 }
+
+/* ===================================================== */
+/* 履歴カードの削除ボタン（開いたときだけ。data_loader.js の confirmDeleteHistorySession()） */
+/* ===================================================== */
+.session-card:not(.is-expanded) .session-delete-row {
+  display: none;
+}
+
+.session-delete-row {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.session-delete-btn {
+  min-height: 34px;
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 107, 107, 0.45);
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.08);
+  color: #ff8a8a;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.session-delete-btn:active {
+  background: rgba(255, 107, 107, 0.2);
+}

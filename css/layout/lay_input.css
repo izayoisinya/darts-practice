@@ -233,6 +233,40 @@ body .number-table.board-mode {
 
 .board-svg .seg-inner-bull:active { fill: #1f2733; }
 
+/* Phoenix の色（設定画面の Board Color。main.js の applyBoardColor() が body に board-color-phoenix を付ける）
+   シングルは黒とクリーム、ダブル・トリプルは赤と緑、アウターブルは赤、インナーブルは黒 */
+body.board-color-phoenix .seg-single.seg-a { fill: #161616; }
+body.board-color-phoenix .seg-single.seg-b { fill: #efe4c8; }
+
+body.board-color-phoenix .seg-triple.seg-a,
+body.board-color-phoenix .seg-double.seg-a,
+body.board-color-phoenix .board-svg .seg-outer-bull { fill: #cf2a2f; }
+
+body.board-color-phoenix .seg-triple.seg-b,
+body.board-color-phoenix .seg-double.seg-b { fill: #1d8a4e; }
+
+body.board-color-phoenix .board-svg .seg-inner-bull { fill: #161616; }
+
+body.board-color-phoenix .board-svg .seg {
+  stroke: rgba(150, 150, 150, .45);
+}
+
+body.board-color-phoenix .board-svg .seg-single.seg-a:active { fill: #2c2c2c; }
+body.board-color-phoenix .board-svg .seg-single.seg-b:active { fill: #fff6dd; }
+
+body.board-color-phoenix .board-svg .seg-triple.seg-a:active,
+body.board-color-phoenix .board-svg .seg-double.seg-a:active,
+body.board-color-phoenix .board-svg .seg-outer-bull:active { fill: #ec4a4f; }
+
+body.board-color-phoenix .board-svg .seg-triple.seg-b:active,
+body.board-color-phoenix .board-svg .seg-double.seg-b:active { fill: #2fae68; }
+
+body.board-color-phoenix .board-svg .seg-inner-bull:active { fill: #2c2c2c; }
+
+body.board-color-phoenix .board-number {
+  fill: #f2f2f2;
+}
+
 .board-number {
   fill: var(--text-muted);
 

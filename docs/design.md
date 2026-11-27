@@ -413,6 +413,7 @@ ES Modules は使わず、各 HTML が `<script defer>` で順に読み込む。
 | `inputMode` | 入力形式（`"board"`〔初期値〕 / `"buttons"`） |
 | `boardZoomReset` | ボードの拡大を戻すタイミング（`"manual"` / `"round"`） |
 | `boardSize` | ボードの大きさ（`"soft"` 15.5 インチ〔初期値〕 / `"steel"` 13.2 インチ）。RANGE を mm で出すときに使う |
+| `boardColor` | ボード入力のボードの色（`"live"` 今までの暗い色〔初期値〕 / `"phoenix"` シングルは黒とクリーム、ダブル・トリプルは赤と緑、アウターブルは赤、インナーブルは黒）。`main.js` の `applyBoardColor()` が `body` に `board-color-phoenix` を付け、`lay_input.css` で色を変える。設定画面のプレビューの図も同じ色にする。データ画面のヒートマップの図の色は変えない |
 | `undoSwipeDirection` | 3 本指スワイプで戻る向き（`"left"` / `"right"`） |
 | `lockedRound` | Undo で戻れない確定済みラウンド |
 | `game` | ゲーム状態 `{ rounds, currentRound, currentDart }` |
@@ -815,6 +816,7 @@ PHOENIX の換算の元にした表（Rt16 / Rt30。01 の PPD とクリケッ�
   inputMode: "board" | "buttons",                                     // 保存されていなければ "board"
   boardZoomReset: "manual" | "round",                                 // ボードの拡大を戻すタイミング
   boardSize: "soft" | "steel",                                        // ボードの大きさ（RANGE の mm に使う）
+  boardColor: "live" | "phoenix",                                     // ボード入力のボードの色
   boardUndoButton: boolean,                                           // ボード入力で戻るボタンを出すか（ないときは出さない）
   undoSwipeDirection: "left" | "right",                               // 3 本指スワイプで戻る向き
   orientationMode: "auto" | "portrait" | "landscape",
@@ -1117,3 +1119,4 @@ graph LR
 | 2026.10.31 | Stats の 01 にヒートマップを追加（Bull Aim / All Darts を切り替え。RANGE の欄をヒートマップのカードにまとめた。`renderZeroOneHeatmap()`） |
 | 2026.11.6 | セッティングを追加（`gear.js`）：チップ・バレル・シャフト・フライトのパーツを登録し、データのトップで選んだ日のセッティングとして記録（前に使ったセッティングはワンタップ、新しいパーツはその場で登録）。今日はまだ投げていなくてもカレンダーで選べる。バックアップに含める（`BACKUP_VERSION` 3） |
 | 2026.11.20 | 履歴カード（History・データのトップ）を開いたとき、いちばん下に Delete ボタンを追加（友達に試してもらったゲームなどを消せる。`confirmDeleteHistorySession()`） |
+| 2026.11.27 | 設定に Board Color（Live / Phoenix）を追加。Phoenix はボード入力のボードを黒・クリームのシングルと赤・緑のダブル・トリプル（アウターブル赤・インナーブル黒）にする（`applyBoardColor()`） |

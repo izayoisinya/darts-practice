@@ -35,7 +35,7 @@
 index.html      メインメニュー（ゲーム選択 / Data / Settings / Info）
 countup.html    COUNT-UP ゲーム画面（Rounds / Input / Stats の 3 エリア）。?game=01 で 01、?game=cricket でクリケット（同じ画面を GAME_TYPE で切り替え）
 data.html       スコア記録データの表示（見出しは Data）。トップ → History（記録：全ゲームの一覧）/ Stats（分析：ゲームの種類ごと）
-settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、ボードの大きさ: soft / steel、表示エリアの表示/非表示、画面向き、ストレージ状況、バックアップと声かけの頻度）
+settings.html   設定（入力形式: buttons / board、ブルモード: fat / double、ボードの大きさ: soft / steel、ボードの色: live / phoenix、表示エリアの表示/非表示、画面向き、ストレージ状況、バックアップと声かけの頻度）
 news.html       お知らせ
 sw.js           Service Worker（プリキャッシュ）
 manifest.json   PWA マニフェスト

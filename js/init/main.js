@@ -86,6 +86,8 @@ function getSavedSettings() {
 // カウントアップ画面の Rounds / Stats の表示・非表示（設定画面の Game Panels）
 // body に hide-round-area / hide-stats-area を付け、CSS でレイアウトを切り替える
 function applyGamePanelVisibility() {
+  applyBoardColor()
+
   const roundArea = document.querySelector(".round-area")
   const statsArea = document.querySelector(".stats-area")
   if (!roundArea || !statsArea) return
@@ -103,6 +105,12 @@ function applyGamePanelVisibility() {
 
   // ボード入力のときの戻るボタン（設定画面の Board Undo Button。初期値は隠す）
   document.body.classList.toggle("hide-undo-button", getSavedSettings().boardUndoButton !== true)
+}
+
+// ボード入力のボードの色（設定画面の Board Color。live：今までの色〔初期値〕/ phoenix：黒・クリームと赤・緑）
+// body に board-color-phoenix を付け、lay_input.css で色を切り替える
+function applyBoardColor() {
+  document.body.classList.toggle("board-color-phoenix", getSavedSettings().boardColor === "phoenix")
 }
 
 function applyOrientationPreference(mode) {

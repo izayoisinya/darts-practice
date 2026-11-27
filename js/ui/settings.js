@@ -5,6 +5,7 @@ const DEFAULT_SETTINGS = {
   inputMode: "board",
   boardZoomReset: "manual",
   boardSize: "soft",
+  boardColor: "live",
   boardUndoButton: false,
   undoSwipeDirection: "left",
   orientationMode: "auto",
@@ -67,6 +68,10 @@ function loadSettings() {
   if (boardSizeSelect) {
     boardSizeSelect.value = settings.boardSize === "steel" ? "steel" : "soft"
   }
+  const boardColorSelect = document.getElementById("boardColorSetting")
+  if (boardColorSelect) {
+    boardColorSelect.value = settings.boardColor === "phoenix" ? "phoenix" : "live"
+  }
   const boardZoomSelect = document.getElementById("boardZoomResetSetting")
   if (boardZoomSelect) {
     boardZoomSelect.value = settings.boardZoomReset === "round" ? "round" : "manual"
@@ -97,6 +102,7 @@ function saveSettings() {
     inputMode: document.getElementById("inputModeSetting")?.value || "board",
     boardZoomReset: document.getElementById("boardZoomResetSetting")?.value || "manual",
     boardSize: document.getElementById("boardSizeSetting")?.value || "soft",
+    boardColor: document.getElementById("boardColorSetting")?.value || "live",
     boardUndoButton: !!document.getElementById("boardUndoButtonSetting")?.checked,
     undoSwipeDirection: document.getElementById("undoSwipeSetting")?.value || "left",
     orientationMode: document.getElementById("orientationSetting")?.value || "auto",
@@ -349,6 +355,7 @@ function initBackupControls() {
 function getPreviewSettingsFromForm() {
   return {
     inputMode: document.getElementById("inputModeSetting")?.value || "board",
+    boardColor: document.getElementById("boardColorSetting")?.value || "live",
     boardUndoButton: !!document.getElementById("boardUndoButtonSetting")?.checked,
     gamePanels: readTogglesFromForm(GAME_PANEL_TOGGLES)
   }
@@ -360,6 +367,11 @@ function renderPreviewInput(settings, landscape) {
   const showUndo = !board || settings.boardUndoButton
   const inputOnly = !settings.gamePanels.round && !settings.gamePanels.stats
 
+  // ボードの色（設定の Board Color。lay_input.css のボードの色に合わせる）
+  const colors = settings.boardColor === "phoenix"
+    ? { ring: "#cf2a2f", ring2: "#1d8a4e", single: "#7d776b", outerBull: "#cf2a2f", innerBull: "#161616" }
+    : { ring: "#b8404c", ring2: "#2f6fb3", single: "#2b313d", outerBull: "#b8404c", innerBull: "#12161d" }
+
   let main
   if (board) {
     // 縦横の短い方に合わせた円（上詰め。実際のボードと同じ置き方）
@@ -367,12 +379,12 @@ function renderPreviewInput(settings, landscape) {
       <div class="pv-board-wrap">
         <svg class="pv-board" viewBox="-1 -1 2 2" preserveAspectRatio="xMidYMin meet">
           <circle r="1" fill="#0b0e13"/>
-          <circle r="0.86" fill="#b8404c"/>
-          <circle r="0.8" fill="#2b313d"/>
-          <circle r="0.54" fill="#2f6fb3"/>
-          <circle r="0.48" fill="#2b313d"/>
-          <circle r="0.13" fill="#b8404c"/>
-          <circle r="0.06" fill="#12161d"/>
+          <circle r="0.86" fill="${colors.ring}"/>
+          <circle r="0.8" fill="${colors.single}"/>
+          <circle r="0.54" fill="${colors.ring2}"/>
+          <circle r="0.48" fill="${colors.single}"/>
+          <circle r="0.13" fill="${colors.outerBull}"/>
+          <circle r="0.06" fill="${colors.innerBull}"/>
         </svg>
       </div>`
   } else {
@@ -469,6 +481,7 @@ function setupLayoutPreview() {
 
   const watch = [
     ["inputModeSetting", "game"],
+    ["boardColorSetting", "game"],
     ["boardUndoButtonSetting", "game"]
   ]
     .concat(Object.values(GAME_PANEL_TOGGLES).map(id => [id, "game"]))
@@ -497,7 +510,7 @@ async function initSettingsPage() {
   if (inputModeSelect) {
     inputModeSelect.addEventListener("change", saveSettings)
   }
-  ["boardZoomResetSetting", "boardSizeSetting", "boardUndoButtonSetting", "undoSwipeSetting"].forEach(id => {
+  ["boardZoomResetSetting", "boardSizeSetting", "boardColorSetting", "boardUndoButtonSetting", "undoSwipeSetting"].forEach(id => {
     const input = document.getElementById(id)
     if (input) input.addEventListener("change", saveSettings)
   })
